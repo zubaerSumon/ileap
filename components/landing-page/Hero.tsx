@@ -33,24 +33,26 @@ const Hero = () => {
             <span>Google review</span>
           </div>
           
-          {/* Stats */}
-          <div className="flex justify-center gap-8 mb-8 text-sm">
-            <div className="flex items-center gap-2">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 text-blue-500" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M12 6V12L16 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-              <span>300+ volunteer works</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-blue-500" />
-              <span>All over Australia</span>
-            </div>
-          </div>
-          
           {/* Search form */}
           <Card className="bg-white rounded-lg shadow-lg">
             <CardContent className="p-4">
+              {/* Stats - Moved inside */}
+              <div className="flex justify-start gap-8 mb-6 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <svg viewBox="0 0 24 24" className="h-5 w-5 text-blue-500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M6 12C6 11.4477 6.44772 11 7 11H17C17.5523 11 18 11.4477 18 12C18 12.5523 17.5523 13 17 13H7C6.44772 13 6 12.5523 6 12Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M9 6C9 5.44772 9.44772 5 10 5H14C14.5523 5 15 5.44772 15 6V11H9V6Z" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M12 13V19" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                    <path d="M15 19H9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                  <span>300+ volunteer works</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-5 w-5 text-blue-500" />
+                  <span>All over Australia</span>
+                </div>
+              </div>
+
               <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <Select value={category} onValueChange={setCategory}>
@@ -58,6 +60,7 @@ const Hero = () => {
                       <SelectValue placeholder="Categories of volunteer work you're looking for" />
                     </SelectTrigger>
                     <SelectContent>
+                      <div className="px-2 py-2 text-sm font-medium text-gray-500">Category</div>
                       <SelectItem value="homeless">Homeless</SelectItem>
                       <SelectItem value="education">Education</SelectItem>
                       <SelectItem value="environment">Environment</SelectItem>
@@ -72,6 +75,7 @@ const Hero = () => {
                       <SelectValue placeholder="Location" />
                     </SelectTrigger>
                     <SelectContent>
+                      <div className="px-2 py-2 text-sm font-medium text-gray-500">Location</div>
                       <SelectItem value="australia-square">Australia Square</SelectItem>
                       <SelectItem value="sydney">Sydney</SelectItem>
                       <SelectItem value="melbourne">Melbourne</SelectItem>

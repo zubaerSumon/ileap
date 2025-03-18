@@ -1,58 +1,61 @@
-'use client';
-
+import { Card, CardContent } from "@/components/ui/card";
+import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 import Image from "next/image";
 
-const Benefits = () => {
-  const benefits = [
-    {
-      title: 'Perfect for solo volunteers',
-      description: 'Start your journey today with our supportive community and expert guidance.',
-      icon: '/globe.svg'
-    },
-    {
-      title: 'Earn academic credits while you volunteer',
-      description: 'Combine your passion for helping others with your academic goals through our accredited programs.',
-      icon: '/file.svg'
-    },
-    {
-      title: 'The ethical and responsible choice',
-      description: 'Our programs are carefully vetted to ensure positive impact for both volunteers and communities.',
-      icon: '/window.svg'
-    },
-    {
-      title: 'Safe and impactful programs',
-      description: 'Experience meaningful volunteering with our thoroughly assessed and secure programs.',
-      icon: '/window.svg'
-    }
-  ];
+interface BenefitsProps {
+  title: string;
+  description: string;
+  linkText: string;
+  linkHref: string;
+  imageSrc: string;
+  imageAlt: string;
+  reverse?: boolean;
+}
 
+export default function Benefits({
+  title,
+  description,
+  linkText,
+  linkHref,
+  imageSrc,
+  imageAlt,
+  reverse = false,
+}: BenefitsProps) {
   return (
-    <section className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold text-center mb-12">Over 5,000 people have volunteered with iLEAP. Here&apos;s why.</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {benefits.map((benefit, index) => (
-            <div key={index} className="p-6 bg-gray-50 rounded-lg hover:shadow-lg transition-shadow">
-              <Image
-                src={benefit.icon}
-                alt={benefit.title}
-                width={40}
-                height={40}
-                className="w-12 h-12 mb-4"
-              />
-              <h3 className="text-xl font-semibold mb-3">{benefit.title}</h3>
-              <p className="text-gray-600">{benefit.description}</p>
-            </div>
-          ))}
+    <Card className="flex flex-col md:flex-row items-center gap-8 md:gap-16 p-6 border-none shadow-none max-w-[1000px] mx-auto">
+      {!reverse && (
+        <div className="w-full md:w-1/2">
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            width={450}
+            height={300}
+            className="rounded-lg"
+          />
         </div>
-        <div className="text-center mt-12">
-          <button className="px-8 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors">
-            Find your next opportunity
-          </button>
-        </div>
-      </div>
-    </section>
-  );
-};
+      )}
 
-export default Benefits;
+      <CardContent className="w-full md:w-1/2 space-y-4 text-left">
+        <h3 className="text-lg font-semibold">{title}</h3>
+        <p className="text-gray-600">{description}</p>
+        <div className="h-[3px] bg-gray-200 w-[400px]"></div>
+        <Link href={linkHref} className="text-blue-600 flex items-center gap-1">
+          {linkText} <ArrowRight size={16} />
+        </Link>
+      </CardContent>
+
+      {reverse && (
+        <div className="w-full md:w-1/2">
+          <Image
+            src={imageSrc}
+            alt={imageAlt}
+            width={450}
+            height={300}
+            className="rounded-lg"
+          />
+        </div>
+      )}
+    </Card>
+  );
+}
