@@ -1,8 +1,9 @@
  
  
- import Hero from './components/Hero';
-import VideoTestimonial from './components/VideoTestimonial';
-import Benefits from './components/Benefits';
+ import Hero from '../components/landing-page/Hero';
+import VideoTestimonial from '../components/landing-page/VideoTestimonial';
+import Benefits from '../components/landing-page/Benefits';
+import RegistrationBanner from '@/components/RegistrationBanner';
 
 export default function Home() {
   return (
@@ -10,6 +11,7 @@ export default function Home() {
       <Hero />
       <VideoTestimonial />
       <Benefits />
+      <RegistrationBanner />
     </main>
   );
 }
