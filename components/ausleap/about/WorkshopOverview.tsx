@@ -1,94 +1,90 @@
-'use client';
+import { useState } from "react";
+import { ChevronDown, ChevronUp, Calendar, Clock } from "lucide-react";
 
-import { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
-
-interface Workshop {
-  id: number;
-  title: string;
-  date: string;
-  duration: string;
-  description: string[];
-}
+const workshops = [
+  {
+    id: 1,
+    title: "Workshop 1",
+    date: "Saturday, 10 August",
+    time: "10AM - 4PM",
+    details: [
+      "Start your AusLEAP journey!",
+      "Learn about the power of volunteering!",
+      "Delve deeper into exploring your purpose and values.",
+      "Develop networking and relationship building skills to explore volunteering opportunities."
+    ]
+  },
+  {
+    id: 2,
+    title: "Workshop 2",
+    date: "Saturday, 24 August",
+    time: "10AM - 4PM",
+    details: [
+      "Explore how to grow into an inspiring leader in your community.",
+      "Learn about intelligence and explore different communication and work styles in Australia.",
+      "Engage with a panel of leading experts in non-profit fields."
+    ]
+  },
+  {
+    id: 3,
+    title: "Workshop 3",
+    date: "Saturday, 14 September",
+    time: "10AM - 4PM",
+    details: [
+      "Celebrate your completion of the AusLEAP program!",
+      "Understand the role of volunteers in creating inclusive communities and making a real difference."
+    ]
+  }
+];
 
 export default function WorkshopOverview() {
-  const [expandedWorkshop, setExpandedWorkshop] = useState<number | null>(null);
+  const [openWorkshops, setOpenWorkshops] = useState<number[]>([]);
 
-  const workshops: Workshop[] = [
-    {
-      id: 1,
-      title: 'Workshop 1',
-      date: 'SAT 14 APR, 10:30-12:30',
-      duration: '2 hrs',
-      description: [
-        'Introduction to AusLEAP program',
-        'Learn about Student culture',
-        'Get tips on how to make friends',
-        'Develop awareness and understanding about safety while engaging in volunteering opportunities'
-      ]
-    },
-    {
-      id: 2,
-      title: 'Workshop 2',
-      date: 'SAT 21 APR, 10:30-12:30',
-      duration: '2 hrs',
-      description: [
-        'Learn how to serve as a project leader',
-        'Design and create effective presentations',
-        'Engage with a panel of inspiring leaders'
-      ]
-    },
-    {
-      id: 3,
-      title: 'Workshop 3',
-      date: 'SAT 28 APR, 10:30-12:30',
-      duration: '2 hrs',
-      description: [
-        'Celebrate your participation of the AusLEAP program',
-        'Reflect and share your experience of working towards meaningful social difference'
-      ]
-    }
-  ];
+  const toggleWorkshop = (id: number): void => {
+    setOpenWorkshops((prev) =>
+      prev.includes(id) ? prev.filter((workshopId) => workshopId !== id) : [...prev, id]
+    );
+  };
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-12 text-center">Workshop overview</h2>
-        <div className="max-w-3xl mx-auto space-y-4">
-          {workshops.map((workshop) => (
-            <div key={workshop.id} className="bg-white rounded-lg shadow-md overflow-hidden">
-              <button
-                className="w-full p-4 text-left flex items-center justify-between"
-                onClick={() => setExpandedWorkshop(expandedWorkshop === workshop.id ? null : workshop.id)}
-              >
-                <div>
-                  <h3 className="text-lg font-semibold">{workshop.title}</h3>
-                  <div className="text-sm text-gray-500">
-                    <span>{workshop.date}</span>
-                    <span className="mx-2">•</span>
-                    <span>{workshop.duration}</span>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 transition-transform ${expandedWorkshop === workshop.id ? 'transform rotate-180' : ''}`}
-                />
-              </button>
-              {expandedWorkshop === workshop.id && (
-                <div className="p-4 border-t border-gray-200">
-                  <ul className="space-y-2">
-                    {workshop.description.map((item, index) => (
-                      <li key={index} className="flex items-start">
-                        <span className="mr-2">•</span>
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+    <div className="max-w-3xl mx-auto px-6 py-20">
+      <h2 className="text-2xl font-semibold mb-6">Workshop Overview</h2>
+      <div className="space-y-4">
+        {workshops.map((workshop) => (
+          <div key={workshop.id} className="border-b pb-4">
+            <button
+              className="w-full flex justify-between items-center text-blue-600 text-lg font-medium"
+              onClick={() => toggleWorkshop(workshop.id)}
+            >
+              {workshop.title}
+              {openWorkshops.includes(workshop.id) ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </button>
+            <div className="text-[#101010] mt-2 flex items-center gap-2">
+              <Calendar className="w-4 h-4" /> {workshop.date}
             </div>
-          ))}
-        </div>
+            <div className="text-[#101010] mt-1 flex items-center gap-2">
+              <Clock className="w-4 h-4" /> {workshop.time}
+            </div>
+            {openWorkshops.includes(workshop.id) && (
+              <div className="mt-4 text-[#101010]">
+                <h3 className="font-semibold">About the workshop</h3>
+                <ul className="list-disc pl-5 mt-2 space-y-1">
+                  {workshop.details.map((detail, index) => (
+                    <li key={index}>{detail}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        ))}
       </div>
-    </section>
+      
+      {/* Apply Now Button */}
+      <div className="mt-7 flex justify-center">
+        <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition">
+          Apply Now
+        </button>
+      </div>
+    </div>
   );
 }

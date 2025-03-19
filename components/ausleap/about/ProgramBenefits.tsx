@@ -1,58 +1,60 @@
-'use client';
-
-interface Benefit {
-  title: string;
-  description: string;
-  icon: string;
-}
+import Image from "next/image";
 
 export default function ProgramBenefits() {
-  const programBenefits: Benefit[] = [
+  const items = [
     {
-      title: 'Learn about Student culture',
-      description: 'Learn about the diverse student culture and engage with peers from different backgrounds.',
-      icon: '👥'
+      title: "Learn about Aussie culture",
+      description: "Understand Australian language and workplace practices.",
+      image: "/s1.svg",
     },
     {
-      title: 'Ready to help',
-      description: 'Get prepared with the skills and knowledge needed to make a meaningful impact.',
-      icon: '🤝'
+      title: "Make friends",
+      description: "Create long-lasting personal connections with like-minded people.",
+      image: "/s2.svg",
     },
     {
-      title: 'Build professional networks',
-      description: 'Connect with like-minded individuals and organizations to expand your network.',
-      icon: '🌐'
+      title: "Build professional networks",
+      description: "Acquire valuable industry connections across universities and local communities.",
+      image: "/s4.svg",
     },
     {
-      title: 'Grow in your social impact',
-      description: 'Develop your leadership skills and make a lasting difference in your community.',
-      icon: '📈'
+      title: "Create broader social impact",
+      description: "Create meaningful change in the community.",
+      image: "/s3.svg",
     },
     {
-      title: 'Improve employability',
-      description: 'Gain valuable experience and skills that enhance your career prospects.',
-      icon: '💼'
+      title: "Improve employability",
+      description: "Build essential soft skills that employers look for in every field.",
+      image: "/s5.svg",
     },
     {
-      title: 'Receive official certificates',
-      description: 'Get recognized for your participation and achievements in the program.',
-      icon: '🎓'
-    }
+      title: "Receive official certification",
+      description: "Validate your skills and experience in the AusLEAP program.",
+      image: "/s6.svg",
+    },
   ];
 
   return (
-    <section className="py-16">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-bold mb-12 text-center">See the program</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {programBenefits.map((benefit, index) => (
-            <div key={index} className="p-6 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow">
-              <div className="text-4xl mb-4">{benefit.icon}</div>
-              <h3 className="text-xl font-semibold mb-3">{benefit.title}</h3>
-              <p className="text-gray-600">{benefit.description}</p>
+    <section className="text-center py-20">
+      <h2 className="text-2xl font-bold text-black pb-6">See the program</h2>
+      <p className="text-gray-500 text-sm mb-6">Take a view on our program</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
+        {items.map((item, index) => (
+          <div key={index} className="bg-white shadow-md rounded-lg p-8 text-center border border-gray-100">
+            <div className="h-28 mb-6 rounded-md flex items-center justify-center relative">
+              <Image 
+                src={item.image} 
+                alt={item.title} 
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                priority
+              />
             </div>
-          ))}
-        </div>
+            <h3 className="text-base font-medium text-[#4A4A4A]">{item.title}</h3>
+            <p className="text-gray-400 text-xs mt-2">{item.description}</p>
+          </div>
+        ))}
       </div>
     </section>
   );

@@ -17,10 +17,10 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-black/20"></div>
       </div>
       
-      <div className="container mx-auto px-4 h-full relative z-10 flex flex-col justify-center">
-        <div className="max-w-3xl bg-[#000000A1]">
+      <div className="container h-full relative z-10 flex flex-col justify-center">
+        <div className="max-w-3xl bg-[#000000A1] py-10 px-28">
           {/* UTS Logo */}
-          <div className="mb-4">
+          <div className="mb-4 pl-6">
             <Image 
               src="/uts_logo.png" 
               alt="UTS Logo" 
@@ -30,10 +30,10 @@ export default function HeroSection() {
             />
           </div>
           
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
+          <h1 className="text-xl md:text-2xl text-white mb-2 pl-6">
             AusLEAP : volunteering opportunities
           </h1>
-          <p className="text-xl md:text-2xl font-medium text-white">
+          <p className="text-xl md:text-2xl text-white pl-6">
             for international students
           </p>
         </div>
