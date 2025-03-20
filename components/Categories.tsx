@@ -21,7 +21,7 @@ export default function Categories() {
       categories: ["Human Rights", "Health & Medicine", "Education & Literacy"],
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      logoSrc: "/images/all-in-logo.png",
+      logoSrc: "/v1.svg",
     },
     {
       id: 2,
@@ -34,7 +34,7 @@ export default function Categories() {
       categories: ["Disaster Relief", "Emergency & Safety"],
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      logoSrc: "/images/red-cross-logo.png",
+      logoSrc: "/v2.svg",
     },
     {
       id: 3,
@@ -47,7 +47,7 @@ export default function Categories() {
       categories: ["Education & Literacy"],
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      logoSrc: "/images/all-in-logo.png",
+      logoSrc: "/v3.svg",
     },
     {
       id: 4,
@@ -60,7 +60,7 @@ export default function Categories() {
       categories: ["Human Rights", "Health & Medicine", "Education & Literacy"],
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      logoSrc: "/images/all-in-logo.png",
+      logoSrc: "/v4.svg",
     },
   ];
 
@@ -154,12 +154,14 @@ export default function Categories() {
       </CardContent>
 
       <CardFooter className="flex justify-between items-center p-4 pt-0">
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-          Apply now
-        </Button>
-        <Button variant="ghost" size="icon" className="text-yellow-400">
-          <Star className="h-5 w-5 fill-current" />
-        </Button>
+        <div className="flex gap-2 items-center">
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white h-10">
+            Apply now
+          </Button>
+          <Button variant="ghost" size="icon" className="text-yellow-400 h-10 w-10">
+            <Star className="h-5 w-5 fill-current" />
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );
@@ -178,22 +180,22 @@ export default function Categories() {
         </div>
 
         <Tabs defaultValue="nearby" className="w-full">
-          <TabsList className="mb-6 bg-transparent w-full justify-start space-x-4 border-b border-gray-200 p-0 h-auto">
+          <TabsList className="mb-6 bg-transparent inline-flex justify-start space-x-4  p-0 h-auto">
             <TabsTrigger
               value="nearby"
-              className="px-4 py-2 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-sm font-medium border-0 h-auto"
+              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
             >
               Nearby Opportunities
             </TabsTrigger>
             <TabsTrigger
               value="interests"
-              className="px-4 py-2 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-sm font-medium border-0 h-auto"
+              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
             >
               Your interests
             </TabsTrigger>
             <TabsTrigger
               value="newest"
-              className="px-4 py-2 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-sm font-medium border-0 h-auto"
+              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
             >
               Newest Opportunities
             </TabsTrigger>
