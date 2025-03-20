@@ -1,5 +1,6 @@
 'use client';
 
+import WhyILEAP2 from '@/components/about/WhyILEAP2';
 import AboutHero from '../../components/about/AboutHero';
 import VisionMission from '../../components/about/VisionMission';
 import WhyILEAP from '../../components/about/WhyILEAP';
@@ -11,6 +12,7 @@ export default function AboutPage() {
       <AboutHero />
       <VisionMission />
       <WhyILEAP />
+      <WhyILEAP2/>
       <Categories />
     </main>
   );

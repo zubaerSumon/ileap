@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
+import Image from 'next/image';
 
 type GalleryImage = {
   id: number;
@@ -16,18 +16,62 @@ const galleryImages: GalleryImage[] = [
   {
     id: 1,
     year: '2024',
-    src: '/volunteers-group.jpg',
-    alt: 'Volunteer Group Photo',
-    description: 'AusLEAP volunteers at community event'
+    src: '/grid1.svg',
+    alt: 'Community Event',
+    description: 'Community engagement workshop with local leaders'
   },
   {
     id: 2,
-    year: '2023',
-    src: '/raised-hands.jpg',
-    alt: 'Team Building Activity',
-    description: 'Leadership workshop session'
+    year: '2024',
+    src: '/grid1.svg',
+    alt: 'Volunteer Training',
+    description: 'Skills development session for new volunteers'
   },
-  // Add more images here
+  {
+    id: 3,
+    year: '2024',
+    src: '/grid1.svg',
+    alt: 'Team Building',
+    description: 'Team building activities and leadership training'
+  }
+];
+
+const galleryImages2: GalleryImage[] = [
+  {
+    id: 4,
+    year: '2024',
+    src: '/grid2.svg',
+    alt: 'Event 1',
+    description: 'Event description'
+  },
+  {
+    id: 5,
+    year: '2024',
+    src: '/grid2.svg',
+    alt: 'Event 2',
+    description: 'Event description'
+  },
+  {
+    id: 6,
+    year: '2024',
+    src: '/grid3.svg',
+    alt: 'Event 3',
+    description: 'Event description'
+  },
+  {
+    id: 7,
+    year: '2024',
+    src: '/grid4.svg',
+    alt: 'Event 4',
+    description: 'Event description'
+  },
+  {
+    id: 8,
+    year: '2024',
+    src: '/grid5.svg',
+    alt: 'Event 5',
+    description: 'Event description'
+  }
 ];
 
 export default function GalleryGrid() {
@@ -38,12 +82,12 @@ export default function GalleryGrid() {
   return (
     <section className="py-8 container mx-auto px-4">
       <Tabs defaultValue={activeYear} className="w-full" onValueChange={setActiveYear}>
-        <TabsList className="bg-transparent w-full flex space-x-0 p-0 h-auto">
+        <TabsList className="bg-transparent inline-flex justify-center p-2 h-auto">
           {years.map((year) => (
             <TabsTrigger
               key={year}
               value={year}
-              className="flex-1 py-3 px-4 rounded-none data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 text-base font-medium border-0"
+              className="py-3 px-20 rounded data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 text-base font-medium border-0"
             >
               {year}
             </TabsTrigger>
@@ -52,24 +96,131 @@ export default function GalleryGrid() {
 
         {years.map((year) => (
           <TabsContent key={year} value={year} className="mt-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* First Set */}
+            <div className="grid grid-cols-3 gap-4">
               {galleryImages
                 .filter(img => img.year === year)
                 .map(image => (
-                  <Card key={image.id} className="overflow-hidden">
-                    <CardContent className="p-0">
-                      <div className="relative aspect-video">
-                        <img
-                          src={image.src}
-                          alt={image.alt}
-                          className="object-cover w-full h-full"
-                        />
-                      </div>
-                      <div className="p-4">
-                        <p className="text-sm text-gray-600">{image.description}</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <div key={image.id}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={500}
+                      height={500}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+            </div>
+            <div className="grid grid-cols-5 gap-4 mt-4 mb-8">
+              {galleryImages2
+                .filter(img => img.year === year)
+                .map(image => (
+                  <div key={image.id}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={500}
+                      height={500}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+            </div>
+
+            {/* Second Set */}
+            <div className="grid grid-cols-3 gap-4">
+              {galleryImages
+                .filter(img => img.year === year)
+                .map(image => (
+                  <div key={`set2-${image.id}`}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={500}
+                      height={500}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+            </div>
+            <div className="grid grid-cols-5 gap-4 mt-4 mb-8">
+              {galleryImages2
+                .filter(img => img.year === year)
+                .map(image => (
+                  <div key={`set2-${image.id}`}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={500}
+                      height={500}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+            </div>
+
+            {/* Third Set */}
+            <div className="grid grid-cols-3 gap-4">
+              {galleryImages
+                .filter(img => img.year === year)
+                .map(image => (
+                  <div key={`set3-${image.id}`}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={500}
+                      height={500}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+            </div>
+            <div className="grid grid-cols-5 gap-4 mt-4 mb-8">
+              {galleryImages2
+                .filter(img => img.year === year)
+                .map(image => (
+                  <div key={`set3-${image.id}`}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={500}
+                      height={500}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+            </div>
+
+            {/* Fourth Set */}
+            <div className="grid grid-cols-3 gap-4">
+              {galleryImages
+                .filter(img => img.year === year)
+                .map(image => (
+                  <div key={`set4-${image.id}`}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={500}
+                      height={500}
+                      className="w-full"
+                    />
+                  </div>
+                ))}
+            </div>
+            <div className="grid grid-cols-5 gap-4 mt-4">
+              {galleryImages2
+                .filter(img => img.year === year)
+                .map(image => (
+                  <div key={`set4-${image.id}`}>
+                    <Image
+                      src={image.src}
+                      alt={image.alt}
+                      width={500}
+                      height={500}
+                      className="w-full"
+                    />
+                  </div>
                 ))}
             </div>
           </TabsContent>

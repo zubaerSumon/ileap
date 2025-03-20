@@ -1,15 +1,21 @@
 'use client';
 
-import { Globe, Users } from 'lucide-react';
+import Image from 'next/image';
 
 export default function VisionMission() {
   return (
-    <div className="py-16 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-2 gap-12">
+    <div className="py-16 bg-[#F5F7FA]">
+      <div className="container px-4 mx-auto max-w-[1340px]">
+        <div className="grid md:grid-cols-1 gap-12">
           <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <Globe className="w-8 h-8 text-blue-600" />
+            <div className="flex flex-col items-start space-x-4">
+              <Image
+                src="/i1.svg"
+                alt="Vision Icon"
+                width={32}
+                height={32}
+                className="text-blue-600 pb-2"
+              />
               <h2 className="text-2xl font-bold text-gray-900">Vision</h2>
             </div>
             <p className="text-gray-600 leading-relaxed">
@@ -19,8 +25,14 @@ export default function VisionMission() {
           </div>
           
           <div className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <Users className="w-8 h-8 text-blue-600" />
+            <div className="flex flex-col items-start space-x-4">
+              <Image
+                src="/i2.svg"
+                alt="Mission Icon"
+                width={32}
+                height={32}
+                className="text-blue-600 pb-2"
+              />
               <h2 className="text-2xl font-bold text-gray-900">Mission</h2>
             </div>
             <p className="text-gray-600 leading-relaxed">
