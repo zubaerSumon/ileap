@@ -1,7 +1,7 @@
 'use client';
 
-import GalleryGrid from '@/components/ausleap/gallery/GalleryGrid';
-import GalleryHero from '@/components/ausleap/gallery/GalleryHero';
+import GalleryGrid from '@/components/layout/unprotected/ausleap/gallery/GalleryGrid';
+import GalleryHero from '@/components/layout/unprotected/ausleap/gallery/GalleryHero';
  import Image from 'next/image';
 export default function GalleryPage() {
   return (

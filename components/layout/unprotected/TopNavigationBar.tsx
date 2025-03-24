@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
  
-import Logo from "../public/brand_logo.png";
+import Logo from "../../../public/brand_logo.png";
 
 import {
   NavigationMenu,
@@ -31,7 +31,7 @@ export default function TopNavigationBar() {
             <Link href="/organization/signup" className="hover:underline">
               Organisation Sign up
             </Link>
-            <Link href="/volunteer/signup" className="hover:underline">
+            <Link href="/volunteer-signup" className="hover:underline">
               Volunteer Sign up
             </Link>
           </div>
