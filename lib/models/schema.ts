@@ -11,6 +11,7 @@ export const UserRole = {
 export const userSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
+  password: z.string(),
   role: z.enum([UserRole.VOLUNTEER, UserRole.ORGANIZATION]),
   image: z.string().optional(),
   bio: z.string().optional(),
@@ -41,6 +42,7 @@ export const messageSchema = z.object({
 const UserModel = mongoose.model('User', new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   role: { type: String, required: true, enum: Object.values(UserRole) },
   image: String,
   bio: String,
