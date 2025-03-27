@@ -1,42 +1,46 @@
-"use client";
+'use client';
 
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, UseFormRegister } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 
-import { Step1Form } from "./components/Step1Form";
-import { Step2Form } from "./components/Step2Form";
-import { Step3Form } from "./components/Step3Form";
-import { volunteerSignupSchema, VolunteerSignupForm } from './types';
+import { Step1Form } from "../volunteer-signup/components/Step1Form";
+import { Step2Form } from "../volunteer-signup/components/Step2Form";
+import { OrganizerStep3Form } from "./components/OrganizerStep3Form";
+import { organizerSignupSchema, OrganizerSignupForm } from './types';
 
-export default function VolunteerSignup() {
+export default function OrganizerSignupPage() {
   const [step, setStep] = useState(1);
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<VolunteerSignupForm>({
-    resolver: zodResolver(volunteerSignupSchema),
+  } = useForm<OrganizerSignupForm>({
+    resolver: zodResolver(organizerSignupSchema),
   });
 
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (data: VolunteerSignupForm) => {
+  const onSubmit = async (data: OrganizerSignupForm) => {
     try {
       setIsSubmitting(true);
       setError(null);
 
+      const formData = new FormData();
+      Object.keys(data).forEach(key => {
+        if (key === 'organizationLogo' && data[key][0]) {
+          formData.append(key, data[key][0]);
+        } else {
+          formData.append(key, data[key as keyof OrganizerSignupForm].toString());
+        }
+      });
+      formData.append('role', 'organizer');
+
       const response = await fetch("/api/auth/signup", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...data,
-          role: "volunteer",
-        }),
+        body: formData,
       });
 
       const result = await response.json();
@@ -45,15 +49,10 @@ export default function VolunteerSignup() {
         throw new Error(result.error || "Registration failed");
       }
 
-      // Show success message and redirect
       window.location.href = "/auth/signin?registered=true";
-    } catch (error: Error | unknown) {
+    } catch (error: unknown) {
       console.error("Registration error:", error);
-      setError(
-        error instanceof Error
-          ? error.message
-          : "An error occurred during registration"
-      );
+      setError(error instanceof Error ? error.message : "An error occurred during registration");
     } finally {
       setIsSubmitting(false);
     }
@@ -61,23 +60,18 @@ export default function VolunteerSignup() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8 pb-24">
-      <div className="sm:mx-auto sm:w-full sm:max-w-xl">
-        {step === 1 && (
-          <>
-            <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 pb-2">
-              Let&apos;s create your account
-            </h2>
-            <p className="mt-2 text-center text-sm text-gray-600">
-              Signing up for Square is fast and free. No commitments or long-term
-              contracts required.
-            </p>
-          </>
-        )}
-      </div>
+      {step === 1 && (
+        <div className="sm:mx-auto sm:w-full sm:max-w-xl">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 pb-2">
+            Let&apos;s create your organization account
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Join our platform to start organizing impactful volunteer events
+          </p>
+        </div>
+      )}
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
-        {" "}
-        {/* Changed from max-w-md to max-w-xl */}
         {error && (
           <div className="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg">
             {error}
@@ -85,9 +79,9 @@ export default function VolunteerSignup() {
         )}
         <div className="bg-white py-8 px-4 sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {step === 1 && <Step1Form register={register} errors={errors} />}
-            {step === 2 && <Step2Form register={register} />}
-            {step === 3 && <Step3Form register={register} />}
+            {step === 1 && <Step1Form register={register as never} errors={errors} />}
+            {step === 2 && <Step2Form register={register} errors={errors} />}
+            {step === 3 && <OrganizerStep3Form register={register} errors={errors} />}
           </form>
         </div>
       </div>
@@ -109,9 +103,7 @@ export default function VolunteerSignup() {
             </div>
             <Button
               type="button"
-              onClick={() =>
-                step < 3 ? setStep(step + 1) : handleSubmit(onSubmit)()
-              }
+              onClick={() => step < 3 ? setStep(step + 1) : handleSubmit(onSubmit)()}
               className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#2563EB] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               disabled={isSubmitting}
             >
