@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
+import HomePageHero from "../../../components/layout/protected/organization/homepage/HomePageHero";
+import Categories from "../../../components/layout/protected/organization/homepage/HomePageCategories";
 
 const page = () => {
   return (
-    <div>Organization page</div>
-  )
-}
+    <div>
+      <HomePageHero />
 
-export default page
+      <Categories title="Volunteer by categories" />
+      <Categories title="Most popular volunteers" />
+    </div>
+  );
+};
+
+export default page;

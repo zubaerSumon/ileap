@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Bell, MessageSquare } from "lucide-react";
-import Logo from "../../../public/brand_logo.png";
+import Logo from "../../../public/ILEAP.svg";
 
 export default function TopNavigationBar() {
   return (
