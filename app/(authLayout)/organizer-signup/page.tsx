@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
 import { useState } from "react";
-import { useForm, UseFormRegister } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
+import { trpc } from "@/lib/trpc/client";
 
 import { Step1Form } from "../volunteer-signup/components/Step1Form";
 import { Step2Form } from "../volunteer-signup/components/Step2Form";
 import { OrganizerStep3Form } from "./components/OrganizerStep3Form";
-import { organizerSignupSchema, OrganizerSignupForm } from './types';
+import { organizerSignupSchema, OrganizerSignupForm } from "./types";
 
 export default function OrganizerSignupPage() {
   const [step, setStep] = useState(1);
@@ -23,36 +24,25 @@ export default function OrganizerSignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const onSubmit = async (data: OrganizerSignupForm) => {
+  const organizerSignup = trpc.auth.organizerSignup.useMutation({
+    onSuccess: () => {
+      window.location.href = "/auth/signin?registered=true";
+    },
+    onError: (error) => {
+      console.error("Registration error:", error);
+      setError(error.message || "An error occurred during registration");
+    },
+  });
+
+  const onSubmit = async (data ) => {
+    console.log("data_",data);
+    
     try {
       setIsSubmitting(true);
       setError(null);
-
-      const formData = new FormData();
-      Object.keys(data).forEach(key => {
-        if (key === 'organizationLogo' && data[key][0]) {
-          formData.append(key, data[key][0]);
-        } else {
-          formData.append(key, data[key as keyof OrganizerSignupForm].toString());
-        }
-      });
-      formData.append('role', 'organizer');
-
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        body: formData,
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || result.error) {
-        throw new Error(result.error || "Registration failed");
-      }
-
-      window.location.href = "/auth/signin?registered=true";
-    } catch (error: unknown) {
-      console.error("Registration error:", error);
-      setError(error instanceof Error ? error.message : "An error occurred during registration");
+      await organizerSignup.mutateAsync(data);
+    } catch (error) {
+      console.log(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -79,9 +69,13 @@ export default function OrganizerSignupPage() {
         )}
         <div className="bg-white py-8 px-4 sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-            {step === 1 && <Step1Form register={register as never} errors={errors} />}
+            {step === 1 && (
+              <Step1Form register={register as never} errors={errors} />
+            )}
             {step === 2 && <Step2Form register={register} errors={errors} />}
-            {step === 3 && <OrganizerStep3Form register={register} errors={errors} />}
+            {step === 3 && (
+              <OrganizerStep3Form register={register} errors={errors} />
+            )}
           </form>
         </div>
       </div>
@@ -103,7 +97,9 @@ export default function OrganizerSignupPage() {
             </div>
             <Button
               type="button"
-              onClick={() => step < 3 ? setStep(step + 1) : handleSubmit(onSubmit)()}
+              onClick={() =>
+                step < 3 ? setStep(step + 1) : handleSubmit(onSubmit)()
+              }
               className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#2563EB] hover:bg-[#2563EB] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
               disabled={isSubmitting}
             >
