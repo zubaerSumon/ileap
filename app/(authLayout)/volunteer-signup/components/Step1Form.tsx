@@ -36,7 +36,7 @@ export function Step1Form({ register, errors }: Step1Props) {
             What type of volunteer work do you like?
           </label>
           <div className="mt-1">
-            <Select onValueChange={(value) => register('volunteerType').onChange({ target: { value } })}>
+            <Select onValueChange={(value) => register('volunteerTypes').onChange({ target: { value: [value] } })}>
               <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 bg-[#EAF1FF]">
                 <SelectValue placeholder="Select volunteer type" />
               </SelectTrigger>
@@ -48,8 +48,8 @@ export function Step1Form({ register, errors }: Step1Props) {
             </Select>
           </div>
         </div>
-        {errors.volunteerType && (
-          <p className="mt-2 text-sm text-red-600">{errors.volunteerType.message}</p>
+        {errors.volunteerTypes && (
+          <p className="mt-2 text-sm text-red-600">{errors.volunteerTypes.message}</p>
         )}
       </div>
 
@@ -97,7 +97,7 @@ export function Step1Form({ register, errors }: Step1Props) {
         <input
           id="terms"
           type="checkbox"
-          {...register('termsAccepted')}
+          {...register('terms')}
           className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded-[50%]"
         />
         <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
