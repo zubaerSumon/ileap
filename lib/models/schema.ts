@@ -1,20 +1,31 @@
 import { z } from 'zod';
 import mongoose from 'mongoose';
 
-// User Role Enum
 export const UserRole = {
   VOLUNTEER: 'volunteer',
   ORGANIZATION: 'organization',
 } as const;
 
-// Zod Schemas
 export const userSchema = z.object({
-  name: z.string().min(2),
-  email: z.string().email(),
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
   role: z.enum([UserRole.VOLUNTEER, UserRole.ORGANIZATION]),
   image: z.string().optional(),
   bio: z.string().optional(),
   location: z.string().optional(),
+  terms: z.boolean().refine(val => val === true, {
+    message: 'You must agree to the terms and conditions'
+  }),
+  volunteerType: z.array(z.string()).optional(),
+  availabilityDate: z.object({
+    startDate: z.string(),
+    endDate: z.string().optional(),
+  }).optional(),
+  availabilityTime: z.object({
+    startTime: z.string(),
+    endTime: z.string(),
+  }).optional(),
 });
 
 export const opportunitySchema = z.object({
@@ -41,10 +52,21 @@ export const messageSchema = z.object({
 const UserModel = mongoose.model('User', new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
   role: { type: String, required: true, enum: Object.values(UserRole) },
   image: String,
   bio: String,
   location: String,
+  terms: { type: Boolean, required: true },
+  volunteerType: [String],
+  availabilityDate: {
+    startDate: String,
+    endDate: String,
+  },
+  availabilityTime: {
+    startTime: String,
+    endTime: String,
+  },
   createdAt: { type: Date, default: Date.now },
 }));
 
