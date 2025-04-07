@@ -1,41 +1,43 @@
 import mongoose from 'mongoose';
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/ileap';
-
-if (!MONGODB_URI) {
-  throw new Error('Please define the MONGODB_URI environment variable inside .env');
-}
-
-let cached: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } = ((global as unknown) as { mongoose: { conn: typeof mongoose | null; promise: Promise<typeof mongoose> | null } }).mongoose || { conn: null, promise: null };
-
-if (!cached) {
-  cached = { conn: null, promise: null };
-(global as unknown as { mongoose: typeof cached }).mongoose = cached;
-}
-
-async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      return mongoose;
-    });
-  }
+const connectToDatabase = async () => {
+  if (mongoose.connection.readyState >= 1) return;
 
   try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
+    if (!process.env.MONGODB_URI) {
+      throw new Error('MONGODB_URI is not set');
+    }
+
+    await mongoose.connect(process.env.MONGODB_URI, {
+      maxPoolSize: 10,
+      minPoolSize: 5,
+      connectTimeoutMS: 10000,
+      socketTimeoutMS: 45000,
+      serverSelectionTimeoutMS: 10000,
+      heartbeatFrequencyMS: 5000,
+    });
+
+    mongoose.connection.on('error', (err) => {
+      console.error('MongoDB connection error:', err);
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.warn('MongoDB disconnected. Retrying connection...');
+    });
+
+    console.log('MongoDB connected');
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    throw error;
   }
+};
 
-  return cached.conn;
+// Cache the promise to prevent multiple connection attempts
+let dbPromise: Promise<void> | null = null;
+
+export default async function () {
+  if (!dbPromise) {
+    dbPromise = connectToDatabase();
+  }
+  return dbPromise;
 }
-
-export default connectDB;

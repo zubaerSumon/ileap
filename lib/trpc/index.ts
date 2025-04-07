@@ -1,5 +1,6 @@
 import { initTRPC } from '@trpc/server';
 import superjson from 'superjson';
+import connectToDatabase from '../db/index'
 
  
 const createInnerTRPCContext = () => {
@@ -8,6 +9,8 @@ const createInnerTRPCContext = () => {
 
 export const createTRPCContext = async () => {
   const innerContext = createInnerTRPCContext();
+  await connectToDatabase();
+
   return {
     ...innerContext,
   };

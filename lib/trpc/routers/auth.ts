@@ -1,66 +1,70 @@
-import { createTRPCRouter, publicProcedure } from '../index';
+import { publicProcedure, router } from '../index';
 import { volunteerSignupSchema } from '@/app/(authLayout)/volunteer-signup/types';
 import { organizerSignupSchema } from '@/app/(authLayout)/organizer-signup/types';
 import { hash } from 'bcryptjs';
-// import mongoose from 'mongoose';
-import UserModel, { UserRole } from '@/lib/models/schema';
+import { TRPCError } from '@trpc/server';
+// Fix the import path
+import UserModel, { UserRole } from '@/lib/models/user';
+import User from '@/lib/models/user';
 
- 
-// const User = mongoose.models.User || mongoose.model('User', new mongoose.Schema({
-//   name: { type: String, required: true },
-//   email: { type: String, required: true, unique: true },
-//   password: { type: String, required: true },
-//   image: String,
-//   emailVerified: Date,
-//   role: { type: String, required: true, enum: Object.values(UserRole) },
-//   phoneNumber: String,
-//   country: String,
-//   streetAddress: String,
-//   terms: { type: Boolean, required: true },
-//   bio: String,
-//   age: String,
-//   description: String,
-//   organizationType: String,
-//   abn: String,
-//   website: String,
-//   volunteerTypes: [String],
-//   skills: [String],
-//   availabilityDate: {
-//     startDate: String,
-//     endDate: String,
-//   },
-//   availabilityTime: {
-//     startTime: String,
-//     endTime: String,
-//   },
-//   createdAt: { type: Date, default: Date.now },
-//   updatedAt: { type: Date, default: Date.now },
-// }));
-
-export const authRouter = createTRPCRouter({
+export const authRouter = router({
   volunteerSignup: publicProcedure
     .input(volunteerSignupSchema)
     .mutation(async ({ input }) => {
       try {
+        // const db = await connectDB();
+        // if (!db) throw new Error('Database connection failed');
+        console.log("input: ", input)
+        const existingUser = await User.findOne({ email: input.email }).exec();
 
-        console.log({input});
-        const existingUser = await UserModel.findOne({ email: input.email });
         if (existingUser) {
-          throw new Error('Email already registered');
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: 'Email already registered'
+          });
         }
 
         const hashedPassword = await hash(input.password, 12);
 
-        const user = await UserModel.create({
-          ...input,
+        // Create volunteer profile structure
+        const volunteerData = {
+          email: input.email,
           password: hashedPassword,
           role: UserRole.VOLUNTEER,
-         
-        });
+          terms: input.terms,
+          volunteer_profile: {
+            name: input.name,
+            skills: input.skills || '',
+            age: input.age || '',
+            phone_number: input.phone_number || '',
+            country: input.country || '',
+            street_address: input.street_address || '',
+            bio: input.bio || '',
+            availability_date: input.availability_date || '',
+            availability_time: input.availability_time || '',
+          }
+        };
+
+        const user = await UserModel.create(volunteerData);
+        
+        if (!user) {
+          throw new TRPCError({
+            code: 'INTERNAL_SERVER_ERROR',
+            message: 'Failed to create user'
+          });
+        }
 
         return { success: true, userId: user._id };
       } catch (error) {
-        throw new Error(error instanceof Error ? error.message : 'Registration failed');
+        console.error('Volunteer signup error:', error);
+        
+        if (error instanceof TRPCError) throw error;
+        
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: error instanceof Error ? error.message : 'Registration failed',
+          cause: error
+        });
       }
     }),
 

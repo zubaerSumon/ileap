@@ -52,8 +52,8 @@ export function Step3Form({ register, errors }: Step3Props) {
               register={register}
               errors={errors}
               name={{
-                startDate: "availabilityDate.startDate",
-                endDate: "availabilityDate.endDate"
+                startDate: "availability_date.startDate",
+                endDate: " availability_date.endDate"
               }}
               label="Availability Date"
               dateOnly
@@ -65,8 +65,8 @@ export function Step3Form({ register, errors }: Step3Props) {
               register={register}
               errors={errors}
               name={{
-                startTime: "availabilityTime.startTime",
-                endTime: "availabilityTime.endTime"
+                startTime: "availability_time.startTime",
+                endTime: "availability_time.endTime"
               }}
               label="Availability Time"
               timeOnly
