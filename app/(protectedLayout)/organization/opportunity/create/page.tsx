@@ -1,5 +1,11 @@
-import React from "react";
+import BasicInformation from "./components/BasicInformation";
+import CreateFooter from "./components/CreateFooter";
 
-export default function page() {
-  return <div>yo</div>;
+export default function CreateOpportunityPage() {
+  return (
+    <div className="min-h-screen bg-[#F5F7FA]">
+      <BasicInformation />
+      <CreateFooter step={1} />
+    </div>
+  );
 }
