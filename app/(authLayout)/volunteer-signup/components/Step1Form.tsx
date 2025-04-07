@@ -36,7 +36,7 @@ export function Step1Form({ register, errors }: Step1Props) {
             What type of volunteer work do you like?
           </label>
           <div className="mt-1">
-            <Select onValueChange={(value) => register('volunteerTypes').onChange({ target: { value: [value] } })}>
+            <Select onValueChange={(value) => register('skills').onChange({ target: { value: [value] } })}>
               <SelectTrigger className="w-full border-0 shadow-none focus:ring-0 bg-[#EAF1FF]">
                 <SelectValue placeholder="Select volunteer type" />
               </SelectTrigger>
@@ -48,8 +48,8 @@ export function Step1Form({ register, errors }: Step1Props) {
             </Select>
           </div>
         </div>
-        {errors.volunteerTypes && (
-          <p className="mt-2 text-sm text-red-600">{errors.volunteerTypes.message}</p>
+        {errors.skills && (
+          <p className="mt-2 text-sm text-red-600">{errors.skills.message}</p>
         )}
       </div>
 

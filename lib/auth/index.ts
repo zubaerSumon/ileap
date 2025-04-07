@@ -1,6 +1,6 @@
 import NextAuth from "next-auth";
 import { MongoDBAdapter } from "@next-auth/mongodb-adapter";
-import UserModel, {  UserRole } from "../models/schema";
+import UserModel, {  UserRole } from "../models/user";
 import type { DefaultSession, Session, User } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import clientPromise from "@/lib/mongodb";
@@ -58,7 +58,7 @@ const authOptions = {
         }
 
         return {
-          id: user._id.toString(),
+          id: user.id.toString(),
           email: user.email,
           role: user.role,
         };
