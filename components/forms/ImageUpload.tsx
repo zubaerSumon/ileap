@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 interface ImageUploadProps {
   label: string;
@@ -53,7 +54,7 @@ export function ImageUpload({
           className
         )}>
           {preview ? (
-            <img 
+            <Image
               src={preview} 
               alt="Preview" 
               className="h-full w-full object-cover" 
