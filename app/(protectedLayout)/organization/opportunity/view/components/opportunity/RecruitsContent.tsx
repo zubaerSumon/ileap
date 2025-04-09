@@ -1,8 +1,14 @@
+'use client';
+
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { MapPin, Star } from "lucide-react";
 import Image from "next/image";
+import VolunteerModal from './VolunteerModal';
 
 export function RecruitsContent() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <div className="space-y-6">
       {Array.from({ length: 3 }).map((_, index) => (
@@ -78,6 +84,7 @@ export function RecruitsContent() {
                     variant="ghost"
                     size="lg"
                     className="bg-gray-100 hover:bg-gray-200 rounded-[6px] px-6 font-normal"
+                    onClick={() => setIsModalOpen(true)}
                   >
                     Recruit
                   </Button>
@@ -93,6 +100,11 @@ export function RecruitsContent() {
           </div>
         </div>
       ))}
+
+      <VolunteerModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }
