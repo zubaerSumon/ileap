@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import {  useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -9,11 +9,12 @@ import { Step1Form } from "./components/Step1Form";
 import { Step2Form } from "./components/Step2Form";
 import { Step3Form } from "./components/Step3Form";
 import { volunteerSignupSchema, VolunteerSignupForm } from "./types";
-
+import { useRouter } from "next/navigation";
+ 
 export default function VolunteerSignup() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
-
+  const router = useRouter();
   const {
     register,
     handleSubmit,
@@ -32,7 +33,7 @@ export default function VolunteerSignup() {
 
   const volunteerSignupMutation = trpc.auth.volunteerSignup.useMutation({
     onSuccess: () => {
-      window.location.href = "/auth/signin?registered=true";
+      router.push("/volunteer");
     },
     onError: (error) => {
       console.error("Registration error details:", error);
