@@ -34,7 +34,7 @@ export default function OrganizerSignupPage() {
     },
   });
 
-  const onSubmit = async (data ) => {
+  const onSubmit = async (data: OrganizerSignupForm) => {
     console.log("data_",data);
     
     try {
@@ -72,7 +72,7 @@ export default function OrganizerSignupPage() {
             {step === 1 && (
               <Step1Form register={register as never} errors={errors} />
             )}
-            {step === 2 && <Step2Form register={register} errors={errors} />}
+            {step === 2 && <Step2Form register={register as never} errors={errors} />}
             {step === 3 && (
               <OrganizerStep3Form register={register} errors={errors} />
             )}
