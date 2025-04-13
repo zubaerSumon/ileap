@@ -1,9 +1,9 @@
 "use client";
 
-import HeroSection from "../../../../components/layout/unprotected/ausleap/about/HeroSection";
-import WhatIsAusLEAP from "../../../../components/layout/unprotected/ausleap/about/WhatIsAusLEAP";
-import ProgramBenefits from "../../../../components/layout/unprotected/ausleap/about/ProgramBenefits";
-import WorkshopOverview from "../../../../components/layout/unprotected/ausleap/about/WorkshopOverview";
+import HeroSection from "../../../../components/layout/landing/ausleap/about/HeroSection";
+import WhatIsAusLEAP from "../../../../components/layout/landing/ausleap/about/WhatIsAusLEAP";
+import ProgramBenefits from "../../../../components/layout/landing/ausleap/about/ProgramBenefits";
+import WorkshopOverview from "../../../../components/layout/landing/ausleap/about/WorkshopOverview";
 import RegistrationBanner from "@/components/RegistrationBanner";
 
 export default function AusLEAPAboutPage() {

@@ -1,6 +1,6 @@
 
-import { volunteerSignupSchema } from '@/app/(authLayout)/volunteer-signup/types';
-import { organizerSignupSchema } from '@/app/(authLayout)/organizer-signup/types';
+import { volunteerSignupSchema } from '@/app/(auth)/volunteer-signup/types';
+import { organizerSignupSchema } from '@/app/(auth)/organizer-signup/types';
 import { hash } from 'bcryptjs';
 import { TRPCError } from '@trpc/server';
 import UserModel, { UserRole } from '@/lib/models/user';

@@ -3,13 +3,13 @@ import {  useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { trpc } from "@/lib/trpc/client";
-
+ 
 import { Step1Form } from "./components/Step1Form";
 import { Step2Form } from "./components/Step2Form";
 import { Step3Form } from "./components/Step3Form";
 import { volunteerSignupSchema, VolunteerSignupForm } from "./types";
 import { useRouter } from "next/navigation";
+import { trpc } from "@/config/client";
  
 export default function VolunteerSignup() {
   const [step, setStep] = useState(1);

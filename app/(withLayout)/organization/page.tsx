@@ -1,6 +1,6 @@
 import React from "react";
-import HomePageHero from "../../../components/layout/protected/volunteer/homepage/HomePageHero";
-import Categories from "../../../components/layout/protected/volunteer/homepage/HomePageCategories";
+import HomePageHero from "../../../components/layout/organization/homepage/HomePageHero";
+import Categories from "../../../components/layout/organization/homepage/HomePageCategories";
 
 const page = () => {
   return (

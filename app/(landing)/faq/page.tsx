@@ -1,7 +1,7 @@
 "use client";
 
-import FAQSection from "../../../components/layout/unprotected/faq/FAQSection";
-import FAQHero from "../../../components/layout/unprotected/faq/FAQHero";
+import FAQSection from "../../../components/layout/landing/faq/FAQSection";
+import FAQHero from "../../../components/layout/landing/faq/FAQHero";
 import RegistrationBanner from "../../../components/RegistrationBanner";
 import Categories from "@/components/Categories";
 import Image from "next/image";

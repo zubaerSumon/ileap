@@ -1,4 +1,4 @@
-import { auth } from "@/app/auth";
+import { auth } from "@/auth";
 import { inferAsyncReturnType } from "@trpc/server";
 import mongoose from "mongoose";
 import connectDB from "./mongoose";

@@ -1,6 +1,6 @@
+import { UserRole } from "@/server/db/interfaces/user";
 import { z } from "zod";
-import { UserRole } from "@/lib/models/user";
-
+ 
 export const volunteerSignupSchema = z.object({
 
   email: z.string().email("Invalid email address"),
