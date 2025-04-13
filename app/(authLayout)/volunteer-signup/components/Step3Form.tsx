@@ -9,7 +9,7 @@ interface Step3Props {
 
 export function Step3Form({ register, errors }: Step3Props) {
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="w-full max-w-2xl mx-auto px-4 sm:px-6">
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900">
           Tell us about yourself
@@ -22,12 +22,10 @@ export function Step3Form({ register, errors }: Step3Props) {
 
       <div className="space-y-6">
         {/* Profile Photo Section */}
-        <div className="w-[600px]">
+        <div className="w-full max-w-[600px]">
           <ImageUpload
             label="Profile photo"
             onChange={(file) => {
-              // In a real implementation, you would handle the file upload here
-              // and set the image URL to the form value
               console.log('File selected:', file);
             }}
             error={errors.image?.message}
@@ -42,25 +40,25 @@ export function Step3Form({ register, errors }: Step3Props) {
           error={errors.bio?.message}
           placeholder="Tell us about yourself..."
           rows={4}
-          containerClassName="w-[600px]"
+          containerClassName="w-full max-w-[600px]"
         />
 
         {/* Availability Sections Container */}
-        <div className="flex gap-4 w-[600px]">
-          <div className="w-1/2">
+        <div className="flex flex-col sm:flex-row gap-4 w-full max-w-[600px]">
+          <div className="w-full sm:w-1/2">
             <FormDateTimeRangePicker
               register={register}
               errors={errors}
               name={{
                 startDate: "availability_date.startDate",
-                endDate: " availability_date.endDate"
+                endDate: "availability_date.endDate"
               }}
               label="Availability Date"
               dateOnly
             />
           </div>
 
-          <div className="w-1/2">
+          <div className="w-full sm:w-1/2">
             <FormDateTimeRangePicker
               register={register}
               errors={errors}
