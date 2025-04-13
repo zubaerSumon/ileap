@@ -6,8 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc/client";
 
-import { Step1Form } from "../volunteer-signup/components/Step1Form";
-import { Step2Form } from "../volunteer-signup/components/Step2Form";
+import { Step1Form } from "../../../components/layout/auth/Step1Form";
+import { Step2Form } from "../../../components/layout/auth/Step2Form";
 import { OrganizerStep3Form } from "./components/OrganizerStep3Form";
 import { organizerSignupSchema, OrganizerSignupForm } from "./types";
 

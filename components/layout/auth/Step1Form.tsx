@@ -1,5 +1,5 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
-import { VolunteerSignupForm } from "../types";
+import { VolunteerSignupForm } from "../../../app/(auth)/volunteer-signup/types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Step1Props {

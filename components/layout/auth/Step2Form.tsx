@@ -1,5 +1,5 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
-import { VolunteerSignupForm } from "../types";
+import { VolunteerSignupForm } from "../../../app/(auth)/volunteer-signup/types";
 
 interface Step2Props {
   register: UseFormRegister<VolunteerSignupForm>;

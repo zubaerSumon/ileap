@@ -4,9 +4,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
  
-import { Step1Form } from "./components/Step1Form";
-import { Step2Form } from "./components/Step2Form";
-import { Step3Form } from "./components/Step3Form";
+import { Step1Form } from "../../../components/layout/auth/Step1Form";
+import { Step2Form } from "../../../components/layout/auth/Step2Form";
+import { Step3Form } from "../../../components/layout/auth/Step3Form";
 import { volunteerSignupSchema, VolunteerSignupForm } from "./types";
 //import { useRouter } from "next/navigation";
 //import { trpc } from "@/config/client";
