@@ -1,7 +1,8 @@
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { Providers } from './providers';
-
+ import { ClientProviders } from '@/config/ClientProviders';
+import TopNavigationBar from '@/components/TopNavigationBar';
+  
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -18,9 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>
+        <ClientProviders session={null}>
+        <TopNavigationBar />
           {children}
-        </Providers>
+        </ClientProviders>
       </body>
     </html>
   );
