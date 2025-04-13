@@ -77,7 +77,7 @@ if(isSubmitting)  return
 
   return (
     <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8 pb-24">
-      <div className="sm:mx-auto sm:w-full sm:max-w-xl">
+      <div className="sm:mx-auto sm:w-full sm:max-w-3xl">
         {step === 1 && (
           <>
             <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 pb-2">
@@ -91,7 +91,7 @@ if(isSubmitting)  return
         )}
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
+      <div className={`mt-8 sm:mx-auto sm:w-full ${step === 3 ? 'sm:max-w-2.5xl' : 'sm:max-w-xl'}`}>
         {error && (
           <div className="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg">
             {error}
