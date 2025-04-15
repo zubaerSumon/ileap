@@ -1,11 +1,11 @@
 // /server/router.ts
-import { authRouter } from '../modules/auth';
+import { authRouter } from './modules/auth';
+import { userRouter } from './modules/users';
 import { router } from './trpc';
-//import { userRouter } from './modules/users';
- 
+  
 
 export const appRouter = router({
-  //users: userRouter,
+  users: userRouter,
   auth: authRouter,
   //upload: uploadRouter,
 });

@@ -1,5 +1,5 @@
 import { createContext } from "@/server/config/context";
-import { appRouter } from "@/server/routers";
+import { appRouter } from "@/server";
 import { fetchRequestHandler } from "@trpc/server/adapters/fetch";
  
 

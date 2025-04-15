@@ -11,6 +11,16 @@ const userSchema = z.object({
   isVerified: z.boolean(),
 });
 
+const updateUserSchema = z.object({
+  name: z.string().optional(),
+  email: z.string().email().optional(),
+  password: z.string().optional(),
+  provider: z.enum([AuthProvider.CREDENTIALS, AuthProvider.GOOGLE]).optional(),
+  role: z.enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION]).optional(),
+  reffered_by: z.string().optional(),
+  isVerified: z.boolean().optional(),
+});
+
 const volunteerSchema = z.object({
   phone: z.string(),
   age: z.string(),
@@ -46,6 +56,7 @@ const organizationSchema = z.object({
 
 export const userValidation = {
   userSchema,
+  updateUserSchema,
   volunteerSchema,
   organizationSchema,
 };
