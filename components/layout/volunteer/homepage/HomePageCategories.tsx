@@ -72,24 +72,24 @@ export default function Categories({ title = "Opportunities by categories" }: { 
   }) => (
     <Card className="border rounded-lg overflow-hidden">
       <CardContent className="p-0">
-        <div className="p-4">
-          <div className="flex items-center mb-3">
-            <div className="w-10 h-10 mr-3">
+        <div className="p-3">
+          <div className="flex items-center mb-2">
+            <div className="w-8 h-8 mr-2">
               <Image
                 src={opportunity.logoSrc}
                 alt={opportunity.organization}
-                width={40}
-                height={40}
+                width={32}
+                height={32}
                 className="rounded-full"
               />
             </div>
-            <h3 className="text-lg font-semibold">{opportunity.title}</h3>
+            <h3 className="text-base font-semibold">{opportunity.title}</h3>
           </div>
 
-          <div className="flex items-center text-sm text-gray-500 mb-3">
-            <MapPin className="w-4 h-4 mr-1 text-blue-500" />
+          <div className="flex items-center text-xs text-gray-500 mb-2">
+            <MapPin className="w-3 h-3 mr-1 text-blue-500" />
             <span>{opportunity.location}</span>
-            <Badge variant="outline" className="ml-2 px-2 py-0.5 text-xs">
+            <Badge variant="outline" className="ml-2 px-1.5 py-0.5 text-xs">
               {opportunity.type}
             </Badge>
           </div>
@@ -154,13 +154,13 @@ export default function Categories({ title = "Opportunities by categories" }: { 
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-between items-center p-4 pt-0">
+      <CardFooter className="flex justify-between items-center p-3 pt-0">
         <div className="flex gap-2 items-center">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white h-10">
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white h-8 text-xs">
             Apply now
           </Button>
-          <Button variant="ghost" size="icon" className="text-yellow-400 h-10 w-10">
-            <Star className="h-5 w-5 fill-current" />
+          <Button variant="ghost" size="icon" className="text-yellow-400 h-8 w-8">
+            <Star className="h-4 w-4 fill-current" />
           </Button>
         </div>
       </CardFooter>
@@ -168,10 +168,10 @@ export default function Categories({ title = "Opportunities by categories" }: { 
   );
 
   return (
-    <section className="py-12 bg-white">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold">{title}</h2>
+    <section className="py-8 bg-white">
+      <div className="container mx-auto">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">{title}</h2>
           <Link
             href="/opportunities"
             className="text-sm text-gray-600 hover:text-blue-600 flex items-center"
