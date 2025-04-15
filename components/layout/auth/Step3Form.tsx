@@ -1,5 +1,5 @@
 import { UseFormRegister, FieldErrors } from "react-hook-form";
-import { VolunteerSignupForm } from "../types";
+import { VolunteerSignupForm } from "../../../app/(auth)/volunteer-signup/types";
 import { FormTextarea, ImageUpload, FormDateTimeRangePicker } from "@/components/forms";
 
 interface Step3Props {
