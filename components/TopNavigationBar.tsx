@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, Bell, MessageSquare } from "lucide-react";
+import { Menu, X, Bell, MessageSquare, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Logo from "../public/brand_logo.png";
 
@@ -14,6 +14,17 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarShortcut,
+  MenubarTrigger,
+} from "./ui/menubar";
+import { signOut } from "next-auth/react";
 
 const publicNavOptions = [
   {
@@ -68,7 +79,9 @@ export default function TopNavigationBar() {
   const pathname = usePathname();
 
   const isAuthPath =
-    pathname?.includes("signin") || pathname?.includes("signup") || pathname?.includes("set-role");
+    pathname?.includes("signin") ||
+    pathname?.includes("signup") ||
+    pathname?.includes("set-role");
   const isProtectedPath =
     pathname?.includes("volunteer") ||
     pathname?.includes("organization") ||
@@ -245,7 +258,31 @@ export default function TopNavigationBar() {
                 <button className="hover:text-blue-500">
                   <Bell className="h-5 w-5" />
                 </button>
-                <div className="h-8 w-8 rounded-full bg-gray-600"></div>
+
+                <Menubar className="p-0 bg-transparent border-none ">
+                  <MenubarMenu>
+                    <MenubarTrigger className="p-0 bg-transparent border-none rounded-full">
+                      <Avatar className="ring-2 ring-blue-500 border border-white">
+                        <AvatarImage src="https://github.com/shadcn.png" />
+                        <AvatarFallback>CN</AvatarFallback>
+                      </Avatar>
+                    </MenubarTrigger>
+                    <MenubarContent>
+                      <MenubarItem
+                        onClick={() => signOut({ callbackUrl: "/signin" })}
+                      >
+                        Sign out{" "}
+                        <MenubarShortcut>
+                          <LogOut />
+                        </MenubarShortcut>
+                      </MenubarItem>
+                      <MenubarSeparator />
+                      <MenubarItem>Profile</MenubarItem>
+                      <MenubarSeparator />
+                      <MenubarItem>Settings</MenubarItem>
+                    </MenubarContent>
+                  </MenubarMenu>
+                </Menubar>
               </div>
 
               <Link

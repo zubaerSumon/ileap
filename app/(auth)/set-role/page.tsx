@@ -1,20 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
+ 
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { UserRole } from "@/server/db/interfaces/user";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
 
 const SetRolePage = () => {
-  const [selectedRole, setSelectedRole] = useState<
+   const [selectedRole, setSelectedRole] = useState<
     "volunteer" | "organization" | null
   >(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const { data: session, update } = useSession();
+  const { data: session, update, status } = useSession();
 
   const handleRoleSelect = (role: "volunteer" | "organization") => {
     setSelectedRole(role);
@@ -25,11 +26,9 @@ const SetRolePage = () => {
         ...session,
         user: {
           ...session?.user,
-          role: selectedRole,
+          role: selectedRole === "volunteer" ? UserRole.VOLUNTEER : UserRole.ORGANIZATION,
         },
       });
-      console.log({session});
-      
       router.push(`/${selectedRole}`);
       toast.success(`User Updated with role ${selectedRole} successfully`, {
         duration: 4000,
@@ -50,7 +49,15 @@ const SetRolePage = () => {
           : UserRole.ORGANIZATION,
     });
   };
-
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      const { role } = session.user;
+      const targetRoute = role !== ""  && `/${role}`;
+      if (targetRoute) {
+        router.replace(targetRoute);
+      }
+    }
+  }, [session, status, router]);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -156,7 +163,7 @@ const SetRolePage = () => {
           </div>
         </div>
 
-        <button
+        <Button
           onClick={handleContinue}
           className={`w-full py-3 rounded-lg font-medium ${
             selectedRole && !isLoading
@@ -165,6 +172,9 @@ const SetRolePage = () => {
           }`}
           disabled={!selectedRole || isLoading}
         >
+          {isLoading && (
+           <Loader2 /> 
+          )}
           {isLoading
             ? "Processing..."
             : selectedRole === "volunteer"
@@ -172,7 +182,7 @@ const SetRolePage = () => {
             : selectedRole === "organization"
             ? "Continue as Organization"
             : "Continue"}
-        </button>
+        </Button>
       </div>
     </div>
   );

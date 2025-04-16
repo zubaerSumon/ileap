@@ -9,13 +9,15 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
+import GLogo from "../../../public/images/Google__G__logo.svg";
+import toast from "react-hot-toast";
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
 const passwordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type EmailForm = z.infer<typeof emailSchema>;
@@ -28,8 +30,8 @@ export default function LoginPage() {
   const error = searchParams.get("error");
   const [step, setStep] = useState<"email" | "password">("email");
   const [userEmail, setUserEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
+ 
   const {
     register: registerEmail,
     handleSubmit: handleEmailSubmit,
@@ -47,22 +49,35 @@ export default function LoginPage() {
   });
 
   const onEmailSubmit = async (data: EmailForm) => {
-    setIsLoading(true);
+    setIsSubmitting(true);
     try {
-      console.log("Email submitted:", data);
       setUserEmail(data.email);
       setStep("password");
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
   const onPasswordSubmit = async (data: PasswordForm) => {
-    setIsLoading(true);
+     
+    setIsSubmitting(true);
     try {
-      console.log("Password submitted:", data, "for email:", userEmail);
-    } finally {
-      setIsLoading(false);
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: userEmail,
+        password: data.password,
+      });
+
+       
+
+      if (result?.error) {
+        console.log('result.error', result);
+        //setError('Invalid email or password');
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      toast.error(`An unexpected error occurred: ${error}`, { duration: 4000 });
+      setIsSubmitting(false);
     }
   };
 
@@ -77,25 +92,22 @@ export default function LoginPage() {
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
       console.log("User is authenticated:", session.user, status);
-      
+
       const { role } = session.user;
       const targetRoute = role === "" ? "/set-role" : `/${role}`;
-      console.log("targetRoute", targetRoute);
-      
-
       if (targetRoute) {
         router.replace(targetRoute);
       }
     }
   }, [session, status, router]);
-  // if (status === 'loading' || (status === 'authenticated' && session?.user)) {
-  //   return (
-  //     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-  //       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-  //       <p className="mt-4 text-gray-600">Wait a sec..</p>
-  //     </div>
-  //   );
-  // }
+  if (status === "loading" || (status === "authenticated" && session?.user)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="mt-4 text-gray-600">Wait a sec..</p>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -163,10 +175,10 @@ export default function LoginPage() {
 
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                     className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center justify-center"
                   >
-                    {isLoading ? (
+                    {isSubmitting ? (
                       <svg
                         className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                         xmlns="http://www.w3.org/2000/svg"
@@ -205,12 +217,7 @@ export default function LoginPage() {
                     onClick={handleGoogleLogin}
                     className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition-colors"
                   >
-                    <Image
-                      src="/google.svg"
-                      alt="Google"
-                      width={40}
-                      height={40}
-                    />
+                    <Image src={GLogo} alt="Google" width={20} height={20} />
                     <span>Continue with Google</span>
                   </button>
                 </form>
@@ -290,10 +297,10 @@ export default function LoginPage() {
 
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                     className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center justify-center"
                   >
-                    {isLoading ? (
+                    {isSubmitting ? (
                       <svg
                         className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                         xmlns="http://www.w3.org/2000/svg"

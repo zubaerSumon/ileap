@@ -1,12 +1,12 @@
 "use client";
 
- import { useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import GLogo from "../../../public/images/Google__G__logo.svg";
-import { toast } from 'react-hot-toast';
+import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { authValidation } from "@/server/modules/auth/auth.validation";
@@ -14,6 +14,7 @@ import { SignupForm } from "@/utils/constants";
 import { AuthProvider, UserRole } from "@/server/db/interfaces/user";
 import { Button } from "@/components/ui/button";
 import { signIn } from "next-auth/react";
+import { Loader2 } from "lucide-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -31,11 +32,13 @@ export default function SignupPage() {
   } = useForm<SignupForm>({
     resolver: zodResolver(authValidation.signupSchema),
   });
+  console.log({ errors });
 
   const signupMutation = trpc.auth.signup.useMutation({
     onSuccess: (data) => {
       toast.success(data.message);
-      router.push('/signin');
+      router.push("/signin");
+      setIsLoading(false);
     },
     onError: (error) => {
       toast.error(error.message);
@@ -43,32 +46,32 @@ export default function SignupPage() {
   });
 
   const onSubmit = async (data: SignupForm) => {
+    console.log();
+
+    console.log("clicked submit");
+
     if (!acceptedTerms) {
-      toast.error('Please accept the terms and conditions');
+      toast.error("Please accept the terms and conditions");
       return;
     }
-    
     setIsLoading(true);
-    try {
-      await signupMutation.mutateAsync({
-        name: data.name,
-        email: data.email,
-        password: data.password,
-        role: selectedRole === 'volunteer' ? UserRole.VOLUNTEER : UserRole.ORGANIZATION,
-        provider: AuthProvider.CREDENTIALS,
-      });
-    } catch (error) {
-      console.error('Signup error:', error);
-    } finally {
-      setIsLoading(false);
-    }
+
+    await signupMutation.mutateAsync({
+      name: data.name,
+      email: data.email,
+      password: data.password,
+      role:
+        selectedRole === "volunteer"
+          ? UserRole.VOLUNTEER
+          : UserRole.ORGANIZATION,
+      provider: AuthProvider.CREDENTIALS,
+    });
   };
 
   const handleRoleSelect = (role: "volunteer" | "organization") => {
     setSelectedRole(role);
   };
 
-  // Update the role selection section
   if (step === 1) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -213,7 +216,11 @@ export default function SignupPage() {
           {selectedRole === "volunteer" ? "volunteer" : "post opportunities"}
         </h2>
 
-        <Button onClick={() => signIn('google')} variant='outline' className="w-full flex items-center justify-center font-medium gap-2 border rounded-lg p-3 hover:bg-gray-100 transition-colors mb-6">
+        <Button
+          onClick={() => signIn("google")}
+          variant="outline"
+          className="w-full flex items-center justify-center font-medium gap-2 border rounded-lg p-3 hover:bg-gray-100 transition-colors mb-6"
+        >
           <Image src={GLogo} alt="Google" width={20} height={20} />
           Continue with Google
         </Button>
@@ -270,7 +277,7 @@ export default function SignupPage() {
 
           <div className="space-y-4">
             <label className="flex items-start gap-2">
-               <input
+              <input
                 type="checkbox"
                 checked={acceptedTerms}
                 onChange={(e) => setAcceptedTerms(e.target.checked)}
@@ -285,9 +292,10 @@ export default function SignupPage() {
 
           <Button
             type="submit"
-            disabled={isLoading || !acceptedTerms ||!isValid }
+            disabled={isLoading || !acceptedTerms || !isValid}
             className="w-full  bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
+            {isLoading && <Loader2 />}
             Create my account
           </Button>
         </form>

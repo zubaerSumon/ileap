@@ -10,14 +10,14 @@ import connectDB from '@/server/config/mongoose';
 export const CredentialsProvider = Credentials({
   async authorize(credentials) {
     try {
+      console.log('credentials from providers', credentials);
       if (!credentials?.email || !credentials?.password) {
         throw new Error('Invalid credentials');
       }
 
       await connectDB();
       const user = await User.findOne({ email: credentials.email });
-
-      if (!user) {
+       if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
       }
 
@@ -29,6 +29,7 @@ export const CredentialsProvider = Credentials({
       }
 
       if (user) {
+        console.log('user from isPasswordCorrect block', user);
         const isPasswordCorrect = await bcrypt.compare(
           credentials.password as string,
           user.password
@@ -37,6 +38,7 @@ export const CredentialsProvider = Credentials({
           throw new Error('Invalid email or password. Please try again.');
         }
         if (isPasswordCorrect) {
+         
           return user;
         }
       }

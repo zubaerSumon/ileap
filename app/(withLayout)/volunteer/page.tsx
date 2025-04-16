@@ -4,10 +4,11 @@ import Categories from "../../../components/layout/volunteer/homepage/HomePageCa
 import HomePageSuggestions from "@/components/layout/volunteer/homepage/HomePageSuggestions";
 import Footer from "@/components/Footer";
 import RegistrationBanner from "@/components/RegistrationBanner";
+import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
 const page = () => {
   return (
-    <div>
+    <ProtectedLayout>
       <HomePageHero />
       <RegistrationBanner
         title="Are you an International Student?"
@@ -21,7 +22,7 @@ const page = () => {
         <Categories  title="Most popular opportunities" />
       </div>
       <Footer />
-    </div>
+    </ProtectedLayout>
   );
 };
 

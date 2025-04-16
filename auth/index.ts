@@ -46,46 +46,32 @@ export const {
       }
 
       if (account?.provider === "credentials") {
-        try {
-          const existingUser = await User.findOne({ email: user.email });
-          if (!existingUser) {
-            throw new Error("User not found");
-          }
-
-          if (existingUser.role) {
-            return `/${existingUser.role.toLowerCase()}`;
-          }
-          return true;
-        } catch (error) {
-          console.error("Error during credentials sign-in:", error);
-          throw error;
-        }
+       return true
       }
 
       return false;
     },
     async jwt({ token, user, trigger, session }) {
       if (trigger === 'signIn' || (trigger === 'update' && session)) {
-        const retrievedUser = await User.findOne({ email: user?.email });
-
+        const retrievedUser = await User.findOne({ email: user?.email || token.email });
+        
         if (retrievedUser) {
           token.id = retrievedUser.id;
           token.email = retrievedUser.email;
-          token.name = retrievedUser.name || user.name;
-          token.role = retrievedUser?.role || "";
+          token.name = retrievedUser.name || user?.name;
+          token.role = retrievedUser.role || '';
         }
       }
       return token;
     },
     async session({ session, token }) {
-      console.log("__Triggered__","session", session, token);
       return {
         ...session,
         user: {
           id: token.id,
           email: token.email,
           name: token.name,
-          role: token.role,
+          role: token.role || '',
         },
       };
     },
