@@ -7,7 +7,8 @@ export const createContext = async () => {
   const session = await auth();
 
   await connectDB();
-
+  console.log("session_", session);
+  
   return {
     user: session?.user || null,
     session: session || null,

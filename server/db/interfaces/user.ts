@@ -3,7 +3,7 @@ import { Document, ObjectId } from "mongoose";
 export enum UserRole {
   ADMIN = "admin",
   VOLUNTEER = "volunteer",
-  ORGANIZATION = "organization",
+  ORGANIZATION = "organization", 
 }
 
 export enum AuthProvider {

@@ -21,15 +21,15 @@ const publicNavOptions = [
     href: "/support",
     className: "hover:underline hidden sm:inline",
   },
-  { label: "Log in", href: "/auth/login", className: "hover:underline" },
+  { label: "Log in", href: "/signin", className: "hover:underline" },
   {
     label: "Organisation Sign up",
-    href: "/organization/signup",
+    href: "/signup?role=organization",
     className: "hover:underline hidden md:inline",
   },
   {
     label: "Volunteer Sign up",
-    href: "/volunteer-signup",
+    href: "/signup?role=volunteer",
     className: "hover:underline hidden md:inline",
   },
 ];

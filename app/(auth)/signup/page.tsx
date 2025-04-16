@@ -1,52 +1,70 @@
-'use client';
+"use client";
 
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-
-// Update the schema and types
-const signupSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
-  country: z.string().min(1, "Country is required"),
-  role: z.enum(['volunteer', 'organization']),
-  acceptTerms: z.boolean().refine(val => val === true, {
-    message: "You must accept the terms and conditions"
-  }),
-  receiveUpdates: z.boolean().optional(),
-});
-
-type SignupForm = z.infer<typeof signupSchema>;
+import GLogo from "../../../public/images/Google__G__logo.svg";
+import { toast } from 'react-hot-toast';
+import { useRouter } from "next/navigation";
+import { trpc } from "@/utils/trpc";
+import { authValidation } from "@/server/modules/auth/auth.validation";
+import { SignupForm } from "@/utils/constants";
+import { AuthProvider, UserRole } from "@/server/db/interfaces/user";
+import { Button } from "@/components/ui/button";
+import { signIn } from "next-auth/react";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
-  const [selectedRole, setSelectedRole] = useState<'volunteer' | 'organization' | null>(null);
-  
-  const { 
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<
+    "volunteer" | "organization" | null
+  >(null);
+
+  const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, isValid  },
   } = useForm<SignupForm>({
-    resolver: zodResolver(signupSchema),
+    resolver: zodResolver(authValidation.signupSchema),
+  });
+
+  const signupMutation = trpc.auth.signup.useMutation({
+    onSuccess: (data) => {
+      toast.success(data.message);
+      router.push('/signin');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const onSubmit = async (data: SignupForm) => {
+    if (!acceptedTerms) {
+      toast.error('Please accept the terms and conditions');
+      return;
+    }
+    
     setIsLoading(true);
     try {
-      sessionStorage.setItem('signupData', JSON.stringify({ ...data, role: selectedRole }));
-      window.location.href = selectedRole === 'volunteer' ? '/volunteer-signup' : '/organization-signup';
+      await signupMutation.mutateAsync({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        role: selectedRole === 'volunteer' ? UserRole.VOLUNTEER : UserRole.ORGANIZATION,
+        provider: AuthProvider.CREDENTIALS,
+      });
+    } catch (error) {
+      console.error('Signup error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleRoleSelect = (role: 'client' | 'freelancer') => {
+  const handleRoleSelect = (role: "volunteer" | "organization") => {
     setSelectedRole(role);
   };
 
@@ -55,57 +73,105 @@ export default function SignupPage() {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center mb-8">Join as a volunteer or organization</h2>
+          <h2 className="text-2xl font-bold text-center mb-8">
+            Join as a volunteer or organization
+          </h2>
 
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <div 
-              className={`border-2 rounded-lg p-6 cursor-pointer ${selectedRole === 'volunteer' ? 'border-green-600' : 'border-gray-200'}`}
-              onClick={() => handleRoleSelect('volunteer')}
+            <div
+              className={`border-2 rounded-lg p-6 cursor-pointer ${
+                selectedRole === "volunteer"
+                  ? "border-blue-700"
+                  : "border-gray-200"
+              }`}
+              onClick={() => handleRoleSelect("volunteer")}
             >
               <div className="flex flex-col space-y-4">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
-                    <svg className="w-6 h-6 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    <svg
+                      className="w-6 h-6 text-gray-700"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                      />
                     </svg>
                   </div>
-                  <div className={`w-5 h-5 rounded-full border ${selectedRole === 'volunteer' ? 'border-green-600 bg-green-600' : 'border-gray-300'}`}>
-                    {selectedRole === 'volunteer' && (
-                      <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="12" cy="12" r="10" fill="currentColor" />
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center 
+    ${selectedRole === "volunteer" ? "border-blue-700" : "border-gray-300"}`}
+                  >
+                    {selectedRole === "volunteer" && (
+                      <svg
+                        className="w-5 h-5 text-blue-700"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle cx="12" cy="12" r="8" fill="currentColor" />
                       </svg>
                     )}
                   </div>
                 </div>
                 <div>
-                  <p className="text-lg font-medium">I'm a volunteer</p>
+                  <p className="text-lg font-medium">I&apos;m a volunteer</p>
                   <p className="text-sm text-gray-600">looking to help</p>
                 </div>
               </div>
             </div>
 
-            <div 
-              className={`border-2 rounded-lg p-6 cursor-pointer ${selectedRole === 'organization' ? 'border-green-600' : 'border-gray-200'}`}
-              onClick={() => handleRoleSelect('organization')}
+            <div
+              className={`border-2 rounded-lg p-6 cursor-pointer ${
+                selectedRole === "organization"
+                  ? "border-blue-700"
+                  : "border-gray-200"
+              }`}
+              onClick={() => handleRoleSelect("organization")}
             >
               <div className="flex flex-col space-y-4">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center">
-                    <svg className="w-6 h-6 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    <svg
+                      className="w-6 h-6 text-gray-700"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      />
                     </svg>
                   </div>
-                  <div className={`w-5 h-5 rounded-full border ${selectedRole === 'organization' ? 'border-green-600 bg-green-600' : 'border-gray-300'}`}>
-                    {selectedRole === 'organization' && (
-                      <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                        <circle cx="12" cy="12" r="10" fill="currentColor" />
+                  <div
+                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center 
+    ${selectedRole === "organization" ? "border-blue-700" : "border-gray-300"}`}
+                  >
+                    {selectedRole === "organization" && (
+                      <svg
+                        className="w-5 h-5 text-blue-700"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                      >
+                        <circle cx="12" cy="12" r="8" fill="currentColor" />
                       </svg>
                     )}
                   </div>
                 </div>
                 <div>
-                  <p className="text-lg font-medium">I'm an organization</p>
-                  <p className="text-sm text-gray-600">looking to post opportunities</p>
+                  <p className="text-lg font-medium">
+                    I&apos;m an organization
+                  </p>
+                  <p className="text-sm text-gray-600">
+                    looking to post opportunities
+                  </p>
                 </div>
               </div>
             </div>
@@ -114,15 +180,24 @@ export default function SignupPage() {
           <button
             onClick={() => selectedRole && setStep(2)}
             className={`w-full py-3 rounded-lg font-medium ${
-              selectedRole ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+              selectedRole
+                ? "bg-blue-600 text-white hover:bg-blue-700"
+                : "bg-gray-200 text-gray-500 cursor-not-allowed"
             }`}
             disabled={!selectedRole}
           >
-            {selectedRole === 'volunteer' ? 'Apply as Volunteer' : selectedRole === 'organization' ? 'Join as Organization' : 'Create Account'}
+            {selectedRole === "volunteer"
+              ? "Apply as Volunteer"
+              : selectedRole === "organization"
+              ? "Join as Organization"
+              : "Create Account"}
           </button>
 
           <p className="text-center mt-6 text-sm text-gray-600">
-            Already have an account? <Link href="/signin" className="text-green-600 hover:underline">Log In</Link>
+            Already have an account?{" "}
+            <Link href="/signin" className="text-blue-700 hover:underline">
+              Log In
+            </Link>
           </p>
         </div>
       </div>
@@ -134,13 +209,14 @@ export default function SignupPage() {
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-8">
-          Sign up to {selectedRole === 'volunteer' ? 'volunteer' : 'post opportunities'}
+          Sign up to{" "}
+          {selectedRole === "volunteer" ? "volunteer" : "post opportunities"}
         </h2>
-        
-        <button className="w-full flex items-center justify-center gap-2 border rounded-lg p-3 hover:bg-gray-100 transition-colors mb-6">
-          <Image src="/google.svg" alt="Google" width={24} height={24} />
+
+        <Button onClick={() => signIn('google')} variant='outline' className="w-full flex items-center justify-center font-medium gap-2 border rounded-lg p-3 hover:bg-gray-100 transition-colors mb-6">
+          <Image src={GLogo} alt="Google" width={20} height={20} />
           Continue with Google
-        </button>
+        </Button>
 
         <div className="relative my-6">
           <div className="absolute inset-0 flex items-center">
@@ -155,12 +231,12 @@ export default function SignupPage() {
           <div>
             <input
               type="text"
-              {...register("firstName")}
+              {...register("name")}
               placeholder="Full name"
               className="w-full border rounded-lg p-3"
             />
-            {errors.firstName && (
-              <p className="text-red-500 text-sm mt-1">{errors.firstName.message}</p>
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
             )}
           </div>
 
@@ -172,7 +248,9 @@ export default function SignupPage() {
               className="w-full border rounded-lg p-3"
             />
             {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.email.message}
+              </p>
             )}
           </div>
 
@@ -184,30 +262,34 @@ export default function SignupPage() {
               className="w-full border rounded-lg p-3"
             />
             {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              <p className="text-red-500 text-sm mt-1">
+                {errors.password.message}
+              </p>
             )}
           </div>
 
           <div className="space-y-4">
             <label className="flex items-start gap-2">
-              <input
+               <input
                 type="checkbox"
-                {...register("acceptTerms")}
+                checked={acceptedTerms}
+                onChange={(e) => setAcceptedTerms(e.target.checked)}
                 className="mt-1"
               />
               <span className="text-sm text-gray-600">
-                Yes, I understand and agree to the iLeap Terms of Service, including the User Agreement and Privacy Policy.
+                Yes, I understand and agree to the iLeap Terms of Service,
+                including the User Agreement and Privacy Policy.
               </span>
             </label>
           </div>
 
-          <button
+          <Button
             type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium"
+            disabled={isLoading || !acceptedTerms ||!isValid }
+            className="w-full  bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
             Create my account
-          </button>
+          </Button>
         </form>
       </div>
     </div>

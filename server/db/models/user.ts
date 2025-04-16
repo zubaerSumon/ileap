@@ -16,7 +16,10 @@ const UserSchema: Schema = new Schema<IUser>(
       enum: Object.values(AuthProvider),
       default: AuthProvider.CREDENTIALS,
     },
-    role: { type: String, required: true, enum: Object.values(UserRole), default: UserRole.VOLUNTEER },
+    role: {
+      type: String,
+      enum: Object.values(UserRole),
+    },
     referred_by: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
