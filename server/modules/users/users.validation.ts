@@ -8,7 +8,7 @@ const userSchema = z.object({
   provider: z.enum([AuthProvider.CREDENTIALS, AuthProvider.GOOGLE]),
   role: z.enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION]),
   reffered_by: z.string().optional(),
-  isVerified: z.boolean(),
+  is_verified: z.boolean(),
 });
 
 const updateUserSchema = z.object({
@@ -18,7 +18,7 @@ const updateUserSchema = z.object({
   provider: z.enum([AuthProvider.CREDENTIALS, AuthProvider.GOOGLE]).optional(),
   role: z.enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION]).optional(),
   reffered_by: z.string().optional(),
-  isVerified: z.boolean().optional(),
+  is_verified: z.boolean().optional(),
 });
 
 const volunteerSchema = z.object({

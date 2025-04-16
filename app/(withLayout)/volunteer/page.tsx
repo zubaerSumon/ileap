@@ -1,32 +1,16 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import HomePageHero from "../../../components/layout/volunteer/homepage/HomePageHero";
 import Categories from "../../../components/layout/volunteer/homepage/HomePageCategories";
 import HomePageSuggestions from "@/components/layout/volunteer/homepage/HomePageSuggestions";
 import Footer from "@/components/Footer";
 import RegistrationBanner from "@/components/RegistrationBanner";
-import { StudentInfoModal } from "@/components/layout/volunteer/StudentInfoModal";
+import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
-const Page = () => {
-  const [showModal, setShowModal] = useState(true);
-
-  const handleComplete = async (data: unknown) => {
-    try {
-      console.log("Form data:", data);
-      // Add your API call here
-      setShowModal(false);
-    } catch (err) {
-      console.error("Error submitting form:", err);
-    }
-  };
-
+const VolunteerPage = () => {
+  
   return (
-    <div>
-      <StudentInfoModal 
-        open={showModal} 
-        onOpenChange={setShowModal}
-        onComplete={handleComplete}
-      />
+    <ProtectedLayout>
       <HomePageHero />
       <RegistrationBanner
         title="Are you an International Student?"
@@ -40,8 +24,8 @@ const Page = () => {
         <Categories title="Most popular opportunities" />
       </div>
       <Footer />
-    </div>
+    </ProtectedLayout>
   );
 };
 
-export default Page;
+export default VolunteerPage;

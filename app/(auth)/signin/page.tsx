@@ -1,20 +1,24 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
+import { Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react"; // <-- Add this import
+import GLogo from "../../../public/images/Google__G__logo.svg";
+import toast from "react-hot-toast";
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
 });
 
 const passwordSchema = z.object({
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 type EmailForm = z.infer<typeof emailSchema>;
@@ -22,12 +26,14 @@ type PasswordForm = z.infer<typeof passwordSchema>;
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const error = searchParams.get("error");
   const [step, setStep] = useState<"email" | "password">("email");
   const [userEmail, setUserEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const session = useSession();
-console.log("session from login page: ", session);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // <-- Add this state
+ 
   const {
     register: registerEmail,
     handleSubmit: handleEmailSubmit,
@@ -40,38 +46,78 @@ console.log("session from login page: ", session);
     register: registerPassword,
     handleSubmit: handlePasswordSubmit,
     formState: { errors: passwordErrors },
+    reset: resetPasswordForm,
+    setValue: setPasswordValue, // <-- Add this
   } = useForm<PasswordForm>({
     resolver: zodResolver(passwordSchema),
   });
 
   const onEmailSubmit = async (data: EmailForm) => {
-    setIsLoading(true);
+    setIsSubmitting(true);
     try {
-      console.log("Email submitted:", data);
       setUserEmail(data.email);
       setStep("password");
+      resetPasswordForm(); // Reset all fields
+      setPasswordValue("password", ""); // <-- Explicitly clear password field
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
-  };
-
-  const onPasswordSubmit = async (data: PasswordForm) => {
-    setIsLoading(true);
-    try {
-      console.log("Password submitted:", data, "for email:", userEmail);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGoogleLogin = () => {
-     signIn('google');
   };
 
   const goBackToEmail = () => {
     setStep("email");
+    resetPasswordForm(); // <-- Also reset when going back
+    setPasswordValue("password", ""); // <-- Explicitly clear password field
   };
 
+  const onPasswordSubmit = async (data: PasswordForm) => {
+     
+    setIsSubmitting(true);
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: userEmail,
+        password: data.password,
+      });
+
+       
+
+      if (result?.error) {
+        console.log('result.error', result);
+        //setError('Invalid email or password');
+        setIsSubmitting(false);
+      }
+    } catch (error) {
+      toast.error(`An unexpected error occurred: ${error}`, { duration: 4000 });
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleGoogleLogin = () => {
+    signIn("google");
+  };
+
+   
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      console.log("User is authenticated:", session.user, status);
+
+      const { role } = session.user;
+      const targetRoute = role === "" ? "/set-role" : `/${role}`;
+      if (targetRoute) {
+        router.replace(targetRoute);
+      }
+    }
+  }, [session, status, router]);
+  if (status === "loading" || (status === "authenticated" && session?.user)) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        <p className="mt-4 text-gray-600">Wait a sec..</p>
+      </div>
+    );
+  }
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -139,10 +185,10 @@ console.log("session from login page: ", session);
 
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                     className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center justify-center"
                   >
-                    {isLoading ? (
+                    {isSubmitting ? (
                       <svg
                         className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                         xmlns="http://www.w3.org/2000/svg"
@@ -181,12 +227,7 @@ console.log("session from login page: ", session);
                     onClick={handleGoogleLogin}
                     className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition-colors"
                   >
-                    <Image
-                      src="/google.svg"
-                      alt="Google"
-                      width={40}
-                      height={40}
-                    />
+                    <Image src={GLogo} alt="Google" width={20} height={20} />
                     <span>Continue with Google</span>
                   </button>
                 </form>
@@ -228,10 +269,10 @@ console.log("session from login page: ", session);
                     <div className="relative">
                       <input
                         id="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"} // <-- Toggle type
                         {...registerPassword("password")}
                         placeholder="Enter your password"
-                        className="w-full border border-gray-300 rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full border border-gray-300 rounded-lg p-3 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       />
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg
@@ -247,6 +288,18 @@ console.log("session from login page: ", session);
                           />
                         </svg>
                       </div>
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
                     </div>
                     {passwordErrors.password && (
                       <p className="text-red-500 text-sm mt-1">
@@ -266,10 +319,10 @@ console.log("session from login page: ", session);
 
                   <button
                     type="submit"
-                    disabled={isLoading}
+                    disabled={isSubmitting}
                     className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center justify-center"
                   >
-                    {isLoading ? (
+                    {isSubmitting ? (
                       <svg
                         className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
                         xmlns="http://www.w3.org/2000/svg"
