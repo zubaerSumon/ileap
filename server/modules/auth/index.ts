@@ -84,7 +84,7 @@ export const authRouter = router({
         throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
       }
 
-      if (user.isVerified) {
+      if (user.is_verified) {
         return {
           message: 'User is already verified.',
           alreadyVerified: true,
@@ -92,7 +92,7 @@ export const authRouter = router({
         };
       }
 
-      user.isVerified = true;
+      user.is_verified = true;
       await user.save();
 
       return {

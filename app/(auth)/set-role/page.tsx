@@ -1,37 +1,54 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
-"use client"
- import React, { useState } from "react";
+"use client";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
- import { UserRole } from "@/server/db/interfaces/user";
+import { UserRole } from "@/server/db/interfaces/user";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
- 
+import { useSession } from "next-auth/react";
+
 const SetRolePage = () => {
-  const [selectedRole, setSelectedRole] = useState<"volunteer" | "organization" | null>(null);
+  const [selectedRole, setSelectedRole] = useState<
+    "volunteer" | "organization" | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  const { data: session, update } = useSession();
 
   const handleRoleSelect = (role: "volunteer" | "organization") => {
     setSelectedRole(role);
   };
-
+  const updateUserMutation = trpc.users.updateUser.useMutation({
+    onSuccess: async () => {
+      await update({
+        ...session,
+        user: {
+          ...session?.user,
+          role: selectedRole,
+        },
+      });
+      console.log({session});
+      
+      router.push(`/${selectedRole}`);
+      toast.success(`User Updated with role ${selectedRole} successfully`, {
+        duration: 4000,
+      });
+      setIsLoading(false);
+    },
+    onError: () => {
+      toast.error("Failed to update user role. Please try again.");
+      setIsLoading(false);
+    },
+  });
   const handleContinue = async () => {
     if (!selectedRole) return;
-
-    try {
-      setIsLoading(true);
-      await trpc.users.updateUser.mutate({
-        role: selectedRole === "volunteer" ? UserRole.VOLUNTEER : UserRole.ORGANIZATION
-      });
-      
-      router.push(selectedRole === "volunteer" ? "/volunteer/profile" : "/organization/profile");
-      toast.success("Role updated successfully");
-     } catch (error) {
-      toast.error("Failed to update role");
-    } finally {
-      setIsLoading(false);
-    }
+    updateUserMutation.mutate({
+      role:
+        selectedRole === "volunteer"
+          ? UserRole.VOLUNTEER
+          : UserRole.ORGANIZATION,
+    });
   };
 
   return (
@@ -148,7 +165,7 @@ const SetRolePage = () => {
           }`}
           disabled={!selectedRole || isLoading}
         >
-          {isLoading 
+          {isLoading
             ? "Processing..."
             : selectedRole === "volunteer"
             ? "Continue as Volunteer"

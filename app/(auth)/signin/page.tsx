@@ -1,13 +1,14 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
+import { Loader2 } from "lucide-react";
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -22,12 +23,13 @@ type PasswordForm = z.infer<typeof passwordSchema>;
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const error = searchParams.get("error");
   const [step, setStep] = useState<"email" | "password">("email");
   const [userEmail, setUserEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const session = useSession();
-console.log("session from login page: ", session);
+
   const {
     register: registerEmail,
     handleSubmit: handleEmailSubmit,
@@ -65,13 +67,35 @@ console.log("session from login page: ", session);
   };
 
   const handleGoogleLogin = () => {
-     signIn('google');
+    signIn("google");
   };
 
   const goBackToEmail = () => {
     setStep("email");
   };
 
+  useEffect(() => {
+    if (status === "authenticated" && session?.user) {
+      console.log("User is authenticated:", session.user, status);
+      
+      const { role } = session.user;
+      const targetRoute = role === "" ? "/set-role" : `/${role}`;
+      console.log("targetRoute", targetRoute);
+      
+
+      if (targetRoute) {
+        router.replace(targetRoute);
+      }
+    }
+  }, [session, status, router]);
+  // if (status === 'loading' || (status === 'authenticated' && session?.user)) {
+  //   return (
+  //     <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+  //       <Loader2 className="h-8 w-8 animate-spin text-primary" />
+  //       <p className="mt-4 text-gray-600">Wait a sec..</p>
+  //     </div>
+  //   );
+  // }
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">

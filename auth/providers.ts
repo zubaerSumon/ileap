@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
-import connectToDatabase from '@/server/config/mongoose';
-import User from '@/server/db/models/user';
+ import User from '@/server/db/models/user';
 import { ApiError } from '@/lib/exceptions';
 import httpStatus from 'http-status';
 import { errorHandler } from '@/server/middlewares/error-handler';
+import connectDB from '@/server/config/mongoose';
 
 export const CredentialsProvider = Credentials({
   async authorize(credentials) {
@@ -14,14 +14,14 @@ export const CredentialsProvider = Credentials({
         throw new Error('Invalid credentials');
       }
 
-      await connectToDatabase();
+      await connectDB();
       const user = await User.findOne({ email: credentials.email });
 
       if (!user) {
         throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
       }
 
-      if (user && !user?.isVerified) {
+      if (user && !user?.is_verified) {
         throw new ApiError(
           httpStatus.BAD_REQUEST,
           'Please verify your email first!'

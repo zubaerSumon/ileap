@@ -68,7 +68,7 @@ export default function TopNavigationBar() {
   const pathname = usePathname();
 
   const isAuthPath =
-    pathname?.includes("signin") || pathname?.includes("signup");
+    pathname?.includes("signin") || pathname?.includes("signup") || pathname?.includes("set-role");
   const isProtectedPath =
     pathname?.includes("volunteer") ||
     pathname?.includes("organization") ||

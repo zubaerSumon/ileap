@@ -1,6 +1,7 @@
  import { AuthError } from "@/lib/exceptions";
 import { errorHandler } from "./error-handler";
-import { middleware, publicProcedure } from "../routers/trpc";
+import { middleware, publicProcedure } from "../trpc";
+ 
 
 type User = {
   name?: string | null;
