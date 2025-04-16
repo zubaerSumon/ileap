@@ -1,4 +1,6 @@
 import User from "@/server/db/models/user";
+import Volunteer from "@/server/db/models/volunteer"; // <-- Add this import
+import Organization from "@/server/db/models/organization"; // <-- Add this import
 import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
 import { userValidation } from "./users.validation";
@@ -32,4 +34,23 @@ export const userRouter = router({
 
       return updatedUser;
     }),
+
+ 
+profileCheckup: protectedProcedure.query(async ({ ctx }) => {
+  const sessionUser = ctx.user as JwtPayload;
+  if (!sessionUser || !sessionUser?.role || !sessionUser?.id) {
+    throw new Error("You must be logged in to check profile.");
+  }
+
+  let profile = null;
+
+  if (sessionUser.role === "volunteer") {
+    profile = await Volunteer.findOne({ user: sessionUser.id });
+  } else if (sessionUser.role === "organization") {
+    profile = await Organization.findOne({ user: sessionUser.id });
+  }
+
+  return profile;
+}),
+
 });
