@@ -9,6 +9,7 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react"; // <-- Add this import
 import GLogo from "../../../public/images/Google__G__logo.svg";
 import toast from "react-hot-toast";
 
@@ -31,6 +32,7 @@ export default function LoginPage() {
   const [step, setStep] = useState<"email" | "password">("email");
   const [userEmail, setUserEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // <-- Add this state
  
   const {
     register: registerEmail,
@@ -44,6 +46,8 @@ export default function LoginPage() {
     register: registerPassword,
     handleSubmit: handlePasswordSubmit,
     formState: { errors: passwordErrors },
+    reset: resetPasswordForm,
+    setValue: setPasswordValue, // <-- Add this
   } = useForm<PasswordForm>({
     resolver: zodResolver(passwordSchema),
   });
@@ -53,9 +57,17 @@ export default function LoginPage() {
     try {
       setUserEmail(data.email);
       setStep("password");
+      resetPasswordForm(); // Reset all fields
+      setPasswordValue("password", ""); // <-- Explicitly clear password field
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const goBackToEmail = () => {
+    setStep("email");
+    resetPasswordForm(); // <-- Also reset when going back
+    setPasswordValue("password", ""); // <-- Explicitly clear password field
   };
 
   const onPasswordSubmit = async (data: PasswordForm) => {
@@ -85,9 +97,7 @@ export default function LoginPage() {
     signIn("google");
   };
 
-  const goBackToEmail = () => {
-    setStep("email");
-  };
+   
 
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
@@ -259,10 +269,10 @@ export default function LoginPage() {
                     <div className="relative">
                       <input
                         id="password"
-                        type="password"
+                        type={showPassword ? "text" : "password"} // <-- Toggle type
                         {...registerPassword("password")}
                         placeholder="Enter your password"
-                        className="w-full border border-gray-300 rounded-lg p-3 pl-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                        className="w-full border border-gray-300 rounded-lg p-3 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       />
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <svg
@@ -278,6 +288,18 @@ export default function LoginPage() {
                           />
                         </svg>
                       </div>
+                      <button
+                        type="button"
+                        tabIndex={-1}
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                      >
+                        {showPassword ? (
+                          <EyeOff className="h-5 w-5" />
+                        ) : (
+                          <Eye className="h-5 w-5" />
+                        )}
+                      </button>
                     </div>
                     {passwordErrors.password && (
                       <p className="text-red-500 text-sm mt-1">
