@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import HomePageHero from "../../../components/layout/volunteer/homepage/HomePageHero";
 import Categories from "../../../components/layout/volunteer/homepage/HomePageCategories";
@@ -6,7 +7,8 @@ import Footer from "@/components/Footer";
 import RegistrationBanner from "@/components/RegistrationBanner";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
-const page = () => {
+const VolunteerPage = () => {
+  
   return (
     <ProtectedLayout>
       <HomePageHero />
@@ -19,11 +21,11 @@ const page = () => {
 
       <div className="max-w-[1280px] mx-auto px-4 pb-20">
         <Categories title="Opportunities by categories" />
-        <Categories  title="Most popular opportunities" />
+        <Categories title="Most popular opportunities" />
       </div>
       <Footer />
     </ProtectedLayout>
   );
 };
 
-export default page;
+export default VolunteerPage;
