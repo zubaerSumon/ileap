@@ -103,13 +103,13 @@ importers:
         version: 15.2.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       next-auth:
         specifier: 5.0.0-beta.25
-        version: 5.0.0-beta.25(next@15.2.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.10.0)(react@19.0.0)
+        version: 5.0.0-beta.25(next@15.2.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.10.1)(react@19.0.0)
       nodemailer:
         specifier: ^6.10.0
-        version: 6.10.0
+        version: 6.10.1
       nodemailer-express-handlebars:
         specifier: ^7.0.0
-        version: 7.0.0(express-handlebars@8.0.1)(nodemailer@6.10.0)
+        version: 7.0.0(express-handlebars@8.0.1)(nodemailer@6.10.1)
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -2286,8 +2286,8 @@ packages:
       express-handlebars: '>= 8.0.0'
       nodemailer: '>= 6.0.0'
 
-  nodemailer@6.10.0:
-    resolution: {integrity: sha512-SQ3wZCExjeSatLE/HBaXS5vqUOQk6GtBdIIKxiFdmm01mOQZX/POJkO3SUX1wDiYcwUOJwT23scFSC9fY2H8IA==}
+  nodemailer@6.10.1:
+    resolution: {integrity: sha512-Z+iLaBGVaSjbIzQ4pX6XV41HrooLsQ10ZWPUehGmuantvzWoDVBnmsdUcOIDM1t+yPor5pDhVlDESgOMEGxhHA==}
     engines: {node: '>=6.0.0'}
 
   oauth4webapi@3.4.1:
@@ -2862,7 +2862,7 @@ snapshots:
 
   '@alloc/quick-lru@5.2.0': {}
 
-  '@auth/core@0.37.2(nodemailer@6.10.0)':
+  '@auth/core@0.37.2(nodemailer@6.10.1)':
     dependencies:
       '@panva/hkdf': 1.2.1
       '@types/cookie': 0.6.0
@@ -2871,6 +2871,16 @@ snapshots:
       oauth4webapi: 3.4.1
       preact: 10.11.3
       preact-render-to-string: 5.2.3(preact@10.11.3)
+    optionalDependencies:
+      nodemailer: 6.10.1
+
+  '@auth/core@0.38.0(nodemailer@6.10.0)':
+    dependencies:
+      '@panva/hkdf': 1.2.1
+      jose: 6.0.10
+      oauth4webapi: 3.4.1
+      preact: 10.24.3
+      preact-render-to-string: 6.5.11(preact@10.24.3)
     optionalDependencies:
       nodemailer: 6.10.0
 
@@ -4987,13 +4997,13 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  next-auth@5.0.0-beta.25(next@15.2.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.10.0)(react@19.0.0):
+  next-auth@5.0.0-beta.25(next@15.2.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(nodemailer@6.10.1)(react@19.0.0):
     dependencies:
-      '@auth/core': 0.37.2(nodemailer@6.10.0)
+      '@auth/core': 0.37.2(nodemailer@6.10.1)
       next: 15.2.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       react: 19.0.0
     optionalDependencies:
-      nodemailer: 6.10.0
+      nodemailer: 6.10.1
 
   next@15.2.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
@@ -5020,12 +5030,12 @@ snapshots:
       - '@babel/core'
       - babel-plugin-macros
 
-  nodemailer-express-handlebars@7.0.0(express-handlebars@8.0.1)(nodemailer@6.10.0):
+  nodemailer-express-handlebars@7.0.0(express-handlebars@8.0.1)(nodemailer@6.10.1):
     dependencies:
       express-handlebars: 8.0.1
-      nodemailer: 6.10.0
+      nodemailer: 6.10.1
 
-  nodemailer@6.10.0: {}
+  nodemailer@6.10.1: {}
 
   oauth4webapi@3.4.1: {}
 
