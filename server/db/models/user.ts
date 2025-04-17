@@ -20,10 +20,7 @@ const UserSchema: Schema = new Schema<IUser>(
       type: String,
       enum: Object.values(UserRole),
     },
-    referred_by: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-    },
+    referred_by: { type: String },
     is_verified: {
       type: Boolean,
       default: false,

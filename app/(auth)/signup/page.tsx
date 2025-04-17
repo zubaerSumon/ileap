@@ -1,303 +1,197 @@
 "use client";
-
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import Link from "next/link";
-import Image from "next/image";
-import { useState } from "react";
-import GLogo from "../../../public/images/Google__G__logo.svg";
-import { toast } from "react-hot-toast";
-import { useRouter } from "next/navigation";
-import { trpc } from "@/utils/trpc";
-import { authValidation } from "@/server/modules/auth/auth.validation";
-import { SignupForm } from "@/utils/constants";
-import { AuthProvider, UserRole } from "@/server/db/interfaces/user";
 import { Button } from "@/components/ui/button";
-import { signIn } from "next-auth/react";
-import { Loader2 } from "lucide-react";
+import { signIn, useSession } from "next-auth/react";
+import { SignupStep } from "@/components/layout/auth/SignupStep";
+import { BasicProfileStep } from "@/components/layout/auth/BasicProfileStep";
+import { DetailedProfileStep } from "@/components/layout/auth/DetailedProfileStep";
+import { VolunteerSignupForm, volunteerSignupSchema } from "@/types/auth";
 
-export default function SignupPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+export default function VolunteerSignup() {
+  const { data: session } = useSession();
   const [step, setStep] = useState(1);
-  const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<
-    "volunteer" | "organization" | null
-  >(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userData, setUserData] = useState<VolunteerSignupForm | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsError, setTermsError] = useState<string | null>(null);
+  const [isSignupLoading, setIsSignupLoading] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid  },
-  } = useForm<SignupForm>({
-    resolver: zodResolver(authValidation.signupSchema),
-  });
-  console.log({ errors });
-
-  const signupMutation = trpc.auth.signup.useMutation({
-    onSuccess: (data) => {
-      toast.success(data.message);
-      router.push("/signin");
-      setIsLoading(false);
-    },
-    onError: (error) => {
-      toast.error(error.message);
+  const form = useForm<VolunteerSignupForm>({
+    resolver: zodResolver(volunteerSignupSchema),
+    mode: "onChange",
+    defaultValues: {
+      student_type: "no",
+      media_consent: false,
     },
   });
 
-  const onSubmit = async (data: SignupForm) => {
-    console.log();
+  const handleNext = async () => {
+    let fieldsToValidate: Array<keyof VolunteerSignupForm> = [];
 
-    console.log("clicked submit");
-
-    if (!acceptedTerms) {
-      toast.error("Please accept the terms and conditions");
-      return;
+    if (step === 1) {
+      if (!termsAccepted) {
+        setTermsError("You must accept the terms and conditions");
+        return;
+      }
+      fieldsToValidate = ["name", "email", "password", "confirm_password"];
+    } else if (step === 2) {
+      fieldsToValidate = ["bio", "volunteer_type", "phone_number", "country", "street_address", "postcode"];
+    } else if (step === 3) {
+      fieldsToValidate = ["student_type", "course", "major", "referral_source"];
+      if (form.watch("student_type") === "yes") {
+        fieldsToValidate.push("home_country");
+      }
+      if (form.watch("referral_source") === "other") {
+        fieldsToValidate.push("referral_source_other");
+      }
     }
-    setIsLoading(true);
 
-    await signupMutation.mutateAsync({
-      name: data.name,
-      email: data.email,
-      password: data.password,
-      role:
-        selectedRole === "volunteer"
-          ? UserRole.VOLUNTEER
-          : UserRole.ORGANIZATION,
-      provider: AuthProvider.CREDENTIALS,
-    });
+    const isValid = await form.trigger(fieldsToValidate);
+
+    if (isValid) {
+      if (step === 3) {
+        form.handleSubmit(onSubmit)();
+      } else {
+        setStep(step + 1);
+      }
+    }
   };
 
-  const handleRoleSelect = (role: "volunteer" | "organization") => {
-    setSelectedRole(role);
+  const handleBack = () => {
+    setStep(Math.max(1, step - 1));
   };
 
-  if (step === 1) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <h2 className="text-2xl font-bold text-center mb-8">
-            Join as a volunteer or organization
-          </h2>
+  useEffect(() => {
+    if (session) {
+      setStep(2);
+      setIsLoggedIn(true);
+      setUserData({
+        name: session.user?.name || "",
+        email: session.user?.email || "",
+        password: "",
+        confirm_password: "",
+        bio: "",
+        volunteer_type: [],
+        phone_number: "",
+        country: "",
+        street_address: "",
+        postcode: "",
+        student_type: "no",
+        home_country: "",
+        course: "",
+        major: "",
+        referral_source: "",
+        referral_source_other: "",
+        media_consent: false,
+      });
+    }
+  }, [session]);
 
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div
-              className={`border-2 rounded-lg p-6 cursor-pointer ${
-                selectedRole === "volunteer"
-                  ? "border-blue-700"
-                  : "border-gray-200"
-              }`}
-              onClick={() => handleRoleSelect("volunteer")}
-            >
-              <div className="flex flex-col space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <svg
-                      className="w-6 h-6 text-gray-700"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                      />
-                    </svg>
-                  </div>
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center 
-    ${selectedRole === "volunteer" ? "border-blue-700" : "border-gray-300"}`}
-                  >
-                    {selectedRole === "volunteer" && (
-                      <svg
-                        className="w-5 h-5 text-blue-700"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <circle cx="12" cy="12" r="8" fill="currentColor" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-lg font-medium">I&apos;m a volunteer</p>
-                  <p className="text-sm text-gray-600">looking to help</p>
-                </div>
-              </div>
-            </div>
+  const onSubmit = async (data: VolunteerSignupForm) => {
+    if (form.formState.isSubmitting) return;
+    try {
+      setError(null);
+      setIsSignupLoading(true);
+      
+      // First create the user account
+      const response = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: data.name,
+          email: data.email,
+          password: data.password,
+        }),
+      });
 
-            <div
-              className={`border-2 rounded-lg p-6 cursor-pointer ${
-                selectedRole === "organization"
-                  ? "border-blue-700"
-                  : "border-gray-200"
-              }`}
-              onClick={() => handleRoleSelect("organization")}
-            >
-              <div className="flex flex-col space-y-4">
-                <div className="flex justify-between items-center">
-                  <div className="flex items-center">
-                    <svg
-                      className="w-6 h-6 text-gray-700"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                      />
-                    </svg>
-                  </div>
-                  <div
-                    className={`w-5 h-5 rounded-full border-2 flex items-center justify-center 
-    ${selectedRole === "organization" ? "border-blue-700" : "border-gray-300"}`}
-                  >
-                    {selectedRole === "organization" && (
-                      <svg
-                        className="w-5 h-5 text-blue-700"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                      >
-                        <circle cx="12" cy="12" r="8" fill="currentColor" />
-                      </svg>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="text-lg font-medium">
-                    I&apos;m an organization
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    looking to post opportunities
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to create account");
+      }
 
-          <button
-            onClick={() => selectedRole && setStep(2)}
-            className={`w-full py-3 rounded-lg font-medium ${
-              selectedRole
-                ? "bg-blue-600 text-white hover:bg-blue-700"
-                : "bg-gray-200 text-gray-500 cursor-not-allowed"
-            }`}
-            disabled={!selectedRole}
-          >
-            {selectedRole === "volunteer"
-              ? "Apply as Volunteer"
-              : selectedRole === "organization"
-              ? "Join as Organization"
-              : "Create Account"}
-          </button>
+      // Then sign in the user
+      const signInResult = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
 
-          <p className="text-center mt-6 text-sm text-gray-600">
-            Already have an account?{" "}
-            <Link href="/signin" className="text-blue-700 hover:underline">
-              Log In
-            </Link>
-          </p>
-        </div>
-      </div>
-    );
-  }
+      if (signInResult?.error) {
+        throw new Error(signInResult.error);
+      }
 
-  // Simplified Step 2
+      // Update user data and login state
+      setUserData(data);
+      setIsLoggedIn(true);
+      setStep(2); // Move to next step after successful signup
+    } catch (err: unknown) {
+      console.error("Error during signup:", err);
+      setError(err instanceof Error ? err.message : "An error occurred during signup");
+    } finally {
+      setIsSignupLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-8">
-          Sign up to{" "}
-          {selectedRole === "volunteer" ? "volunteer" : "post opportunities"}
-        </h2>
-
-        <Button
-          onClick={() => signIn("google")}
-          variant="outline"
-          className="w-full flex items-center justify-center font-medium gap-2 border rounded-lg p-3 hover:bg-gray-100 transition-colors mb-6"
-        >
-          <Image src={GLogo} alt="Google" width={20} height={20} />
-          Continue with Google
-        </Button>
-
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">or</span>
-          </div>
+    <div className="min-h-screen bg-white flex flex-col justify-center py-12 sm:px-6 lg:px-8 pb-24">
+      {error && (
+        <div className="mb-4 p-4 text-sm text-red-700 bg-red-100 rounded-lg mx-auto max-w-xl">
+          {error}
         </div>
+      )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <input
-              type="text"
-              {...register("name")}
-              placeholder="Full name"
-              className="w-full border rounded-lg p-3"
+      {isLoggedIn && (
+        <div className="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg mx-auto max-w-xl">
+          Account created successfully! You are now logged in as{" "}
+          {userData?.name}.
+        </div>
+      )}
+
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
+        <form className="space-y-6">
+          {step === 1 && (
+            <SignupStep
+              form={form}
+              termsAccepted={termsAccepted}
+              setTermsAccepted={setTermsAccepted}
+              termsError={termsError}
+              setTermsError={setTermsError}
             />
-            {errors.name && (
-              <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-            )}
-          </div>
+          )}
+          {step === 2 && <BasicProfileStep form={form} />}
+          {step === 3 && <DetailedProfileStep form={form} />}
 
-          <div>
-            <input
-              type="email"
-              {...register("email")}
-              placeholder="Email address"
-              className="w-full border rounded-lg p-3"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
+          <div className="fixed bottom-0 left-0 right-0 bg-gray-50 py-4 px-6 border-t border-gray-200">
+            <div className="container mx-auto px-4">
+              <div className="flex justify-between">
+                <div>
+                  {step > 1 && (
+                    <Button
+                      type="button"
+                      onClick={handleBack}
+                      className="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      Back
+                    </Button>
+                  )}
+                </div>
 
-          <div>
-            <input
-              type="password"
-              {...register("password")}
-              placeholder="Password (8 or more characters)"
-              className="w-full border rounded-lg p-3"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
-            )}
+                <Button
+                  type="button"
+                  onClick={handleNext}
+                  className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  disabled={form.formState.isSubmitting || isSignupLoading}
+                >
+                  {step === 3 ? "Complete" : "Continue"}
+                </Button>
+              </div>
+            </div>
           </div>
-
-          <div className="space-y-4">
-            <label className="flex items-start gap-2">
-              <input
-                type="checkbox"
-                checked={acceptedTerms}
-                onChange={(e) => setAcceptedTerms(e.target.checked)}
-                className="mt-1"
-              />
-              <span className="text-sm text-gray-600">
-                Yes, I understand and agree to the iLeap Terms of Service,
-                including the User Agreement and Privacy Policy.
-              </span>
-            </label>
-          </div>
-
-          <Button
-            type="submit"
-            disabled={isLoading || !acceptedTerms || !isValid}
-            className="w-full  bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
-          >
-            {isLoading && <Loader2 />}
-            Create my account
-          </Button>
         </form>
       </div>
     </div>

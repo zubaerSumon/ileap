@@ -1,4 +1,4 @@
-import { Document, ObjectId } from "mongoose";
+import { Document} from "mongoose";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -18,5 +18,5 @@ export interface IUser extends Document {
   role: UserRole;
   provider: AuthProvider;
   is_verified: boolean;
-  referred_by: ObjectId;
+  referred_by: string;
 }

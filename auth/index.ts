@@ -64,13 +64,13 @@ export const {
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token, user }) {
       return {
         ...session,
         user: {
           id: token.id,
           email: token.email,
-          name: token.name,
+          name: token.name || user?.name,
           role: token.role || '',
         },
       };
