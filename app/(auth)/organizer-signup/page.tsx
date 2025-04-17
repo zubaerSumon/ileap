@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
-import { trpc } from "@/lib/trpc/client";
-
-import { Step1Form } from "../../../components/layout/auth/Step1Form";
+ 
+import { Step1Form } from "../../../components/layout/volunteer/create-volunteer-profile-modal/Step1Form";
 import { Step2Form } from "../../../components/layout/auth/Step2Form";
 import { OrganizerStep3Form } from "./components/OrganizerStep3Form";
 import { organizerSignupSchema, OrganizerSignupForm } from "./types";
+import { trpc } from "@/utils/trpc";
 
 export default function OrganizerSignupPage() {
   const [step, setStep] = useState(1);

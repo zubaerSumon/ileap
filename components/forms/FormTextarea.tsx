@@ -1,39 +1,62 @@
-import React from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+"use client";
 
-interface FormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+ import { 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormControl, 
+  FormMessage,
+  FormDescription
+} from "@/components/ui/form";
+ import { Textarea } from "@/components/ui/textarea";
+ 
+ import { Control, FieldValues, Path  } from "react-hook-form";
+
+// Base props for all form components
+interface BaseFormFieldProps<T extends FieldValues> {
+  name: Path<T>;
   label: string;
-  error?: string;
-  containerClassName?: string;
-  labelClassName?: string;
-  textareaWrapperClassName?: string;
+  description?: string;
+  control: Control<T>;
+  className?: string;
 }
 
-export function FormTextarea({
+ 
+interface FormTextareaProps<T extends FieldValues> extends BaseFormFieldProps<T> {
+  placeholder?: string;
+  rows?: number;
+}
+
+export function FormTextarea<T extends FieldValues>({
+  name,
   label,
-  error,
-  className,
-  containerClassName,
-  labelClassName,
-   
-  ...props
-}: FormTextareaProps) {
+  description,
+  control,
+  placeholder,
+  rows = 4,
+  className
+}: FormTextareaProps<T>) {
   return (
-    <div className={cn('w-full', containerClassName)}>
-      <label 
-        htmlFor={props.id} 
-        className={cn('block text-sm font-medium text-gray-700 mb-1', labelClassName)}
-      >
-        {label}
-      </label>
-      <Textarea
-        className={cn('w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500', className)}
-        {...props}
-      />
-      {error && (
-        <p className="mt-2 text-sm text-red-600">{error}</p>
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className={className}>
+          <FormLabel>{label}</FormLabel>
+          {description && <FormDescription>{description}</FormDescription>}
+          <FormControl>
+            <Textarea
+              placeholder={placeholder}
+              className="bg-[#F9FAFB]"
+              rows={rows}
+              {...field}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
       )}
-    </div>
+    />
   );
 }
+
+ 
