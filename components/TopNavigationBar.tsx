@@ -24,8 +24,8 @@ import {
   MenubarShortcut,
   MenubarTrigger,
 } from "./ui/menubar";
-import { signOut } from "next-auth/react";
-
+import { signOut, useSession } from "next-auth/react";
+ 
 const publicNavOptions = [
   {
     label: "Support",
@@ -77,11 +77,12 @@ const staticLinks = [
 export default function TopNavigationBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname();
+  const { data: session } = useSession(); // <-- Add this line
+console.log("from_top_ ",{session});
 
   const isAuthPath =
     pathname?.includes("signin") ||
-    pathname?.includes("signup") ||
-    pathname?.includes("set-role");
+    pathname?.includes("signup") 
   const isProtectedPath =
     pathname?.includes("volunteer") ||
     pathname?.includes("organization") ||
@@ -236,18 +237,49 @@ export default function TopNavigationBar() {
 
           {isAuthPath ? (
             <div className="flex items-center space-x-4">
-              <Link
-                href={pathname?.includes("signin") ? "/signup" : "/signin"}
-                className="text-sm font-normal hover:text-blue-500"
-              >
-                {pathname?.includes("signin") ? "Sign up" : "Sign in"}
-              </Link>
-              <Link
-                href="/support"
-                className="text-sm font-normal hover:text-blue-500"
-              >
-                Support
-              </Link>
+              {session ? (
+                <>
+                  <div className="flex items-center space-x-2 bg-gray-800 px-3 py-1 rounded-full">
+                    <Avatar className="h-7 w-7 border border-white">
+                      <AvatarImage src={session.user?.image || undefined} />
+                      <AvatarFallback>
+                        {session.user?.name
+                          ? session.user.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")
+                              .toUpperCase()
+                          : "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-white">
+                      {session.user?.name || "User"}
+                    </span>
+                    <button
+                      onClick={() => signOut({ callbackUrl: "/signin" })}
+                      className="ml-2 p-1 rounded-full hover:bg-blue-600 transition-colors"
+                      title="Log out"
+                    >
+                      <LogOut className="h-5 w-5 text-white" />
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Link
+                    href={pathname?.includes("signin") ? "/signup" : "/signin"}
+                    className="text-sm font-normal hover:text-blue-500"
+                  >
+                    {pathname?.includes("signin") ? "Sign up" : "Sign in"}
+                  </Link>
+                  <Link
+                    href="/support"
+                    className="text-sm font-normal hover:text-blue-500"
+                  >
+                    Support
+                  </Link>
+                </>
+              )}
             </div>
           ) : isProtectedPath ? (
             <div className="flex items-center space-x-6">

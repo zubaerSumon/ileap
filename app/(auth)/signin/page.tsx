@@ -5,12 +5,10 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { signIn, useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react"; // <-- Add this import
-import GLogo from "../../../public/images/Google__G__logo.svg";
 import toast from "react-hot-toast";
 
 const emailSchema = z.object({
@@ -33,7 +31,7 @@ export default function LoginPage() {
   const [userEmail, setUserEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false); // <-- Add this state
- 
+
   const {
     register: registerEmail,
     handleSubmit: handleEmailSubmit,
@@ -71,19 +69,17 @@ export default function LoginPage() {
   };
 
   const onPasswordSubmit = async (data: PasswordForm) => {
-     
     setIsSubmitting(true);
     try {
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         redirect: false,
         email: userEmail,
         password: data.password,
+        hola: "hola",
       });
 
-       
-
       if (result?.error) {
-        console.log('result.error', result);
+        console.log("result.error", result);
         //setError('Invalid email or password');
         setIsSubmitting(false);
       }
@@ -92,12 +88,6 @@ export default function LoginPage() {
       setIsSubmitting(false);
     }
   };
-
-  const handleGoogleLogin = () => {
-    signIn("google");
-  };
-
-   
 
   useEffect(() => {
     if (status === "authenticated" && session?.user) {
@@ -211,24 +201,6 @@ export default function LoginPage() {
                       </svg>
                     ) : null}
                     Continue
-                  </button>
-
-                  <div className="relative my-6">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300"></div>
-                    </div>
-                    <div className="relative flex justify-center text-sm">
-                      <span className="px-2 bg-white text-gray-500">Or</span>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleGoogleLogin}
-                    className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-lg p-3 hover:bg-gray-50 transition-colors"
-                  >
-                    <Image src={GLogo} alt="Google" width={20} height={20} />
-                    <span>Continue with Google</span>
                   </button>
                 </form>
               </>
