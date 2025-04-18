@@ -1,6 +1,6 @@
 "use client";
 
-import { FieldValues, Path, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import { FieldValues, Path, UseFormRegister, UseFormSetValue, PathValue } from "react-hook-form";
 import Select from "react-select";
 
 interface Option {
@@ -47,7 +47,7 @@ export const MultiSelectField = <T extends FieldValues>({
             onChange={(newValue) => {
               setValue(
                 registerName,
-                (newValue as Option[]).map((option) => option.value) as any
+                (newValue as Option[]).map((option) => option.value) as PathValue<T, Path<T>>
               );
             }}
             placeholder={placeholder}
