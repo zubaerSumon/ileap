@@ -1,35 +1,38 @@
+import { userValidation } from "@/server/modules/users/users.validation";
 import { z } from "zod";
-
-export const signupBaseSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 8 characters"),
-  confirm_password: z.string().min(6, "Please confirm your password"),
+ 
+// Re-export the base schemas from server
+export const signupBaseSchema = userValidation.userSchema.pick({
+  name: true,
+  email: true,
+  password: true,
 });
 
-export const profileBasicSchema = z.object({
-  bio: z.string().min(1, "About you is required"),
-  volunteer_type: z.array(z.string()).min(1, "Please select at least one volunteer type"),
-  phone_number: z.string().min(1, "Phone number is required"),
-  country: z.string().min(1, "Country/State is required"),
-  street_address: z.string().min(1, "Area is required"),
-  postcode: z.string().min(1, "Postcode is required"),
+export const profileBasicSchema = userValidation.volunteerSchema.pick({
+  bio: true,
+  interested_on: true,
+  phone_number: true,
+  country: true,
+  area: true,
+  postcode: true,
 });
 
-export const profileDetailSchema = z.object({
-  student_type: z.string().optional(),
-  home_country: z.string().optional(),
-  course: z.string().optional(),
-  major: z.string().optional(),
-  referral_source: z.string().optional(),
-  referral_source_other: z.string().optional(),
-  media_consent: z.boolean().default(false),
+export const profileDetailSchema = userValidation.volunteerSchema.pick({
+  student_type: true,
+  home_country: true,
+  course: true,
+  major: true,
+  referral_source: true,
+  referral_source_other: true,
 });
 
+// Create the combined schema
 export const volunteerSignupSchema = z.object({
   ...signupBaseSchema.shape,
   ...profileBasicSchema.shape,
   ...profileDetailSchema.shape,
+  confirm_password: z.string().min(6, "Please confirm your password"),
+  media_consent: z.boolean().default(false),
 }).superRefine((data, ctx) => {
   if (data.password !== data.confirm_password) {
     ctx.addIssue({
@@ -38,7 +41,7 @@ export const volunteerSignupSchema = z.object({
       path: ["confirm_password"],
     });
   }
-  if (data.student_type === 'international' && !data.home_country) {
+  if (data.student_type === 'yes' && !data.home_country) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: "Home country is required for international students",
@@ -54,5 +57,6 @@ export const volunteerSignupSchema = z.object({
   }
 });
 
+// Create types from the schemas
 export type VolunteerSignupForm = z.infer<typeof volunteerSignupSchema>;
 export type SignupFormData = z.infer<typeof signupBaseSchema>; 

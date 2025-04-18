@@ -6,10 +6,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { Loader2 } from "lucide-react";
-import { Eye, EyeOff } from "lucide-react"; // <-- Add this import
+import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
+import { useAuthCheck } from "@/hooks/useAuthCheck";
+import { trpc } from "@/utils/trpc";
 
 const emailSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -24,13 +26,14 @@ type PasswordForm = z.infer<typeof passwordSchema>;
 
 export default function LoginPage() {
   const searchParams = useSearchParams();
-  const { data: session, status } = useSession();
   const router = useRouter();
+  const { isLoading, isAuthenticated, session, hasProfile } = useAuthCheck();
+  const utils = trpc.useUtils();
   const error = searchParams.get("error");
   const [step, setStep] = useState<"email" | "password">("email");
   const [userEmail, setUserEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // <-- Add this state
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register: registerEmail,
@@ -45,18 +48,32 @@ export default function LoginPage() {
     handleSubmit: handlePasswordSubmit,
     formState: { errors: passwordErrors },
     reset: resetPasswordForm,
-    setValue: setPasswordValue, // <-- Add this
+    setValue: setPasswordValue,
   } = useForm<PasswordForm>({
     resolver: zodResolver(passwordSchema),
   });
+
+  useEffect(() => {
+    if (!isLoading) {
+      if (isAuthenticated && session?.user?.role) {
+        router.replace(`/${session.user.role}`);
+      } else if (!isAuthenticated && session?.user?.role && !hasProfile) {
+        const timeoutId = setTimeout(() => {
+          router.replace("/signup");
+        }, 100);
+        
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [isLoading, isAuthenticated, hasProfile, session, router]);
 
   const onEmailSubmit = async (data: EmailForm) => {
     setIsSubmitting(true);
     try {
       setUserEmail(data.email);
       setStep("password");
-      resetPasswordForm(); // Reset all fields
-      setPasswordValue("password", ""); // <-- Explicitly clear password field
+      resetPasswordForm();
+      setPasswordValue("password", "");
     } finally {
       setIsSubmitting(false);
     }
@@ -64,8 +81,8 @@ export default function LoginPage() {
 
   const goBackToEmail = () => {
     setStep("email");
-    resetPasswordForm(); // <-- Also reset when going back
-    setPasswordValue("password", ""); // <-- Explicitly clear password field
+    resetPasswordForm();
+    setPasswordValue("password", "");
   };
 
   const onPasswordSubmit = async (data: PasswordForm) => {
@@ -75,39 +92,28 @@ export default function LoginPage() {
         redirect: false,
         email: userEmail,
         password: data.password,
-        hola: "hola",
+        action: "signin",
       });
-
-      if (result?.error) {
-        console.log("result.error", result);
-        //setError('Invalid email or password');
+       if (result?.error) {
+        toast.error("Invalid email or password", { duration: 4000 });
         setIsSubmitting(false);
       }
+      await utils.users.profileCheckup.invalidate();
     } catch (error) {
       toast.error(`An unexpected error occurred: ${error}`, { duration: 4000 });
       setIsSubmitting(false);
     }
   };
 
-  useEffect(() => {
-    if (status === "authenticated" && session?.user) {
-      console.log("User is authenticated:", session.user, status);
-
-      const { role } = session.user;
-      const targetRoute = role === "" ? "/set-role" : `/${role}`;
-      if (targetRoute) {
-        router.replace(targetRoute);
-      }
-    }
-  }, [session, status, router]);
-  if (status === "loading" || (status === "authenticated" && session?.user)) {
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-4 text-gray-600">Wait a sec..</p>
+        <p className="mt-4 text-gray-600">Wait a sec...</p>
       </div>
     );
   }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
@@ -241,7 +247,7 @@ export default function LoginPage() {
                     <div className="relative">
                       <input
                         id="password"
-                        type={showPassword ? "text" : "password"} // <-- Toggle type
+                        type={showPassword ? "text" : "password"}
                         {...registerPassword("password")}
                         placeholder="Enter your password"
                         className="w-full border border-gray-300 rounded-lg p-3 pl-10 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"

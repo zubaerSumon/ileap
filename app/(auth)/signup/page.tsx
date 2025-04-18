@@ -8,23 +8,48 @@ import { SignupStep } from "@/components/layout/auth/SignupStep";
 import { BasicProfileStep } from "@/components/layout/auth/BasicProfileStep";
 import { DetailedProfileStep } from "@/components/layout/auth/DetailedProfileStep";
 import { VolunteerSignupForm, volunteerSignupSchema } from "@/types/auth";
+import { useSearchParams, useRouter } from "next/navigation";
+import { trpc } from "@/utils/trpc";
+import { useAuthCheck } from "@/hooks/useAuthCheck";
+import toast from "react-hot-toast";
 
 export default function VolunteerSignup() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const utils = trpc.useUtils();
   const { data: session } = useSession();
+  const { isLoading, isAuthenticated } = useAuthCheck();
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userData, setUserData] = useState<VolunteerSignupForm | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
+  const [mediaConsent, setMediaConsent] = useState(false);
+  const [mediaConsentError, setMediaConsentError] = useState<string | null>(null);
   const [isSignupLoading, setIsSignupLoading] = useState(false);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+  const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
+  const showStudentStep = searchParams?.get("referral") === "ausleap2025";
+  const setupVolunteerProfile = trpc.users.setupVolunteerProfile.useMutation({
+    onSuccess: () => {
+      utils.users.profileCheckup.invalidate();
+      toast.success("Profile setup completed successfully!");
+      setIsProfileSetupComplete(true);
+      const role = session?.user?.role;
+      if (!isLoading && role && isAuthenticated) {
+        router.push(`/${role}`);
+      }
+    },
+    onError: (error) => {
+      setError(error.message || "Failed to setup profile");
+    },
+  });
 
   const form = useForm<VolunteerSignupForm>({
     resolver: zodResolver(volunteerSignupSchema),
     mode: "onChange",
     defaultValues: {
       student_type: "no",
-      media_consent: false,
     },
   });
 
@@ -36,10 +61,24 @@ export default function VolunteerSignup() {
         setTermsError("You must accept the terms and conditions");
         return;
       }
+      // Check for password mismatch
+      const password = form.getValues("password");
+      const confirmPassword = form.getValues("confirm_password");
+      if (password !== confirmPassword) {
+        setError("Please confirm your password");
+        return;
+      }
       fieldsToValidate = ["name", "email", "password", "confirm_password"];
     } else if (step === 2) {
-      fieldsToValidate = ["bio", "volunteer_type", "phone_number", "country", "street_address", "postcode"];
-    } else if (step === 3) {
+      fieldsToValidate = [
+        "bio",
+        "interested_on",
+        "phone_number",
+        "country",
+        "area",
+        "postcode",
+      ];
+    } else if (step === 3 && showStudentStep) {
       fieldsToValidate = ["student_type", "course", "major", "referral_source"];
       if (form.watch("student_type") === "yes") {
         fieldsToValidate.push("home_country");
@@ -52,11 +91,60 @@ export default function VolunteerSignup() {
     const isValid = await form.trigger(fieldsToValidate);
 
     if (isValid) {
-      if (step === 3) {
-        form.handleSubmit(onSubmit)();
-      } else {
-        setStep(step + 1);
+      if (step === 1) {
+        await onSubmit(form.getValues());
+      } else if (step === 2 && !showStudentStep) {
+        // If no student step, create profile directly in step 2
+        const formData = form.getValues();
+        try {
+          setIsProfileLoading(true);
+          await setupVolunteerProfile.mutateAsync({
+            bio: formData.bio,
+            interested_on: formData.interested_on,
+            phone_number: formData.phone_number,
+            country: formData.country,
+            area: formData.area,
+            postcode: formData.postcode,
+            student_type: "no", // Default to no for non-student flow
+          });
+        } catch (err) {
+          console.error("Profile setup error:", err);
+        } finally {
+          setIsProfileLoading(false);
+        }
+      } else if (step === (showStudentStep ? 3 : 2)) {
+        // Check media consent in the last step
+        if (!mediaConsent) {
+          setMediaConsentError(
+            "You must grant media consent to complete your profile"
+          );
+          return;
+        }
+        // Handle profile setup
+        try {
+          setIsProfileLoading(true);
+          const formData = form.getValues();
+          await setupVolunteerProfile.mutateAsync({
+            bio: formData.bio,
+            interested_on: formData.interested_on,
+            phone_number: formData.phone_number,
+            country: formData.country,
+            area: formData.area,
+            postcode: formData.postcode,
+            student_type: formData.student_type,
+            home_country: formData.home_country,
+            course: formData.course,
+            major: formData.major,
+            referral_source: formData.referral_source,
+            referral_source_other: formData.referral_source_other,
+          });
+        } catch (err) {
+          console.error("Profile setup error:", err);
+        } finally {
+          setIsProfileLoading(false);
+        }
       }
+      setStep(step + 1);
     }
   };
 
@@ -65,73 +153,50 @@ export default function VolunteerSignup() {
   };
 
   useEffect(() => {
-    if (session) {
-      setStep(2);
-      setIsLoggedIn(true);
-      setUserData({
-        name: session.user?.name || "",
-        email: session.user?.email || "",
-        password: "",
-        confirm_password: "",
-        bio: "",
-        volunteer_type: [],
-        phone_number: "",
-        country: "",
-        street_address: "",
-        postcode: "",
-        student_type: "no",
-        home_country: "",
-        course: "",
-        major: "",
-        referral_source: "",
-        referral_source_other: "",
-        media_consent: false,
-      });
+    if (!isLoading) {
+      // Case 1: User has a role and is fully authenticated - go to role page
+      if (isAuthenticated && session?.user?.role) {
+        router.replace(`/${session.user.role}`);
+      } 
+      // Case 2: User has started but not completed profile - show step 2
+      else if (session?.user && !isAuthenticated) {
+        setStep(2);
+        setIsLoggedIn(true);
+      }
     }
-  }, [session]);
+  }, [isLoading, isAuthenticated, session, router]);
 
   const onSubmit = async (data: VolunteerSignupForm) => {
     if (form.formState.isSubmitting) return;
     try {
       setError(null);
       setIsSignupLoading(true);
-      
-      // First create the user account
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        }),
-      });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to create account");
-      }
-
-      // Then sign in the user
+      const referral = searchParams?.get("referral");
+        
       const signInResult = await signIn("credentials", {
         email: data.email,
         password: data.password,
+        name: data.name,
         redirect: false,
+        action: "signup",
+        referred_by: referral || undefined,
       });
+
+       
 
       if (signInResult?.error) {
         throw new Error(signInResult.error);
       }
 
-      // Update user data and login state
-      setUserData(data);
+      // Update login state and store user name
       setIsLoggedIn(true);
       setStep(2); // Move to next step after successful signup
     } catch (err: unknown) {
       console.error("Error during signup:", err);
-      setError(err instanceof Error ? err.message : "An error occurred during signup");
+      setError(
+        err instanceof Error ? err.message : "An error occurred during signup"
+      );
     } finally {
       setIsSignupLoading(false);
     }
@@ -145,10 +210,9 @@ export default function VolunteerSignup() {
         </div>
       )}
 
-      {isLoggedIn && (
+      {isLoggedIn && !isAuthenticated && !isProfileSetupComplete && (
         <div className="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg mx-auto max-w-xl">
-          Account created successfully! You are now logged in as{" "}
-          {userData?.name}.
+          Account created successfully! Let&apos;s complete your profile.
         </div>
       )}
 
@@ -164,7 +228,15 @@ export default function VolunteerSignup() {
             />
           )}
           {step === 2 && <BasicProfileStep form={form} />}
-          {step === 3 && <DetailedProfileStep form={form} />}
+          {step === 3 && showStudentStep && (
+            <DetailedProfileStep
+              form={form}
+              mediaConsent={mediaConsent}
+              setMediaConsent={setMediaConsent}
+              mediaConsentError={mediaConsentError}
+              setMediaConsentError={setMediaConsentError}
+            />
+          )}
 
           <div className="fixed bottom-0 left-0 right-0 bg-gray-50 py-4 px-6 border-t border-gray-200">
             <div className="container mx-auto px-4">
@@ -173,21 +245,35 @@ export default function VolunteerSignup() {
                   {step > 1 && (
                     <Button
                       type="button"
+                      variant="outline"
                       onClick={handleBack}
-                      className="px-6 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      disabled={isSignupLoading || isProfileLoading}
                     >
                       Back
                     </Button>
                   )}
                 </div>
-
                 <Button
                   type="button"
                   onClick={handleNext}
-                  className="px-6 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  disabled={form.formState.isSubmitting || isSignupLoading}
+                  disabled={isSignupLoading || isProfileLoading}
+                  className="bg-blue-600 hover:bg-blue-700"
                 >
-                  {step === 3 ? "Complete" : "Continue"}
+                  {isSignupLoading || isProfileLoading ? (
+                    <div className="flex items-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      {step === 1 ? "Creating account..." : "Saving profile..."}
+                    </div>
+                  ) : step === 1 ? (
+                    "Signup & Continue"
+                  ) : step === (showStudentStep ? 3 : 2) ? (
+                    "Complete"
+                  ) : (
+                    "Continue"
+                  )}
                 </Button>
               </div>
             </div>

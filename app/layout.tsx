@@ -1,7 +1,6 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ClientProviders } from "@/config/ClientProviders";
-import TopNavigationBar from "@/components/TopNavigationBar";
 import { auth } from "@/auth";
 import { Toaster } from "react-hot-toast";
 
@@ -18,11 +17,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
+  console.log({session});
+  
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ClientProviders session={session}>
-          <TopNavigationBar />
           {children}
           <Toaster position="top-center" />
         </ClientProviders>
