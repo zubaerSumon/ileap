@@ -1,6 +1,6 @@
 "use client";
 
-import { FieldValues, Path, UseFormRegister, UseFormSetValue } from "react-hook-form";
+import { FieldValues, Path, UseFormRegister, UseFormSetValue, PathValue } from "react-hook-form";
 import PhoneInput from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 
@@ -37,7 +37,7 @@ export const PhoneField = <T extends FieldValues>({
             defaultCountry="AU"
             value={value}
             onChange={(newValue) => {
-              setValue(registerName, newValue as any);
+              setValue(registerName, newValue as PathValue<T, Path<T>>);
             }}
             placeholder={placeholder}
             className="text-sm"
