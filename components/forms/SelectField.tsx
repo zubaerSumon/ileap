@@ -1,6 +1,7 @@
 "use client";
 
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
+import { ChevronDown } from "lucide-react";
 
 interface Option {
   value: string;
@@ -32,11 +33,11 @@ export const SelectField = <T extends FieldValues>({
         <label htmlFor={id} className="block text-sm font-medium text-gray-700">
           {label}
         </label>
-        <div className="mt-1 bg-[#EAF1FF]">
+        <div className="mt-1 bg-[#EAF1FF] relative">
           <select
             id={id}
             {...register(registerName)}
-            className="w-full bg-[#EAF1FF] h-6 px-2 py-0 focus:outline-none text-sm appearance-none"
+            className="w-full bg-[#EAF1FF] h-6 px-2 py-0 focus:outline-none text-sm appearance-none pr-8"
           >
             <option value="">{placeholder || `Select ${label}`}</option>
             {options.map((option) => (
@@ -45,6 +46,9 @@ export const SelectField = <T extends FieldValues>({
               </option>
             ))}
           </select>
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none">
+            <ChevronDown className="h-4 w-4 text-gray-500" />
+          </div>
         </div>
       </div>
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}

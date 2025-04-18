@@ -1,28 +1,16 @@
 "use client";
 import React from "react";
-import HomePageHero from "../../../components/layout/volunteer/homepage/HomePageHero";
-import Categories from "../../../components/layout/volunteer/homepage/HomePageCategories";
+ import Categories from "../../../components/layout/volunteer/homepage/HomePageCategories";
 
 import Footer from "@/components/Footer";
 
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
-   
-const VolunteerPage = () => {
  
+const VolunteerPage = () => {
   return (
     <ProtectedLayout>
-    
-      <HomePageHero />
-      <RegistrationBanner
-        title="Are you an International Student?"
-        description="Learn more about the AusLEAP program"
-        buttonText="Join us now"
-      />
-      <HomePageSuggestions />
-
       <div className="max-w-[1280px] mx-auto px-4 pb-20">
         <Categories title="Opportunities Available for you right now" />
-       
       </div>
       <Footer />
     </ProtectedLayout>

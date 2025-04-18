@@ -1,8 +1,9 @@
 "use client";
 import { Fragment, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { Loader2 } from "lucide-react";
+import { useAuthCheck } from "@/hooks/useAuthCheck";
+import TopNavigationBar from "@/components/TopNavigationBar";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -10,15 +11,20 @@ interface ProtectedLayoutProps {
 
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { isLoading, isAuthenticated, profileCheck } = useAuthCheck();
 
   useEffect(() => {
-    if (!session?.user?.role) {
-      router.push("/signin");
+    if (!isLoading && !isAuthenticated) {
+      const hasRole = Boolean(profileCheck?.hasVolunteerProfile || profileCheck?.hasOrganizationProfile);
+      if (hasRole) {
+        router.push("/signup");
+      } else {
+        router.push("/signin");
+      }
     }
-  }, [router, session]);
+  }, [isLoading, isAuthenticated, router, profileCheck]);
 
-  if (status !== "authenticated") {
+  if (isLoading || !isAuthenticated) {
     return (
       <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -27,5 +33,10 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     );
   }
 
-  return <Fragment>{children}</Fragment>;
+  return (
+    <Fragment>
+      <TopNavigationBar />
+      {children}
+    </Fragment>
+  );
 }

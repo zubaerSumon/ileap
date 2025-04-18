@@ -7,9 +7,19 @@ import { Label } from "@/components/ui/label";
 
 interface DetailedProfileStepProps {
   form: UseFormReturn<VolunteerSignupForm>;
+  mediaConsent: boolean;
+  setMediaConsent: (value: boolean) => void;
+  mediaConsentError: string | null;
+  setMediaConsentError: (value: string | null) => void;
 }
 
-export function DetailedProfileStep({ form }: DetailedProfileStepProps) {
+export function DetailedProfileStep({ 
+  form, 
+  mediaConsent, 
+  setMediaConsent,
+  mediaConsentError,
+  setMediaConsentError
+}: DetailedProfileStepProps) {
   const countries = [
     { value: "china", label: "China" },
     { value: "india", label: "India" },
@@ -151,13 +161,20 @@ export function DetailedProfileStep({ form }: DetailedProfileStepProps) {
           <input
             type="checkbox"
             id="media_consent"
-            {...form.register("media_consent")}
+            checked={mediaConsent}
+            onChange={(e) => {
+              setMediaConsent(e.target.checked);
+              setMediaConsentError(null);
+            }}
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
           <label htmlFor="media_consent" className="text-sm text-gray-600">
             I grant permission for the use of photographs or electronic media images in which I may appear
           </label>
         </div>
+        {mediaConsentError && (
+          <p className="text-sm text-red-600">{mediaConsentError}</p>
+        )}
       </div>
     </>
   );

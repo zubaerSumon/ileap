@@ -14,8 +14,7 @@ const Hero = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Implement search functionality
-    console.log('Search:', { category, location });
-  };
+   };
 
   return (
     <section className="relative bg-black text-white py-20">

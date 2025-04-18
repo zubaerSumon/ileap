@@ -22,22 +22,19 @@ const updateUserSchema = z.object({
 });
 
 const volunteerSchema = z.object({
-  phone: z.string(),
-  age: z.string(),
+  phone_number: z.string(),
   bio: z.string(),
   interested_on: z.array(z.string()),
   country: z.string(),
-  street_address: z.string(),
-  profile_img: z.string().optional(),
-  availability_date: z.object({
-    start_date: z.string(),
-    end_date: z.string(),
-  }),
-  availability_time: z.object({
-    start_time: z.string(),
-    end_time: z.string(),
-  }),
-  user: z.string().optional(), 
+  area: z.string(),
+  postcode: z.string(),
+  student_type: z.string().optional(),
+  home_country: z.string().optional(),
+  course: z.string().optional(),
+  major: z.string().optional(),
+  referral_source: z.string().optional(),
+  referral_source_other: z.string().optional(),
+  user: z.string().optional(),
 });
 
 const organizationSchema = z.object({

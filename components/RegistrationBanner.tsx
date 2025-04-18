@@ -14,8 +14,7 @@ export default function RegistrationBanner({
   description = "Ready to get started? Signing up is easy and free",
   buttonText = "Sign me up",
 }: RegistrationBannerProps) {
-  console.log("Props received:", title, description, buttonText); // Debugging
-  return (
+   return (
     <div className="bg-[#1649B8] py-16 relative overflow-hidden">
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-22" 

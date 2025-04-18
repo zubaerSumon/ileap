@@ -30,6 +30,29 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
     { value: "canberra_act", label: "Canberra, Australian Capital Territory" },
   ];
 
+  const areas = [
+    { value: "sydney_cbd", label: "Sydney CBD" },
+    { value: "north_sydney", label: "North Sydney" },
+    { value: "eastern_suburbs", label: "Eastern Suburbs" },
+    { value: "inner_west", label: "Inner West" },
+    { value: "northern_beaches", label: "Northern Beaches" },
+    { value: "western_sydney", label: "Western Sydney" },
+    { value: "south_sydney", label: "South Sydney" },
+    { value: "melbourne_cbd", label: "Melbourne CBD" },
+    { value: "south_yarra", label: "South Yarra" },
+    { value: "st_kilda", label: "St Kilda" },
+    { value: "fitzroy", label: "Fitzroy" },
+    { value: "richmond", label: "Richmond" },
+    { value: "brisbane_cbd", label: "Brisbane CBD" },
+    { value: "south_bank", label: "South Bank" },
+    { value: "fortitude_valley", label: "Fortitude Valley" },
+    { value: "west_end", label: "West End" },
+    { value: "perth_cbd", label: "Perth CBD" },
+    { value: "northbridge", label: "Northbridge" },
+    { value: "subiaco", label: "Subiaco" },
+    { value: "fremantle", label: "Fremantle" },
+  ];
+
   return (
     <>
       <div className="mb-8">
@@ -46,7 +69,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
           label="About you"
           id="bio"
           type="textarea"
-          placeholder="Being a student and passionate about protecting our environment, I"
+          placeholder="e.g. Being a student and passionate about protecting our environment, I ..."
           register={form.register}
           registerName="bio"
           error={form.formState.errors.bio?.message}
@@ -54,14 +77,14 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
 
         <MultiSelectField
           label="What type of volunteer work you like?"
-          id="volunteer_type"
+          id="interested_on"
           placeholder="Animal welfare · Homeless · Education & literacy"
           register={form.register}
-          registerName="volunteer_type"
-          error={form.formState.errors.volunteer_type?.message}
+          registerName="interested_on"
+          error={form.formState.errors.interested_on?.message}
           options={volunteerTypes}
           setValue={form.setValue}
-          value={form.watch("volunteer_type")}
+          value={form.watch("interested_on")}
         />
 
         <PhoneField
@@ -85,19 +108,20 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
           options={locations}
         />
 
-        <FormField
+        <SelectField
           label="Area"
-          id="street_address"
-          placeholder="(list of area)"
+          id="area"
+          placeholder="Select your area"
           register={form.register}
-          registerName="street_address"
-          error={form.formState.errors.street_address?.message}
+          registerName="area"
+          error={form.formState.errors.area?.message}
+          options={areas}
         />
 
         <FormField
           label="Postcode"
           id="postcode"
-          placeholder="2146"
+          placeholder="e.g. 45365"
           register={form.register}
           registerName="postcode"
           error={form.formState.errors.postcode?.message}
