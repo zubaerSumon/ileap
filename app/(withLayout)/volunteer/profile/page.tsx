@@ -1,9 +1,12 @@
 "use client";
 
 import React from 'react';
-import { VolunteerProfileForm } from './components/VolunteerProfileForm';
+
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import Footer from "@/components/Footer";
+import { VolunteerProfileForm } from '@/components/layout/volunteer/VolunteerProfileForm';
+ 
+
 
 export default function ProfilePage() {
   return (
