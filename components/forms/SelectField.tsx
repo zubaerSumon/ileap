@@ -29,15 +29,15 @@ export const SelectField = <T extends FieldValues>({
 }: SelectFieldProps<T>) => {
   return (
     <div className="space-y-1">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-700">
+        {label}
+      </label>
       <div className="border-[0.5px] border-[#CBCBCB] px-3 py-2 rounded-lg">
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-          {label}
-        </label>
-        <div className="mt-1 bg-[#EAF1FF] relative">
+        <div className="relative">
           <select
             id={id}
             {...register(registerName)}
-            className="w-full bg-[#EAF1FF] h-6 px-2 py-0 focus:outline-none text-sm appearance-none pr-8"
+            className="w-full h-6 px-2 py-0 focus:outline-none text-sm appearance-none pr-8"
           >
             <option value="">{placeholder || `Select ${label}`}</option>
             {options.map((option) => (
@@ -54,4 +54,4 @@ export const SelectField = <T extends FieldValues>({
       {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
     </div>
   );
-}; 
+};

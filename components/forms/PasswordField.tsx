@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 
 interface PasswordFieldProps {
   label: string;
   id: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  register: any;
-  registerName?: string; // Make registerName optional
+  register: unknown;
+  registerName?: string;
   error?: string;
   placeholder?: string;
   onFieldChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -24,34 +26,41 @@ export function PasswordField({
   onFieldChange,
 }: PasswordFieldProps) {
   const [show, setShow] = useState(false);
+  const [showWarning, setShowWarning] = useState(false);
 
   return (
     <div className="space-y-2">
-      <div className="border-[0.5px] border-[#CBCBCB] px-3 py-2 rounded-lg">
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-          {label}
-        </label>
-        <div className="mt-1 bg-[#EAF1FF] relative flex items-center">
-          <input
-            id={id}
-            type={show ? "text" : "password"}
-            {...(typeof register === "function" && registerName
-              ? register(registerName, onFieldChange ? { onChange: onFieldChange } : {})
-              : register)} // Accept either direct register result or function+name combo
-            className="appearance-none focus-visible:ring-[1px] block w-full focus:outline-none sm:text-sm bg-[#EAF1FF] h-6 px-2 py-1 border-none pr-8"
-            placeholder={placeholder}
-          />
-          <button
-            type="button"
-            tabIndex={-1}
-            className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500"
-            onClick={() => setShow((prev) => !prev)}
-          >
-            {show ? <EyeOff size={18} /> : <Eye size={18} />}
-          </button>
-        </div>
+      <Label htmlFor={id}>{label}</Label>
+      <div className="relative">
+        <Input
+          id={id}
+          type={show ? "text" : "password"}
+          {...(typeof register === "function" && registerName
+            ? register(registerName, { 
+                onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+                  setShowWarning(e.target.value.length > 0 && e.target.value.length < 6);
+                  if (onFieldChange) {
+                    onFieldChange(e);
+                  }
+                },
+              })
+            : register)}
+          placeholder={placeholder}
+        />
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+          onClick={() => setShow((prev) => !prev)}
+        >
+          {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+        </Button>
       </div>
-      {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+      {showWarning && (
+        <p className="text-sm text-yellow-600">Password must be at least 6 characters long</p>
+      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { FieldValues, Path, UseFormRegister, UseFormSetValue, PathValue } from "react-hook-form";
 import Select from "react-select";
+import { Label } from "@/components/ui/label";
 
 interface Option {
   value: string;
@@ -33,70 +34,73 @@ export const MultiSelectField = <T extends FieldValues>({
   const selectedOptions = options.filter((option) => value.includes(option.value));
 
   return (
-    <div className="space-y-1">
-      <div className="border-[0.5px] border-[#CBCBCB] px-3 py-2 rounded-lg">
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-          {label}
-        </label>
-        <div className="mt-1 bg-[#EAF1FF]">
-          <Select
-            isMulti
-            id={id}
-            options={options}
-            value={selectedOptions}
-            onChange={(newValue) => {
-              setValue(
-                registerName,
-                (newValue as Option[]).map((option) => option.value) as PathValue<T, Path<T>>
-              );
-            }}
-            placeholder={placeholder}
-            className="react-select"
-            classNamePrefix="react-select"
-            styles={{
-              control: (base) => ({
-                ...base,
-                minHeight: '24px',
-                border: 'none',
-                borderRadius: '0',
-                backgroundColor: '#EAF1FF',
-                boxShadow: 'none',
-                '&:hover': {
-                  border: 'none',
-                },
-              }),
-              valueContainer: (base) => ({
-                ...base,
-                padding: '0 8px',
-              }),
-              input: (base) => ({
-                ...base,
-                margin: '0',
-                padding: '0',
-              }),
-              placeholder: (base) => ({
-                ...base,
-                fontSize: '0.875rem',
-              }),
-              option: (base, state) => ({
-                ...base,
-                fontSize: '0.875rem',
-                backgroundColor: state.isSelected
-                  ? '#2563EB'
-                  : state.isFocused
-                  ? '#DBEAFE'
-                  : 'white',
-                color: state.isSelected ? 'white' : '#111827',
-              }),
-              multiValue: (base) => ({
-                ...base,
-                backgroundColor: '#DBEAFE',
-              }),
-            }}
-          />
-        </div>
-      </div>
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      <Select
+        isMulti
+        id={id}
+        options={options}
+        value={selectedOptions}
+        onChange={(newValue) => {
+          setValue(
+            registerName,
+            (newValue as Option[]).map((option) => option.value) as PathValue<T, Path<T>>
+          );
+        }}
+        placeholder={placeholder}
+        classNamePrefix="react-select"
+        theme={(theme) => ({
+          ...theme,
+          colors: {
+            ...theme.colors,
+            primary: 'hsl(var(--primary))',
+            primary75: 'hsl(var(--primary) / 0.75)',
+            primary50: 'hsl(var(--primary) / 0.5)',
+            primary25: 'hsl(var(--primary) / 0.25)',
+          },
+        })}
+        styles={{
+          control: (base) => ({
+            ...base,
+            backgroundColor: 'transparent',
+            border: '1px solid #CBCBCB',
+            borderRadius: '8px',
+            padding: '4px 8px',
+            '&:hover': {
+              borderColor: '#CBCBCB',
+            },
+          }),
+          option: (base, state) => ({
+            ...base,
+            backgroundColor: state.isSelected
+              ? 'hsl(var(--primary))'
+              : state.isFocused
+              ? 'hsl(var(--accent))'
+              : 'transparent',
+            color: state.isSelected ? 'white' : 'inherit',
+          }),
+          multiValue: (base) => ({
+            ...base,
+            backgroundColor: 'transparent',
+            border: '1px solid #CBCBCB',
+            borderRadius: '6px',
+          }),
+          multiValueLabel: (base) => ({
+            ...base,
+            color: 'inherit',
+            padding: '2px 6px',
+          }),
+          multiValueRemove: (base) => ({
+            ...base,
+            color: 'inherit',
+            ':hover': {
+              backgroundColor: 'transparent',
+              color: 'red',
+            },
+          }),
+        }}
+      />
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
-}; 
+};

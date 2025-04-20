@@ -1,6 +1,10 @@
 "use client";
 
 import { FieldValues, Path, UseFormRegister } from "react-hook-form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface FormFieldProps<T extends FieldValues> {
   label: string;
@@ -24,31 +28,25 @@ export const FormField = <T extends FieldValues>({
   className = "",
 }: FormFieldProps<T>) => {
   return (
-    <div className="space-y-1">
-      <div className="border-[0.5px] border-[#CBCBCB] px-3 py-2 rounded-lg">
-        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
-          {label}
-        </label>
-        <div className="mt-1 bg-[#EAF1FF]">
-          {type === "textarea" ? (
-            <textarea
-              id={id}
-              {...register(registerName)}
-              placeholder={placeholder}
-              className={`w-full bg-[#EAF1FF] min-h-[100px] focus:outline-none text-sm ${className}`}
-            />
-          ) : (
-            <input
-              type={type}
-              id={id}
-              {...register(registerName)}
-              placeholder={placeholder}
-              className={`w-full bg-[#EAF1FF] h-6 px-2 py-1 focus:outline-none text-sm ${className}`}
-            />
-          )}
-        </div>
-      </div>
-      {error && <p className="text-sm text-red-600 mt-1">{error}</p>}
+    <div className="space-y-2">
+      <Label htmlFor={id}>{label}</Label>
+      {type === "textarea" ? (
+        <Textarea
+          id={id}
+          {...register(registerName)}
+          placeholder={placeholder}
+          className={cn("resize-none", className)}
+        />
+      ) : (
+        <Input
+          type={type}
+          id={id}
+          {...register(registerName)}
+          placeholder={placeholder}
+          className={className}
+        />
+      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 };

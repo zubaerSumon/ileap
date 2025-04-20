@@ -6,6 +6,8 @@ export const signupBaseSchema = userValidation.userSchema.pick({
   name: true,
   email: true,
   password: true,
+}).extend({
+  password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
 export const profileBasicSchema = userValidation.volunteerSchema.pick({
@@ -31,7 +33,7 @@ export const volunteerSignupSchema = z.object({
   ...signupBaseSchema.shape,
   ...profileBasicSchema.shape,
   ...profileDetailSchema.shape,
-  confirm_password: z.string().min(6, "Please confirm your password"),
+  confirm_password: z.string().min(6, ""),
   media_consent: z.boolean().default(false),
 }).superRefine((data, ctx) => {
   if (data.password !== data.confirm_password) {
@@ -59,4 +61,4 @@ export const volunteerSignupSchema = z.object({
 
 // Create types from the schemas
 export type VolunteerSignupForm = z.infer<typeof volunteerSignupSchema>;
-export type SignupFormData = z.infer<typeof signupBaseSchema>; 
+export type SignupFormData = z.infer<typeof signupBaseSchema>;

@@ -10,7 +10,9 @@ export default function AuthLayout({
   return (
     <>
       <TopNavigationBar />
-      {children}
+      <div className="px-4 md:px-0">
+        {children}
+      </div>
     </>
   );
-} 
+}
