@@ -13,7 +13,7 @@ export function ClientProviders({
   session: Session | null;
 }) {
   return (
-    <SessionProvider session={session}>
+    <SessionProvider session={session || null}>
       <TrpcProvider>{children}</TrpcProvider>
     </SessionProvider>
   );
