@@ -19,7 +19,7 @@ interface BaseFormFieldProps<T extends FieldValues> {
   className?: string;
 }
 
- interface FormInputProps<T extends FieldValues> extends BaseFormFieldProps<T> {
+interface FormInputProps<T extends FieldValues> extends BaseFormFieldProps<T> {
   placeholder?: string;
   type?: string;
 }
@@ -45,7 +45,6 @@ export function FormInput<T extends FieldValues>({
             <Input
               type={type}
               placeholder={placeholder}
-              className="bg-[#F9FAFB]"
               {...field}
             />
           </FormControl>

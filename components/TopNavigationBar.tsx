@@ -307,6 +307,12 @@ export default function TopNavigationBar() {
                         </Avatar>
                       </MenubarTrigger>
                       <MenubarContent>
+                        <MenubarItem>
+                          <Link href="/volunteer/profile" className="w-full">
+                            Edit Profile
+                          </Link>
+                        </MenubarItem>
+                        <MenubarSeparator />
                         <MenubarItem
                           onClick={() => signOut({ callbackUrl: "/signin" })}
                         >
@@ -315,8 +321,6 @@ export default function TopNavigationBar() {
                             <LogOut />
                           </MenubarShortcut>
                         </MenubarItem>
-                        <MenubarSeparator />
-                        <MenubarItem>Profile</MenubarItem>
                         <MenubarSeparator />
                         <MenubarItem>Settings</MenubarItem>
                       </MenubarContent>

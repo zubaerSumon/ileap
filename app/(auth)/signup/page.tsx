@@ -156,7 +156,7 @@ export default function VolunteerSignup() {
     if (!isLoading) {
       // Case 1: User has a role and is fully authenticated - go to role page
       if (isAuthenticated && session?.user?.role) {
-        router.replace(`/${session.user.role}`);
+        router.replace(`/${session.user.role.toLowerCase()}`);
       } 
       // Case 2: User has started but not completed profile - show step 2
       else if (session?.user && !isAuthenticated) {
