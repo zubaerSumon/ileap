@@ -21,6 +21,20 @@ const updateUserSchema = z.object({
   is_verified: z.boolean().optional(),
 });
 
+const resetPasswordSchema = z
+  .object({
+    email: z.string().email("Invalid email address"),
+    password: z
+      .string()
+      .min(6, { message: "Password must be at least 6 characters" }),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
+
+
 const volunteerSchema = z.object({
   phone_number: z.string(),
   bio: z.string(),
@@ -56,4 +70,5 @@ export const userValidation = {
   updateUserSchema,
   volunteerSchema,
   organizationSchema,
+  resetPasswordSchema
 };

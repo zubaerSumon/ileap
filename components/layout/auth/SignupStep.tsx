@@ -52,25 +52,25 @@ export function SignupStep({
           label="Password"
           id="password"
           placeholder="Enter your password"
-          register={form.register("password", {
-            onChange: async () => {
-              await form.trigger("password");
-              await form.trigger("confirm_password");
-            },
-          })}
+          register={form.register}
+          registerName="password"
           error={form.formState.errors.password?.message}
+          onFieldChange={() => {
+            form.trigger("password");
+            form.trigger("confirm_password");
+          }}
         />
         <div className="space-y-2">
           <PasswordField
             label="Confirm Password"
             id="confirm_password"
             placeholder="Re-enter your password"
-            register={form.register("confirm_password", {
-              onChange: async () => {
-                await form.trigger("confirm_password");
-              },
-            })}
+            register={form.register}
+            registerName="confirm_password"
             error={form.formState.errors.confirm_password?.message}
+            onFieldChange={() => {
+              form.trigger("confirm_password");
+            }}
           />
           {form.getValues("password") && 
            form.getValues("confirm_password") && 
@@ -105,4 +105,4 @@ export function SignupStep({
       </div>
     </>
   );
-} 
+}
