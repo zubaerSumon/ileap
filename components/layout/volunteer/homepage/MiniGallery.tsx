@@ -33,7 +33,7 @@ const MiniGallery: React.FC<MiniGalleryProps> = ({
   ];
 
   return (
-    <div className="bg-[#254A9B] rounded-[51px] w-[450px] h-[450px] pb-8 pt-6 px-6 flex flex-col">
+    <div className="bg-[#254A9B] rounded-[51px] w-[480px] h-[450px] pb-7 pt-8 px-7 flex flex-col">
       <h2 className="text-white text-center font-inter text-base font-normal leading-normal mb-2 pb-2">
         {title}
       </h2>
