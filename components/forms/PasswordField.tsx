@@ -26,7 +26,6 @@ export function PasswordField({
   onFieldChange,
 }: PasswordFieldProps) {
   const [show, setShow] = useState(false);
-  const [showWarning, setShowWarning] = useState(false);
 
   return (
     <div className="space-y-2">
@@ -36,9 +35,8 @@ export function PasswordField({
           id={id}
           type={show ? "text" : "password"}
           {...(typeof register === "function" && registerName
-            ? register(registerName, { 
+            ? register(registerName, {
                 onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-                  setShowWarning(e.target.value.length > 0 && e.target.value.length < 6);
                   if (onFieldChange) {
                     onFieldChange(e);
                   }
@@ -57,9 +55,6 @@ export function PasswordField({
           {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
         </Button>
       </div>
-      {showWarning && (
-        <p className="text-sm text-yellow-600">Password must be at least 6 characters long</p>
-      )}
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );

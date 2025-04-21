@@ -13,3 +13,6 @@ export const VolunteerProfileUpdateSchema =
 export type VolunteerProfileUpdateData = z.infer<
   typeof VolunteerProfileUpdateSchema
 >;
+
+export const ResetPasswordSchema =  userValidation.resetPasswordSchema;
+export type ResetPasswordFormData = z.infer<typeof ResetPasswordSchema>;

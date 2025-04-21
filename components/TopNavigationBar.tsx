@@ -84,12 +84,15 @@ export default function TopNavigationBar() {
  
   const isAuthPath =
     pathname?.includes("signin") ||
-    pathname?.includes("signup") 
+    pathname?.includes("signup") ||
+    pathname?.endsWith("reset-password");
   const isProtectedPath =
     pathname?.includes("volunteer") ||
     pathname?.includes("organization") ||
     pathname?.includes("opportunities") ||
     pathname?.includes("find-volunteer");
+
+  const isResetPasswordPath = pathname?.endsWith("reset-password");
 
   useEffect(() => {
     setShowNav(!isProtectedPath || (isProtectedPath && isAuthenticated));
@@ -200,7 +203,7 @@ export default function TopNavigationBar() {
 
   return (
     <div className={`bg-white ${isAuthPath ? "sticky" : ""}`}>
-      {!isAuthPath && !isProtectedPath && (
+      {!isAuthPath && !isProtectedPath && !isResetPasswordPath && (
         <div className="bg-blue-600 text-white py-1 px-4">
           <div className="container mx-auto flex justify-end space-x-4 text-sm">
             {publicNavOptions.map((option, index) => (
@@ -212,152 +215,176 @@ export default function TopNavigationBar() {
         </div>
       )}
 
-      {showNav && (
+      {isResetPasswordPath ? (
         <div className="bg-black text-white py-2 px-6">
           <div className="container mx-auto flex justify-between items-center">
-            <div className="flex items-center space-x-6">
-              <Link href="/" className="flex items-center ">
-                <Image
-                  src={Logo}
-                  alt="iLEAP Logo"
-                  width={80}
-                  height={32}
-                  className="h-8 w-auto"
-                  priority
-                />
-              </Link>
-              {isProtectedPath && (
-                <div className="flex items-center space-x-4">
-                  {protectedNavOptions.map((option, index) => (
-                    <Link
-                      key={index}
-                      href={option.href}
-                      className="flex items-center space-x-1 text-sm hover:text-blue-500"
-                    >
-                      {option.icon && <span>{option.icon}</span>}
-                      <span>{option.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {isAuthPath ? (
-              <div className="flex items-center space-x-4">
-                {session ? (
-                  <>
-                    <div className="flex items-center space-x-2 bg-gray-800 px-3 py-1 rounded-full">
-                      <Avatar className="h-7 w-7 border border-white">
-                        <AvatarImage src={session.user?.image || undefined} />
-                        <AvatarFallback>
-                          {session.user?.name
-                            ? session.user.name
-                                .split(" ")
-                                .map((n) => n[0])
-                                .join("")
-                                .toUpperCase()
-                            : "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <span className="text-sm font-medium text-white">
-                        {session.user?.name || "User"}
-                      </span>
-                      <button
-                        onClick={() => signOut({ callbackUrl: "/signin" })}
-                        className="ml-2 p-1 rounded-full hover:bg-blue-600 transition-colors"
-                        title="Log out"
-                      >
-                        <LogOut className="h-5 w-5 text-white" />
-                      </button>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <Link
-                      href={pathname?.includes("signin") ? "/signup" : "/signin"}
-                      className="text-sm font-normal hover:text-blue-500"
-                    >
-                      {pathname?.includes("signin") ? "Sign up" : "Sign in"}
-                    </Link>
-                    <Link
-                      href="/support"
-                      className="text-sm font-normal hover:text-blue-500"
-                    >
-                      Support
-                    </Link>
-                  </>
-                )}
-              </div>
-            ) : isProtectedPath ? (
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center space-x-4">
-                  {/* <button className="hover:text-blue-500">
-                    <MessageSquare className="h-5 w-5" />
-                  </button>
-                  <button className="hover:text-blue-500">
-                    <Bell className="h-5 w-5" />
-                  </button> */}
-
-                  <Menubar className="p-0 bg-transparent border-none ">
-                    <MenubarMenu>
-                      <MenubarTrigger className="p-0 bg-transparent border-none rounded-full">
-                        <Avatar className="ring-2 ring-blue-500 border border-white">
-                          <AvatarImage src="https://github.com/shadcn.png" />
-                          <AvatarFallback>CN</AvatarFallback>
-                        </Avatar>
-                      </MenubarTrigger>
-                      <MenubarContent>
-                        <MenubarItem>
-                          <Link href="/volunteer/profile" className="w-full">
-                            Edit Profile
-                          </Link>
-                        </MenubarItem>
-                        <MenubarSeparator />
-                        <MenubarItem
-                          onClick={() => signOut({ callbackUrl: "/signin" })}
-                        >
-                          Sign out{" "}
-                          <MenubarShortcut>
-                            <LogOut />
-                          </MenubarShortcut>
-                        </MenubarItem>
-                        <MenubarSeparator />
-                        <MenubarItem>Settings</MenubarItem>
-                      </MenubarContent>
-                    </MenubarMenu>
-                  </Menubar>
-                </div>
-{/* 
-                <Link
-                  href="/post-opportunity"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
-                >
-                  Post an opportunity
-                </Link> */}
-              </div>
-            ) : (
-              <>
-                <button
-                  className="md:hidden text-white focus:outline-none"
-                  onClick={toggleMenu}
-                >
-                  {isMenuOpen ? (
-                    <X className="h-6 w-6" />
-                  ) : (
-                    <Menu className="h-6 w-6" />
-                  )}
-                </button>
-
-                <div className="hidden md:flex items-center space-x-6">
-                  {renderDesktopNavMenus()}
-                </div>
-              </>
-            )}
+            <Link href="/" className="flex items-center">
+              <Image
+                src={Logo}
+                alt="iLEAP Logo"
+                width={80}
+                height={32}
+                className="h-8 w-auto"
+                priority
+              />
+            </Link>
+            {/* Add Sign in link for reset-password page */}
+            <Link
+              href="/signin"
+              className="text-sm font-normal hover:text-blue-500"
+            >
+              Sign in
+            </Link>
           </div>
         </div>
+      ) : (
+        showNav && (
+          <div className="bg-black text-white py-2 px-6">
+            <div className="container mx-auto flex justify-between items-center">
+              <div className="flex items-center space-x-6">
+                <Link href="/" className="flex items-center ">
+                  <Image
+                    src={Logo}
+                    alt="iLEAP Logo"
+                    width={80}
+                    height={32}
+                    className="h-8 w-auto"
+                    priority
+                  />
+                </Link>
+                {isProtectedPath && (
+                  <div className="flex items-center space-x-4">
+                    {protectedNavOptions.map((option, index) => (
+                      <Link
+                        key={index}
+                        href={option.href}
+                        className="flex items-center space-x-1 text-sm hover:text-blue-500"
+                      >
+                        {option.icon && <span>{option.icon}</span>}
+                        <span>{option.label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {isAuthPath ? (
+                <div className="flex items-center space-x-4">
+                  {session ? (
+                    <>
+                      <div className="flex items-center space-x-2 bg-gray-800 px-3 py-1 rounded-full">
+                        <Avatar className="h-7 w-7 border border-white">
+                          <AvatarImage src={session.user?.image || undefined} />
+                          <AvatarFallback>
+                            {session.user?.name
+                              ? session.user.name
+                                  .split(" ")
+                                  .map((n) => n[0])
+                                  .join("")
+                                  .toUpperCase()
+                              : "U"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span className="text-sm font-medium text-white">
+                          {session.user?.name || "User"}
+                        </span>
+                        <button
+                          onClick={() => signOut({ callbackUrl: "/signin" })}
+                          className="ml-2 p-1 rounded-full hover:bg-blue-600 transition-colors"
+                          title="Log out"
+                        >
+                          <LogOut className="h-5 w-5 text-white" />
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href={pathname?.includes("signin") ? "/signup" : "/signin"}
+                        className="text-sm font-normal hover:text-blue-500"
+                      >
+                        {pathname?.includes("signin") ? "Sign up" : "Sign in"}
+                      </Link>
+                      <Link
+                        href="/support"
+                        className="text-sm font-normal hover:text-blue-500"
+                      >
+                        Support
+                      </Link>
+                    </>
+                  )}
+                </div>
+              ) : isProtectedPath ? (
+                <div className="flex items-center space-x-6">
+                  <div className="flex items-center space-x-4">
+                    {/* <button className="hover:text-blue-500">
+                      <MessageSquare className="h-5 w-5" />
+                    </button>
+                    <button className="hover:text-blue-500">
+                      <Bell className="h-5 w-5" />
+                    </button> */}
+
+                    <Menubar className="p-0 bg-transparent border-none ">
+                      <MenubarMenu>
+                        <MenubarTrigger className="p-0 bg-transparent border-none rounded-full">
+                          <Avatar className="ring-2 ring-blue-500 border border-white">
+                            <AvatarImage src="https://github.com/shadcn.png" />
+                            <AvatarFallback>CN</AvatarFallback>
+                          </Avatar>
+                        </MenubarTrigger>
+                        <MenubarContent>
+                          <MenubarItem>
+                            <Link href="/volunteer/profile" className="w-full">
+                              Edit Profile
+                            </Link>
+                          </MenubarItem>
+                          <MenubarSeparator />
+                          <MenubarItem
+                            onClick={() => signOut({ callbackUrl: "/signin" })}
+                          >
+                            Sign out{" "}
+                            <MenubarShortcut>
+                              <LogOut />
+                            </MenubarShortcut>
+                          </MenubarItem>
+                          <MenubarSeparator />
+                          <MenubarItem>Settings</MenubarItem>
+                        </MenubarContent>
+                      </MenubarMenu>
+                    </Menubar>
+                  </div>
+{/* 
+                  <Link
+                    href="/post-opportunity"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
+                  >
+                    Post an opportunity
+                  </Link> */}
+                </div>
+              ) : (
+                <>
+                  <button
+                    className="md:hidden text-white focus:outline-none"
+                    onClick={toggleMenu}
+                  >
+                    {isMenuOpen ? (
+                      <X className="h-6 w-6" />
+                    ) : (
+                      <Menu className="h-6 w-6" />
+                    )}
+                  </button>
+
+                  <div className="hidden md:flex items-center space-x-6">
+                    {renderDesktopNavMenus()}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )
       )}
 
-      {!isAuthPath && !isProtectedPath && renderMobileMenu()}
+      {!isAuthPath && !isProtectedPath && !isResetPasswordPath && renderMobileMenu()}
     </div>
   );
 }
