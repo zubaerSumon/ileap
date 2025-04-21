@@ -60,7 +60,7 @@ const MiniGallery: React.FC<MiniGalleryProps> = ({
           ))}
         </div>
         
-        <div className="mt-3 flex justify-center w-[150px] mx-auto pb-2">
+        <div className="mt-3 flex justify-center w-[150px] mx-auto pb-4">
           <Link 
             href={seeMoreLink}
             className="  flex px-[18px] py-[6px] justify-center items-center gap-[6px] flex-[1_0_0] rounded-[6px] bg-[#2563EB] text-white text-sm font-medium hover:bg-blue-600 transition-colors"
