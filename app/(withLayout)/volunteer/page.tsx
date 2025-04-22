@@ -16,12 +16,13 @@ const VolunteerPage = () => {
         <p className="text-[#8D8D8D] font-inter text-m font-medium text-center mb-12">
           We have some new volunteering opportunities available for you
         </p>
-        {/* Update layout to flex-row for horizontal alignment */}
-        <div className="flex flex-row gap-8">
+        {/* Update layout to flex-row for horizontal alignment on larger screens */}
+        <div className="flex flex-col md:flex-row gap-8">
           <Categories />
-          <MiniGallery />
+          <div className="pl-5 md:pl-0"><MiniGallery /></div>
         </div>
       </div>
+     
       <Footer />
     </ProtectedLayout>
   );
