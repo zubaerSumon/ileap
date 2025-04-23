@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import MiniGallery from "@/components/layout/volunteer/homepage/MiniGallery";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
- 
+
 const VolunteerPage = () => {
   return (
     <ProtectedLayout>
@@ -19,10 +19,12 @@ const VolunteerPage = () => {
         {/* Update layout to flex-row for horizontal alignment on larger screens */}
         <div className="flex flex-col md:flex-row gap-8">
           <Categories />
-          <div className="pl-5 md:pl-0"><MiniGallery /></div>
+          <div className="pl-5 md:pl-0">
+            <MiniGallery />
+          </div>
         </div>
       </div>
-     
+
       <Footer />
     </ProtectedLayout>
   );

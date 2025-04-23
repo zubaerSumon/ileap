@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X,/*  Bell, MessageSquare, */ LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
-import Logo from "../public/brand_logo.png";
+import Logo from "../public/AusLeap.png";
 
 import {
   NavigationMenu,
