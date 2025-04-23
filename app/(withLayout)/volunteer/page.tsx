@@ -4,7 +4,8 @@ import React from "react";
 import Footer from "@/components/Footer";
 import MiniGallery from "@/components/layout/volunteer/homepage/MiniGallery";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
- 
+import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
+
 const VolunteerPage = () => {
   return (
     <ProtectedLayout>
@@ -15,8 +16,15 @@ const VolunteerPage = () => {
         <p className="text-[#8D8D8D] font-inter text-m font-medium text-center mb-12">
           We have some new volunteering opportunities available for you
         </p>
-        <MiniGallery />
+        {/* Update layout to flex-row for horizontal alignment on larger screens */}
+        <div className="flex flex-col md:flex-row gap-8">
+          <Categories />
+          <div className="pl-5 md:pl-0">
+            <MiniGallery />
+          </div>
+        </div>
       </div>
+
       <Footer />
     </ProtectedLayout>
   );
