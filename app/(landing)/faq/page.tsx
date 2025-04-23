@@ -8,9 +8,9 @@ import Image from "next/image";
 
 const iLEAPFAQs = [
   {
-    question: "What's iLEAP?",
+    question: "What's AusLEAP?",
     answer:
-      "iLEAP is a platform that connects passionate volunteers with organizations making a difference in their communities. We facilitate meaningful volunteer opportunities and help organizations find dedicated individuals to support their causes.",
+      "AusLEAP is a platform that connects passionate volunteers with organizations making a difference in their communities. We facilitate meaningful volunteer opportunities and help organizations find dedicated individuals to support their causes.",
   },
   {
     question: "What is a community organisation?",
@@ -18,9 +18,9 @@ const iLEAPFAQs = [
       "Currently, we offer a wide range of volunteer opportunities across various sectors including education, healthcare, environmental conservation, and community development. Organizations can post opportunities, and volunteers can easily search and apply for positions that match their interests and skills.",
   },
   {
-    question: "Why should I use iLEAP?",
+    question: "Why should I use AusLEAP?",
     answer:
-      "By joining iLEAP, you become part of a community dedicated to making positive change. Volunteers gain valuable experience, develop new skills, and make meaningful connections. Organizations benefit from dedicated support and can efficiently manage their volunteer programs through our platform.",
+      "By joining AusLEAP, you become part of a community dedicated to making positive change. Volunteers gain valuable experience, develop new skills, and make meaningful connections. Organizations benefit from dedicated support and can efficiently manage their volunteer programs through our platform.",
   },
 ];
 
@@ -75,7 +75,7 @@ export default function FAQPage() {
       </div>
       <div className="container mx-auto px-4 py-16 -mt-8">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-2">iLEAP</h2>
+          <h2 className="text-3xl font-bold text-center mb-2">AusLEAP</h2>
           <p className="text-gray-500 text-center mb-4">
             Each week we get questions on volunteering topic. Browse all
             available discussions below -- We can&apos;t wait for you to join

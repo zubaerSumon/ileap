@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "iLEAP - Volunteer Platform",
+  title: "AusLeap - Volunteer Platform",
   description: "Connect organizations with passionate volunteers",
 };
 
@@ -21,7 +21,7 @@ export default async function RootLayout({
   
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${inter.className} `} >
         <ClientProviders session={session || null}>
           {children}
           <Toaster position="top-center" />

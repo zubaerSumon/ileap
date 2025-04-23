@@ -9,7 +9,7 @@ export default function Volunteer() {
       <br />
       <h2 className="text-3xl font-bold max-w-[960px] mx-auto">
         {" "}
-        Over 5,000 people have volunteered with iLEAP, Here’s why.
+        Over 5,000 people have volunteered with AusLEAP, Here’s why.
       </h2>
       <div className="py-4">
         <Benefits

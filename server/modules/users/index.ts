@@ -4,8 +4,8 @@ import Organization from "@/server/db/models/organization";
 import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
 import { userValidation } from "./users.validation";
-
-import { router } from "@/server/trpc";
+import bcrypt from "bcryptjs";
+import { publicProcedure, router } from "@/server/trpc";
 
 export const userRouter = router({
   updateUser: protectedProcedure
@@ -43,14 +43,14 @@ export const userRouter = router({
 
     const [volunteer, organization] = await Promise.all([
       Volunteer.findOne({ user: sessionUser.id }),
-      Organization.findOne({ user: sessionUser.id })
+      Organization.findOne({ user: sessionUser.id }),
     ]);
 
     return {
       hasVolunteerProfile: !!volunteer,
       hasOrganizationProfile: !!organization,
       volunteerProfile: volunteer,
-      organizationProfile: organization
+      organizationProfile: organization,
     };
   }),
 
@@ -62,13 +62,11 @@ export const userRouter = router({
         throw new Error("You must be logged in to setup your profile.");
       }
 
-      // Check if profile already exists
       const existingProfile = await Volunteer.findOne({ user: sessionUser.id });
       if (existingProfile) {
         throw new Error("Profile already exists.");
       }
 
-      // Create new volunteer profile
       const volunteer = await Volunteer.create({
         ...input,
         user: sessionUser.id,
@@ -79,5 +77,34 @@ export const userRouter = router({
       }
 
       return volunteer;
+    }),
+
+  resetPassword: publicProcedure
+    .input(userValidation.resetPasswordSchema)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    .mutation(async ({ ctx, input }) => {
+      const { email, password } = input;
+
+      const existingUser = await User.findOne({ email });
+      if (!existingUser) {
+        throw new Error(
+          "No account found with this email address. Please check and try again."
+        );
+      }
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const updatedUser = await User.findOneAndUpdate(
+        { email },
+        { password: hashedPassword },
+        { new: true }
+      );
+
+      if (!updatedUser) {
+        throw new Error("Password reset failed. Please try again.");
+      }
+
+      return {
+        success: true,
+        message: "Password has been successfully reset",
+      };
     }),
 });
