@@ -14,7 +14,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/volunteer-report" className="text-sm text-gray-600 hover:text-primary">
-                  iLEAP volunteer report
+                AusLEAP volunteer report
                 </Link>
               </li>
               <li>
@@ -92,7 +92,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-8 pt-8 border-t text-center text-sm text-gray-500">
-          © Copyright iLeap Volunteer - Category: Australian University - ABN: 77 257 686 961 - {new Date().getFullYear()}
+          © Copyright AusLEAP Volunteer - Category: Australian University - ABN: 77 257 686 961 - {new Date().getFullYear()}
         </div>
       </div>
     </footer>

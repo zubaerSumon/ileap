@@ -10,7 +10,7 @@ interface RegistrationBannerProps {
 }
 
 export default function RegistrationBanner({
-  title = "Learn more about iLEAP",
+  title = "Learn more about AusLEAP",
   description = "Ready to get started? Signing up is easy and free",
   buttonText = "Sign me up",
 }: RegistrationBannerProps) {

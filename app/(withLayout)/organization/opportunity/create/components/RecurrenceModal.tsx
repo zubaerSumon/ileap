@@ -58,7 +58,7 @@ export default function RecurrenceModal({
           <div>
             <h3 className="text-lg font-medium mb-4">Recurrence date & time</h3>
             <p className="text-sm text-gray-500 mb-4">
-              To help avoid surprises, please be specific. e.g. a few hours every day. iLeap Australia recommends no more than 15 hours per week.
+              To help avoid surprises, please be specific. e.g. a few hours every day. AusLEAP Australia recommends no more than 15 hours per week.
             </p>
             <div className="space-y-4">
               <div className="flex gap-4">

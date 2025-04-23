@@ -60,7 +60,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
           Setup your profile
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          We want to make sure you know exactly how ILEAP can meet your unique needs.
+          We want to make sure you know exactly how AusLEAP can meet your unique needs.
         </p>
       </div>
 

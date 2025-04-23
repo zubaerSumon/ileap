@@ -24,7 +24,7 @@ export default function BasicInformation() {
         Back
       </button>
       <h1 className="text-2xl font-bold mb-6 pb-2">Basic Information</h1>
-      <h1 className="text-[14px] pb-12 font-normal">Fill out the information below so Ileap can find you volunteers for your organisation.</h1>
+      <h1 className="text-[14px] pb-12 font-normal">Fill out the information below so AusLEAP can find you volunteers for your organisation.</h1>
       <Card className="bg-white rounded-lg shadow-none border-0 relative">
         <div className="absolute top-6 left-6 text-sm text-blue-600 font-medium">
           Step 1 of 2

@@ -18,7 +18,7 @@ export default function FAQHero() {
             <span className="text-white ml-2 text-lg font-medium">4.8/5.0</span>
           </div>
           <a
-            href="https://www.google.com/search?q=ileap+reviews"
+            href="https://www.google.com/search?q=AusLEAP+reviews"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-100 hover:text-white transition-colors duration-200 flex items-center space-x-2 underline"

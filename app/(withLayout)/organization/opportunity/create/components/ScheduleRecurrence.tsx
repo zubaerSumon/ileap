@@ -27,7 +27,7 @@ export default function ScheduleRecurrence() {
           Back
         </button>
         <h1 className="text-2xl font-bold mb-6 pb-2">Schedule & Recurrence</h1>
-        <h1 className="text-[14px] pb-12 font-normal">Fill out the information below so Ileap can find you volunteers for your organisation.</h1>
+        <h1 className="text-[14px] pb-12 font-normal">Fill out the information below so AusLEAP can find you volunteers for your organisation.</h1>
         <div className="bg-white rounded-lg relative">
           <div className="absolute top-6 left-6 text-sm text-blue-600 font-medium">
             Step 2 of 2
@@ -100,7 +100,7 @@ export default function ScheduleRecurrence() {
                   <span className="text-red-500 ml-1">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
-                  To help avoid surprises, please be specific. e.g. a few hours every day. ileap Australia recommends no more than 15 hours per week.
+                  To help avoid surprises, please be specific. e.g. a few hours every day. AusLEAP Australia recommends no more than 15 hours per week.
                 </p>
                 <div className="flex gap-4">
                   <div>
