@@ -5,15 +5,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { signIn, useSession } from "next-auth/react";
 import { SignupStep } from "@/components/layout/auth/SignupStep";
-import { BasicProfileStep } from "@/components/layout/auth/BasicProfileStep";
-import { DetailedProfileStep } from "@/components/layout/auth/DetailedProfileStep";
-import { VolunteerSignupForm, volunteerSignupSchema } from "@/types/auth";
+import { OrganizationBasicProfileStep } from "@/components/layout/auth/OrganizationBasicProfileStep";
+import { OrganizationDetailedProfileStep } from "@/components/layout/auth/OrganizationDetailedProfileStep";
+import { OrganizationSignupForm, organizationSignupSchema } from "@/types/auth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 import toast from "react-hot-toast";
 
-export default function VolunteerSignup() {
+export default function OrganizationSignup() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const utils = trpc.useUtils();
@@ -29,10 +29,11 @@ export default function VolunteerSignup() {
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
-  const setupVolunteerProfile = trpc.users.setupVolunteerProfile.useMutation({
+  
+  const setupOrganizationProfile = trpc.users.setupOrganizationProfile.useMutation({
     onSuccess: () => {
       utils.users.profileCheckup.invalidate();
-      toast.success("Profile setup completed successfully!");
+      toast.success("Organization profile setup completed successfully!");
       setIsProfileSetupComplete(true);
       const role = session?.user?.role;
       if (!isLoading && role && isAuthenticated) {
@@ -40,20 +41,20 @@ export default function VolunteerSignup() {
       }
     },
     onError: (error) => {
-      setError(error.message || "Failed to setup profile");
+      setError(error.message || "Failed to setup organization profile");
     },
   });
 
-  const form = useForm<VolunteerSignupForm>({
-    resolver: zodResolver(volunteerSignupSchema),
+  const form = useForm<OrganizationSignupForm>({
+    resolver: zodResolver(organizationSignupSchema),
     mode: "onChange",
     defaultValues: {
-      student_type: "no",
+      organization_type: "nonprofit",
     },
   });
 
   const handleNext = async () => {
-    let fieldsToValidate: Array<keyof VolunteerSignupForm> = [];
+    let fieldsToValidate: Array<keyof OrganizationSignupForm> = [];
 
     if (step === 1) {
       if (!termsAccepted) {
@@ -70,18 +71,22 @@ export default function VolunteerSignup() {
       fieldsToValidate = ["name", "email", "password", "confirm_password"];
     } else if (step === 2) {
       fieldsToValidate = [
-        "bio",
-        "interested_on",
+        "organization_name",
+        "organization_website",
+        "organization_type",
         "phone_number",
         "country",
         "area",
         "postcode",
       ];
-    } else if (step === 3) { // Removed the condition for showStudentStep
-      fieldsToValidate = ["student_type", "course", "major", "referral_source"];
-      if (form.watch("student_type") === "yes") {
-        fieldsToValidate.push("home_country");
-      }
+    } else if (step === 3) {
+      fieldsToValidate = [
+        "mission_statement",
+        "services_provided",
+        "target_audience",
+        "referral_source",
+      ];
+      
       if (form.watch("referral_source") === "other") {
         fieldsToValidate.push("referral_source_other");
       }
@@ -107,17 +112,17 @@ export default function VolunteerSignup() {
         try {
           setIsProfileLoading(true);
           const formData = form.getValues();
-          await setupVolunteerProfile.mutateAsync({
-            bio: formData.bio,
-            interested_on: formData.interested_on,
+          await setupOrganizationProfile.mutateAsync({
+            organization_name: formData.organization_name,
+            organization_website: formData.organization_website,
+            organization_type: formData.organization_type,
             phone_number: formData.phone_number,
             country: formData.country,
             area: formData.area,
             postcode: formData.postcode,
-            student_type: formData.student_type,
-            home_country: formData.home_country,
-            course: formData.course,
-            major: formData.major,
+            mission_statement: formData.mission_statement,
+            services_provided: formData.services_provided,
+            target_audience: formData.target_audience,
             referral_source: formData.referral_source,
             referral_source_other: formData.referral_source_other,
           });
@@ -153,7 +158,7 @@ export default function VolunteerSignup() {
     }
   }, [isLoading, isAuthenticated, session, router]);
 
-  const onSubmit = async (data: VolunteerSignupForm) => {
+  const onSubmit = async (data: OrganizationSignupForm) => {
     if (form.formState.isSubmitting) return;
     try {
       setError(null);
@@ -167,10 +172,9 @@ export default function VolunteerSignup() {
         name: data.name,
         redirect: false,
         action: "signup",
+        role: "organization", // Set role to organization
         referred_by: referral || undefined,
       });
-
-       
 
       if (signInResult?.error) {
         throw new Error(signInResult.error);
@@ -199,7 +203,7 @@ export default function VolunteerSignup() {
 
       {isLoggedIn && !isAuthenticated && !isProfileSetupComplete && (
         <div className="mb-4 p-4 text-sm text-green-700 bg-green-100 rounded-lg mx-auto max-w-xl">
-          Account created successfully! Let&apos;s complete your profile.
+          Account created successfully! Let&apos;s complete your organization profile.
         </div>
       )}
 
@@ -214,9 +218,9 @@ export default function VolunteerSignup() {
               setTermsError={setTermsError}
             />
           )}
-          {step === 2 && <BasicProfileStep form={form} />}
+          {step === 2 && <OrganizationBasicProfileStep form={form} />}
           {step === 3 && (
-            <DetailedProfileStep
+            <OrganizationDetailedProfileStep
               form={form}
               mediaConsent={mediaConsent}
               setMediaConsent={setMediaConsent}

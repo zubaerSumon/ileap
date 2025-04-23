@@ -32,9 +32,9 @@ export function SignupStep({
 
       <div className="space-y-6">
         <FormField
-          label="Volunteer Name"
+          label="Name"
           id="name"
-          placeholder="Enter your name"
+          placeholder="Enter user name"
           register={form.register}
           registerName="name"
           error={form.formState.errors.name?.message}
