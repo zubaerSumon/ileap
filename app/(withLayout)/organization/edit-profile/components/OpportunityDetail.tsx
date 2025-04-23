@@ -76,7 +76,7 @@ export function OpportunityDetail({ onBack }: OpportunityDetailProps) {
       <div className="mb-6">
         <p className="text-sm text-gray-500 mb-2">Opportunity link</p>
         <div className="space-y-2">
-          <div className="bg-gray-50 p-2 rounded text-sm">http://www.iLEAP.com/jobs/</div>
+          <div className="bg-gray-50 p-2 rounded text-sm">http://www.AusLEAP.com/jobs/</div>
           <Button variant="outline" className="text-xs">Copy link</Button>
         </div>
       </div>

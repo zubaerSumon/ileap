@@ -7,7 +7,7 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "iLEAP - Volunteer Platform",
+  title: "AusLeap - Volunteer Platform",
   description: "Connect organizations with passionate volunteers",
 };
 

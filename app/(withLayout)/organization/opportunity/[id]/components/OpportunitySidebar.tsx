@@ -39,7 +39,7 @@ export function OpportunitySidebar() {
       <div className="space-y-2">
         <h3 className="font-medium">Opportunity link</h3>
         <div className="bg-gray-50 p-2 rounded text-sm">
-          http://www.iLEAP.com/jobs/
+          http://www.AusLEAP.com/jobs/
         </div>
         <div className="text-blue-600 text-[12px]"><u>
           Copy link </u>

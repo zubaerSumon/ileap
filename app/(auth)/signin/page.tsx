@@ -86,7 +86,7 @@ export default function LoginPage() {
         <div className="overflow-hidden">
           <div className="p-8">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Log in to iLeap
+              Log in to AusLeap
             </h2>
 
             {error && (
@@ -96,7 +96,7 @@ export default function LoginPage() {
             )}
 
             <div className="flex items-center gap-2 mb-6">
-              <span className="text-sm text-gray-600">New to iLeap?</span>
+              <span className="text-sm text-gray-600">New to AusLEAP?</span>
               <Link
                 href="/signup"
                 className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors"

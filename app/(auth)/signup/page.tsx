@@ -29,7 +29,8 @@ export default function VolunteerSignup() {
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
-  const showStudentStep = searchParams?.get("referral") === "ausleap2025";
+  // Remove the condition for showing student step - everyone will see step 3
+  const showStudentStep = true; // Changed from searchParams?.get("referral") === "ausleap2025"
   const setupVolunteerProfile = trpc.users.setupVolunteerProfile.useMutation({
     onSuccess: () => {
       utils.users.profileCheckup.invalidate();
@@ -78,7 +79,8 @@ export default function VolunteerSignup() {
         "area",
         "postcode",
       ];
-    } else if (step === 3 && showStudentStep) {
+    } else if (step === 3) {
+      // Remove the showStudentStep condition since it's always true now
       fieldsToValidate = ["student_type", "course", "major", "referral_source"];
       if (form.watch("student_type") === "yes") {
         fieldsToValidate.push("home_country");
@@ -91,28 +93,14 @@ export default function VolunteerSignup() {
     const isValid = await form.trigger(fieldsToValidate);
 
     if (isValid) {
+      // Only runs if form.trigger returns true
       if (step === 1) {
         await onSubmit(form.getValues());
-      } else if (step === 2 && !showStudentStep) {
-        // If no student step, create profile directly in step 2
-        const formData = form.getValues();
-        try {
-          setIsProfileLoading(true);
-          await setupVolunteerProfile.mutateAsync({
-            bio: formData.bio,
-            interested_on: formData.interested_on,
-            phone_number: formData.phone_number,
-            country: formData.country,
-            area: formData.area,
-            postcode: formData.postcode,
-            student_type: "no", // Default to no for non-student flow
-          });
-        } catch (err) {
-          console.error("Profile setup error:", err);
-        } finally {
-          setIsProfileLoading(false);
-        }
-      } else if (step === (showStudentStep ? 3 : 2)) {
+      } else if (step === 2) {
+        // Remove the !showStudentStep condition since we always want to go to step 3
+        setStep(step + 1); // Just move to step 3 without creating profile
+      } else if (step === 3) {
+        // Remove the showStudentStep condition since it's always true now
         // Check media consent in the last step
         if (!mediaConsent) {
           setMediaConsentError(
@@ -143,8 +131,8 @@ export default function VolunteerSignup() {
         } finally {
           setIsProfileLoading(false);
         }
+        setStep(step + 1);
       }
-      setStep(step + 1);
     }
   };
 
@@ -228,7 +216,7 @@ export default function VolunteerSignup() {
             />
           )}
           {step === 2 && <BasicProfileStep form={form} />}
-          {step === 3 && showStudentStep && (
+          {step === 3 && (
             <DetailedProfileStep
               form={form}
               mediaConsent={mediaConsent}
