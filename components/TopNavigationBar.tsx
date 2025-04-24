@@ -31,11 +31,7 @@ import { useAuthCheck } from "@/hooks/useAuthCheck";
 
 
 const publicNavOptions = [
-  // {
-  //   // label: "Support",
-  //   // href: "/support",
-  //   // className: "hover:underline hidden sm:inline",
-  // },
+
   { label: "Log in", href: "/signin", className: "hover:underline" },
   {
     // label: "Organisation Sign up",
