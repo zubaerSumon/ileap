@@ -174,7 +174,7 @@ export default function VolunteerSignup() {
       if (signInResult?.error) {
         // Properly handle specific error messages
         if (signInResult.error) {
-          toast.error("This email already exists. Please provide the correct password.");
+          toast.error("Account with this email already exists. Please provide the correct password.");
         } 
         setIsSignupLoading(false);
         return;
