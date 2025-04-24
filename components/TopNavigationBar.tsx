@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, LogOut, Home } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Logo from "../public/AusLeap.png";
+import { FaInstagram, FaLinkedin } from "react-icons/fa"; 
 
 import {
   NavigationMenu,
@@ -27,6 +28,8 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 
+
+
 const publicNavOptions = [
   // {
   //   // label: "Support",
@@ -46,11 +49,6 @@ const publicNavOptions = [
   },
 ];
 
-const protectedNavOptions = [{ 
-  label: "Home", 
-  href: "/volunteer", 
-  icon: <Home className="h-5 w-5 md:hidden" /> 
-}];
 
 const desktopMenus = [
   // {
@@ -220,7 +218,7 @@ export default function TopNavigationBar() {
       {isResetPasswordPath ? (
         <div className="bg-black text-white py-2 px-6">
           <div className="container mx-auto flex justify-between items-center">
-            <Link href="/">
+            <Link href="/volunteer">
               <Image
                 src={Logo}
                 alt="iLEAP Logo"
@@ -230,6 +228,7 @@ export default function TopNavigationBar() {
                 priority
               />
             </Link>
+            
             <Link
               href="/signin"
               className="text-sm font-normal hover:text-blue-500"
@@ -243,7 +242,7 @@ export default function TopNavigationBar() {
           <div className="bg-black text-white py-2 px-6">
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center space-x-6">
-                <Link href="/" className="flex items-center">
+                <Link href={isProtectedPath ? "/volunteer" : "/"} className="flex items-center">
                   <Image
                     src={Logo}
                     alt="iLEAP Logo"
@@ -254,17 +253,23 @@ export default function TopNavigationBar() {
                   />
                 </Link>
                 {isProtectedPath && (
-                  <div className="flex items-center space-x-4">
-                    {protectedNavOptions.map((option, index) => (
-                      <Link
-                        key={index}
-                        href={option.href}
-                        className="flex items-center space-x-1 text-sm hover:text-blue-500"
-                      >
-                        {option.icon}
-                        <span className="hidden md:inline">{option.label}</span>
-                      </Link>
-                    ))}
+                  <div className="flex items-center justify-center space-x-4">
+                    <a 
+                      href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="hover:text-gray-300"
+                    >
+                      <FaInstagram className="h-4 w-4" />
+                    </a>
+                    <a 
+                      href="https://www.linkedin.com/company/ausleap/" 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="hover:text-gray-300"
+                    >
+                      <FaLinkedin className="h-4 w-4" />
+                    </a>
                   </div>
                 )}
               </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Phone, Instagram, Linkedin } from 'lucide-react';
+import { Instagram, Linkedin } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -78,15 +78,22 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-[#2563EB]">Find us</h3>
             <div className="flex space-x-4">
-              <span className="text-gray-400">
-                <Phone className="h-6 w-6" />
-              </span>
-              <span className="text-gray-400 ">
+              <a 
+                href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#2563EB] transition-colors"
+              >
                 <Instagram className="h-6 w-6" />
-              </span>
-              <span className="text-gray-400 ">
+              </a>
+              <a 
+                href="https://www.linkedin.com/company/ausleap/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-[#2563EB] transition-colors"
+              >
                 <Linkedin className="h-6 w-6" />
-              </span>
+              </a>
             </div>
           </div>
         </div>
