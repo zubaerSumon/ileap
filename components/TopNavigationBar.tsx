@@ -252,26 +252,24 @@ export default function TopNavigationBar() {
                     priority
                   />
                 </Link>
-                {isProtectedPath && (
-                  <div className="flex items-center justify-center space-x-4">
-                    <a 
-                      href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="hover:text-gray-300"
-                    >
-                      <FaInstagram className="h-4 w-4" />
-                    </a>
-                    <a 
-                      href="https://www.linkedin.com/company/ausleap/" 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="hover:text-gray-300"
-                    >
-                      <FaLinkedin className="h-4 w-4" />
-                    </a>
-                  </div>
-                )}
+                <div className="flex items-center justify-center space-x-4">
+                  <a 
+                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-gray-300"
+                  >
+                    <FaInstagram className="h-4 w-4" />
+                  </a>
+                  <a 
+                    href="https://www.linkedin.com/company/ausleap/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-gray-300"
+                  >
+                    <FaLinkedin className="h-4 w-4" />
+                  </a>
+                </div>
               </div>
 
               {isAuthPath ? (
