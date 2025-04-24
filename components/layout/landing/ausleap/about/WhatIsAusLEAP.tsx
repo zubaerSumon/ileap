@@ -1,8 +1,15 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 export default function WhatIsAusLEAP() {
+  const router = useRouter();
+
+  const handleJoinProgram = () => {
+    router.push('/signup?role=volunteer');
+  };
+
   return (
     <section className="py-32 bg-gray-50">
       <div className="container mx-auto px-4">
@@ -17,12 +24,10 @@ export default function WhatIsAusLEAP() {
           opportunities.
         </p>
         <div className="flex justify-center gap-4">
-          <Button className="bg-black">
-            Why should I join?
-          </Button>
           <Button
             variant="outline"
             className="bg-black text-white"
+            onClick={handleJoinProgram}
           >
             Join the program
           </Button>

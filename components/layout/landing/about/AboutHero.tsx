@@ -13,7 +13,7 @@ export default function AboutHero() {
             <span>Excellent</span>
             <span>4.7 out of 5</span>
             <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-            <span>Google review</span>
+            
           </div>
           </div>
         </div>

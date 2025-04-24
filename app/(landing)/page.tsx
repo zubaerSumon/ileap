@@ -4,6 +4,7 @@ import RegistrationBanner from "@/components/RegistrationBanner";
 import Hero from "@/components/layout/landing/landing-page/Hero";
 import VideoTestimonial from "@/components/layout/landing/landing-page/VideoTestimonial";
 
+
 export default function Home() {
   return (
     <main className="min-h-screen">
@@ -12,6 +13,7 @@ export default function Home() {
       <VideoTestimonial />
       <Volunteers/>
       <RegistrationBanner />
+      
     </main>
   );
 }
