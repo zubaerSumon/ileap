@@ -13,19 +13,19 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-[#2563EB]">Recruit volunteer</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/volunteer-report" className="text-sm text-gray-600 hover:text-primary">
+                <span className="text-sm text-gray-400 ">
                 AusLEAP volunteer report
-                </Link>
+                </span>
               </li>
               <li>
-                <Link href="/help-support" className="text-sm text-gray-600 hover:text-primary">
+                <span className="text-sm text-gray-400 ">
                   Help & support
-                </Link>
+                </span>
               </li>
               <li>
-                <Link href="/terms" className="text-sm text-gray-600 hover:text-primary">
+                <span className="text-sm text-gray-400 ">
                   Terms of Policies
-                </Link>
+                </span>
               </li>
             </ul>
           </div>
@@ -35,30 +35,30 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-[#2563EB]">Categories</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/faqs" className="text-sm text-gray-600 hover:text-primary">
+                <span className="text-sm text-gray-400 ">
                   FAQ&apos;s
-                </Link>
+                </span>
               </li>
               <li className="flex items-center gap-2">
-                <Link href="/community-service" className="text-sm text-gray-600 hover:text-primary">
+                <span className="text-sm text-gray-400 ">
                   Community service
-                </Link>
+                </span>
                 <Link
-                  href="/join"
+                  href="/signup?role=volunteer"
                   className="px-4 py-2 bg-[#2563EB] text-white rounded-full hover:bg-primary/90 transition-colors text-sm font-medium"
                 >
                   Join us!
                 </Link>
               </li>
               <li>
-                <Link href="/disable-services" className="text-sm text-gray-600 hover:text-primary">
+                <span className="text-sm text-gray-400 ">
                   Disable Services
-                </Link>
+                </span>
               </li>
               <li>
-                <Link href="/young-people" className="text-sm text-gray-600 hover:text-primary">
+                <span className="text-sm text-gray-400 ">
                   Young people
-                </Link>
+                </span>
               </li>
             </ul>
           </div>
@@ -78,15 +78,15 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-[#2563EB]">Find us</h3>
             <div className="flex space-x-4">
-              <Link href="tel:+61295142000" className="text-gray-600 hover:text-primary">
+              <span className="text-gray-400">
                 <Phone className="h-6 w-6" />
-              </Link>
-              <Link href="https://www.instagram.com" className="text-gray-600 hover:text-primary">
+              </span>
+              <span className="text-gray-400 ">
                 <Instagram className="h-6 w-6" />
-              </Link>
-              <Link href="https://www.linkedin.com" className="text-gray-600 hover:text-primary">
+              </span>
+              <span className="text-gray-400 ">
                 <Linkedin className="h-6 w-6" />
-              </Link>
+              </span>
             </div>
           </div>
         </div>

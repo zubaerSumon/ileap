@@ -2,6 +2,7 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface RegistrationBannerProps {
   title?: string;
@@ -14,7 +15,13 @@ export default function RegistrationBanner({
   description = "Ready to get started? Signing up is easy and free",
   buttonText = "Sign me up",
 }: RegistrationBannerProps) {
-   return (
+  const router = useRouter();
+
+  const handleSignUp = () => {
+    router.push('/signup?role=volunteer');
+  };
+
+  return (
     <div className="bg-[#1649B8] py-16 relative overflow-hidden">
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-22" 
@@ -33,7 +40,11 @@ export default function RegistrationBanner({
             {description}
           </p>
           
-          <Button className="bg-black hover:bg-gray-900 text-white border-none" size="lg">
+          <Button 
+            className="bg-black hover:bg-gray-900 text-white border-none" 
+            size="lg"
+            onClick={handleSignUp}
+          >
             {buttonText}
           </Button>
         </div>

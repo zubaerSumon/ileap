@@ -3,7 +3,7 @@
 import FAQSection from "../../../components/layout/landing/faq/FAQSection";
 import FAQHero from "../../../components/layout/landing/faq/FAQHero";
 import RegistrationBanner from "../../../components/RegistrationBanner";
-import Categories from "@/components/Categories";
+// import Categories from "@/components/Categories";
 import Image from "next/image";
 
 const iLEAPFAQs = [
@@ -108,7 +108,7 @@ export default function FAQPage() {
           <FAQSection title="" faqs={AusLEAPFAQs} />
         </div>
       </div>
-      <Categories />
+     
       <RegistrationBanner
         title="AusLEAP 2025 registration has just opened!"
         description="We're here to help. If you have any questions about volunteering, donations, or our programs, please feel free to reach out. We look forward to hearing from you!"
