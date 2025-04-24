@@ -3,9 +3,10 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X,/*  Bell, MessageSquare, */ LogOut } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Logo from "../public/AusLeap.png";
+import { FaInstagram, FaLinkedin } from "react-icons/fa"; 
 
 import {
   NavigationMenu,
@@ -27,15 +28,13 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 
+
+
 const publicNavOptions = [
-  {
-    label: "Support",
-    href: "/support",
-    className: "hover:underline hidden sm:inline",
-  },
+
   { label: "Log in", href: "/signin", className: "hover:underline" },
   {
-    label: "Organisation Sign up",
+    // label: "Organisation Sign up",
     href: "/signup?role=organization",
     className: "hover:underline hidden md:inline",
   },
@@ -46,25 +45,20 @@ const publicNavOptions = [
   },
 ];
 
-const protectedNavOptions = [
-  { label: "Home", href: "/", icon: null },
-  // { label: "Opportunities", href: "/opportunities", icon: null },
-  // { label: "Find volunteer", href: "/find-volunteer", icon: null },
-];
 
 const desktopMenus = [
-  {
-    title: "Fast volunteer opportunities",
-    items: [
-      { label: "Search Opportunities", href: "/opportunities/search" },
-      { label: "Featured Opportunities", href: "/opportunities/featured" },
-    ],
-  },
+  // {
+  //   title: "Fast volunteer opportunities",
+  //   items: [
+  //     { label: "Search Opportunities", href: "/opportunities/search" },
+  //     { label: "Featured Opportunities", href: "/opportunities/featured" },
+  //   ],
+  // },
   {
     title: "AusLEAP",
     items: [
       { label: "About AusLEAP", href: "/ausleap/about" },
-      { label: "Testimonials", href: "/ausleap/testimonials" },
+      // { label: "Testimonials", href: "/ausleap/testimonials" },
       { label: "Gallery", href: "/ausleap/gallery" },
     ],
   },
@@ -77,11 +71,11 @@ const staticLinks = [
 
 export default function TopNavigationBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showNav, setShowNav] = useState(true);
+  const [showNav, setShowNav] = useState(false); // Initialize as false
   const pathname = usePathname();
   const { data: session } = useSession();
   const { isAuthenticated } = useAuthCheck();
- 
+
   const isAuthPath =
     pathname?.includes("signin") ||
     pathname?.includes("signup") ||
@@ -95,7 +89,9 @@ export default function TopNavigationBar() {
   const isResetPasswordPath = pathname?.endsWith("reset-password");
 
   useEffect(() => {
-    setShowNav(!isProtectedPath || (isProtectedPath && isAuthenticated));
+    if (typeof window !== "undefined") {
+      setShowNav(!isProtectedPath || (isProtectedPath && isAuthenticated));
+    }
   }, [isProtectedPath, isAuthenticated]);
 
   useEffect(() => {
@@ -218,7 +214,7 @@ export default function TopNavigationBar() {
       {isResetPasswordPath ? (
         <div className="bg-black text-white py-2 px-6">
           <div className="container mx-auto flex justify-between items-center">
-            <Link href="/" className="flex items-center">
+            <Link href="/volunteer">
               <Image
                 src={Logo}
                 alt="iLEAP Logo"
@@ -228,7 +224,7 @@ export default function TopNavigationBar() {
                 priority
               />
             </Link>
-            {/* Add Sign in link for reset-password page */}
+            
             <Link
               href="/signin"
               className="text-sm font-normal hover:text-blue-500"
@@ -242,7 +238,7 @@ export default function TopNavigationBar() {
           <div className="bg-black text-white py-2 px-6">
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center space-x-6">
-                <Link href="/" className="flex items-center ">
+                <Link href={isProtectedPath ? "/volunteer" : "/"} className="flex items-center">
                   <Image
                     src={Logo}
                     alt="iLEAP Logo"
@@ -252,20 +248,24 @@ export default function TopNavigationBar() {
                     priority
                   />
                 </Link>
-                {isProtectedPath && (
-                  <div className="flex items-center space-x-4">
-                    {protectedNavOptions.map((option, index) => (
-                      <Link
-                        key={index}
-                        href={option.href}
-                        className="flex items-center space-x-1 text-sm hover:text-blue-500"
-                      >
-                        {option.icon && <span>{option.icon}</span>}
-                        <span>{option.label}</span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
+                <div className="flex items-center justify-center space-x-4">
+                  <a 
+                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-gray-300"
+                  >
+                    <FaInstagram className="h-4 w-4" />
+                  </a>
+                  <a 
+                    href="https://www.linkedin.com/company/ausleap/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-gray-300"
+                  >
+                    <FaLinkedin className="h-4 w-4" />
+                  </a>
+                </div>
               </div>
 
               {isAuthPath ? (
@@ -274,12 +274,12 @@ export default function TopNavigationBar() {
                     <>
                       <div className="flex items-center space-x-2 bg-gray-800 px-3 py-1 rounded-full">
                         <Avatar className="h-7 w-7 border border-white">
-                          <AvatarImage src={session.user?.image || undefined} />
+                          <AvatarImage src={session?.user?.image || ""} />
                           <AvatarFallback>
-                            {session.user?.name
+                            {session?.user?.name
                               ? session.user.name
                                   .split(" ")
-                                  .map((n) => n[0])
+                                  .map((n) => n?.[0] || "")
                                   .join("")
                                   .toUpperCase()
                               : "U"}
@@ -300,7 +300,9 @@ export default function TopNavigationBar() {
                   ) : (
                     <>
                       <Link
-                        href={pathname?.includes("signin") ? "/signup" : "/signin"}
+                        href={
+                          pathname?.includes("signin") ? "/signup" : "/signin"
+                        }
                         className="text-sm font-normal hover:text-blue-500"
                       >
                         {pathname?.includes("signin") ? "Sign up" : "Sign in"}
@@ -317,49 +319,58 @@ export default function TopNavigationBar() {
               ) : isProtectedPath ? (
                 <div className="flex items-center space-x-6">
                   <div className="flex items-center space-x-4">
-                    {/* <button className="hover:text-blue-500">
-                      <MessageSquare className="h-5 w-5" />
-                    </button>
-                    <button className="hover:text-blue-500">
-                      <Bell className="h-5 w-5" />
-                    </button> */}
+                    <div className="flex items-center space-x-3">
+                      <Avatar className="ring-2 ring-blue-500 border border-white">
+                        <AvatarImage src={session?.user?.image || ""} />
+                        <AvatarFallback className="bg-yellow-400 text-black">
+                          {session?.user?.name
+                            ? session.user.name
+                                .split(" ")
+                                .map((n) => n?.[0] || "")
+                                .join("")
+                                .toUpperCase()
+                            : "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-medium">
+                          {session?.user?.name || "User"}
+                        </span>
+                        <span className="text-xs text-white hidden md:block">
+                          {session?.user?.email}
+                        </span>
+                      </div>
 
-                    <Menubar className="p-0 bg-transparent border-none ">
-                      <MenubarMenu>
-                        <MenubarTrigger className="p-0 bg-transparent border-none rounded-full">
-                          <Avatar className="ring-2 ring-blue-500 border border-white">
-                            <AvatarImage src="https://github.com/shadcn.png" />
-                            <AvatarFallback>CN</AvatarFallback>
-                          </Avatar>
-                        </MenubarTrigger>
-                        <MenubarContent>
-                          <MenubarItem>
-                            <Link href="/volunteer/profile" className="w-full">
-                              Edit Profile
-                            </Link>
-                          </MenubarItem>
-                          <MenubarSeparator />
-                          <MenubarItem
-                            onClick={() => signOut({ callbackUrl: "/signin" })}
-                          >
-                            Sign out{" "}
-                            <MenubarShortcut>
-                              <LogOut />
-                            </MenubarShortcut>
-                          </MenubarItem>
-                          <MenubarSeparator />
-                          <MenubarItem>Settings</MenubarItem>
-                        </MenubarContent>
-                      </MenubarMenu>
-                    </Menubar>
+                      <Menubar className="p-0 bg-transparent border-none">
+                        <MenubarMenu>
+                          <MenubarTrigger className="p-0 bg-transparent border-none rounded-full hover:bg-gray-800 px-2">
+                            <Menu className="h-5 w-5" />
+                          </MenubarTrigger>
+                          <MenubarContent className="bg-white border border-gray-800">
+                            <MenubarItem>
+                              <Link
+                                href="/volunteer/profile"
+                                className="w-full"
+                              >
+                                Edit Profile
+                              </Link>
+                            </MenubarItem>
+                            <MenubarSeparator />
+                            <MenubarItem
+                              onClick={() =>
+                                signOut({ callbackUrl: "/signin" })
+                              }
+                            >
+                              Sign out{" "}
+                              <MenubarShortcut>
+                                <LogOut />
+                              </MenubarShortcut>
+                            </MenubarItem>
+                          </MenubarContent>
+                        </MenubarMenu>
+                      </Menubar>
+                    </div>
                   </div>
-{/* 
-                  <Link
-                    href="/post-opportunity"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm"
-                  >
-                    Post an opportunity
-                  </Link> */}
                 </div>
               ) : (
                 <>
@@ -384,7 +395,10 @@ export default function TopNavigationBar() {
         )
       )}
 
-      {!isAuthPath && !isProtectedPath && !isResetPasswordPath && renderMobileMenu()}
+      {!isAuthPath &&
+        !isProtectedPath &&
+        !isResetPasswordPath &&
+        renderMobileMenu()}
     </div>
   );
 }

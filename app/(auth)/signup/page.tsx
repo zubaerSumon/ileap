@@ -171,10 +171,13 @@ export default function VolunteerSignup() {
         referred_by: referral || undefined,
       });
 
-       
-
       if (signInResult?.error) {
-        throw new Error(signInResult.error);
+        // Properly handle specific error messages
+        if (signInResult.error) {
+          toast.error("This email already exists. Please provide the correct password.");
+        } 
+        setIsSignupLoading(false);
+        return;
       }
 
       // Update login state and store user name

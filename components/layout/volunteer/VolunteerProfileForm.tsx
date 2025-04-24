@@ -61,16 +61,21 @@ export function VolunteerProfileForm() {
         phone_number: volunteerProfile.phone_number,
         bio: volunteerProfile.bio,
         interested_on: volunteerProfile.interested_on,
-        country: volunteerProfile.country,
-        area: volunteerProfile.area,
+        country: volunteerProfile.country?.replace(/_/g, ' '),
+        area: volunteerProfile.area?.replace(/_/g, ' '),
       });
     }
   }, [volunteerProfile, form]);
 
   const onSubmit = async (data: VolunteerProfileUpdateData) => {
     try {
-      await volunteerProfileUpdateMutation.mutateAsync(data);
-      console.log({ data });
+      const formattedData = {
+        ...data,
+        country: data.country?.replace(/_/g, ' '),
+        area: data.area?.replace(/_/g, ' ')
+      };
+      await volunteerProfileUpdateMutation.mutateAsync(formattedData);
+      console.log({ formattedData });
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       // Error handling is already done in the mutation's onError
@@ -135,18 +140,8 @@ export function VolunteerProfileForm() {
             >
               Account information
             </Link>
-            <Link
-              href="/volunteer/profile/social"
-              className="block text-gray-600 hover:text-gray-900"
-            >
-              Social accounts
-            </Link>
-            <Link
-              href="/volunteer/profile/delete"
-              className="block text-gray-600 hover:text-gray-900"
-            >
-              Delete account
-            </Link>
+           
+            
           </div>
         </div>
 
@@ -194,8 +189,12 @@ export function VolunteerProfileForm() {
               <FormInput
                 control={form.control}
                 name="country"
-                label="Country"
+                label="State"
                 placeholder="Enter your country"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/_/g, ' ');
+                  form.setValue('country', value);
+                }}
               />
 
               <FormInput
@@ -203,6 +202,10 @@ export function VolunteerProfileForm() {
                 name="area"
                 label="Area"
                 placeholder="Enter your Area"
+                onChange={(e) => {
+                  const value = e.target.value.replace(/_/g, ' ');
+                  form.setValue('area', value);
+                }}
               />
 
               <Button 
