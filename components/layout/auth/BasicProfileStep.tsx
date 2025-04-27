@@ -12,7 +12,7 @@ interface BasicProfileStepProps {
 export function BasicProfileStep({ form }: BasicProfileStepProps) {
   const volunteerTypes = [
     { value: "animal_welfare", label: "Animal welfare" },
-    { value: "homeless", label: "Homeless" },
+    { value: "homeless", label: "Homelessness" },
     { value: "education", label: "Education & literacy" },
     { value: "environment", label: "Environment" },
     { value: "health", label: "Health & Medicine" },
@@ -76,7 +76,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
         />
 
         <MultiSelectField
-          label="What type of volunteer work you like?"
+          label="What type of volunteer work are you interested in?"
           id="interested_on"
           placeholder="Animal welfare · Homeless · Education & literacy"
           register={form.register}
@@ -121,7 +121,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
         <FormField
           label="Postcode"
           id="postcode"
-          placeholder="e.g. 45365"
+          placeholder="e.g. 2000"
           register={form.register}
           registerName="postcode"
           error={form.formState.errors.postcode?.message}

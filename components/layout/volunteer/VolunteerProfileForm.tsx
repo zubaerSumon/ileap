@@ -19,7 +19,7 @@ import { useEffect } from "react";
 import toast from "react-hot-toast";
 const volunteerTypes = [
   { value: "animal_welfare", label: "Animal welfare" },
-  { value: "homeless", label: "Homeless" },
+  { value: "homeless", label: "Homelessness" },
   { value: "education", label: "Education & literacy" },
   { value: "environment", label: "Environment" },
   { value: "health", label: "Health & Medicine" },
@@ -97,26 +97,7 @@ export function VolunteerProfileForm() {
             </Link>
             <h2 className="text-lg font-semibold">Edit profile</h2>
           </div>
-          <div className="flex justify-between items-center">
-            <Link
-              href="/volunteer/profile/edit"
-              className="text-blue-600 text-sm font-medium"
-            >
-              Account
-            </Link>
-            <Link
-              href="/volunteer/profile/social"
-              className="text-gray-600 text-sm hover:text-gray-900"
-            >
-              Social
-            </Link>
-            <Link
-              href="/volunteer/profile/delete"
-              className="text-gray-600 text-sm hover:text-gray-900"
-            >
-              Delete
-            </Link>
-          </div>
+         
         </div>
 
         {/* Desktop sidebar */}
@@ -134,12 +115,7 @@ export function VolunteerProfileForm() {
           <h2 className="text-xl font-semibold mb-4 ">Edit profile</h2>
 
           <div className="space-y-2">
-            <Link
-              href="/volunteer/profile/edit"
-              className="block text-blue-600 font-medium"
-            >
-              Account information
-            </Link>
+           
            
             
           </div>
@@ -177,7 +153,7 @@ export function VolunteerProfileForm() {
               <MultiSelectField
                 label="What type of volunteer work you like?"
                 id="interested_on"
-                placeholder="Animal welfare · Homeless · Education & literacy"
+                placeholder="Animal welfare · Homelessness · Education & literacy"
                 register={form.register}
                 registerName="interested_on"
                 error={form.formState.errors.interested_on?.message}
