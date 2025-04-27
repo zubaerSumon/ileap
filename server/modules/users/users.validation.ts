@@ -2,9 +2,15 @@ import { AuthProvider, UserRole } from "@/server/db/interfaces/user";
 import { z } from "zod";
 
 const userSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  password: z.string(),
+  name: z.string().nonempty("Name is required"),
+  email: z
+    .string()
+    .email("Invalid email address")
+    .nonempty("Email is required"),
+  password: z
+    .string()
+    .min(6, "Password must be at least 6 characters long")
+    .nonempty("Password is required"),
   provider: z.enum([AuthProvider.CREDENTIALS, AuthProvider.GOOGLE]),
   role: z.enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION]),
   reffered_by: z.string().optional(),
@@ -16,7 +22,9 @@ const updateUserSchema = z.object({
   email: z.string().email().optional(),
   password: z.string().optional(),
   provider: z.enum([AuthProvider.CREDENTIALS, AuthProvider.GOOGLE]).optional(),
-  role: z.enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION]).optional(),
+  role: z
+    .enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION])
+    .optional(),
   reffered_by: z.string().optional(),
   is_verified: z.boolean().optional(),
 });
@@ -34,19 +42,20 @@ const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-
 const volunteerSchema = z.object({
-  phone_number: z.string(),
-  bio: z.string(),
-  interested_on: z.array(z.string()),
-  country: z.string(),
-  area: z.string(),
-  postcode: z.string(),
-  student_type: z.string().optional(),
+  bio: z.string().nonempty("Bio is required"),
+  interested_on: z
+    .array(z.string())
+    .nonempty("Please select at least one interest"),
+  phone_number: z.string().nonempty("Phone number is required"),
+  country: z.string().nonempty("Country is required"),
+  area: z.string().nonempty("Area/Suburb is required"),
+  postcode: z.string().nonempty("Postcode is required"),
+  student_type: z.string().nonempty("Please specify if you are a student"),
+  course: z.string().nonempty("Course is required"),
+  major: z.string().nonempty("Major is required"),
+  referral_source: z.string().nonempty("Please select a referral source"),
   home_country: z.string().optional(),
-  course: z.string().optional(),
-  major: z.string().optional(),
-  referral_source: z.string().optional(),
   referral_source_other: z.string().optional(),
   user: z.string().optional(),
 });
@@ -62,7 +71,7 @@ const organizationSchema = z.object({
   abn: z.string(),
   website: z.string(),
   profile_img: z.string().optional(),
-  user: z.string().optional(), 
+  user: z.string().optional(),
 });
 
 export const userValidation = {
@@ -70,5 +79,5 @@ export const userValidation = {
   updateUserSchema,
   volunteerSchema,
   organizationSchema,
-  resetPasswordSchema
+  resetPasswordSchema,
 };
