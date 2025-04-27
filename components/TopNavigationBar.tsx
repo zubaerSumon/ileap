@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, LogOut } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Logo from "../public/AusLeap.png";
-import { FaInstagram, FaLinkedin } from "react-icons/fa"; 
+import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
 import {
   NavigationMenu,
@@ -28,10 +28,7 @@ import {
 import { signOut, useSession } from "next-auth/react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 
-
-
 const publicNavOptions = [
-
   { label: "Log in", href: "/signin", className: "hover:underline" },
   {
     // label: "Organisation Sign up",
@@ -44,7 +41,6 @@ const publicNavOptions = [
     className: "hover:underline hidden md:inline",
   },
 ];
-
 
 const desktopMenus = [
   // {
@@ -150,7 +146,7 @@ export default function TopNavigationBar() {
 
   const renderMobileMenu = () => (
     <div
-      className={`md:hidden bg-black text-white overflow-hidden transition-all duration-300 ease-in-out ${
+      className={`md:hidden bg-black  text-white overflow-hidden transition-all duration-300 ease-in-out ${
         isMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
       }`}
     >
@@ -198,7 +194,7 @@ export default function TopNavigationBar() {
   );
 
   return (
-    <div className={`bg-white ${isAuthPath ? "sticky" : ""}`}>
+    <div className="bg-white sticky top-0 z-50" >
       {!isAuthPath && !isProtectedPath && !isResetPasswordPath && (
         <div className="bg-blue-600 text-white py-1 px-4">
           <div className="container mx-auto flex justify-end space-x-4 text-sm">
@@ -224,7 +220,7 @@ export default function TopNavigationBar() {
                 priority
               />
             </Link>
-            
+
             <Link
               href="/signin"
               className="text-sm font-normal hover:text-blue-500"
@@ -238,7 +234,10 @@ export default function TopNavigationBar() {
           <div className="bg-black text-white py-2 px-6">
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center space-x-6">
-                <Link href={session ? "/volunteer" : "/"} className="flex items-center">
+                <Link
+                  href={session ? "/volunteer" : "/"}
+                  className="flex items-center"
+                >
                   <Image
                     src={Logo}
                     alt="iLEAP Logo"
@@ -249,17 +248,17 @@ export default function TopNavigationBar() {
                   />
                 </Link>
                 <div className="flex items-center justify-center space-x-4">
-                  <a 
-                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
-                    target="_blank" 
+                  <a
+                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-gray-300"
                   >
                     <FaInstagram className="h-4 w-4" />
                   </a>
-                  <a 
-                    href="https://www.linkedin.com/company/ausleap/" 
-                    target="_blank" 
+                  <a
+                    href="https://www.linkedin.com/company/ausleap/"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-gray-300"
                   >
