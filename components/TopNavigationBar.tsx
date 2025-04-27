@@ -214,7 +214,7 @@ export default function TopNavigationBar() {
       {isResetPasswordPath ? (
         <div className="bg-black text-white py-2 px-6">
           <div className="container mx-auto flex justify-between items-center">
-            <Link href="/volunteer">
+            <Link href="/">
               <Image
                 src={Logo}
                 alt="iLEAP Logo"
@@ -238,7 +238,7 @@ export default function TopNavigationBar() {
           <div className="bg-black text-white py-2 px-6">
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center space-x-6">
-                <Link href="/volunteer" className="flex items-center">
+                <Link href={session ? "/volunteer" : "/"} className="flex items-center">
                   <Image
                     src={Logo}
                     alt="iLEAP Logo"
