@@ -19,7 +19,7 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen bg-white">
       <GalleryHero />
-      <div className="relative w-full h-[50vh] bg-black">
+      <div className="relative w-full h-[50vh] bg-white mt-6">
         <div className="absolute inset-0">
           <iframe
             src="https://player.vimeo.com/video/1017098219?h=d42ef94db3&autopause=0&autoplay=1&loop=1"
