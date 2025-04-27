@@ -115,7 +115,7 @@ export default function TopNavigationBar() {
         <NavigationMenu key={index}>
           <NavigationMenuList>
             <NavigationMenuItem>
-              <NavigationMenuTrigger className="bg-black hover:bg-black hover:text-blue-600 text-sm font-medium focus:bg-black">
+              <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-blue-600 text-sm font-medium focus:bg-transparent">
                 {menu.title}
               </NavigationMenuTrigger>
               <NavigationMenuContent className="bg-black border border-gray-800 rounded-lg z-50">
@@ -238,7 +238,7 @@ export default function TopNavigationBar() {
           <div className="bg-black text-white py-2 px-6">
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center space-x-6">
-                <Link href={isProtectedPath ? "/volunteer" : "/"} className="flex items-center">
+                <Link href="/volunteer" className="flex items-center">
                   <Image
                     src={Logo}
                     alt="iLEAP Logo"
