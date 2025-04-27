@@ -6,6 +6,7 @@ export interface IVolunteer extends Document {
   interested_on: string[];
   phone_number: string;
   country: string;
+  state: string;
   area: string;
   postcode: string;
 

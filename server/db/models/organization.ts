@@ -3,13 +3,13 @@ import { IOrgnization } from "../interfaces/organization";
 
 const OrganizationSchema: Schema = new Schema<IOrgnization>(
   {
-    phone: { type: String },
+    phone_number: { type: String },
     bio: { type: String },
     type: { type: String },
-    categories: { type: [String] },
-    skills_required: { type: [String] },
-    country: { type: String },
-    street_address: { type: String },
+    opportunity_types: { type: [String] },
+    required_skills: { type: [String] },
+    state: { type: String },
+    area: { type: String },
     abn: { type: String },
     website: { type: String },
     profile_img: { type: String },

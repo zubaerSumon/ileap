@@ -5,13 +5,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { signIn, useSession } from "next-auth/react";
 import { SignupStep } from "@/components/layout/auth/SignupStep";
-import { BasicProfileStep } from "@/components/layout/auth/BasicProfileStep";
-import { DetailedProfileStep } from "@/components/layout/auth/DetailedProfileStep";
+ import { DetailedProfileStep } from "@/components/layout/auth/DetailedProfileStep";
 import { VolunteerSignupForm, volunteerSignupSchema } from "@/types/auth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 import toast from "react-hot-toast";
+import { BasicProfileStep } from "./BasicProfileStep";
 
 export default function VolunteerSignup() {
   const searchParams = useSearchParams();
@@ -75,7 +75,7 @@ export default function VolunteerSignup() {
         "bio",
         "interested_on",
         "phone_number",
-        "country",
+        "state",
         "area",
         "postcode",
       ];
@@ -116,7 +116,7 @@ export default function VolunteerSignup() {
             bio: formData.bio,
             interested_on: formData.interested_on,
             phone_number: formData.phone_number,
-            country: formData.country,
+            state: formData.state,
             area: formData.area,
             postcode: formData.postcode,
             student_type: formData.student_type,
@@ -142,12 +142,10 @@ export default function VolunteerSignup() {
 
   useEffect(() => {
     if (!isLoading) {
-      // Case 1: User has a role and is fully authenticated - go to role page
-      if (isAuthenticated && session?.user?.role) {
+       if (isAuthenticated && session?.user?.role) {
         router.replace(`/${session.user.role.toLowerCase()}`);
       } 
-      // Case 2: User has started but not completed profile - show step 2
-      else if (session?.user && !isAuthenticated) {
+       else if (session?.user && !isAuthenticated) {
         setStep(2);
         setIsLoggedIn(true);
       }
@@ -172,17 +170,15 @@ export default function VolunteerSignup() {
       });
 
       if (signInResult?.error) {
-        // Properly handle specific error messages
-        if (signInResult.error) {
+         if (signInResult.error) {
           toast.error("Account with this email already exists. Please provide the correct password.");
         } 
         setIsSignupLoading(false);
         return;
       }
 
-      // Update login state and store user name
-      setIsLoggedIn(true);
-      setStep(2); // Move to next step after successful signup
+       setIsLoggedIn(true);
+      setStep(2);  
     } catch (err: unknown) {
       console.error("Error during signup:", err);
       setError(

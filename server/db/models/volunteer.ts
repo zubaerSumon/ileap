@@ -24,6 +24,10 @@ const VolunteerSchema = new Schema<IVolunteer>(
       type: String,
       required: true,
     },
+    state: {
+      type: String,
+      required: true,
+    },
     area: {
       type: String,
       required: true,

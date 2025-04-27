@@ -3,16 +3,16 @@ import { MultiSelectField } from "@/components/forms/MultiSelectField";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { SelectField } from "@/components/forms/SelectField";
 import { UseFormReturn } from "react-hook-form";
-import { VolunteerSignupForm } from "@/types/auth";
+import { OrgSignupForm } from "@/types/auth";
 
-interface BasicProfileStepProps {
-  form: UseFormReturn<VolunteerSignupForm>;
+interface OrgProfileStepProps {
+  form: UseFormReturn<OrgSignupForm>;
 }
 
-export function BasicProfileStep({ form }: BasicProfileStepProps) {
+export function OrgProfileStep({ form }: OrgProfileStepProps) {
   const volunteerTypes = [
     { value: "animal_welfare", label: "Animal welfare" },
-    { value: "homeless", label: "Homelessness" },
+    { value: "homeless", label: "Homeless" },
     { value: "education", label: "Education & literacy" },
     { value: "environment", label: "Environment" },
     { value: "health", label: "Health & Medicine" },
@@ -57,34 +57,23 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
     <>
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900">
-          Setup your profile
+          Setup your organization profile
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          We want to make sure you know exactly how AusLEAP can meet your unique needs.
+          We want to make sure you know exactly how AusLEAP can meet your unique
+          needs.
         </p>
       </div>
 
       <div className="space-y-6">
         <FormField
-          label="About you"
+          label="Bio"
           id="bio"
           type="textarea"
-          placeholder="e.g. Being a student and passionate about protecting our environment, I ..."
+          placeholder="We are a community-driven volunteer organization dedicated to ....."
           register={form.register}
           registerName="bio"
           error={form.formState.errors.bio?.message}
-        />
-
-        <MultiSelectField
-          label="What type of volunteer work are you interested in?"
-          id="interested_on"
-          placeholder="Animal welfare · Homeless · Education & literacy"
-          register={form.register}
-          registerName="interested_on"
-          error={form.formState.errors.interested_on?.message}
-          options={volunteerTypes}
-          setValue={form.setValue}
-          value={form.watch("interested_on")}
         />
 
         <PhoneField
@@ -96,6 +85,38 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
           error={form.formState.errors.phone_number?.message}
           value={form.watch("phone_number")}
           setValue={form.setValue}
+        />
+        <SelectField
+          label="Orgnaization type"
+          id="type"
+          placeholder="Select organization type"
+          register={form.register}
+          registerName="type"
+          error={form.formState.errors.type?.message}
+          options={locations}
+        />
+
+        <MultiSelectField
+          label={`What type of volunteer work you’re providing?`}
+          id="opportunity_types"
+          placeholder="Animal welfare · Homeless · Education & literacy"
+          register={form.register}
+          registerName="opportunity_types"
+          error={form.formState.errors.opportunity_types?.message}
+          options={volunteerTypes}
+          setValue={form.setValue}
+          value={form.watch("opportunity_types")}
+        />
+        <MultiSelectField
+          label={`What are the skills you prefering?`}
+          id="required_skills"
+          placeholder="Select prefered skills"
+          register={form.register}
+          registerName="required_skills"
+          error={form.formState.errors.required_skills?.message}
+          options={volunteerTypes}
+          setValue={form.setValue}
+          value={form.watch("required_skills")}
         />
 
         <SelectField
@@ -119,14 +140,23 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
         />
 
         <FormField
-          label="Postcode"
-          id="postcode"
-          placeholder="e.g. 2000"
+          label="ABN"
+          id="abn"
+          placeholder="e.g. 43 625 460 915"
           register={form.register}
-          registerName="postcode"
-          error={form.formState.errors.postcode?.message}
+          registerName="abn"
+          error={form.formState.errors.abn?.message}
+        />
+
+        <FormField
+          label="website"
+          id="website"
+          placeholder="e.g. www.charity.ausralia.com"
+          register={form.register}
+          registerName="website"
+          error={form.formState.errors.website?.message}
         />
       </div>
     </>
   );
-} 
+}
