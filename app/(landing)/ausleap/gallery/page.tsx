@@ -20,11 +20,11 @@ export default function GalleryPage() {
     <div className="min-h-screen bg-white">
       <GalleryHero />
       <div className="relative w-full h-[50vh] bg-black">
-        <div className="absolute inset-0  bg-opacity-50 z-10" />
         <div className="absolute inset-0">
           <iframe
-            src="https://player.vimeo.com/video/1017098219?h=d42ef94db3&badge=0&autopause=0&player_id=0&app_id=58479&background=1&autoplay=1&loop=1&muted=1"
-            allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+            src="https://player.vimeo.com/video/1017098219?h=d42ef94db3&autopause=0&autoplay=1&loop=1"
+            frameBorder="0"
+            allow="autoplay; fullscreen; picture-in-picture"
             className="w-full h-full"
             title="AUSLEAP 2024 HIGHLIGHT V3"
           ></iframe>

@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 
-import Footer from "@/components/Footer";
+
 import MiniGallery from "@/components/layout/volunteer/homepage/MiniGallery";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 // import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
@@ -25,7 +25,7 @@ const VolunteerPage = () => {
         </div>
       </div>
 
-      <Footer />
+      
     </ProtectedLayout>
   );
 };
