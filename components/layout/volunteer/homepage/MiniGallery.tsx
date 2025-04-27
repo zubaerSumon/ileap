@@ -91,7 +91,7 @@ const MiniGallery: React.FC<MiniGalleryProps> = ({
 
       {/* Mobile version */}
       <div className="sm:hidden bg-[#254A9B] rounded-[51px] w-[320px] h-[350px] pb-2 pt-2 px-3 flex flex-col">
-        <h2 className="text-white text-center font-inter text-sm font-normal leading-normal pb-1">
+        <h2 className="text-white text-center font-inter text-sm font-normal leading-normal pb-3 pt-2 px-2">
           {title}
         </h2>
         

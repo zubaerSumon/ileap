@@ -247,10 +247,10 @@ export default function TopNavigationBar() {
                     priority
                   />
                 </Link>
-                <div className="flex items-center justify-center space-x-4">
-                  <a
-                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
-                    target="_blank"
+                <div className="hidden md:flex items-center justify-center space-x-4">
+                  <a 
+                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
+                    target="_blank" 
                     rel="noopener noreferrer"
                     className="hover:text-gray-300"
                   >
@@ -276,11 +276,7 @@ export default function TopNavigationBar() {
                           <AvatarImage src={session?.user?.image || ""} />
                           <AvatarFallback>
                             {session?.user?.name
-                              ? session.user.name
-                                  .split(" ")
-                                  .map((n) => n?.[0] || "")
-                                  .join("")
-                                  .toUpperCase()
+                              ? session.user.name[0].toUpperCase()
                               : "U"}
                           </AvatarFallback>
                         </Avatar>
@@ -323,19 +319,17 @@ export default function TopNavigationBar() {
                         <AvatarImage src={session?.user?.image || ""} />
                         <AvatarFallback className="bg-yellow-400 text-black">
                           {session?.user?.name
-                            ? session.user.name
-                                .split(" ")
-                                .map((n) => n?.[0] || "")
-                                .join("")
-                                .toUpperCase()
+                            ? session.user.name[0].toUpperCase()
                             : "U"}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium">
-                          {session?.user?.name || "User"}
+                        <span className="text-sm font-medium truncate max-w-[120px]">
+                          {session?.user?.name 
+                            ? session.user.name.split(' ')[0]
+                            : "User"}
                         </span>
-                        <span className="text-xs text-white hidden md:block">
+                        <span className="text-xs text-white hidden md:block truncate max-w-[120px]">
                           {session?.user?.email}
                         </span>
                       </div>
