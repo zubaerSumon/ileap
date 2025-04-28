@@ -1,7 +1,7 @@
 import { FormField } from "@/components/forms/FormField";
 import { PasswordField } from "@/components/forms/PasswordField";
 import { UseFormReturn } from "react-hook-form";
-import { OrgSignupForm  } from "@/types/auth";
+import { OrgSignupForm } from "@/types/auth";
 import { useState } from "react";
 
 interface OrgSignupStepProps {
@@ -10,7 +10,7 @@ interface OrgSignupStepProps {
   setTermsAccepted: (value: boolean) => void;
   termsError: string | null;
   setTermsError: (value: string | null) => void;
- }
+}
 
 export function OrgSignupStep({
   form,
@@ -18,7 +18,7 @@ export function OrgSignupStep({
   setTermsAccepted,
   termsError,
   setTermsError,
- }: OrgSignupStepProps) {
+}: OrgSignupStepProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = (e: React.MouseEvent) => {
@@ -113,17 +113,17 @@ export function OrgSignupStep({
 
       <div className="text-center sm:text-left space-y-3">
         <h2 className="mt-6 text-3xl font-bold text-gray-900">
-          Let&apos;s create your account
+          Welcome to AusLeap!
         </h2>
         <p className=" text-sm text-gray-600">
-          Signing up is fast and free. No commitments or long-term contracts
-          required.
+          We&apos;re excited to have you join our community. Please provide the
+          following details to get started:
         </p>
       </div>
 
       <div className="space-y-6">
         <FormField
-          label= "Organization name" 
+          label="Organization name"
           id="name"
           placeholder={`Enter your organization name `}
           register={form.register}
@@ -131,7 +131,7 @@ export function OrgSignupStep({
           error={form.formState.errors.name?.message}
         />
         <FormField
-          label= "Organization email"  
+          label="Organization email"
           id="email"
           type="email"
           placeholder={`Enter your organization email `}

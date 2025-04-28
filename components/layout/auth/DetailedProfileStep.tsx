@@ -13,12 +13,12 @@ interface DetailedProfileStepProps {
   setMediaConsentError: (value: string | null) => void;
 }
 
-export function DetailedProfileStep({ 
-  form, 
-  mediaConsent, 
+export function DetailedProfileStep({
+  form,
+  mediaConsent,
   setMediaConsent,
   mediaConsentError,
-  setMediaConsentError
+  setMediaConsentError,
 }: DetailedProfileStepProps) {
   const countries = [
     { value: "china", label: "China" },
@@ -26,15 +26,16 @@ export function DetailedProfileStep({
     { value: "brazil", label: "Brazil" },
     { value: "malaysia", label: "Malaysia" },
     { value: "singapore", label: "Singapore" },
-    { value: "other", label: "Other" },
-  ];
+   ];
 
   const courseOptions = [
-    { value: "phd", label: "PhD" },
-    { value: "masters", label: "Masters" },
-    { value: "bachelor", label: "Bachelor" },
-    { value: "diploma", label: "Diploma" },
-    { value: "certificate", label: "Certificate" },
+    { value: "phd", label: "Doctorate / PhD" },
+    { value: "masters", label: "Master’s Degree (Postgraduate)" },
+    { value: "bachelor", label: "Bachelor’s Degree (Undergraduate)" },
+    { value: "diploma", label: "Diploma / Certificate" },
+    { value: "professional", label: "Professional / Industry Expert" },
+    { value: "non-student", label: "Non-Student / Not Currently Studying" },
+   
   ];
 
   const majorOptions = [
@@ -52,8 +53,7 @@ export function DetailedProfileStep({
     { value: "email", label: "Email" },
     { value: "classes", label: "Classes" },
     { value: "friends", label: "Friends" },
-    { value: "other", label: "Other" },
-  ];
+   ];
 
   const isInternational = form.watch("student_type") === "yes";
   const referralSource = form.watch("referral_source");
@@ -81,20 +81,30 @@ export function DetailedProfileStep({
               onValueChange={(value) => form.setValue("student_type", value)}
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem 
-                  value="yes" 
-                  id="yes" 
+                <RadioGroupItem
+                  value="yes"
+                  id="yes"
                   className="h-4 w-4 border-gray-300 focus:ring-blue-500 data-[state=checked]:border-blue-600 [&>div>svg]:fill-blue-600"
                 />
-                <Label htmlFor="yes" className="text-sm text-gray-700 cursor-pointer">Yes</Label>
+                <Label
+                  htmlFor="yes"
+                  className="text-sm text-gray-700 cursor-pointer"
+                >
+                  Yes
+                </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem 
-                  value="no" 
-                  id="no" 
+                <RadioGroupItem
+                  value="no"
+                  id="no"
                   className="h-4 w-4 border-gray-300 focus:ring-blue-500 data-[state=checked]:border-blue-600 [&>div>svg]:fill-blue-600"
                 />
-                <Label htmlFor="no" className="text-sm text-gray-700 cursor-pointer">No</Label>
+                <Label
+                  htmlFor="no"
+                  className="text-sm text-gray-700 cursor-pointer"
+                >
+                  No
+                </Label>
               </div>
             </RadioGroup>
 
@@ -169,7 +179,8 @@ export function DetailedProfileStep({
             className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
           />
           <label htmlFor="media_consent" className="text-sm text-gray-600">
-            I grant permission for the use of photographs or electronic media images in which I may appear
+            I grant permission for the use of photographs or electronic media
+            images in which I may appear
           </label>
         </div>
         {mediaConsentError && (
@@ -178,4 +189,4 @@ export function DetailedProfileStep({
       </div>
     </>
   );
-} 
+}

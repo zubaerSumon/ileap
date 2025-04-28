@@ -14,6 +14,7 @@ interface PasswordFieldProps {
   error?: string;
   placeholder?: string;
   onFieldChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  customClass?: string;
 }
 
 export function PasswordField({
@@ -24,6 +25,7 @@ export function PasswordField({
   error,
   placeholder,
   onFieldChange,
+  customClass = "h-12"
 }: PasswordFieldProps) {
   const [show, setShow] = useState(false);
 
@@ -32,6 +34,7 @@ export function PasswordField({
       <Label htmlFor={id}>{label}</Label>
       <div className="relative">
         <Input
+          className={customClass}
           id={id}
           type={show ? "text" : "password"}
           {...(typeof register === "function" && registerName

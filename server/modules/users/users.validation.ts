@@ -43,7 +43,7 @@ const resetPasswordSchema = z
   });
 
 const volunteerSchema = z.object({
-  bio: z.string().nonempty("Bio is required"),
+  bio: z.string().nonempty("Your motivation is required"),
   interested_on: z
     .array(z.string())
     .nonempty("Please select at least one interest"),
@@ -63,7 +63,7 @@ const volunteerSchema = z.object({
 
 const organizationSchema = z.object({
   phone_number: z.string().nonempty("Phone number is required"),
-  bio: z.string().nonempty("Bio is required"),
+  bio: z.string().nonempty("Motivation is required"),
   type: z.string().nonempty("Type is required"),
   opportunity_types: z
     .array(z.string())

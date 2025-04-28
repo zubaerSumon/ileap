@@ -115,11 +115,10 @@ export function SignupStep({
 
       <div className="text-center sm:text-left space-y-3">
         <h2 className="mt-6 text-3xl font-bold text-gray-900">
-          Let&apos;s create your account
+        Welcome to AusLeap!
         </h2>
         <p className=" text-sm text-gray-600">
-          Signing up is fast and free. No commitments or long-term contracts
-          required.
+        We&apos;re excited to have you join our community. Please provide the following details to get started:
         </p>
       </div>
 

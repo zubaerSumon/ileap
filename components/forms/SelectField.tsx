@@ -37,7 +37,7 @@ export const SelectField = <T extends FieldValues>({
           <select
             id={id}
             {...register(registerName)}
-            className="w-full h-6 px-2 py-0 focus:outline-none text-sm appearance-none pr-8"
+            className="w-full h-8 px-2 py-0 focus:outline-none text-sm appearance-none pr-8"
           >
             <option value="">{placeholder || `Select ${label}`}</option>
             {options.map((option) => (

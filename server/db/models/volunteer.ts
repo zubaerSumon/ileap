@@ -22,7 +22,6 @@ const VolunteerSchema = new Schema<IVolunteer>(
     },
     country: {
       type: String,
-      required: true,
     },
     state: {
       type: String,

@@ -57,11 +57,11 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
     <>
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900">
-          Setup your organization profile
+          We&apos;re excited to have you on board!
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          We want to make sure you know exactly how AusLEAP can meet your unique
-          needs.
+          Please provide your organization details so we can keep you updated on
+          our efforts and ways you can get involved.
         </p>
       </div>
 
@@ -86,6 +86,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           value={form.watch("phone_number")}
           setValue={form.setValue}
         />
+
         <SelectField
           label="Orgnaization type"
           id="type"
@@ -130,7 +131,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
         />
 
         <SelectField
-          label="Area"
+          label="Suburb"
           id="area"
           placeholder="Select your area"
           register={form.register}
@@ -146,6 +147,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           register={form.register}
           registerName="abn"
           error={form.formState.errors.abn?.message}
+          className="h-12"
         />
 
         <FormField
@@ -155,6 +157,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           register={form.register}
           registerName="website"
           error={form.formState.errors.website?.message}
+          className="h-12"
         />
       </div>
     </>

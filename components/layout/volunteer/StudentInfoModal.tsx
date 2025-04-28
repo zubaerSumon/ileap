@@ -51,8 +51,7 @@ export function StudentInfoModal({ open, onOpenChange, onComplete }: StudentInfo
     { value: "email", label: "Email" },
     { value: "uts_classes", label: "UTS Classes" },
     { value: "friends", label: "Friends" },
-    { value: "other", label: "Other" },
-  ]
+   ]
 
   const isInternational = form.watch("studentType") === "international"
   const referralSource = form.watch("referralSource")

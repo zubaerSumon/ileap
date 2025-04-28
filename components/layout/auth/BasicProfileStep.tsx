@@ -57,16 +57,17 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
     <>
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900">
-          Setup your profile
+          We&apos;re excited to have you on board!
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          We want to make sure you know exactly how AusLEAP can meet your unique needs.
+          Please provide your details so we can keep you updated on our efforts
+          and ways you can get involved.
         </p>
       </div>
 
       <div className="space-y-6">
         <FormField
-          label="About you"
+          label="We’d love to hear what motivates you to volunteer"
           id="bio"
           type="textarea"
           placeholder="e.g. Being a student and passionate about protecting our environment, I ..."
@@ -109,7 +110,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
         />
 
         <SelectField
-          label="Area"
+          label="Suburb"
           id="area"
           placeholder="Select your area"
           register={form.register}
@@ -129,4 +130,4 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
       </div>
     </>
   );
-} 
+}

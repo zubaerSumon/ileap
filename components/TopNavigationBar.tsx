@@ -31,7 +31,7 @@ import { useAuthCheck } from "@/hooks/useAuthCheck";
 const publicNavOptions = [
   { label: "Log in", href: "/signin", className: "hover:underline" },
   {
-    // label: "Organisation Sign up",
+    label: "Organisation Sign up",
     href: "/signup?role=organization",
     className: "hover:underline hidden md:inline",
   },
@@ -194,7 +194,7 @@ export default function TopNavigationBar() {
   );
 
   return (
-    <div className="bg-white sticky top-0 z-50" >
+    <div className="bg-white sticky top-0 z-50">
       {!isAuthPath && !isProtectedPath && !isResetPasswordPath && (
         <div className="bg-blue-600 text-white py-1 px-4">
           <div className="container mx-auto flex justify-end space-x-4 text-sm">
@@ -248,9 +248,9 @@ export default function TopNavigationBar() {
                   />
                 </Link>
                 <div className="hidden md:flex items-center justify-center space-x-4">
-                  <a 
-                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
-                    target="_blank" 
+                  <a
+                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-gray-300"
                   >
@@ -325,8 +325,8 @@ export default function TopNavigationBar() {
                       </Avatar>
                       <div className="flex flex-col">
                         <span className="text-sm font-medium truncate max-w-[120px]">
-                          {session?.user?.name 
-                            ? session.user.name.split(' ')[0]
+                          {session?.user?.name
+                            ? session.user.name.split(" ")[0]
                             : "User"}
                         </span>
                         <span className="text-xs text-white hidden md:block truncate max-w-[120px]">
