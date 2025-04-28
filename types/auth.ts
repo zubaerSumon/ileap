@@ -24,7 +24,7 @@ export const profileBasicSchema = userValidation.volunteerSchema.pick({
   area: true,
   postcode: true,
 }).extend({
-  bio: z.string().nonempty("Bio is required"),
+  bio: z.string().nonempty("Your motivation is required"),
   interested_on: z.array(z.string()).nonempty("Please select at least one interest"), // Assuming interested_on is an array of strings
   phone_number: z.string().nonempty("Phone number is required"),
   country: z.string().nonempty("Country is required"),
