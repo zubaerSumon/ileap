@@ -65,6 +65,18 @@ export const {
       return token;
     },
     async session({ session, token, user }) {
+      if (!token) {
+        return {
+          ...session,
+          user: {
+            id: '',
+            email: '',
+            name: '',
+            role: '',
+          },
+        };
+      }
+      
       return {
         ...session,
         user: {

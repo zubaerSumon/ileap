@@ -58,7 +58,7 @@ export const CredentialsProvider = Credentials({
           name: credentials.name,
           password: hashedPassword,
           referred_by: credentials.referred_by,
-          role: UserRole.VOLUNTEER,
+          role: credentials.role || UserRole.VOLUNTEER,
           is_verified: true,
         });
 
