@@ -43,17 +43,19 @@ const resetPasswordSchema = z
   });
 
 const volunteerSchema = z.object({
-  bio: z.string().nonempty("Bio is required"),
+  bio: z.string().nonempty("Your motivation is required"),
   interested_on: z
     .array(z.string())
     .nonempty("Please select at least one interest"),
   phone_number: z.string().nonempty("Phone number is required"),
-  country: z.string().nonempty("Country is required"),
+  country: z.string().optional(),
+  state: z.string().nonempty("State is required"),
   area: z.string().nonempty("Area/Suburb is required"),
   postcode: z.string().nonempty("Postcode is required"),
   student_type: z.string().nonempty("Please specify if you are a student"),
   course: z.string().nonempty("Course is required"),
-  major: z.string().nonempty("Major is required"),
+  major: z.string().optional(),
+  major_other: z.string().optional(),
   referral_source: z.string().nonempty("Please select a referral source"),
   home_country: z.string().optional(),
   referral_source_other: z.string().optional(),
@@ -61,15 +63,17 @@ const volunteerSchema = z.object({
 });
 
 const organizationSchema = z.object({
-  phone: z.string(),
-  bio: z.string(),
-  type: z.string(),
-  categories: z.array(z.string()),
-  skills_required: z.array(z.string()),
-  country: z.string(),
-  street_address: z.string(),
-  abn: z.string(),
-  website: z.string(),
+  phone_number: z.string().nonempty("Phone number is required"),
+  bio: z.string().nonempty("Motivation is required"),
+  type: z.string().nonempty("Type is required"),
+  opportunity_types: z
+    .array(z.string())
+    .nonempty("Please select at least one volunteer work"),
+  required_skills: z.array(z.string()).nonempty("Skills is required"),
+  state: z.string().nonempty("State is required"),
+  area: z.string().nonempty("Area/Suburb is required"),
+  abn: z.string().nonempty("ABN is required"),
+  website: z.string().optional(),
   profile_img: z.string().optional(),
   user: z.string().optional(),
 });

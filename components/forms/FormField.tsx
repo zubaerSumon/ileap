@@ -25,7 +25,7 @@ export const FormField = <T extends FieldValues>({
   register,
   registerName,
   error,
-  className = "",
+  className = "h-12",
 }: FormFieldProps<T>) => {
   return (
     <div className="space-y-2">

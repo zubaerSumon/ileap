@@ -11,7 +11,7 @@ export const profileBasicSchema = userValidation.volunteerSchema.pick({
   bio: true,
   interested_on: true,
   phone_number: true,
-  country: true,
+  state: true,
   area: true,
   postcode: true,
 });
@@ -21,10 +21,12 @@ export const profileDetailSchema = userValidation.volunteerSchema.pick({
   home_country: true,
   course: true,
   major: true,
+  major_other: true,
   referral_source: true,
   referral_source_other: true,
 });
 
+export const orgProfileSchema = userValidation.organizationSchema;
 export const volunteerSignupSchema = z
   .object({
     ...signupBaseSchema.shape,
@@ -58,7 +60,22 @@ export const volunteerSignupSchema = z
         path: ["referral_source_other"],
       });
     }
+    if (data.major !== "non-student" && !data.major_other) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please specify your major",
+        path: ["major_other"],
+      });
+    }
   });
-
+export const orgSignupSchema = z.object({
+  ...signupBaseSchema.shape,
+  ...orgProfileSchema.shape,
+  confirm_password: z
+    .string()
+    .min(6, "")
+    .nonempty("Please confirm your password"),
+});
 export type VolunteerSignupForm = z.infer<typeof volunteerSignupSchema>;
+export type OrgSignupForm = z.infer<typeof orgSignupSchema>;
 export type SignupFormData = z.infer<typeof signupBaseSchema>;

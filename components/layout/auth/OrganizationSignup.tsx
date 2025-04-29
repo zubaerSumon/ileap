@@ -4,15 +4,14 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { signIn, useSession } from "next-auth/react";
-import { SignupStep } from "@/components/layout/auth/SignupStep";
-import { BasicProfileStep } from "@/components/layout/auth/BasicProfileStep";
-import { DetailedProfileStep } from "@/components/layout/auth/DetailedProfileStep";
-import { VolunteerSignupForm, volunteerSignupSchema } from "@/types/auth";
+import { OrgSignupForm, orgSignupSchema } from "@/types/auth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 import toast from "react-hot-toast";
 import { UserRole } from "@/server/db/interfaces/user";
+import { OrgProfileStep } from "./OrgProfileStep";
+import { OrgSignupStep } from "./OrgSignupStep";
 
 export default function OrganizationSignup() {
   const searchParams = useSearchParams();
@@ -25,15 +24,11 @@ export default function OrganizationSignup() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
-  const [mediaConsent, setMediaConsent] = useState(false);
-  const [mediaConsentError, setMediaConsentError] = useState<string | null>(
-    null
-  );
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
-  const showStudentStep = true; // Changed from searchParams?.get("referral") === "ausleap2025"
-  const setupVolunteerProfile = trpc.users.setupVolunteerProfile.useMutation({
+
+  const setupOrgProfile = trpc.users.setupOrgProfile.useMutation({
     onSuccess: () => {
       utils.users.profileCheckup.invalidate();
       toast.success("Profile setup completed successfully!");
@@ -48,16 +43,13 @@ export default function OrganizationSignup() {
     },
   });
 
-  const form = useForm<VolunteerSignupForm>({
-    resolver: zodResolver(volunteerSignupSchema),
+  const form = useForm<OrgSignupForm>({
+    resolver: zodResolver(orgSignupSchema),
     mode: "onChange",
-    defaultValues: {
-      student_type: "no",
-    },
   });
 
   const handleNext = async () => {
-    let fieldsToValidate: Array<keyof VolunteerSignupForm> = [];
+    let fieldsToValidate: Array<keyof OrgSignupForm> = [];
 
     if (step === 1) {
       if (!termsAccepted) {
@@ -74,20 +66,12 @@ export default function OrganizationSignup() {
     } else if (step === 2) {
       fieldsToValidate = [
         "bio",
-        "interested_on",
+        "opportunity_types",
         "phone_number",
-        "country",
+        "state",
         "area",
-        "postcode",
+        "abn",
       ];
-    } else if (step === 3) {
-      fieldsToValidate = ["student_type", "course", "major", "referral_source"];
-      if (form.watch("student_type") === "yes") {
-        fieldsToValidate.push("home_country");
-      }
-      if (form.watch("referral_source") === "other") {
-        fieldsToValidate.push("referral_source_other");
-      }
     }
 
     const isValid = await form.trigger(fieldsToValidate);
@@ -96,30 +80,21 @@ export default function OrganizationSignup() {
       if (step === 1) {
         await onSubmit(form.getValues());
       } else if (step === 2) {
-        setStep(step + 1);
-      } else if (step === 3) {
-        if (!mediaConsent) {
-          setMediaConsentError(
-            "You must grant media consent to complete your profile"
-          );
-          return;
-        }
         try {
           setIsProfileLoading(true);
           const formData = form.getValues();
-          await setupVolunteerProfile.mutateAsync({
+          console.log("__formData__", { formData });
+
+          await setupOrgProfile.mutateAsync({
             bio: formData.bio,
-            interested_on: formData.interested_on,
+            opportunity_types: formData.opportunity_types,
             phone_number: formData.phone_number,
-            country: formData.country,
+            state: formData.state,
             area: formData.area,
-            postcode: formData.postcode,
-            student_type: formData.student_type,
-            home_country: formData.home_country,
-            course: formData.course,
-            major: formData.major,
-            referral_source: formData.referral_source,
-            referral_source_other: formData.referral_source_other,
+            abn: formData.abn,
+            type: formData.type,
+            website: formData.website,
+            required_skills: formData.required_skills,
           });
         } catch (err) {
           console.error("Profile setup error:", err);
@@ -146,8 +121,10 @@ export default function OrganizationSignup() {
     }
   }, [isLoading, isAuthenticated, session, router]);
 
-  const onSubmit = async (data: VolunteerSignupForm) => {
+  const onSubmit = async (data: OrgSignupForm) => {
     if (form.formState.isSubmitting) return;
+    console.log("__data__", { data });
+
     try {
       setError(null);
       setIsSignupLoading(true);
@@ -201,25 +178,15 @@ export default function OrganizationSignup() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-xl">
         <form className="space-y-6">
           {step === 1 && (
-            <SignupStep
+            <OrgSignupStep
               form={form}
               termsAccepted={termsAccepted}
               setTermsAccepted={setTermsAccepted}
               termsError={termsError}
               setTermsError={setTermsError}
-              customORG
             />
           )}
-          {step === 2 && <BasicProfileStep form={form} />}
-          {step === 3 && (
-            <DetailedProfileStep
-              form={form}
-              mediaConsent={mediaConsent}
-              setMediaConsent={setMediaConsent}
-              mediaConsentError={mediaConsentError}
-              setMediaConsentError={setMediaConsentError}
-            />
-          )}
+          {step === 2 && <OrgProfileStep form={form} />}
 
           <div className="fixed bottom-0 left-0 right-0 bg-gray-50 py-4 px-6 border-t border-gray-200">
             <div className="container mx-auto px-4">
@@ -268,10 +235,8 @@ export default function OrganizationSignup() {
                     </div>
                   ) : step === 1 ? (
                     "Signup & Continue"
-                  ) : step === (showStudentStep ? 3 : 2) ? (
-                    "Complete"
                   ) : (
-                    "Continue"
+                    "Complete"
                   )}
                 </Button>
               </div>

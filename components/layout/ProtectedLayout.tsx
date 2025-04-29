@@ -15,7 +15,10 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      const hasRole = Boolean(profileCheck?.hasVolunteerProfile || profileCheck?.hasOrganizationProfile);
+      const hasRole = Boolean(
+        profileCheck?.hasVolunteerProfile ||
+          profileCheck?.hasOrganizationProfile
+      );
       if (hasRole) {
         router.push("/signup");
       } else {

@@ -1,26 +1,24 @@
 import { FormField } from "@/components/forms/FormField";
 import { PasswordField } from "@/components/forms/PasswordField";
 import { UseFormReturn } from "react-hook-form";
-import { VolunteerSignupForm } from "@/types/auth";
+import { OrgSignupForm } from "@/types/auth";
 import { useState } from "react";
 
-interface SignupStepProps {
-  form: UseFormReturn<VolunteerSignupForm>;
+interface OrgSignupStepProps {
+  form: UseFormReturn<OrgSignupForm>;
   termsAccepted: boolean;
   setTermsAccepted: (value: boolean) => void;
   termsError: string | null;
   setTermsError: (value: string | null) => void;
-  customORG?: boolean;
 }
 
-export function SignupStep({
+export function OrgSignupStep({
   form,
   termsAccepted,
   setTermsAccepted,
   termsError,
   setTermsError,
-  customORG = false,
-}: SignupStepProps) {
+}: OrgSignupStepProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openModal = (e: React.MouseEvent) => {
@@ -115,29 +113,28 @@ export function SignupStep({
 
       <div className="text-center sm:text-left space-y-3">
         <h2 className="mt-6 text-3xl font-bold text-gray-900">
-        Welcome to AusLeap!
+          Welcome to AusLeap!
         </h2>
         <p className=" text-sm text-gray-600">
-        We&apos;re excited to have you join our community. Please provide the following details to get started:
+          We&apos;re excited to have you join our community. Please provide the
+          following details to get started:
         </p>
       </div>
 
       <div className="space-y-6">
         <FormField
-          label={customORG ? "Organization name" : "Name"}
+          label="Organization name"
           id="name"
-          placeholder={`Enter your ${customORG ? "organization name" : "name"}`}
+          placeholder={`Enter your organization name `}
           register={form.register}
           registerName="name"
           error={form.formState.errors.name?.message}
         />
         <FormField
-          label={customORG ? "Organization email" : "Email"}
+          label="Organization email"
           id="email"
           type="email"
-          placeholder={`Enter your ${
-            customORG ? "organization email" : "email"
-          }`}
+          placeholder={`Enter your organization email `}
           register={form.register}
           registerName="email"
           error={form.formState.errors.email?.message}

@@ -49,7 +49,7 @@ export function VolunteerProfileForm() {
       phone_number: "",
       bio: "",
       interested_on: [],
-      country: "",
+      state: "",
       area: "",
     },
   });
@@ -61,7 +61,7 @@ export function VolunteerProfileForm() {
         phone_number: volunteerProfile.phone_number,
         bio: volunteerProfile.bio,
         interested_on: volunteerProfile.interested_on,
-        country: volunteerProfile.country?.replace(/_/g, ' '),
+        state: volunteerProfile.state?.replace(/_/g, ' '),
         area: volunteerProfile.area?.replace(/_/g, ' '),
       });
     }
@@ -71,7 +71,7 @@ export function VolunteerProfileForm() {
     try {
       const formattedData = {
         ...data,
-        country: data.country?.replace(/_/g, ' '),
+        state: data.state?.replace(/_/g, ' '),
         area: data.area?.replace(/_/g, ' ')
       };
       await volunteerProfileUpdateMutation.mutateAsync(formattedData);
@@ -153,7 +153,7 @@ export function VolunteerProfileForm() {
               <MultiSelectField
                 label="What type of volunteer work you like?"
                 id="interested_on"
-                placeholder="Animal welfare · Homelessness · Education & literacy"
+                placeholder="Select volunteer work"
                 register={form.register}
                 registerName="interested_on"
                 error={form.formState.errors.interested_on?.message}
@@ -164,12 +164,12 @@ export function VolunteerProfileForm() {
 
               <FormInput
                 control={form.control}
-                name="country"
+                name="state"
                 label="State"
-                placeholder="Enter your country"
+                placeholder="Enter your state"
                 onChange={(e) => {
                   const value = e.target.value.replace(/_/g, ' ');
-                  form.setValue('country', value);
+                  form.setValue('state', value);
                 }}
               />
 

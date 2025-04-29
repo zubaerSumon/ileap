@@ -79,6 +79,31 @@ export const userRouter = router({
       return volunteer;
     }),
 
+  setupOrgProfile: protectedProcedure
+    .input(userValidation.organizationSchema)
+    .mutation(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.id) {
+        throw new Error("You must be logged in to setup your profile.");
+      }
+
+      const existingProfile = await Organization.findOne({ user: sessionUser.id });
+      if (existingProfile) {
+        throw new Error("Organization profile already exists.");
+      }
+
+      const organization = await Organization.create({
+        ...input,
+        user: sessionUser.id,
+      });
+
+      if (!organization) {
+        throw new Error("Failed to create organization profile");
+      }
+
+      return organization;
+    }),
+
   resetPassword: publicProcedure
     .input(userValidation.resetPasswordSchema)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

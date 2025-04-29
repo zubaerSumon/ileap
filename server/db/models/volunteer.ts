@@ -22,6 +22,9 @@ const VolunteerSchema = new Schema<IVolunteer>(
     },
     country: {
       type: String,
+    },
+    state: {
+      type: String,
       required: true,
     },
     area: {
@@ -44,6 +47,9 @@ const VolunteerSchema = new Schema<IVolunteer>(
       type: String,
     },
     major: {
+      type: String,
+    },
+    major_other: {
       type: String,
     },
     referral_source: {
