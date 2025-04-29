@@ -1,10 +1,12 @@
+"use client";
 import { FormField } from "@/components/forms/FormField";
-import { SelectField } from "@/components/forms/SelectField";
 import { UseFormReturn } from "react-hook-form";
 import { VolunteerSignupForm } from "@/types/auth";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-
+import countryList from "react-select-country-list";
+import { useMemo } from "react";
+import { FormSelect } from "@/components/forms/FormSelect";
 interface DetailedProfileStepProps {
   form: UseFormReturn<VolunteerSignupForm>;
   mediaConsent: boolean;
@@ -20,13 +22,7 @@ export function DetailedProfileStep({
   mediaConsentError,
   setMediaConsentError,
 }: DetailedProfileStepProps) {
-  const countries = [
-    { value: "china", label: "China" },
-    { value: "india", label: "India" },
-    { value: "brazil", label: "Brazil" },
-    { value: "malaysia", label: "Malaysia" },
-    { value: "singapore", label: "Singapore" },
-   ];
+  const countryOptions = useMemo(() => countryList().getData(), []);
 
   const courseOptions = [
     { value: "phd", label: "Doctorate / PhD" },
@@ -35,7 +31,6 @@ export function DetailedProfileStep({
     { value: "diploma", label: "Diploma / Certificate" },
     { value: "professional", label: "Professional / Industry Expert" },
     { value: "non-student", label: "Non-Student / Not Currently Studying" },
-   
   ];
 
   const majorOptions = [
@@ -46,6 +41,7 @@ export function DetailedProfileStep({
     { value: "arts", label: "Arts" },
     { value: "education", label: "Education" },
     { value: "health", label: "Health" },
+    { value: "other", label: "Other" }, // <-- Add this line if not present
   ];
 
   const referralSources = [
@@ -53,10 +49,13 @@ export function DetailedProfileStep({
     { value: "email", label: "Email" },
     { value: "classes", label: "Classes" },
     { value: "friends", label: "Friends" },
-   ];
+    { value: "other", label: "Other" },
+  ];
 
   const isInternational = form.watch("student_type") === "yes";
   const referralSource = form.watch("referral_source");
+  const major = form.watch("major");
+  const course = form.watch("course");
 
   return (
     <>
@@ -76,33 +75,19 @@ export function DetailedProfileStep({
               Are you an international student?
             </Label>
             <RadioGroup
-              defaultValue="no"
+              defaultValue={isInternational ? "yes" : "no"}
               className="flex space-x-6"
               onValueChange={(value) => form.setValue("student_type", value)}
             >
               <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="yes"
-                  id="yes"
-                  className="h-4 w-4 border-gray-300 focus:ring-blue-500 data-[state=checked]:border-blue-600 [&>div>svg]:fill-blue-600"
-                />
-                <Label
-                  htmlFor="yes"
-                  className="text-sm text-gray-700 cursor-pointer"
-                >
+                <RadioGroupItem value="yes" id="yes" className="" />
+                <Label htmlFor="yes" className="text-sm   cursor-pointer">
                   Yes
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem
-                  value="no"
-                  id="no"
-                  className="h-4 w-4 border-gray-300 focus:ring-blue-500 data-[state=checked]:border-blue-600 [&>div>svg]:fill-blue-600"
-                />
-                <Label
-                  htmlFor="no"
-                  className="text-sm text-gray-700 cursor-pointer"
-                >
+                <RadioGroupItem value="no" id="no" className="" />
+                <Label htmlFor="no" className="text-sm  cursor-pointer">
                   No
                 </Label>
               </div>
@@ -110,46 +95,59 @@ export function DetailedProfileStep({
 
             {isInternational && (
               <div className="mt-2 p-2 rounded-lg">
-                <SelectField
+                <FormSelect
                   label="What is your home country?"
                   id="home_country"
                   placeholder="Select your country"
-                  register={form.register}
+                  control={form.control}
                   registerName="home_country"
                   error={form.formState.errors.home_country?.message}
-                  options={countries}
+                  options={countryOptions}
                 />
               </div>
             )}
           </div>
         </div>
 
-        <SelectField
+        <FormSelect
           label="What course are you studying?"
           id="course"
           placeholder="Select your course"
-          register={form.register}
+          control={form.control}
           registerName="course"
           error={form.formState.errors.course?.message}
           options={courseOptions}
         />
 
-        <SelectField
-          label="What major are you currently studying?"
-          id="major"
-          placeholder="Select your major"
-          register={form.register}
-          registerName="major"
-          error={form.formState.errors.major?.message}
-          options={majorOptions}
-        />
+        {course !== "non-student" && (
+          <FormSelect
+            label="What major are you currently studying?"
+            id="major"
+            placeholder="Select your major"
+            control={form.control}
+            registerName="major"
+            error={form.formState.errors.major?.message}
+            options={majorOptions}
+          />
+        )}
+
+        {major === "other" && (
+          <FormField
+            label="Please specify your major"
+            id="major_other"
+            placeholder="Enter your major"
+            register={form.register}
+            registerName="major_other"
+            error={form.formState.errors.major_other?.message}
+          />
+        )}
 
         <div className="space-y-4">
-          <SelectField
+          <FormSelect
             label="Where did you hear about this program?"
             id="referral_source"
             placeholder="Select referral source"
-            register={form.register}
+            control={form.control}
             registerName="referral_source"
             error={form.formState.errors.referral_source?.message}
             options={referralSources}

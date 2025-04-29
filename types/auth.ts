@@ -21,6 +21,7 @@ export const profileDetailSchema = userValidation.volunteerSchema.pick({
   home_country: true,
   course: true,
   major: true,
+  major_other: true,
   referral_source: true,
   referral_source_other: true,
 });
@@ -57,6 +58,13 @@ export const volunteerSignupSchema = z
         code: z.ZodIssueCode.custom,
         message: "Please specify how you heard about us",
         path: ["referral_source_other"],
+      });
+    }
+    if (data.major !== "non-student" && !data.major_other) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Please specify your major",
+        path: ["major_other"],
       });
     }
   });

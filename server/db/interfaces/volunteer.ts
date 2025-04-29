@@ -15,6 +15,7 @@ export interface IVolunteer extends Document {
   home_country?: string;
   course?: string;
   major?: string;
+  major_other?: string;
   referral_source?: string;
   referral_source_other?: string;
 

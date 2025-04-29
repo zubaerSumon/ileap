@@ -1,9 +1,9 @@
 import { FormField } from "@/components/forms/FormField";
 import { MultiSelectField } from "@/components/forms/MultiSelectField";
 import { PhoneField } from "@/components/forms/PhoneField";
-import { SelectField } from "@/components/forms/SelectField";
 import { UseFormReturn } from "react-hook-form";
 import { OrgSignupForm } from "@/types/auth";
+import { FormSelect } from "@/components/forms/FormSelect";
 
 interface OrgProfileStepProps {
   form: UseFormReturn<OrgSignupForm>;
@@ -87,11 +87,11 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           setValue={form.setValue}
         />
 
-        <SelectField
+        <FormSelect
           label="Orgnaization type"
           id="type"
           placeholder="Select organization type"
-          register={form.register}
+          control={form.control}
           registerName="type"
           error={form.formState.errors.type?.message}
           options={locations}
@@ -100,7 +100,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
         <MultiSelectField
           label={`What type of volunteer work you’re providing?`}
           id="opportunity_types"
-          placeholder="Animal welfare · Homeless · Education & literacy"
+          placeholder="Select volunteer work"
           register={form.register}
           registerName="opportunity_types"
           error={form.formState.errors.opportunity_types?.message}
@@ -120,21 +120,21 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           value={form.watch("required_skills")}
         />
 
-        <SelectField
+        <FormSelect
           label="State"
           id="state"
           placeholder="Select your location"
-          register={form.register}
+          control={form.control}
           registerName="state"
           error={form.formState.errors.state?.message}
           options={locations}
         />
 
-        <SelectField
+        <FormSelect
           label="Suburb"
           id="area"
-          placeholder="Select your area"
-          register={form.register}
+          placeholder="Select suburb"
+          control={form.control}
           registerName="area"
           error={form.formState.errors.area?.message}
           options={areas}

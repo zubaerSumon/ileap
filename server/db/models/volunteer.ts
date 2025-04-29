@@ -49,6 +49,9 @@ const VolunteerSchema = new Schema<IVolunteer>(
     major: {
       type: String,
     },
+    major_other: {
+      type: String,
+    },
     referral_source: {
       type: String,
     },

@@ -1,9 +1,11 @@
 import { FormField } from "@/components/forms/FormField";
 import { MultiSelectField } from "@/components/forms/MultiSelectField";
 import { PhoneField } from "@/components/forms/PhoneField";
-import { SelectField } from "@/components/forms/SelectField";
 import { UseFormReturn } from "react-hook-form";
 import { VolunteerSignupForm } from "@/types/auth";
+import { FormSelect } from "@/components/forms/FormSelect";
+import { useEffect } from "react";
+import { suburbs } from "@/utils/constants/suburb";
 
 interface BasicProfileStepProps {
   form: UseFormReturn<VolunteerSignupForm>;
@@ -30,28 +32,24 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
     { value: "canberra_act", label: "Canberra, Australian Capital Territory" },
   ];
 
-  const areas = [
-    { value: "sydney_cbd", label: "Sydney CBD" },
-    { value: "north_sydney", label: "North Sydney" },
-    { value: "eastern_suburbs", label: "Eastern Suburbs" },
-    { value: "inner_west", label: "Inner West" },
-    { value: "northern_beaches", label: "Northern Beaches" },
-    { value: "western_sydney", label: "Western Sydney" },
-    { value: "south_sydney", label: "South Sydney" },
-    { value: "melbourne_cbd", label: "Melbourne CBD" },
-    { value: "south_yarra", label: "South Yarra" },
-    { value: "st_kilda", label: "St Kilda" },
-    { value: "fitzroy", label: "Fitzroy" },
-    { value: "richmond", label: "Richmond" },
-    { value: "brisbane_cbd", label: "Brisbane CBD" },
-    { value: "south_bank", label: "South Bank" },
-    { value: "fortitude_valley", label: "Fortitude Valley" },
-    { value: "west_end", label: "West End" },
-    { value: "perth_cbd", label: "Perth CBD" },
-    { value: "northbridge", label: "Northbridge" },
-    { value: "subiaco", label: "Subiaco" },
-    { value: "fremantle", label: "Fremantle" },
-  ];
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name === "area" && value.area) {
+        const areaInfo = suburbs.find((area) => area.value === value.area);
+        if (areaInfo) {
+          if (areaInfo.postcodes.length > 1) {
+            form.setValue("postcode", "");
+          } else {
+            form.setValue("postcode", areaInfo.postcodes[0]);
+          }
+        }
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
+
+  const currentArea = suburbs.find((area) => area.value === form.watch("area"));
+  const availablePostcodes = currentArea?.postcodes || [];
 
   return (
     <>
@@ -67,7 +65,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
 
       <div className="space-y-6">
         <FormField
-          label="We’d love to hear what motivates you to volunteer"
+          label="We'd love to hear what motivates you to volunteer"
           id="bio"
           type="textarea"
           placeholder="e.g. Being a student and passionate about protecting our environment, I ..."
@@ -79,7 +77,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
         <MultiSelectField
           label="What type of volunteer work are you interested in?"
           id="interested_on"
-          placeholder="Animal welfare · Homeless · Education & literacy"
+          placeholder="Select volunteer work"
           register={form.register}
           registerName="interested_on"
           error={form.formState.errors.interested_on?.message}
@@ -99,34 +97,49 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
           setValue={form.setValue}
         />
 
-        <SelectField
+        <FormSelect
           label="State"
           id="state"
           placeholder="Select your location"
-          register={form.register}
+          control={form.control}
           registerName="state"
           error={form.formState.errors.state?.message}
           options={locations}
         />
 
-        <SelectField
+        <FormSelect
           label="Suburb"
           id="area"
-          placeholder="Select your area"
-          register={form.register}
+          placeholder="Select your suburb"
+          control={form.control}
           registerName="area"
           error={form.formState.errors.area?.message}
-          options={areas}
+          options={suburbs}
         />
 
-        <FormField
-          label="Postcode"
-          id="postcode"
-          placeholder="e.g. 2000"
-          register={form.register}
-          registerName="postcode"
-          error={form.formState.errors.postcode?.message}
-        />
+        {availablePostcodes.length > 1 ? (
+          <FormSelect
+            label="Postcode"
+            id="postcode"
+            placeholder="Select your postcode"
+            control={form.control}
+            registerName="postcode"
+            error={form.formState.errors.postcode?.message}
+            options={availablePostcodes.map((postcode) => ({
+              value: postcode,
+              label: postcode,
+            }))}
+          />
+        ) : (
+          <FormField
+            label="Postcode"
+            id="postcode"
+            placeholder="e.g. 2000"
+            register={form.register}
+            registerName="postcode"
+            error={form.formState.errors.postcode?.message}
+          />
+        )}
       </div>
     </>
   );
