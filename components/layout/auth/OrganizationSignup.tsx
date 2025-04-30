@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { signIn, useSession } from "next-auth/react";
-import { OrgSignupForm, orgSignupSchema } from "@/types/auth";
+import { OrgSignupFormData, orgSignupSchema } from "@/types/auth";
 import { useSearchParams, useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { UserRole } from "@/server/db/interfaces/user";
 import { OrgProfileStep } from "./OrgProfileStep";
 import { OrgSignupStep } from "./OrgSignupStep";
+import { Loader2 } from "lucide-react";
 
 export default function OrganizationSignup() {
   const searchParams = useSearchParams();
@@ -43,13 +44,13 @@ export default function OrganizationSignup() {
     },
   });
 
-  const form = useForm<OrgSignupForm>({
+  const form = useForm<OrgSignupFormData>({
     resolver: zodResolver(orgSignupSchema),
     mode: "onChange",
   });
 
   const handleNext = async () => {
-    let fieldsToValidate: Array<keyof OrgSignupForm> = [];
+    let fieldsToValidate: Array<keyof OrgSignupFormData> = [];
 
     if (step === 1) {
       if (!termsAccepted) {
@@ -121,7 +122,7 @@ export default function OrganizationSignup() {
     }
   }, [isLoading, isAuthenticated, session, router]);
 
-  const onSubmit = async (data: OrgSignupForm) => {
+  const onSubmit = async (data: OrgSignupFormData) => {
     if (form.formState.isSubmitting) return;
     console.log("__data__", { data });
 
@@ -198,6 +199,7 @@ export default function OrganizationSignup() {
                       variant="outline"
                       onClick={handleBack}
                       disabled={isSignupLoading || isProfileLoading}
+                      className="cursor-pointer"
                     >
                       Back
                     </Button>
@@ -207,30 +209,11 @@ export default function OrganizationSignup() {
                   type="button"
                   onClick={handleNext}
                   disabled={isSignupLoading || isProfileLoading}
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
                 >
                   {isSignupLoading || isProfileLoading ? (
                     <div className="flex items-center">
-                      <svg
-                        className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
                       {step === 1 ? "Creating account..." : "Saving profile..."}
                     </div>
                   ) : step === 1 ? (

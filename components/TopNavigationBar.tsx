@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X, LogOut } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import Logo from "../public/AusLeap.png";
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
@@ -67,11 +67,12 @@ const staticLinks = [
 
 export default function TopNavigationBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showNav, setShowNav] = useState(false); // Initialize as false
+  const [showNav, setShowNav] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
   const { isAuthenticated } = useAuthCheck();
-
+  const searchParams = useSearchParams();
+  const paramRole = searchParams?.get("role");
   const isAuthPath =
     pathname?.includes("signin") ||
     pathname?.includes("signup") ||
@@ -294,20 +295,36 @@ export default function TopNavigationBar() {
                     </>
                   ) : (
                     <>
-                      <Link
-                        href={
-                          pathname?.includes("signin") ? "/signup" : "/signin"
-                        }
-                        className="text-sm font-normal hover:text-blue-500"
-                      >
-                        {pathname?.includes("signin") ? "Sign up" : "Sign in"}
-                      </Link>
-                      <Link
-                        href="/support"
-                        className="text-sm font-normal hover:text-blue-500"
-                      >
-                        Support
-                      </Link>
+                      {isAuthPath && !pathname?.includes("signin") ? (
+                        <div className="flex items-center text-sm space-x-3">
+                          <p>
+                            {paramRole === "organization"
+                              ? "Want to help out?"
+                              : "Need a helping hand?"}{" "}
+                          </p>
+                          <Link
+                            href={
+                              paramRole === "organization"
+                                ? "/signup"
+                                : "/signup?role=organization"
+                            }
+                            className="text-sm font-normal text-blue-600 hover:text-blue-700"
+                          >
+                            {`Join as ${
+                              paramRole === "organization"
+                                ? "a Volunteer"
+                                : "an Organization"
+                            }`}
+                          </Link>
+                        </div>
+                      ) : (
+                        <Link
+                          href="/signup"
+                          className="text-sm font-normal hover:text-blue-500"
+                        >
+                          Sign up
+                        </Link>
+                      )}
                     </>
                   )}
                 </div>

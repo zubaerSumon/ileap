@@ -6,32 +6,13 @@ import { VolunteerSignupForm } from "@/types/auth";
 import { FormSelect } from "@/components/forms/FormSelect";
 import { useEffect } from "react";
 import { suburbs } from "@/utils/constants/suburb";
+import { locations, volunteerTypes } from "@/utils/constants/select-options";
 
 interface BasicProfileStepProps {
   form: UseFormReturn<VolunteerSignupForm>;
 }
 
 export function BasicProfileStep({ form }: BasicProfileStepProps) {
-  const volunteerTypes = [
-    { value: "animal_welfare", label: "Animal welfare" },
-    { value: "homeless", label: "Homelessness" },
-    { value: "education", label: "Education & literacy" },
-    { value: "environment", label: "Environment" },
-    { value: "health", label: "Health & Medicine" },
-    { value: "seniors", label: "Seniors" },
-  ];
-
-  const locations = [
-    { value: "sydney_nsw", label: "Sydney, New South Wales" },
-    { value: "melbourne_vic", label: "Melbourne, Victoria" },
-    { value: "brisbane_qld", label: "Brisbane, Queensland" },
-    { value: "perth_wa", label: "Perth, Western Australia" },
-    { value: "adelaide_sa", label: "Adelaide, South Australia" },
-    { value: "hobart_tas", label: "Hobart, Tasmania" },
-    { value: "darwin_nt", label: "Darwin, Northern Territory" },
-    { value: "canberra_act", label: "Canberra, Australian Capital Territory" },
-  ];
-
   useEffect(() => {
     const subscription = form.watch((value, { name }) => {
       if (name === "area" && value.area) {

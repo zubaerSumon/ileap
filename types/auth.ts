@@ -77,5 +77,5 @@ export const orgSignupSchema = z.object({
     .nonempty("Please confirm your password"),
 });
 export type VolunteerSignupForm = z.infer<typeof volunteerSignupSchema>;
-export type OrgSignupForm = z.infer<typeof orgSignupSchema>;
+export type OrgSignupFormData = z.infer<typeof orgSignupSchema>;
 export type SignupFormData = z.infer<typeof signupBaseSchema>;
