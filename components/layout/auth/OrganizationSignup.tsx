@@ -13,7 +13,7 @@ import { UserRole } from "@/server/db/interfaces/user";
 import { OrgProfileStep } from "./OrgProfileStep";
 import { OrgSignupStep } from "./OrgSignupStep";
 
-export default function OrganizationSignup() {
+export default function  OrganizationSignup() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const utils = trpc.useUtils();
