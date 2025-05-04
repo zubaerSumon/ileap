@@ -141,6 +141,8 @@ export default function  OrganizationSignup() {
       });
 
       if (signInResult?.error) {
+        console.log("__signInResult__", { signInResult });
+        
         if (signInResult.error) {
           toast.error(
             "Account with this email already exists. Please provide the correct password."
