@@ -1,4 +1,5 @@
 "use client";
+import React from "react";
 import { FormField } from "@/components/forms/FormField";
 import { UseFormReturn } from "react-hook-form";
 import { VolunteerSignupForm } from "@/types/auth";
@@ -56,6 +57,13 @@ export function DetailedProfileStep({
   const referralSource = form.watch("referral_source");
   const major = form.watch("major");
   const course = form.watch("course");
+
+  // Initialize student_type if not set
+  React.useEffect(() => {
+    if (!form.getValues("student_type")) {
+      form.setValue("student_type", "no");
+    }
+  }, [form]);
 
   return (
     <>

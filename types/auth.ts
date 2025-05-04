@@ -53,6 +53,11 @@ export const volunteerSignupSchema = z
         path: ["home_country"],
       });
     }
+    // Only validate home country if student_type is "yes"
+    if (data.student_type === "no") {
+      // Skip home country validation for non-international students
+      delete data.home_country;
+    }
     if (data.referral_source === "other" && !data.referral_source_other) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
