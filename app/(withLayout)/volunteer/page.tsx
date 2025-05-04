@@ -5,6 +5,7 @@ import React from "react";
 import MiniGallery from "@/components/layout/volunteer/homepage/MiniGallery";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
+import UpdatedFooter from "@/components/UpdatedFooter";
 
 const VolunteerPage = () => {
   return (
@@ -23,7 +24,8 @@ const VolunteerPage = () => {
             <MiniGallery />
           </div>
         </div>
-      </div>
+       
+      </div> <UpdatedFooter/>
 
       
     </ProtectedLayout>
