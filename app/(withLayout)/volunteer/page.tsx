@@ -4,7 +4,7 @@ import React from "react";
 
 import MiniGallery from "@/components/layout/volunteer/homepage/MiniGallery";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
-// import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
+import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
 
 const VolunteerPage = () => {
   return (
@@ -18,7 +18,7 @@ const VolunteerPage = () => {
         </p>
         {/* Update layout to flex-row for horizontal alignment on larger screens */}
         <div className="flex flex-col md:flex-row justify-center w-full">
-          {/* <Categories /> */}
+          <Categories />
           <div className="w-full max-w-xl pl-4 sm:pl-4">
             <MiniGallery />
           </div>
