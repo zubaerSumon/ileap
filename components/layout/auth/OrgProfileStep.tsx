@@ -47,7 +47,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
         />
 
         <FormSelect
-          label="Orgnaization type"
+          label="Organization type"
           id="type"
           placeholder="Select organization type"
           control={form.control}
@@ -122,3 +122,14 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
     </>
   );
 }
+
+  const organizationTypes = [
+    { value: "nonprofit", label: "Non-Profit Organization" },
+    { value: "charity", label: "Registered Charity" },
+    { value: "community", label: "Community Organization" },
+    { value: "social_enterprise", label: "Social Enterprise" },
+    { value: "foundation", label: "Foundation" },
+    { value: "religious", label: "Religious Organization" },
+    { value: "educational", label: "Educational Institution" },
+    { value: "government", label: "Government Agency" }
+  ];

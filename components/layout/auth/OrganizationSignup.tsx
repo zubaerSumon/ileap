@@ -14,7 +14,7 @@ import { OrgProfileStep } from "./OrgProfileStep";
 import { OrgSignupStep } from "./OrgSignupStep";
 import { Loader2 } from "lucide-react";
 
-export default function OrganizationSignup() {
+export default function  OrganizationSignup() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const utils = trpc.useUtils();
