@@ -1,7 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Phone, Instagram, Linkedin } from 'lucide-react';
+import { BsTelephone } from 'react-icons/bs';
+import { AiOutlineInstagram } from 'react-icons/ai';
+import { FaLinkedin } from 'react-icons/fa';
 
 export default function UpdatedFooter() {
   return (
@@ -26,7 +28,7 @@ export default function UpdatedFooter() {
                 href="tel:+61295142000"
                 className="text-gray-400 hover:text-[#2563EB] transition-colors"
               >
-                <Phone className="h-6 w-6" />
+                <BsTelephone size={24} />
               </Link>
               <Link 
                 href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
@@ -34,7 +36,7 @@ export default function UpdatedFooter() {
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-[#2563EB] transition-colors"
               >
-                <Instagram className="h-6 w-6" />
+                <AiOutlineInstagram size={24} />
               </Link>
               <Link 
                 href="https://www.linkedin.com/company/ausleap/"
@@ -42,7 +44,7 @@ export default function UpdatedFooter() {
                 rel="noopener noreferrer"
                 className="text-gray-400 hover:text-[#2563EB] transition-colors"
               >
-                <Linkedin className="h-6 w-6" />
+                <FaLinkedin size={24} />
               </Link>
             </div>
           </div>

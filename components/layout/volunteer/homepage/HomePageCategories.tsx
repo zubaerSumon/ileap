@@ -1,15 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, MapPin, Star } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { ConfirmationModal } from "../../../modals/ConfirmationModal";
+
+// Define a type for the opportunity details
+type OpportunityDetails = {
+  title: string;
+  organization: string;
+  date: string;
+  time: string;
+  location: string;
+  logo: string;
+};
 
 export default function Categories({ title = "Opportunities by categories" }: { title?: string }) {
   const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOpportunity, setSelectedOpportunity] = useState<OpportunityDetails | null>(null);
 
   const opportunities = [
     {
@@ -17,7 +31,9 @@ export default function Categories({ title = "Opportunities by categories" }: { 
       title: "Easy Care Gardening",
       organization: "Easy Care",
       location: "Sydney, Australia",
-      type: "One off; 20/05/2025",
+      type: "One off",
+      date: "20/05/2025",
+      time: "10:00 AM - 02:00 PM",
       matchingAvailability: true,
       matchedSkills: 3,
       categories: ["Seniors & Aged Care"],
@@ -30,6 +46,8 @@ export default function Categories({ title = "Opportunities by categories" }: { 
       organization: "Clean Up",
       location: "Sydney, Australia",
       type: "One off",
+      date: "21/05/2025",
+      time: "01:00 PM - 04:00 PM",
       matchingAvailability: true,
       matchedSkills: 2,
       categories: ["Environmental Management"],
@@ -43,12 +61,7 @@ export default function Categories({ title = "Opportunities by categories" }: { 
       <div className="container mx-auto">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">{title}</h2>
-          <Link
-            href="/opportunities"
-            className="text-sm text-gray-600 hover:text-blue-600 flex items-center"
-          >
-            View all <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
+          
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:flex gap-6">
@@ -79,6 +92,10 @@ export default function Categories({ title = "Opportunities by categories" }: { 
                     <Badge variant="outline" className="ml-2 px-1.5 py-0.5 text-xs">
                       {opportunity.type}
                     </Badge>
+                  </div>
+                  <div className="flex items-center text-xs text-gray-500 mb-2">
+                    <span className="ml-1">Date: {opportunity.date}</span>
+                    <span className="ml-4">Time: {opportunity.time}</span>
                   </div>
 
                   <div className="flex space-x-3 mb-3">
@@ -135,30 +152,37 @@ export default function Categories({ title = "Opportunities by categories" }: { 
                     ))}
                   </div>
 
-                  <p className="text-sm text-gray-600 mb-4">
+                  <p className="text-sm text-gray-600 mb-4 h-[48px] line-clamp-2 overflow-hidden">
                     {opportunity.description}
                   </p>
                 </div>
               </CardContent>
 
-              <CardFooter className="flex justify-between items-center p-3 pt-0">
-                <div className="flex gap-2 items-center">
+              <CardFooter className="flex justify-between items-center p-3 pt-0 pb-[10px]">
+                <div className="flex justify-between w-full items-center">
+                  <Link
+                    href={`/volunteer/opportunities/${opportunity.id}`}
+                    className="text-blue-600 hover:text-blue-700 text-xs"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    View details
+                  </Link>
                   <Button 
                     className="bg-blue-600 hover:bg-blue-700 text-white h-8 text-xs"
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(`/volunteer/opportunities/${opportunity.id}`);
+                      setSelectedOpportunity({
+                        title: opportunity.title,
+                        organization: opportunity.organization,
+                        date: opportunity.date,
+                        time: opportunity.time,
+                        location: opportunity.location,
+                        logo: opportunity.logoSrc
+                      });
+                      setIsModalOpen(true);
                     }}
                   >
                     Apply now
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="text-yellow-400 h-8 w-8"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Star className="h-4 w-4 fill-current" />
                   </Button>
                 </div>
               </CardFooter>
@@ -166,6 +190,13 @@ export default function Categories({ title = "Opportunities by categories" }: { 
           ))}
         </div>
       </div>
+      {selectedOpportunity && (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          opportunityDetails={selectedOpportunity}
+        />
+      )}
     </section>
   );
 }
