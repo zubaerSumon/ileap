@@ -3,17 +3,47 @@
 import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
+import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 
 export function PostContent({ opportunityId }: { opportunityId?: string }) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const getOpportunityDetails = (id?: string) => {
+    if (id === "2") {
+      return {
+        title: "Clean Up Volunteer",
+        organization: "Clean Up Australia",
+        date: "21/05/2025",
+        time: "01:00 PM - 04:00 PM",
+        location: "To be announced",
+        logo: "/images/clean-up-australia-logo.png"  // Added logo property
+      };
+    }
+    // Default to Easy Care Gardening details
+    return {
+      title: "Gardening Volunteer",
+      organization: "Easy Care Gardening",
+      date: "20/05/2025",
+      time: "10:00 AM - 02:00 PM",
+      location: "To be announced",
+      logo: "/images/easy-care-gardening-logo.png"  // Added logo property
+    };
+  };
+
+  const handleApplyClick = () => {
+    setIsModalOpen(true);
+  };
+
   if (opportunityId === "2") {
     return (
       <div className="flex-1 max-w-3xl">
         <h1 className="text-2xl font-bold mb-4">Clean Up Volunteer</h1>
         
         <div className="text-sm text-gray-600 mb-3">
-          Posted by 
+          Posted by  
           <Link href="/volunteer/organizer/clean-up-australia">
-            <span className="text-blue-600 hover:underline cursor-pointer">Clean Up Australia</span>
+            <span className="text-blue-600 hover:underline cursor-pointer"> Clean Up Australia</span>
           </Link>
         </div>
 
@@ -57,7 +87,10 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
           </div>
 
           <div className="flex gap-2 items-center mt-6">
-            <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700 text-white"
+              onClick={handleApplyClick}
+            >
               Apply Now
             </Button>
             <Button 
@@ -69,6 +102,11 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
             </Button>
           </div>
         </div>
+
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          opportunityDetails={getOpportunityDetails(opportunityId)} />
       </div>
     );
   }
@@ -81,7 +119,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
       <div className="text-sm text-gray-600 mb-3">
         Posted by 
         <Link href="/volunteer/organizer/easy-care-gardening">
-          <span className="text-blue-600 hover:underline cursor-pointer">Easy Care Gardening</span>
+          <span className="text-blue-600 hover:underline cursor-pointer"> Easy Care Gardening</span>
         </Link>
       </div>
 
@@ -127,7 +165,10 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
 
         {/* New button section */}
         <div className="flex gap-2 items-center mt-6">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+          <Button 
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+            onClick={handleApplyClick}
+          >
             Apply Now
           </Button>
           <Button 
@@ -138,6 +179,11 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
             <Star className="h-5 w-5 fill-current" />
           </Button>
         </div>
+
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          opportunityDetails={getOpportunityDetails(opportunityId)}         />
       </div>
     </div>
   );
