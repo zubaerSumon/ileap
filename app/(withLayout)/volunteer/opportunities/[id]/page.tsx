@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { PostContent } from "@/components/layout/volunteer/homepage/PostContent";
 import { Sidebar } from "@/components/layout/volunteer/homepage/Sidebar";
 import { useRouter, useParams } from "next/navigation";
+import UpdatedFooter from "@/components/UpdatedFooter";
 
 import TopNavigationBar from "@/components/TopNavigationBar";
 
@@ -52,8 +53,9 @@ export default function OpportunityDetailPage() {
           <div className="lg:w-[300px] shrink-0">
             <Sidebar opportunityId={opportunityId} />
           </div>
+          
         </div>
-      </div>
+      </div><UpdatedFooter></UpdatedFooter>
     </div>
   );
 }
