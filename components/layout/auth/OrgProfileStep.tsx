@@ -2,57 +2,16 @@ import { FormField } from "@/components/forms/FormField";
 import { MultiSelectField } from "@/components/forms/MultiSelectField";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { UseFormReturn } from "react-hook-form";
-import { OrgSignupForm } from "@/types/auth";
+import { OrgSignupFormData } from "@/types/auth";
 import { FormSelect } from "@/components/forms/FormSelect";
+import { suburbs } from "@/utils/constants/suburb";
+import { locations, organizationTypes, volunteerTypes } from "@/utils/constants/select-options";
 
 interface OrgProfileStepProps {
-  form: UseFormReturn<OrgSignupForm>;
+  form: UseFormReturn<OrgSignupFormData>;
 }
 
 export function OrgProfileStep({ form }: OrgProfileStepProps) {
-  const volunteerTypes = [
-    { value: "animal_welfare", label: "Animal welfare" },
-    { value: "homeless", label: "Homeless" },
-    { value: "education", label: "Education & literacy" },
-    { value: "environment", label: "Environment" },
-    { value: "health", label: "Health & Medicine" },
-    { value: "seniors", label: "Seniors" },
-  ];
-
-  const locations = [
-    { value: "sydney_nsw", label: "Sydney, New South Wales" },
-    { value: "melbourne_vic", label: "Melbourne, Victoria" },
-    { value: "brisbane_qld", label: "Brisbane, Queensland" },
-    { value: "perth_wa", label: "Perth, Western Australia" },
-    { value: "adelaide_sa", label: "Adelaide, South Australia" },
-    { value: "hobart_tas", label: "Hobart, Tasmania" },
-    { value: "darwin_nt", label: "Darwin, Northern Territory" },
-    { value: "canberra_act", label: "Canberra, Australian Capital Territory" },
-  ];
-
-  const areas = [
-    { value: "sydney_cbd", label: "Sydney CBD" },
-    { value: "north_sydney", label: "North Sydney" },
-    { value: "eastern_suburbs", label: "Eastern Suburbs" },
-    { value: "inner_west", label: "Inner West" },
-    { value: "northern_beaches", label: "Northern Beaches" },
-    { value: "western_sydney", label: "Western Sydney" },
-    { value: "south_sydney", label: "South Sydney" },
-    { value: "melbourne_cbd", label: "Melbourne CBD" },
-    { value: "south_yarra", label: "South Yarra" },
-    { value: "st_kilda", label: "St Kilda" },
-    { value: "fitzroy", label: "Fitzroy" },
-    { value: "richmond", label: "Richmond" },
-    { value: "brisbane_cbd", label: "Brisbane CBD" },
-    { value: "south_bank", label: "South Bank" },
-    { value: "fortitude_valley", label: "Fortitude Valley" },
-    { value: "west_end", label: "West End" },
-    { value: "perth_cbd", label: "Perth CBD" },
-    { value: "northbridge", label: "Northbridge" },
-    { value: "subiaco", label: "Subiaco" },
-    { value: "fremantle", label: "Fremantle" },
-  ];
-
   return (
     <>
       <div className="mb-8">
@@ -67,7 +26,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
 
       <div className="space-y-6">
         <FormField
-          label="Bio"
+          label="Motivation"
           id="bio"
           type="textarea"
           placeholder="We are a community-driven volunteer organization dedicated to ....."
@@ -137,7 +96,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           control={form.control}
           registerName="area"
           error={form.formState.errors.area?.message}
-          options={areas}
+          options={suburbs}
         />
 
         <FormField
@@ -151,7 +110,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
         />
 
         <FormField
-          label="website"
+          label="Website"
           id="website"
           placeholder="e.g. www.charity.ausralia.com"
           register={form.register}
@@ -164,13 +123,4 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
   );
 }
 
-  const organizationTypes = [
-    { value: "nonprofit", label: "Non-Profit Organization" },
-    { value: "charity", label: "Registered Charity" },
-    { value: "community", label: "Community Organization" },
-    { value: "social_enterprise", label: "Social Enterprise" },
-    { value: "foundation", label: "Foundation" },
-    { value: "religious", label: "Religious Organization" },
-    { value: "educational", label: "Educational Institution" },
-    { value: "government", label: "Government Agency" }
-  ];
+ 

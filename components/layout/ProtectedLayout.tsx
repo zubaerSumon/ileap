@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 import TopNavigationBar from "@/components/TopNavigationBar";
+import UpdatedFooter from "../UpdatedFooter";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -39,7 +40,8 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   return (
     <Fragment>
       <TopNavigationBar />
-      {children}
+      <div className="min-h-screen max-w-[1048px] mx-auto">{children}</div>
+      <UpdatedFooter />
     </Fragment>
   );
 }

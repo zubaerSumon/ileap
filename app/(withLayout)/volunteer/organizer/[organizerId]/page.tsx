@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import Organizer from "@/components/layout/volunteer/organizer/Organizer";
+import ProtectedLayout from "@/components/layout/ProtectedLayout";
 
 export default function OrganizerDetailPage() {
   const params = useParams();
@@ -16,6 +17,8 @@ export default function OrganizerDetailPage() {
   }
 
   return (
-    <Organizer organizerId={organizerId} />  // Pass organizerId to Organizer component
+    <ProtectedLayout>
+      <Organizer organizerId={organizerId} />
+    </ProtectedLayout>  // Pass organizerId to Organizer component
   );
 }

@@ -1,14 +1,14 @@
 import { FormField } from "@/components/forms/FormField";
 import { PasswordField } from "@/components/forms/PasswordField";
 import { UseFormReturn } from "react-hook-form";
-import { OrgSignupForm } from "@/types/auth";
+import { OrgSignupFormData } from "@/types/auth";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 
 interface OrgSignupStepProps {
-  form: UseFormReturn<OrgSignupForm>;
+  form: UseFormReturn<OrgSignupFormData>;
   termsAccepted: boolean;
   setTermsAccepted: (value: boolean) => void;
   termsError: string | null;
