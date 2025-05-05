@@ -58,10 +58,14 @@ const VolunteerSchema = new Schema<IVolunteer>(
     referral_source_other: {
       type: String,
     },
+    applied_events: {
+      type: [String],
+    },
   },
   {
     timestamps: true,
   }
 );
 
-export const Volunteer = mongoose.models.volunteer ||model<IVolunteer>("volunteer", VolunteerSchema);
+export const Volunteer =
+  mongoose.models.volunteer || model<IVolunteer>("volunteer", VolunteerSchema);

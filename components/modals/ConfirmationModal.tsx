@@ -7,11 +7,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { MapPin, Calendar, Clock } from "lucide-react";
+import { trpc } from "@/utils/trpc";
+import toast from "react-hot-toast";
+import Link from "next/link";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
   opportunityDetails: {
+    id: string;
     title: string;
     organization: string;
     date: string;
@@ -26,8 +30,23 @@ export function ConfirmationModal({
   onClose,
   opportunityDetails,
 }: ConfirmationModalProps) {
-  // Hardcoded logo path
   const logoSrc = "/ausleap.svg";
+  const utils = trpc.useUtils();
+
+  const applyToEventMutation = trpc.users.applyToEvent.useMutation({
+    onSuccess: (data) => {
+      if (!data.alreadyApplied) {
+        toast.success("You have successfully applied to this opportunity. ");
+      }
+      utils.users.profileCheckup.invalidate();
+      onClose();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to apply for this opportunity.");
+    },
+  });
+
+  console.log({ opportunityDetails });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -50,13 +69,23 @@ export function ConfirmationModal({
           <div className="flex flex-col items-center">
             <p className="text-center mb-4 sm:mb-8 text-sm sm:text-base text-gray-600">
               Here are the opportunity details for{" "}
-              <span className="text-blue-600 font-semibold">
+              <Link
+                href={`/volunteer/opportunities/${opportunityDetails.id}`}
+                className="text-blue-600 font-semibold"
+              >
                 {opportunityDetails.title}
-              </span>{" "}
+              </Link>{" "}
               with{" "}
-              <span className="text-blue-600 font-semibold">
+              <Link
+                href={`/volunteer/organizer/${
+                  opportunityDetails.id === "2"
+                    ? "clean-up-australia"
+                    : "easy-care-gardening"
+                }`}
+                className="text-blue-600 font-semibold"
+              >
                 {opportunityDetails.organization}
-              </span>
+              </Link>
             </p>
 
             <div className="space-y-4 sm:space-y-2 w-full px-2 sm:px-0">
@@ -93,11 +122,11 @@ export function ConfirmationModal({
             <Button
               className="bg-blue-600 hover:bg-blue-700 text-white w-full max-w-[300px] h-10"
               onClick={() => {
-                // Handle confirmation logic here
-                onClose();
+                applyToEventMutation.mutate({ eventId: opportunityDetails.id });
               }}
+              disabled={applyToEventMutation.isPending}
             >
-              Count me in!!
+              {applyToEventMutation.isPending ? "Applying..." : "Count me in!!"}
             </Button>
           </div>
         </div>

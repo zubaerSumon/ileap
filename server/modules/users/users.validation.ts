@@ -78,10 +78,15 @@ const organizationSchema = z.object({
   user: z.string().optional(),
 });
 
+const applyToEventSchema = z.object({
+  eventId: z.string(),
+});
+
 export const userValidation = {
   userSchema,
   updateUserSchema,
   volunteerSchema,
   organizationSchema,
   resetPasswordSchema,
+  applyToEventSchema,
 };

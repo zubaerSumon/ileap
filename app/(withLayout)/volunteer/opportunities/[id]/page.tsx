@@ -4,22 +4,20 @@ import { ArrowLeft } from "lucide-react";
 import { PostContent } from "@/components/layout/volunteer/homepage/PostContent";
 import { Sidebar } from "@/components/layout/volunteer/homepage/Sidebar";
 import { useRouter, useParams } from "next/navigation";
-import UpdatedFooter from "@/components/UpdatedFooter";
-
-import TopNavigationBar from "@/components/TopNavigationBar";
-
+import ProtectedLayout from "@/components/layout/ProtectedLayout";
+ 
+ 
 export default function OpportunityDetailPage() {
   const router = useRouter();
   const params = useParams();
   const opportunityId = Array.isArray(params?.id) ? params.id[0] : params?.id;
-
-  // Add error handling for invalid IDs
+ 
   if (!opportunityId || !["1", "2"].includes(opportunityId)) {
-    return (
+    return ( 
       <div className="max-w-[1280px] mx-auto px-4 mb-8 pt-20">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-gray-600 mb-6"
+          className="flex items-center gap-2 cursor-pointer text-gray-600 mb-6"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
@@ -35,9 +33,9 @@ export default function OpportunityDetailPage() {
   }
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <TopNavigationBar />
-      <div className="flex-1 max-w-[1280px] mx-auto px-4 mb-8 pt-20">
+    <ProtectedLayout>
+      <div className="flex flex-col min-h-screen">
+       <div className="flex-1 max-w-[1280px] mx-auto px-4 mb-8 pt-20">
         <button
           onClick={() => router.back()}
           className="flex items-center gap-2 text-gray-600 mb-6"
@@ -55,7 +53,8 @@ export default function OpportunityDetailPage() {
           </div>
           
         </div>
-      </div><UpdatedFooter></UpdatedFooter>
+      </div> 
     </div>
+    </ProtectedLayout>
   );
 }

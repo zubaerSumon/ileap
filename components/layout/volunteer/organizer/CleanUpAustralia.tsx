@@ -6,17 +6,15 @@ import Categories from "../homepage/HomePageCategories";
 
 export default function CleanUpAustralia() {
   return (
-    <div className="bg-[#F5F7FA] min-h-screen">
-      <div className="max-w-[1280px] mx-auto px-4 mb-8 bg-white rounded-lg shadow-md">
-        {/* Cover Image and Logo */}
-        <div className="relative mb-6 pt-8">
-          <div className="w-full h-[200px] relative rounded-lg overflow-hidden">
-            <Image
-              src="/pfbg2.svg"
-              alt="Clean Up Australia Cover"
-              fill
-              className="object-cover"
-            />
+    <div className="  px-4 mb-8 ">
+      <div className="relative mb-6 pt-8">
+        <div className="w-full h-[200px] relative rounded-lg overflow-hidden">
+          <Image
+            src="/pfbg2.svg"
+            alt="Clean Up Australia Cover"
+            fill
+            className="object-cover"
+          />
 
           {/* Logo positioned inside the banner */}
           <div className="absolute bottom-4 left-4 w-[80px] h-[80px] rounded-lg overflow-hidden border-4 border-white bg-white">
@@ -35,9 +33,7 @@ export default function CleanUpAustralia() {
         </div>
       </div>
 
-      {/* Organization Info */}
       <div className="flex flex-col md:flex-row md:justify-between md:items-start items-center text-center md:text-left gap-6 md:gap-0">
-        {/* Left Column - Org Info */}
         <div className="flex flex-col items-center md:items-start gap-1 md:w-1/3">
           <h1 className="text-2xl font-bold">Clean Up Australia</h1>
           <div className="flex items-center text-gray-600">
@@ -51,7 +47,6 @@ export default function CleanUpAustralia() {
           </div>
         </div>
 
-        {/* Right Column - Contact Info */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center text-center sm:text-left md:w-2/3">
           <div>
             <h2 className="text-lg font-semibold mb-2">Location</h2>
@@ -82,7 +77,6 @@ export default function CleanUpAustralia() {
         </div>
       </div>
 
-      {/* About Section */}
       <div className="mt-8 text-center md:text-left">
         <h2 className="text-lg font-semibold mb-2">About us</h2>
         <p className="text-gray-700">
@@ -94,7 +88,6 @@ export default function CleanUpAustralia() {
         </p>
       </div>
 
-      {/* Social Media */}
       <div className="mt-8 text-center md:text-left">
         <h2 className="text-lg font-semibold mb-2">Find us on:</h2>
         <Link
@@ -105,12 +98,10 @@ export default function CleanUpAustralia() {
         </Link>
       </div>
 
-      {/* Opportunities */}
       <div className="mt-8">
         <h2 className="text-lg font-semibold mb-4">All Opportunities</h2>
-        <Categories title="" />
+        <Categories customizedFor="clean up" />
       </div>
-    </div>
     </div>
   );
 }

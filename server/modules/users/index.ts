@@ -87,7 +87,9 @@ export const userRouter = router({
         throw new Error("You must be logged in to setup your profile.");
       }
 
-      const existingProfile = await Organization.findOne({ user: sessionUser.id });
+      const existingProfile = await Organization.findOne({
+        user: sessionUser.id,
+      });
       if (existingProfile) {
         throw new Error("Organization profile already exists.");
       }
@@ -106,8 +108,7 @@ export const userRouter = router({
 
   resetPassword: publicProcedure
     .input(userValidation.resetPasswordSchema)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       const { email, password } = input;
 
       const existingUser = await User.findOne({ email });
@@ -130,6 +131,47 @@ export const userRouter = router({
       return {
         success: true,
         message: "Password has been successfully reset",
+      };
+    }),
+
+  applyToEvent: protectedProcedure
+    .input(userValidation.applyToEventSchema)
+    .mutation(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.id) {
+        throw new Error("You must be logged in to apply for events.");
+      }
+
+      const volunteer = await Volunteer.findOne({ user: sessionUser.id });
+      if (!volunteer) {
+        throw new Error("Volunteer profile not found.");
+      }
+
+      // Check if already applied
+      const alreadyApplied = volunteer.applied_events?.includes(input.eventId);
+      if (alreadyApplied) {
+        return {
+          success: true,
+          message: "Already applied to this event",
+          alreadyApplied: true,
+        };
+      }
+
+      // Add the event ID to applied_events array
+      const updatedVolunteer = await Volunteer.findOneAndUpdate(
+        { user: sessionUser.id },
+        { $addToSet: { applied_events: input.eventId } },
+        { new: true }
+      );
+
+      if (!updatedVolunteer) {
+        throw new Error("Failed to apply for the event");
+      }
+
+      return {
+        success: true,
+        message: "Successfully applied to the event",
+        alreadyApplied: false,
       };
     }),
 });

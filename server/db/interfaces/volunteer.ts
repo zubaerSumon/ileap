@@ -29,6 +29,7 @@ export interface IVolunteer extends Document {
     start_time?: string;
     end_time?: string;
   };
+  applied_events?:string[];
   user: Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
