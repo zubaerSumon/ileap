@@ -1,30 +1,27 @@
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { ClientProviders } from "@/config/ClientProviders";
-import { auth } from "@/auth";
-import { Toaster } from "react-hot-toast";
+import { Inter } from 'next/font/google';
+import './globals.css';
+ import { ClientProviders } from '@/config/ClientProviders';
+import TopNavigationBar from '@/components/TopNavigationBar';
+  
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: "AusLeap - Volunteer Platform",
-  description: "Connect organizations with passionate volunteers",
+  title: 'iLEAP - Volunteer Platform',
+  description: 'Connect organizations with passionate volunteers',
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const session = await auth() || null;
-  console.log({session});
-  
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} `} >
-        <ClientProviders session={session}>
+      <body className={inter.className}>
+        <ClientProviders session={null}>
+        <TopNavigationBar />
           {children}
-          <Toaster position="top-center" />
         </ClientProviders>
       </body>
     </html>

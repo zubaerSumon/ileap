@@ -3,7 +3,7 @@ import { AuthProvider, IUser, UserRole } from "../interfaces/user";
 
 const UserSchema: Schema = new Schema<IUser>(
   {
-    name: { type: String, required: true },
+    name: { type: String },
     email: { type: String, required: true, unique: true },
     password: {
       type: String,
@@ -16,11 +16,11 @@ const UserSchema: Schema = new Schema<IUser>(
       enum: Object.values(AuthProvider),
       default: AuthProvider.CREDENTIALS,
     },
-    role: {
-      type: String,
-      enum: Object.values(UserRole),
+    role: { type: String, required: true, enum: Object.values(UserRole), default: UserRole.VOLUNTEER },
+    referred_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
     },
-    referred_by: { type: String },
     is_verified: {
       type: Boolean,
       default: false,

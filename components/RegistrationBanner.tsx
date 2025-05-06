@@ -2,7 +2,6 @@
 'use client';
 
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 
 interface RegistrationBannerProps {
   title?: string;
@@ -11,16 +10,11 @@ interface RegistrationBannerProps {
 }
 
 export default function RegistrationBanner({
-  title = "Learn more about AusLEAP",
+  title = "Learn more about iLEAP",
   description = "Ready to get started? Signing up is easy and free",
   buttonText = "Sign me up",
 }: RegistrationBannerProps) {
-  const router = useRouter();
-
-  const handleSignUp = () => {
-    router.push('/signup?role=volunteer');
-  };
-
+  console.log("Props received:", title, description, buttonText); // Debugging
   return (
     <div className="bg-[#1649B8] py-16 relative overflow-hidden">
       <div 
@@ -40,11 +34,7 @@ export default function RegistrationBanner({
             {description}
           </p>
           
-          <Button 
-            className="bg-black hover:bg-gray-900 text-white border-none" 
-            size="lg"
-            onClick={handleSignUp}
-          >
+          <Button className="bg-black hover:bg-gray-900 text-white border-none" size="lg">
             {buttonText}
           </Button>
         </div>

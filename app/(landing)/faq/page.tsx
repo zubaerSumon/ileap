@@ -3,26 +3,26 @@
 import FAQSection from "../../../components/layout/landing/faq/FAQSection";
 import FAQHero from "../../../components/layout/landing/faq/FAQHero";
 import RegistrationBanner from "../../../components/RegistrationBanner";
-// import Categories from "@/components/Categories";
+import Categories from "@/components/Categories";
 import Image from "next/image";
 
-// const iLEAPFAQs = [
-//   {
-//     question: "What's AusLEAP?",
-//     answer:
-//       "AusLEAP is a platform that connects passionate volunteers with organizations making a difference in their communities. We facilitate meaningful volunteer opportunities and help organizations find dedicated individuals to support their causes.",
-//   },
-//   {
-//     question: "What is a community organisation?",
-//     answer:
-//       "Currently, we offer a wide range of volunteer opportunities across various sectors including education, healthcare, environmental conservation, and community development. Organizations can post opportunities, and volunteers can easily search and apply for positions that match their interests and skills.",
-//   },
-//   {
-//     question: "Why should I use AusLEAP?",
-//     answer:
-//       "By joining AusLEAP, you become part of a community dedicated to making positive change. Volunteers gain valuable experience, develop new skills, and make meaningful connections. Organizations benefit from dedicated support and can efficiently manage their volunteer programs through our platform.",
-//   },
-// ];
+const iLEAPFAQs = [
+  {
+    question: "What's iLEAP?",
+    answer:
+      "iLEAP is a platform that connects passionate volunteers with organizations making a difference in their communities. We facilitate meaningful volunteer opportunities and help organizations find dedicated individuals to support their causes.",
+  },
+  {
+    question: "What is a community organisation?",
+    answer:
+      "Currently, we offer a wide range of volunteer opportunities across various sectors including education, healthcare, environmental conservation, and community development. Organizations can post opportunities, and volunteers can easily search and apply for positions that match their interests and skills.",
+  },
+  {
+    question: "Why should I use iLEAP?",
+    answer:
+      "By joining iLEAP, you become part of a community dedicated to making positive change. Volunteers gain valuable experience, develop new skills, and make meaningful connections. Organizations benefit from dedicated support and can efficiently manage their volunteer programs through our platform.",
+  },
+];
 
 const AusLEAPFAQs = [
   {
@@ -63,7 +63,7 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-[#FFFFFF]">
       <FAQHero />
-      {/* <div className="w-full pt-20 pb-16">
+      <div className="w-full pt-20 pb-16">
         <Image
           src="/banner1.svg"
           width={1440}
@@ -72,16 +72,21 @@ export default function FAQPage() {
           className="w-full"
           priority
         />
-      </div> */}
-      <div className="container mx-auto px-4 ">
+      </div>
+      <div className="container mx-auto px-4 py-16 -mt-8">
         <div className="max-w-4xl mx-auto">
-          
-          {/* <FAQSection title="" faqs={iLEAPFAQs} /> */}
+          <h2 className="text-3xl font-bold text-center mb-2">iLEAP</h2>
+          <p className="text-gray-500 text-center mb-4">
+            Each week we get questions on volunteering topic. Browse all
+            available discussions below -- We can&apos;t wait for you to join
+            the conversation!
+          </p>
+          <FAQSection title="" faqs={iLEAPFAQs} />
         </div>
       </div>
 
       {/* Full width banner */}
-      <div className="w-full py-8">
+      <div className="w-full py-16">
         <Image
           src="/banner2.svg"
           width={1440}
@@ -92,7 +97,7 @@ export default function FAQPage() {
         />
       </div>
 
-      <div className="container mx-auto px-16">
+      <div className="container mx-auto p-16">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-2">AusLEAP</h2>
           <p className="text-gray-500 text-center mb-4">
@@ -103,7 +108,7 @@ export default function FAQPage() {
           <FAQSection title="" faqs={AusLEAPFAQs} />
         </div>
       </div>
-     
+      <Categories />
       <RegistrationBanner
         title="AusLEAP 2025 registration has just opened!"
         description="We're here to help. If you have any questions about volunteering, donations, or our programs, please feel free to reach out. We look forward to hearing from you!"

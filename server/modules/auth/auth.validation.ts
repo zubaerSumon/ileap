@@ -1,17 +1,10 @@
-import { z } from "zod";
-import { UserRole, AuthProvider } from "@/server/db/interfaces/user";
+import { z } from 'zod';
 
 const signupSchema = z.object({
-  name: z.string().min(1),
   email: z.string().email(),
   password: z.string().min(6),
-  role: z
-    .enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION])
-    .default(UserRole.VOLUNTEER),
-  provider: z
-    .enum([AuthProvider.CREDENTIALS, AuthProvider.GOOGLE])
-    .default(AuthProvider.CREDENTIALS),
-  referred_by: z.string().optional(),
+  firstName: z.string().min(1),
+  lastName: z.string().min(1),
+  profile: z.array(z.string()),
 });
-
 export const authValidation = { signupSchema };

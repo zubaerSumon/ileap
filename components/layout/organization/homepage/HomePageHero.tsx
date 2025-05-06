@@ -5,16 +5,16 @@ import { Search, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
- 
+
 const Hero = () => {
   const [category, setCategory] = useState('');
   const [location, setLocation] = useState('');
-    
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Implement search functionality
-   };
+    console.log('Search:', { category, location });
+  };
 
   return (
     <section className="relative bg-black text-white py-20">
