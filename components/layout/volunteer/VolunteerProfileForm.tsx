@@ -83,7 +83,7 @@ export function VolunteerProfileForm() {
   };
 
   return (
-    <div className="bg-[#F5F7FA] min-h-screen">
+    <div className=" min-h-screen">
       <div className="max-w-[1046px] mx-auto flex flex-col md:flex-row gap-8 p-6">
         {/* Mobile navigation */}
         <div className="md:hidden bg-white rounded-lg p-4 mb-4">

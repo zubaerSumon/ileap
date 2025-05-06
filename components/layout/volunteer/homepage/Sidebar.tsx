@@ -1,5 +1,5 @@
 
-import { MapPin, Calendar, Clock, CheckSquare } from "lucide-react";
+import { MapPin, Calendar, Clock } from "lucide-react";
 import Image from "next/image";
 
 interface OpportunityDetails {
@@ -14,6 +14,17 @@ interface OpportunityDetails {
 
 export function Sidebar({ opportunityId }: { opportunityId?: string }) {
   const getOpportunityDetails = (id?: string): OpportunityDetails => {
+    if (id === "3") {
+      return {
+        logo: "/Clean.svg",
+        logoAlt: "Clean Up Australia",
+        category: "Environmental Management",
+        location: "Hyde Park, Sydney",
+        date: "24/05/2025",
+        time: "01:00 PM - 04:00 PM (3 hours)",
+        requirements: "No specific requirements"
+      };
+    }
     if (id === "2") {
       return {
         logo: "/Clean.svg",
@@ -74,13 +85,13 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
           </div>
         </div>
 
-        <div className="mt-4">
+        {/* <div className="mt-4">
           <h3 className="font-medium mb-3 text-gray-900">Requirements</h3>
           <div className="flex items-center gap-2 text-gray-600">
             <CheckSquare className="w-5 h-5 text-blue-500" />
             <span>{details.requirements}</span>
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -8,7 +8,7 @@ import Categories from "@/components/layout/volunteer/homepage/HomePageCategorie
 const VolunteerPage = () => {
   return (
     <ProtectedLayout>
-      <div className="max-w-[1048px] mx-auto px-4 flex flex-col items-center pb-40">
+      <div className="max-w-[1440px] mx-auto px-4 flex flex-col items-center pb-40">
         <h1 className="text-[#101010] font-inter text-2xl font-bold text-center mt-8 mb-2">
           Welcome 2025 AusLeap Participants
         </h1>
