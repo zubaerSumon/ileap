@@ -46,7 +46,8 @@ export default function Categories({
   const opportunities = [
     {
       id: "1",
-      title: "Gardening Volunteer",
+      title: "Easy Care Gardening",
+      popup_title: "Gardening Volunteer",
       organization: "Easy Care Gardening",
       location: "Sydney, Australia",
       type: "One off",
@@ -61,11 +62,28 @@ export default function Categories({
     },
     {
       id: "2",
-      title: "Clean Up Volunteer",
+      title: "Clean Up Australia",
+      popup_title: "Clean Up volunteer",
       organization: "Clean Up Australia",
       location: "Sydney, Australia",
       type: "One off",
       date: "21/05/2025",
+      time: "01:00 PM - 04:00 PM",
+      matchingAvailability: true,
+      matchedSkills: 2,
+      categories: ["Environmental Management"],
+      description:
+        "Want to help protect Australia's parks, beaches, and waterways from litter and waste?...",
+      logoSrc: "/Clean.svg",
+    },
+    {
+      id: "3",
+      title: "Clean Up Australia",
+      popup_title: "Clean Up volunteer",
+      organization: "Clean Up Australia",
+      location: "Sydney, Australia",
+      type: "One off",
+      date: "24/05/2025",
       time: "01:00 PM - 04:00 PM",
       matchingAvailability: true,
       matchedSkills: 2,
@@ -81,7 +99,7 @@ export default function Categories({
     ? customizedFor.toLowerCase() === "easy care"
       ? opportunities.filter((opp) => opp.id === "1")
       : customizedFor.toLowerCase() === "clean up"
-      ? opportunities.filter((opp) => opp.id === "2")
+      ? opportunities.filter((opp) => ["2", "3"].includes(opp.id))
       : opportunities
     : opportunities;
 
@@ -183,7 +201,7 @@ export default function Categories({
                 e.stopPropagation();
                 setSelectedOpportunity({
                   id: opportunity.id,
-                  title: opportunity.title,
+                  title: opportunity.popup_title ||  opportunity.title,
                   organization: opportunity.organization,
                   date: opportunity.date,
                   time: opportunity.time,

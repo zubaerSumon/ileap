@@ -11,9 +11,9 @@ export default function OpportunityDetailPage() {
   const router = useRouter();
   const params = useParams();
   const opportunityId = Array.isArray(params?.id) ? params.id[0] : params?.id;
- 
-  if (!opportunityId || !["1", "2"].includes(opportunityId)) {
-    return ( 
+
+  if (!opportunityId || !["1", "2", "3"].includes(opportunityId)) {
+    return (
       <div className="max-w-[1280px] mx-auto px-4 mb-8 pt-20">
         <button
           onClick={() => router.back()}

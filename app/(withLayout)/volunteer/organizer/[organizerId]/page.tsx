@@ -10,7 +10,7 @@ export default function OrganizerDetailPage() {
 
   if (!organizerId) {
     return (
-      <div className="max-w-[1280px] mx-auto px-4 mb-8 pt-20">
+      <div className="max-w-[1440px] mx-auto px-4 mb-8 pt-20">
         <h1 className="text-2xl font-bold">Organizer not found</h1>
       </div>
     );
@@ -18,7 +18,9 @@ export default function OrganizerDetailPage() {
 
   return (
     <ProtectedLayout>
-      <Organizer organizerId={organizerId} />
-    </ProtectedLayout>  // Pass organizerId to Organizer component
+      <div className="max-w-[1280px] mx-auto">
+        <Organizer organizerId={organizerId} />
+      </div>
+    </ProtectedLayout>
   );
 }

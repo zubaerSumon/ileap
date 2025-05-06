@@ -30,11 +30,11 @@ import { useAuthCheck } from "@/hooks/useAuthCheck";
 
 const publicNavOptions = [
   { label: "Log in", href: "/signin", className: "hover:underline" },
-  {
-    label: "Organisation Sign up",
-    href: "/signup?role=organization",
-    className: "hover:underline hidden md:inline",
-  },
+  // {
+  //   label: "Organisation Sign up",
+  //   href: "/signup?role=organization",
+  //   className: "hover:underline hidden md:inline",
+  // },
   {
     label: "Volunteer Sign up",
     href: "/signup?role=volunteer",
@@ -300,9 +300,9 @@ export default function TopNavigationBar() {
                           <p>
                             {paramRole === "organization"
                               ? "Want to help out?"
-                              : "Need a helping hand?"}{" "}
+                              : ""}{" "}
                           </p>
-                          <Link
+                          {/* <Link
                             href={
                               paramRole === "organization"
                                 ? "/signup"
@@ -315,7 +315,7 @@ export default function TopNavigationBar() {
                                 ? "a Volunteer"
                                 : "an Organization"
                             }`}
-                          </Link>
+                          </Link> */}
                         </div>
                       ) : (
                         <Link

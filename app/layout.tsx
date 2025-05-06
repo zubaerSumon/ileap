@@ -17,11 +17,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const session = await auth() || null;
-  console.log({session});
   
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} `} >
+      <body className={`${inter.className} `}>
         <ClientProviders session={session}>
           {children}
           <Toaster position="top-center" />
