@@ -5,7 +5,7 @@ const VolunteerSchema = new Schema<IVolunteer>(
   {
     user: {
       type: Schema.Types.ObjectId,
-      ref: "User",
+      ref: "user",
       required: true,
     },
     bio: {
@@ -67,5 +67,6 @@ const VolunteerSchema = new Schema<IVolunteer>(
   }
 );
 
-export const Volunteer =
+const Volunteer =
   mongoose.models.volunteer || model<IVolunteer>("volunteer", VolunteerSchema);
+export default Volunteer;

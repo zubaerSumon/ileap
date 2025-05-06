@@ -186,7 +186,7 @@ export default function LoginPage() {
                 className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center justify-center"
               >
                 {isSubmitting ? (
-                  <Loader2  className="h-5 w-5 mr-2"/>
+                  <Loader2  className="h-5 w-5 mr-2 animate-spin"/>
                 ) : null}
                 Sign in
               </button>

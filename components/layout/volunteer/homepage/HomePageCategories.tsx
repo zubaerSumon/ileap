@@ -213,7 +213,7 @@ export default function Categories({
             >
               {appliedEvents.includes(opportunity.id) ? "Applied" : "Apply now"}
             </Button>
-            <Star className="h-[18px] w-[18px] ms-1 text-yellow-400 fill-current" />
+            <Star className="h-4 w-4 ms-1 text-yellow-400 fill-current" />
           </CardFooter>
         </Card>
       ))}
