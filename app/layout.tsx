@@ -20,7 +20,7 @@ export default async function RootLayout({
   
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} bg-[#F5F7FA]`}>
+      <body className={`${inter.className} `}>
         <ClientProviders session={session}>
           {children}
           <Toaster position="top-center" />
