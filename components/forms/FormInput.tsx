@@ -1,62 +1,43 @@
-"use client";
-import { 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormControl, 
-  FormMessage,
-  FormDescription
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Control, FieldValues, Path } from "react-hook-form";
+import React from 'react';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
-interface BaseFormFieldProps<T extends FieldValues> {
-  name: Path<T>;
+interface FormInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
-  description?: string;
-  control: Control<T>;
-  className?: string;
+  error?: string;
+  containerClassName?: string;
+  labelClassName?: string;
+  inputWrapperClassName?: string;
 }
 
-interface FormInputProps<T extends FieldValues> extends BaseFormFieldProps<T> {
-  placeholder?: string;
-  type?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
-
-export function FormInput<T extends FieldValues>({
-  name,
+export function FormInput({
   label,
-  description,
-  control,
-  placeholder,
-  type = "text",
+  error,
   className,
-  onChange
-}: FormInputProps<T>) {
+  containerClassName,
+  labelClassName,
+  inputWrapperClassName,
+  ...props
+}: FormInputProps) {
   return (
-    <FormField
-      control={control}
-      name={name}
-      render={({ field }) => (
-        <FormItem className={className}>
-          <FormLabel>{label}</FormLabel>
-          {description && <FormDescription>{description}</FormDescription>}
-          <FormControl>
-            <Input
-              type={type}
-              placeholder={placeholder}
-              {...field}
-              onChange={(e) => {
-                field.onChange(e);
-                onChange?.(e);
-              }}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+    <div className={cn('w-full', containerClassName)}>
+      <div className={cn('border-[0.5px] border-[#CBCBCB] px-3 py-2 rounded-lg', inputWrapperClassName)}>
+        <label 
+          htmlFor={props.id} 
+          className={cn('block text-sm font-medium text-gray-700', labelClassName)}
+        >
+          {label}
+        </label>
+        <div className="mt-1 bg-[#EAF1FF]">
+          <Input
+            className={cn('appearance-none block w-full focus:outline-none sm:text-sm bg-[#EAF1FF] px-2 py-1 border-0 shadow-none', className)}
+            {...props}
+          />
+        </div>
+      </div>
+      {error && (
+        <p className="mt-2 text-sm text-red-600">{error}</p>
       )}
-    />
+    </div>
   );
 }
- 

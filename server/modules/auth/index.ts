@@ -6,18 +6,17 @@ import jwt from 'jsonwebtoken'; // Import JWT for token generation
 import { authValidation } from './auth.validation';
 import { generateTokenAndSendMail } from '@/utils/helpers/generateToken';
 import { ApiError } from '@/lib/exceptions';
-import { publicProcedure, router } from '@/server/trpc';
-import mongoose from 'mongoose';
+import { publicProcedure, router } from '@/server/routers/trpc';
 
 export const authRouter = router({
   signup: publicProcedure
     .input(authValidation.signupSchema)
     .mutation(async ({ input }) => {
-      const { email, password, name, role, provider, referred_by } = input;
+      const { email, password, firstName, lastName, profile } = input;
 
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        throw new ApiError(httpStatus.CONFLICT, 'User already exists');
+        throw new Error('User already exists');
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -25,23 +24,21 @@ export const authRouter = router({
       const newUser = new User({
         email,
         password: hashedPassword,
-        name,
-        role,
-        provider,
-        referred_by: referred_by ? new mongoose.Types.ObjectId(referred_by) : undefined,
-        is_verified: true,
+        firstName,
+        lastName,
+        profile,
       });
 
       await newUser.save();
 
       await generateTokenAndSendMail(
         newUser,
-        'New Account Registration - Ileap'
+        'New Account Registration - Skattepluss'
       );
 
       return {
         message: 'User registered successfully, please verify your email.',
-        status: httpStatus.OK,
+        status: 200,
         user: newUser,
       };
     }),
@@ -84,7 +81,7 @@ export const authRouter = router({
         throw new ApiError(httpStatus.NOT_FOUND, 'User not found');
       }
 
-      if (user.is_verified) {
+      if (user.isVerified) {
         return {
           message: 'User is already verified.',
           alreadyVerified: true,
@@ -92,7 +89,7 @@ export const authRouter = router({
         };
       }
 
-      user.is_verified = true;
+      user.isVerified = true;
       await user.save();
 
       return {

@@ -25,7 +25,7 @@ export default function WhyILEAP() {
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4 max-w-[1340px]">
         <div className="text-center mb-12">
-          <h2 className="text-2xl font-bold mb-3 pb-3">Why AusLEAP?</h2>
+          <h2 className="text-2xl font-bold mb-3 pb-3">Why iLEAP?</h2>
           <p className="text-gray-600 text-base">
             For VOLUNTEERS - Join a project or organization and start your volunteering journey!
           </p>

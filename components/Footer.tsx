@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Instagram, Linkedin } from 'lucide-react';
+import { Phone, Instagram, Linkedin } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -13,19 +13,19 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-[#2563EB]">Recruit volunteer</h3>
             <ul className="space-y-2">
               <li>
-                <span className="text-sm text-gray-400 ">
-                AusLEAP volunteer report
-                </span>
+                <Link href="/volunteer-report" className="text-sm text-gray-600 hover:text-primary">
+                  iLEAP volunteer report
+                </Link>
               </li>
               <li>
-                <span className="text-sm text-gray-400 ">
+                <Link href="/help-support" className="text-sm text-gray-600 hover:text-primary">
                   Help & support
-                </span>
+                </Link>
               </li>
               <li>
-                <span className="text-sm text-gray-400 ">
+                <Link href="/terms" className="text-sm text-gray-600 hover:text-primary">
                   Terms of Policies
-                </span>
+                </Link>
               </li>
             </ul>
           </div>
@@ -35,30 +35,30 @@ export default function Footer() {
             <h3 className="text-lg font-semibold text-[#2563EB]">Categories</h3>
             <ul className="space-y-2">
               <li>
-                <span className="text-sm text-gray-400 ">
+                <Link href="/faqs" className="text-sm text-gray-600 hover:text-primary">
                   FAQ&apos;s
-                </span>
+                </Link>
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-sm text-gray-400 ">
+                <Link href="/community-service" className="text-sm text-gray-600 hover:text-primary">
                   Community service
-                </span>
+                </Link>
                 <Link
-                  href="/signup?role=volunteer"
+                  href="/join"
                   className="px-4 py-2 bg-[#2563EB] text-white rounded-full hover:bg-primary/90 transition-colors text-sm font-medium"
                 >
                   Join us!
                 </Link>
               </li>
               <li>
-                <span className="text-sm text-gray-400 ">
+                <Link href="/disable-services" className="text-sm text-gray-600 hover:text-primary">
                   Disable Services
-                </span>
+                </Link>
               </li>
               <li>
-                <span className="text-sm text-gray-400 ">
+                <Link href="/young-people" className="text-sm text-gray-600 hover:text-primary">
                   Young people
-                </span>
+                </Link>
               </li>
             </ul>
           </div>
@@ -78,28 +78,21 @@ export default function Footer() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-[#2563EB]">Find us</h3>
             <div className="flex space-x-4">
-              <a 
-                href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#2563EB] transition-colors"
-              >
+              <Link href="tel:+61295142000" className="text-gray-600 hover:text-primary">
+                <Phone className="h-6 w-6" />
+              </Link>
+              <Link href="https://www.instagram.com" className="text-gray-600 hover:text-primary">
                 <Instagram className="h-6 w-6" />
-              </a>
-              <a 
-                href="https://www.linkedin.com/company/ausleap/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#2563EB] transition-colors"
-              >
+              </Link>
+              <Link href="https://www.linkedin.com" className="text-gray-600 hover:text-primary">
                 <Linkedin className="h-6 w-6" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>
 
         <div className="mt-8 pt-8 border-t text-center text-sm text-gray-500">
-          © Copyright AusLEAP Volunteer - Category: Australian University - ABN: 77 257 686 961 - {new Date().getFullYear()}
+          © Copyright iLeap Volunteer - Category: Australian University - ABN: 77 257 686 961 - {new Date().getFullYear()}
         </div>
       </div>
     </footer>

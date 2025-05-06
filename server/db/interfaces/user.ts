@@ -1,9 +1,9 @@
-import { Document} from "mongoose";
+import { Document, ObjectId } from "mongoose";
 
 export enum UserRole {
   ADMIN = "admin",
   VOLUNTEER = "volunteer",
-  ORGANIZATION = "organization", 
+  ORGANIZATION = "organization",
 }
 
 export enum AuthProvider {
@@ -18,5 +18,5 @@ export interface IUser extends Document {
   role: UserRole;
   provider: AuthProvider;
   is_verified: boolean;
-  referred_by: string;
+  referred_by: ObjectId;
 }

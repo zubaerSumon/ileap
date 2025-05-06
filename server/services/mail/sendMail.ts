@@ -2,7 +2,8 @@
 import { transporter } from './mailConfig';
 import type { SendMailOptions } from 'nodemailer';
 
- interface MailOptions extends SendMailOptions {
+// Interface for additional mail options like template and context
+interface MailOptions extends SendMailOptions {
   template: string;
   context: any;
 }
@@ -22,8 +23,8 @@ const sendEmail = async (
       from: '"Email Verification"',
       to: receiverEmail,
       subject: context.subject,
-      template: template,  
-      context: context.data,  
+      template: template, // 'template' property is added here
+      context: context.data, // 'context' property is added here
     };
 
     const reports = await transporter.sendMail(mailOptions);
