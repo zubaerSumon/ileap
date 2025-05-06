@@ -1,241 +1,212 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, MapPin, Star } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { ConfirmationModal } from "../../../modals/ConfirmationModal";
+import { trpc } from "@/utils/trpc";
+import fileIcon from "../../../../public/icons/file-icon.svg";
+import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
+import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
+import { Star } from "lucide-react";
 
-// In the component definition, add the title prop
-export default function Categories({ title = "Opportunities by categories" }: { title?: string }) {
+type OpportunityDetails = {
+  id: string;
+  title: string;
+  organization: string;
+  date: string;
+  time: string;
+  location: string;
+  logo: string;
+};
+
+export default function Categories({
+  customizedFor,
+}: {
+  customizedFor?: string;
+}) {
+  const router = useRouter();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOpportunity, setSelectedOpportunity] =
+    useState<OpportunityDetails | null>(null);
+  const [appliedEvents, setAppliedEvents] = useState<string[]>([]);
+
+  const { data: profileData } = trpc.users.profileCheckup.useQuery();
+
+  useEffect(() => {
+    if (profileData?.volunteerProfile?.applied_events) {
+      setAppliedEvents(profileData.volunteerProfile.applied_events);
+    }
+  }, [profileData]);
+
   const opportunities = [
     {
-      id: 1,
-      title: "Seek help",
-      organization: "All In",
+      id: "1",
+      title: "Gardening Volunteer",
+      organization: "Easy Care Gardening",
       location: "Sydney, Australia",
-      type: "Regular",
+      type: "One off",
+      date: "20/05/2025",
+      time: "10:00 AM - 02:00 PM",
       matchingAvailability: true,
       matchedSkills: 3,
-      categories: ["Human Rights", "Health & Medicine", "Education & Literacy"],
+      categories: ["Seniors & Aged Care"],
       description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      logoSrc: "/v1.svg",
+        "Do you have a passion for gardening and a desire to make a real difference in your community?...",
+      logoSrc: "/Easy.svg",
     },
     {
-      id: 2,
-      title: "Environmental Champions Needed!",
-      organization: "Red Cross",
+      id: "2",
+      title: "Clean Up Volunteer",
+      organization: "Clean Up Australia",
       location: "Sydney, Australia",
-      type: "Regular",
+      type: "One off",
+      date: "21/05/2025",
+      time: "01:00 PM - 04:00 PM",
       matchingAvailability: true,
-      matchedSkills: 3,
-      categories: ["Disaster Relief", "Emergency & Safety"],
+      matchedSkills: 2,
+      categories: ["Environmental Management"],
       description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      logoSrc: "/v2.svg",
-    },
-    {
-      id: 3,
-      title: "Seek help",
-      organization: "All In",
-      location: "Sydney, Australia",
-      type: "Regular",
-      matchingAvailability: true,
-      matchedSkills: 3,
-      categories: ["Education & Literacy"],
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      logoSrc: "/v3.svg",
-    },
-    {
-      id: 4,
-      title: "Seek help",
-      organization: "All In",
-      location: "Sydney, Australia",
-      type: "Regular",
-      matchingAvailability: true,
-      matchedSkills: 3,
-      categories: ["Human Rights", "Health & Medicine", "Education & Literacy"],
-      description:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
-      logoSrc: "/v4.svg",
+        "Want to help protect Australia's parks, beaches, and waterways from litter and waste?...",
+      logoSrc: "/Clean.svg",
     },
   ];
 
-  const OpportunityCard = ({
-    opportunity,
-  }: {
-    opportunity: (typeof opportunities)[0];
-  }) => (
-    <Card className="border rounded-lg overflow-hidden">
-      <CardContent className="p-0">
-        <div className="p-3">
-          <div className="flex items-center mb-2">
-            <div className="w-8 h-8 mr-2">
+  // Filter opportunities based on customizedFor parameter
+  const filteredOpportunities = customizedFor
+    ? customizedFor.toLowerCase() === "easy care"
+      ? opportunities.filter((opp) => opp.id === "1")
+      : customizedFor.toLowerCase() === "clean up"
+      ? opportunities.filter((opp) => opp.id === "2")
+      : opportunities
+    : opportunities;
+
+  return (
+    <section className="flex bg-white flex-wrap gap-3 justify-center sm:justify-start ">
+      {filteredOpportunities.map((opportunity) => (
+        <Card
+          key={opportunity.id}
+          className="rounded-lg overflow-hidden shadow-none border-[#F0F1F2] w-[266px] py-0 h-[250px] cursor-pointer hover:shadow-lg transition-shadow relative"
+          onClick={() =>
+            router.push(`/volunteer/opportunities/${opportunity.id}`)
+          }
+        >
+          <CardContent className="p-3">
+            <div className="space-y-[10px]">
               <Image
                 src={opportunity.logoSrc}
                 alt={opportunity.organization}
-                width={32}
-                height={32}
+                width={34}
+                height={34}
                 className="rounded-full"
               />
-            </div>
-            <h3 className="text-base font-semibold">{opportunity.title}</h3>
-          </div>
 
-          <div className="flex items-center text-xs text-gray-500 mb-2">
-            <MapPin className="w-3 h-3 mr-1 text-blue-500" />
-            <span>{opportunity.location}</span>
-            <Badge variant="outline" className="ml-2 px-1.5 py-0.5 text-xs">
-              {opportunity.type}
-            </Badge>
-          </div>
+              <h3 className="text-sm font-semibold">{opportunity.title}</h3>
 
-          <div className="flex space-x-3 mb-3">
-            <div className="flex items-center text-xs text-green-600">
-              <div className="w-4 h-4 mr-1">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="text-green-500"
-                >
-                  <path
-                    d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+              <div className="flex items-center space-x-[10px] text-xs text-gray-500 ">
+                <div className="flex items-center">
+                  <Image
+                    src={mapPinIcon}
+                    height={14}
+                    width={14}
+                    className="mr-1 "
+                    alt="Map pin icon"
                   />
-                </svg>
-              </div>
-              <span>Matching availability</span>
-            </div>
+                  <span className="text-[10px]">{opportunity.location}</span>
+                </div>
 
-            <div className="flex items-center text-xs text-orange-600">
-              <div className="w-4 h-4 mr-1">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="text-orange-500"
-                >
-                  <path
-                    d="M9 12L11 14L15 10M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                <div className="flex items-center">
+                  <Image
+                    src={fileIcon}
+                    height={14}
+                    width={14}
+                    className="mr-1 "
+                    alt="File icon"
                   />
-                </svg>
+                  <span className="text-[10px]">
+                    {opportunity.type}; {opportunity.date}
+                  </span>
+                </div>
               </div>
-              <span>{opportunity.matchedSkills} matched skills</span>
-            </div>
-          </div>
 
-          <div className="flex flex-wrap gap-1 mb-3">
-            {opportunity.categories.map((category, idx) => (
-              <Badge
-                key={idx}
-                variant="secondary"
-                className="text-xs font-normal"
-              >
-                {category}
-              </Badge>
-            ))}
-          </div>
-
-          <p className="text-sm text-gray-600 mb-4">
-            {opportunity.description}
-          </p>
-        </div>
-      </CardContent>
-
-      <CardFooter className="flex justify-between items-center p-3 pt-0">
-        <div className="flex gap-2 items-center">
-          <Button className="bg-blue-600 hover:bg-blue-700 text-white h-8 text-xs">
-            Apply now
-          </Button>
-          <Button variant="ghost" size="icon" className="text-yellow-400 h-8 w-8">
-            <Star className="h-4 w-4 fill-current" />
-          </Button>
-        </div>
-      </CardFooter>
-    </Card>
-  );
-
-  return (
-    <section className="py-8 bg-white">
-      <div className="container mx-auto">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">{title}</h2>
-          <Link
-            href="/opportunities"
-            className="text-sm text-gray-600 hover:text-blue-600 flex items-center"
-          >
-            View all <ArrowRight className="ml-1 h-4 w-4" />
-          </Link>
-        </div>
-
-        <Tabs defaultValue="nearby" className="w-full">
-          <TabsList className="mb-6 bg-transparent inline-flex justify-start space-x-4  p-0 h-auto">
-            <TabsTrigger
-              value="nearby"
-              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
-            >
-              Nearby Opportunities
-            </TabsTrigger>
-            <TabsTrigger
-              value="interests"
-              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
-            >
-              Your interests
-            </TabsTrigger>
-            <TabsTrigger
-              value="newest"
-              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
-            >
-              Newest Opportunities
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="nearby" className="mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {opportunities.map((opportunity) => (
-                <OpportunityCard
-                  key={opportunity.id}
-                  opportunity={opportunity}
+              <div className="flex items-center w-[114px] rounded-[2px] bg-[#EBF8F4]">
+                <Image
+                  src={mapPinGrayIcon}
+                  height={13}
+                  width={13}
+                  className="mr-1 "
+                  alt="Map pin gray icon"
                 />
-              ))}
-            </div>
-          </TabsContent>
+                <span className=" text-[10px] text-green-600 ">
+                  Matching location
+                </span>
+              </div>
 
-          <TabsContent value="interests" className="mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {opportunities.slice(1, 4).map((opportunity) => (
-                <OpportunityCard
-                  key={opportunity.id}
-                  opportunity={opportunity}
-                />
-              ))}
-            </div>
-          </TabsContent>
+              <div className="flex flex-wrap gap-1 mb-2">
+                {opportunity.categories.map((category, idx) => (
+                  <Badge
+                    key={idx}
+                    variant="secondary"
+                    className="text-[11px] bg-[#F0F0F0] rounded-[2px] font-normal py-0"
+                  >
+                    {category}
+                  </Badge>
+                ))}
+              </div>
 
-          <TabsContent value="newest" className="mt-0">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {opportunities.slice(2).map((opportunity) => (
-                <OpportunityCard
-                  key={opportunity.id}
-                  opportunity={opportunity}
-                />
-              ))}
+              <div className="text-xs text-gray-600 line-clamp-3 h-[51px]">
+                {opportunity.description}
+                <Link
+                  href={`/volunteer/opportunities/${opportunity.id}`}
+                  className="text-blue-600 hover:text-blue-700 text-xs"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  Read more
+                </Link>
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+          </CardContent>
+
+          <CardFooter className="absolute bottom-0 left-0 right-0 flex  items-center p-3 pt-0 ">
+            <Button
+              className={`${
+                appliedEvents.includes(opportunity.id)
+                  ? "bg-green-600 hover:bg-green-600"
+                  : "bg-blue-600 hover:bg-blue-700"
+              } text-white h-6 px-5 rounded-[6px] text-[10px] font-medium `}
+              disabled={appliedEvents.includes(opportunity.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedOpportunity({
+                  id: opportunity.id,
+                  title: opportunity.title,
+                  organization: opportunity.organization,
+                  date: opportunity.date,
+                  time: opportunity.time,
+                  location: opportunity.location,
+                  logo: opportunity.logoSrc,
+                });
+                setIsModalOpen(true);
+              }}
+            >
+              {appliedEvents.includes(opportunity.id) ? "Applied" : "Apply now"}
+            </Button>
+            <Star className="h-[18px] w-[18px] ms-1 text-yellow-400 fill-current" />
+          </CardFooter>
+        </Card>
+      ))}
+
+      {selectedOpportunity && (
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          opportunityDetails={selectedOpportunity}
+        />
+      )}
     </section>
   );
 }

@@ -14,12 +14,12 @@ export default function ScheduleRecurrence() {
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
-      <RecurrenceModal 
+      <RecurrenceModal
         isOpen={isRecurrenceModalOpen}
         onClose={() => setIsRecurrenceModalOpen(false)}
       />
       <div className="container mx-auto py-12">
-        <button 
+        <button
           onClick={() => router.back()}
           className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
         >
@@ -27,7 +27,10 @@ export default function ScheduleRecurrence() {
           Back
         </button>
         <h1 className="text-2xl font-bold mb-6 pb-2">Schedule & Recurrence</h1>
-        <h1 className="text-[14px] pb-12 font-normal">Fill out the information below so Ileap can find you volunteers for your organisation.</h1>
+        <h1 className="text-[14px] pb-12 font-normal">
+          Fill out the information below so AusLEAP can find you volunteers for
+          your organisation.
+        </h1>
         <div className="bg-white rounded-lg relative">
           <div className="absolute top-6 left-6 text-sm text-blue-600 font-medium">
             Step 2 of 2
@@ -47,9 +50,10 @@ export default function ScheduleRecurrence() {
                   <span className="text-red-500 ml-1">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
-                  How much time does the volunteer need to commit to? Volunteers use this to help find suitable opportunities.
+                  How much time does the volunteer need to commit to? Volunteers
+                  use this to help find suitable opportunities.
                 </p>
-                
+
                 <RadioGroup defaultValue="regular" className="flex gap-4">
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="oneoff" id="oneoff" />
@@ -69,10 +73,14 @@ export default function ScheduleRecurrence() {
                   <span className="text-red-500 ml-1">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
-                  Where does the volunteer need to work from? Be specific, but flexible if you can. Does the work need to be done in person (at a physical location) or could it be done online or remotely? You can select up to 8 locations and only one state or territory.
+                  Where does the volunteer need to work from? Be specific, but
+                  flexible if you can. Does the work need to be done in person
+                  (at a physical location) or could it be done online or
+                  remotely? You can select up to 8 locations and only one state
+                  or territory.
                 </p>
-                <Input 
-                  placeholder="21 Darling Dr, Sydney, Australia" 
+                <Input
+                  placeholder="21 Darling Dr, Sydney, Australia"
                   className="w-[382px]"
                 />
               </div>
@@ -84,13 +92,11 @@ export default function ScheduleRecurrence() {
                   <span className="text-red-500 ml-1">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
-                  Which category best represents this opportunity? Volunteers use this to help find opportunities they are interested in supporting.
+                  Which category best represents this opportunity? Volunteers
+                  use this to help find opportunities they are interested in
+                  supporting.
                 </p>
-                <Input 
-                  type="number"
-                  placeholder="20"
-                  className="w-[382px]"
-                />
+                <Input type="number" placeholder="20" className="w-[382px]" />
               </div>
 
               {/* Select date & time */}
@@ -100,19 +106,21 @@ export default function ScheduleRecurrence() {
                   <span className="text-red-500 ml-1">*</span>
                 </h2>
                 <p className="text-sm text-gray-500 mb-4">
-                  To help avoid surprises, please be specific. e.g. a few hours every day. ileap Australia recommends no more than 15 hours per week.
+                  To help avoid surprises, please be specific. e.g. a few hours
+                  every day. AusLEAP Australia recommends no more than 15 hours
+                  per week.
                 </p>
                 <div className="flex gap-4">
                   <div>
                     <Label>Date</Label>
                     <div className="flex items-center gap-2 mt-1">
-                      <Input 
+                      <Input
                         type="date"
                         className="w-[150px]"
                         defaultValue="2025-01-07"
                       />
                       <span>-</span>
-                      <Input 
+                      <Input
                         type="date"
                         className="w-[150px]"
                         defaultValue="2025-01-17"
@@ -122,13 +130,13 @@ export default function ScheduleRecurrence() {
                   <div>
                     <Label>Time</Label>
                     <div className="flex items-center gap-2 mt-1">
-                      <Input 
+                      <Input
                         type="time"
                         className="w-[120px]"
                         defaultValue="16:00"
                       />
                       <span>-</span>
-                      <Input 
+                      <Input
                         type="time"
                         className="w-[120px]"
                         defaultValue="17:30"
@@ -148,16 +156,17 @@ export default function ScheduleRecurrence() {
                   Which email address should we send applications to?
                 </p>
                 <div className="space-y-4">
-                  <Input 
+                  <Input
                     type="email"
                     placeholder="arif@spotify.com"
                     className="w-[382px]"
                   />
                   <div>
                     <p className="text-sm text-gray-500 mb-2">
-                      You can enter your own internal reference number here to help keep track of it.
+                      You can enter your own internal reference number here to
+                      help keep track of it.
                     </p>
-                    <Input 
+                    <Input
                       type="tel"
                       placeholder="+61 1243 5978"
                       className="w-[382px]"

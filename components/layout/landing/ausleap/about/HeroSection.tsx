@@ -22,7 +22,7 @@ export default function HeroSection() {
           {/* UTS Logo */}
           <div className="mb-4 pl-6">
             <Image 
-              src="/uts_logo.png" 
+              src="/UT.svg" 
               alt="UTS Logo" 
               width={80} 
               height={40}

@@ -1,39 +1,46 @@
-import React from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { cn } from '@/lib/utils';
+"use client";
 
-interface FormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+import { FieldValues, Path, Control } from "react-hook-form";
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+
+interface FormTextareaProps<T extends FieldValues> {
+  name: Path<T>;
   label: string;
-  error?: string;
-  containerClassName?: string;
-  labelClassName?: string;
-  textareaWrapperClassName?: string;
+  placeholder?: string;
+  control: Control<T>;
+  className?: string;
 }
 
-export function FormTextarea({
+export function FormTextarea<T extends FieldValues>({
+  name,
   label,
-  error,
+  control,
+  placeholder,
   className,
-  containerClassName,
-  labelClassName,
-   
-  ...props
-}: FormTextareaProps) {
+}: FormTextareaProps<T>) {
   return (
-    <div className={cn('w-full', containerClassName)}>
-      <label 
-        htmlFor={props.id} 
-        className={cn('block text-sm font-medium text-gray-700 mb-1', labelClassName)}
-      >
-        {label}
-      </label>
-      <Textarea
-        className={cn('w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500', className)}
-        {...props}
-      />
-      {error && (
-        <p className="mt-2 text-sm text-red-600">{error}</p>
+    <FormField
+      control={control}
+      name={name}
+      render={({ field }) => (
+        <FormItem className={className}>
+          <FormLabel>{label}</FormLabel>
+          <FormControl>
+            <Textarea
+              placeholder={placeholder}
+              {...field}
+            />
+          </FormControl>
+          <FormMessage />
+        </FormItem>
       )}
-    </div>
+    />
   );
 }

@@ -9,7 +9,7 @@ export default function Volunteer() {
       <br />
       <h2 className="text-3xl font-bold max-w-[960px] mx-auto">
         {" "}
-        Over 5,000 people have volunteered with iLEAP, Here’s why.
+        Over 5,000 people have volunteered with AusLEAP, Here’s why.
       </h2>
       <div className="py-4">
         <Benefits
@@ -58,9 +58,9 @@ export default function Volunteer() {
       </div>
 
       <div className="flex justify-center mt-8">
-        <button className="bg-[#2563EB] text-white px-8 py-3 rounded-lg hover:bg-[#1d4ed8] transition-colors">
+        {/* <button className="bg-[#2563EB] text-white px-8 py-3 rounded-lg hover:bg-[#1d4ed8] transition-colors">
           Find the perfect opportunity
-        </button>
+        </button> */}
       </div>
     </div>
   );

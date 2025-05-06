@@ -1,12 +1,12 @@
 import { Types } from "mongoose";
 export interface IOrgnization extends Document {
-  phone: string;
+  phone_number: string;
   bio: string;
   type: string;
-  categories: string[];
-  skills_required: string[];
-  country: string;
-  street_address: string;
+  opportunity_types: string[];
+  required_skills: string[];
+  state: string;
+  area: string;
   abn: string;
   website: string;
   profile_img: string;

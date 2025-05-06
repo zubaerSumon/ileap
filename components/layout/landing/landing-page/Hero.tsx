@@ -1,20 +1,15 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent } from '@/components/ui/card';
+// import { Search, MapPin, Star } from 'lucide-react';
+// import { Button } from '@/components/ui/button';
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// import { Card, CardContent } from '@/components/ui/card';
 
 const Hero = () => {
-  const [category, setCategory] = useState('');
-  const [location, setLocation] = useState('');
+  const [] = useState('');
+  const [] = useState('');
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Implement search functionality
-    console.log('Search:', { category, location });
-  };
 
   return (
     <section className="relative bg-black text-white py-20">
@@ -25,18 +20,17 @@ const Hero = () => {
             Better Tomorrow.
           </h1>
           
-          {/* Rating display */}
+         
           <div className="flex items-center justify-center gap-2 text-sm mb-8">
             <span>Excellent</span>
             <span>4.7 out of 5</span>
-            <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+            {/* <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /> */}
             <span>Google review</span>
           </div>
           
-          {/* Search form */}
+         {/* 
           <Card className="bg-white rounded-lg shadow-lg">
             <CardContent className="p-4">
-              {/* Stats - Moved inside */}
               <div className="flex justify-start gap-8 mb-6 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <svg viewBox="0 0 24 24" className="h-5 w-5 text-blue-500" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -91,6 +85,7 @@ const Hero = () => {
               </form>
             </CardContent>
           </Card>
+          */}
         </div>
       </div>
     </section>

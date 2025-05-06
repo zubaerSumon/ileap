@@ -1,8 +1,7 @@
-import NextAuth, { Session } from "next-auth";
+import NextAuth from "next-auth";
 import connectToDatabase from "@/server/config/mongoose";
 import User from "@/server/db/models/user";
- import { authConfig } from "./config";
-import { JWT } from "next-auth/jwt";
+import { authConfig } from "./config";
 
 export const {
   handlers: { GET, POST },
@@ -17,69 +16,74 @@ export const {
     updateAge: 24 * 60 * 60, // 24 hours
   },
   pages: {
-    signIn: "/login",
+    signIn: "/signin",
   },
 
   callbacks: {
     async signIn({ user, account }) {
+      await connectToDatabase();
+
       if (account?.provider === "google") {
-        await connectToDatabase();
         try {
           const existingUser = await User.findOne({ email: user.email });
+
           if (!existingUser) {
             const newUser = new User({
               email: user.email,
-              firstName: user.name,
-              lastName: "",
-              role: "customer",
+              name: user.name,
               provider: "google",
-              image: user?.image || "",
-              isVerified: true,
+              is_verified: true,
             });
             await newUser.save();
+            return true;
           }
+
           return true;
         } catch (err) {
-          console.error("Error saving user during Google sign-in", err);
+          console.error("Error during Google sign-in:", err);
           return false;
         }
       }
 
       if (account?.provider === "credentials") {
-        return true;
+       return true
       }
 
       return false;
     },
     async jwt({ token, user, trigger, session }) {
-      if (trigger === "signIn" || (trigger === "update" && session)) {
-        const retrievedUser = await User.findOne({ email: user?.email });
-
+      if (trigger === 'signIn' || (trigger === 'update' && session)) {
+        const retrievedUser = await User.findOne({ email: user?.email || token.email });
+        
         if (retrievedUser) {
           token.id = retrievedUser.id;
           token.email = retrievedUser.email;
-          token.firstName = retrievedUser.firstName || user?.name;
-          token.lastName = retrievedUser.lastName;
-          token.role = retrievedUser.role || "customer";
-          token.hasAnswers = retrievedUser.isStepperSkippedOrCompleted;
-          token.isSawInstructions = retrievedUser.isSawInstructions;
+          token.name = retrievedUser.name || user?.name;
+          token.role = retrievedUser.role || '';
         }
       }
       return token;
     },
-    async session({
-      session,
-      token,
-    }: {
-      session: Session;
-      token: JWT;
-    }): Promise<Session> {
+    async session({ session, token, user }) {
+      if (!token) {
+        return {
+          ...session,
+          user: {
+            id: '',
+            email: '',
+            name: '',
+            role: '',
+          },
+        };
+      }
+      
       return {
         ...session,
         user: {
-          id: token.id as string,
-          email: token.email as string,
-          name: (token.firstName as string) || (token.name as string) || "",
+          id: token.id,
+          email: token.email,
+          name: token.name || user?.name,
+          role: token.role || '',
         },
       };
     },
