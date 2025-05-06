@@ -140,9 +140,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
             >
               {appliedEvents.includes("2") ? "Applied" : "Apply Now"}
             </Button>
-            <Button variant="ghost" size="icon" className="text-yellow-400 h-8 pointer-events-none">
-              <Star className="h-5 w-5 fill-current" />
-            </Button>
+            <Star className="h-5 w-5 text-yellow-400 fill-current" />
           </div>
         </div>
 
@@ -247,9 +245,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
           >
             {appliedEvents.includes("1") ? "Applied" : "Apply Now"}
           </Button>
-          <Button variant="ghost" size="icon"  className="text-yellow-400 bg-[#F0F1F2] h-8 pointer-events-none">
-            <Star className="h-5 w-5 fill-current" />
-          </Button>
+          <Star className="h-5 w-5 text-yellow-400 fill-current" />
         </div>
 
         <ConfirmationModal

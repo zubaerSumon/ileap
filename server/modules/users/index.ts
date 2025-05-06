@@ -1,11 +1,11 @@
 import User from "@/server/db/models/user";
-import { Volunteer } from "@/server/db/models/volunteer";
 import Organization from "@/server/db/models/organization";
 import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
 import { userValidation } from "./users.validation";
 import bcrypt from "bcryptjs";
 import { publicProcedure, router } from "@/server/trpc";
+import Volunteer from "@/server/db/models/volunteer";
 
 export const userRouter = router({
   updateUser: protectedProcedure
