@@ -52,7 +52,7 @@ export function ConfirmationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full sm:w-[750px] min-h-[400px] sm:h-[660px] rounded-lg sm:rounded-[30px] bg-white pb-4 flex flex-col items-center sm:px-2 px-2">
+      <DialogContent className="w-full sm:w-[750px] min-h-[400px] sm:h-[660px] rounded-lg sm:rounded-[10px] bg-white pb-4 flex flex-col items-center sm:px-2 px-2">
         <DialogHeader className="flex flex-col items-center w-full mb-4">
           <DialogTitle className="sr-only">Volunteer Opportunity</DialogTitle>
           <Image

@@ -104,83 +104,84 @@ export default function Categories({
     : opportunities;
 
   return (
-    <section className="flex bg-white flex-wrap gap-3 justify-center sm:justify-start ">
+    <section className="flex bg-white flex-wrap gap-3 justify-center sm:justify-start">
       {filteredOpportunities.map((opportunity) => (
         <Card
           key={opportunity.id}
-          className="rounded-lg overflow-hidden shadow-none border-[#F0F1F2] w-[266px] py-0 h-[250px] cursor-pointer hover:shadow-lg transition-shadow relative"
+          className="rounded-lg overflow-hidden shadow-md border-[#F0F1F2] w-[320px] py-0 h-[340px] cursor-pointer hover:shadow-lg transition-shadow relative"
           onClick={() =>
             router.push(`/volunteer/opportunities/${opportunity.id}`)
           }
         >
-          <CardContent className="p-3">
-            <div className="space-y-[10px]">
+          <CardContent className="px-4 pt-6">
+            <div className="space-y-2">
               <Image
                 src={opportunity.logoSrc}
                 alt={opportunity.organization}
-                width={34}
-                height={34}
+                width={40}
+                height={40}
                 className="rounded-full"
               />
 
-              <h3 className="text-sm font-semibold">{opportunity.title}</h3>
+              <h3 className="text-lg font-semibold line-clamp-1">
+                {opportunity.title}
+              </h3>
 
-              <div className="flex items-center space-x-[10px] text-xs text-gray-500 ">
+              <div className="flex items-center space-x-2 text-xs text-gray-500">
                 <div className="flex items-center">
                   <Image
                     src={mapPinIcon}
-                    height={14}
-                    width={14}
-                    className="mr-1 "
+                    height={16}
+                    width={16}
+                    className="mr-1"
                     alt="Map pin icon"
                   />
-                  <span className="text-[10px]">{opportunity.location}</span>
+                  <span className="">{opportunity.location}</span>
                 </div>
-
-                <div className="flex items-center">
+                <div className="flex items-center text-xs text-gray-500">
                   <Image
                     src={fileIcon}
-                    height={14}
-                    width={14}
-                    className="mr-1 "
+                    height={16}
+                    width={16}
+                    className="mr-1"
                     alt="File icon"
                   />
-                  <span className="text-[10px]">
+                  <span className="">
                     {opportunity.type}; {opportunity.date}
                   </span>
                 </div>
               </div>
 
-              <div className="flex items-center w-[114px] rounded-[2px] bg-[#EBF8F4]">
+              <div className="flex items-center w-[150px] rounded-[4px] bg-[#EBF8F4] p-1">
                 <Image
                   src={mapPinGrayIcon}
-                  height={13}
-                  width={13}
-                  className="mr-1 "
+                  height={16}
+                  width={16}
+                  className="mr-1"
                   alt="Map pin gray icon"
                 />
-                <span className=" text-[10px] text-green-600 ">
+                <span className="text-sm text-green-600">
                   Matching location
                 </span>
               </div>
 
-              <div className="flex flex-wrap gap-1 mb-2">
+              <div className="flex flex-wrap gap-1">
                 {opportunity.categories.map((category, idx) => (
                   <Badge
                     key={idx}
                     variant="secondary"
-                    className="text-[11px] bg-[#F0F0F0] rounded-[2px] font-normal py-0"
+                    className="text-sm bg-[#F0F0F0] rounded-[4px] font-normal"
                   >
                     {category}
                   </Badge>
                 ))}
               </div>
 
-              <div className="text-xs text-gray-600 line-clamp-3 h-[51px]">
+              <div className="text-sm text-gray-600">
                 {opportunity.description}
                 <Link
                   href={`/volunteer/opportunities/${opportunity.id}`}
-                  className="text-blue-600 hover:text-blue-700 text-xs"
+                  className="text-blue-600 hover:text-blue-700 text-sm ml-1"
                   onClick={(e) => e.stopPropagation()}
                 >
                   Read more
@@ -189,31 +190,33 @@ export default function Categories({
             </div>
           </CardContent>
 
-          <CardFooter className="absolute bottom-0 left-0 right-0 flex  items-center p-3 pt-0 ">
-            <Button
-              className={`${
-                appliedEvents.includes(opportunity.id)
-                  ? "bg-green-600 hover:bg-green-600"
-                  : "bg-blue-600 hover:bg-blue-700"
-              } text-white h-6 px-5 rounded-[6px] text-[10px] font-medium `}
-              disabled={appliedEvents.includes(opportunity.id)}
-              onClick={(e) => {
-                e.stopPropagation();
-                setSelectedOpportunity({
-                  id: opportunity.id,
-                  title: opportunity.popup_title ||  opportunity.title,
-                  organization: opportunity.organization,
-                  date: opportunity.date,
-                  time: opportunity.time,
-                  location: opportunity.location,
-                  logo: opportunity.logoSrc,
-                });
-                setIsModalOpen(true);
-              }}
-            >
-              {appliedEvents.includes(opportunity.id) ? "Applied" : "Apply now"}
-            </Button>
-            <Star className="h-4 w-4 ms-1 text-yellow-400 fill-current" />
+          <CardFooter className="absolute bottom-0 left-0 right-0 flex items-center px-4 pb-8">
+            <div className="flex items-center gap-2">
+              <Button
+                className={`${
+                  appliedEvents.includes(opportunity.id)
+                    ? "bg-green-600 hover:bg-green-600"
+                    : "bg-blue-600 hover:bg-blue-700"
+                } text-white h-8 px-6 rounded-md text-sm font-medium`}
+                disabled={appliedEvents.includes(opportunity.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedOpportunity({
+                    id: opportunity.id,
+                    title: opportunity.popup_title || opportunity.title,
+                    organization: opportunity.organization,
+                    date: opportunity.date,
+                    time: opportunity.time,
+                    location: opportunity.location,
+                    logo: opportunity.logoSrc,
+                  });
+                  setIsModalOpen(true);
+                }}
+              >
+                {appliedEvents.includes(opportunity.id) ? "Applied" : "Apply now"}
+              </Button>
+              <Star className="h-5 w-5 text-yellow-400 fill-current" />
+            </div>
           </CardFooter>
         </Card>
       ))}
