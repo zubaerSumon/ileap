@@ -18,7 +18,7 @@ export default function CleanUpAustralia() {
         </Link>
       </div>
 
-      <div className="bg-white/50 rounded-lg shadow-sm">
+      <div className=" ">
         <div className="px-4 mb-8">
           <div className="relative mb-6 pt-4">
             <div className="w-full h-[200px] relative rounded-lg overflow-hidden">

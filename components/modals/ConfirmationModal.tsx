@@ -52,8 +52,8 @@ export function ConfirmationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="w-full sm:w-[750px] min-h-[400px] sm:h-[660px] rounded-lg sm:rounded-[10px] bg-white pb-4 flex flex-col items-center sm:px-2 px-2">
-        <DialogHeader className="flex flex-col items-center w-full mb-4">
+      <DialogContent className="w-full sm:w-[750px] min-h-[400px] sm:h-[600px] rounded-lg sm:rounded-[10px] bg-white pb-4 flex flex-col items-center sm:px-2 px-2">
+        <DialogHeader className="flex flex-col items-center w-full mb-2">
           <DialogTitle className="sr-only">Volunteer Opportunity</DialogTitle>
           <Image
             src={logoSrc}
@@ -67,7 +67,7 @@ export function ConfirmationModal({
           </h2>
         </DialogHeader>
 
-        <div className="flex-1 flex flex-col justify-between w-full max-w-[400px] py-6">
+        <div className="flex-1 flex flex-col justify-between w-full max-w-[400px] ">
           <div className="flex flex-col items-center">
             <p className="text-center mb-4 text-sm sm:text-base text-gray-600 px-4">
               Here are the opportunity details for{" "}

@@ -21,20 +21,20 @@ const MiniGallery: React.FC<MiniGalleryProps> = ({
     "/mg6.svg",
   ];
 
-  const imageWidths = ["105px", "104px", "75px", "60px", "105px", "125px"];
+  const imageWidths = ["110px", "110px", "77px", "60px", "105px", "125px"];
 
-  const imageHeight = "83px";
+  const imageHeight = "100px";
 
   return (
     <>
       {/* Desktop version */}
-      <div className="hidden sm:flex bg-[#254A9B] rounded-[51px] w-[356px] h-[340px] p-5 flex-col">
-        <h2 className="text-white text-center font-inter text-sm font-normal leading-normal mb-3">
+      <div className="hidden sm:flex bg-[#254A9B] rounded-[51px] w-[380px] h-[400px] p-6 flex-col">
+        <h2 className="text-white text-center font-inter text-sm font-normal leading-normal mb-4">
           {title}
         </h2>
 
-        <div className="bg-[#F5F8FF] rounded-[40px] p-4   flex-1 flex flex-col overflow-hidden">
-          <div className="flex flex-wrap space-x-2   justify-center items-start  ">
+        <div className="bg-[#F5F8FF] rounded-[40px]  p-5 flex-1 flex flex-col overflow-hidden">
+          <div className="flex flex-wrap gap-3 justify-center items-start">
             {galleryImages.map((src, index) => (
               <div
                 key={index}
@@ -42,8 +42,7 @@ const MiniGallery: React.FC<MiniGalleryProps> = ({
                 style={{
                   height: imageHeight,
                   width: `${parseInt(imageWidths[index]) * 0.9}px`,
-                  marginBottom: "0.5rem",
-                }}
+                 }}
               >
                 <Image
                   src={src}
@@ -67,13 +66,13 @@ const MiniGallery: React.FC<MiniGalleryProps> = ({
       </div>
 
       {/* Mobile version */}
-      <div className="sm:hidden bg-[#254A9B] rounded-[51px] w-[320px] h-[350px] pb-2 pt-2 px-3 flex flex-col">
-        <h2 className="text-white text-center font-inter text-sm font-normal leading-normal pb-3 pt-2 px-2">
+      <div className="sm:hidden bg-[#254A9B] rounded-[51px] w-[340px] h-[400px] pb-3 pt-3 px-4 flex flex-col">
+        <h2 className="text-white text-center font-inter text-sm font-normal leading-normal pb-4 pt-2 px-2">
           {title}
         </h2>
 
-        <div className="bg-[#F5F8FF] rounded-[51px] p-2 flex-1 flex flex-col">
-          <div className="flex flex-wrap gap-2 flex-1 justify-center items-start pt-2">
+        <div className="bg-[#F5F8FF] rounded-[51px] p-3 flex-1 flex flex-col">
+          <div className="flex flex-wrap gap-3 flex-1 justify-center items-start pt-3">
             {galleryImages
               .map((src, index) => (
                 <div
