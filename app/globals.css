@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
+
 @plugin "tailwindcss-animate";
+@import 'swiper/css';
+
 
 @custom-variant dark (&:is(.dark *));
 
@@ -112,7 +115,23 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 }
+/* Custom transition effect for pagination bullets */
+@media (max-width: 767px) {
+  .pagination-bullet {
+    transition: all 0.2s ease;
+  }
+  
+  /* Optional: make active bullets slightly larger with a smooth transition */
+  .pagination-bullet.active {
+    transform: scale(1.25);
+    transition: transform 0.3s ease;
+  }
+}
 
+/* Hide default Swiper bullets if they appear */
+.swiper-pagination-bullets {
+  display: none !important;
+}
 @layer base {
   * {
     @apply border-border outline-ring/50;
