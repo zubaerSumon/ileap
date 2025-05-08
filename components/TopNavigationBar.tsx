@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, LogOut } from "lucide-react";
 import { usePathname, useSearchParams } from "next/navigation";
 import Logo from "../public/AusLeap.png";
-import { FaInstagram, FaLinkedin } from "react-icons/fa";
+// import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
 import {
   NavigationMenu,
@@ -248,6 +248,7 @@ export default function TopNavigationBar() {
                     priority
                   />
                 </Link>
+                {/* Social media icons commented out
                 <div className="hidden md:flex items-center justify-center space-x-4">
                   <a
                     href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
@@ -266,6 +267,7 @@ export default function TopNavigationBar() {
                     <FaLinkedin className="h-4 w-4" />
                   </a>
                 </div>
+                */}
               </div>
 
               {isAuthPath ? (

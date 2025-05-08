@@ -19,15 +19,15 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
   }, [profileData]);
 
   const getOpportunityDetails = (id?: string) => {
-    if (id === "3") {
+    if (id === "4") {
       return {
-        id: "3",
-        title: "Clean Up Volunteer",
-        organization: "Clean Up Australia",
+        id: "4",
+        title: "Tree Plantation Volunteer",
+        organization: "Easy Care Gardening",
         date: "24/05/2025",
         time: "01:00 PM - 04:00 PM",
-        location: "Sydney, Australia",
-        logo: "/images/clean-up-australia-logo.png",
+        location: "Hyde Park, Sydney",
+        logo: "/images/easy-care-gardening-logo.png",
       };
     }
     if (id === "2") {
@@ -155,7 +155,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
                 appliedEvents.includes("2")
                   ? "bg-green-600 hover:bg-green-600"
                   : "bg-blue-600 hover:bg-blue-700"
-              }   h-8 px-5 font-normal text-[10px] text-white`}
+              }   h-8 px-5 font-normal text-sm text-white`}
               onClick={handleApplyClick}
               disabled={appliedEvents.includes("2")}
             >
@@ -273,7 +273,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
                 appliedEvents.includes("3")
                   ? "bg-green-600 hover:bg-green-600"
                   : "bg-blue-600 hover:bg-blue-700"
-              }   h-8 px-5 font-normal text-[10px] text-white`}
+              }   h-8 px-5 font-normal text-sm text-white`}
               onClick={handleApplyClick}
               disabled={appliedEvents.includes("3")}
             >
@@ -282,6 +282,121 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
             <Button variant="ghost" size="icon" className="text-yellow-400 h-8 pointer-events-none">
               <Star className="h-5 w-5 fill-current" />
             </Button>
+          </div>
+        </div>
+
+        <ConfirmationModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          opportunityDetails={getOpportunityDetails(opportunityId)}
+        />
+      </div>
+    );
+  }
+
+  if (opportunityId === "4") {
+    return (
+      <div className="flex-1 max-w-3xl">
+        <div className="w-full h-[200px] relative mb-6">
+          <Image
+            src="/garden0.svg"
+            alt="Gardening Volunteer Banner"
+            fill
+            className="object-cover rounded-lg"
+          />
+        </div>
+
+        <h1 className="text-2xl font-bold mb-4">Tree Plantation Volunteer</h1>
+
+        <div className="text-sm text-gray-600 mb-3">
+          Posted by
+          <Link href="/volunteer/organizer/easy-care-gardening">
+            <span className="text-blue-600 hover:underline cursor-pointer">
+              {" "}
+              Easy Care Gardening
+            </span>
+          </Link>
+        </div>
+
+        <div className="prose max-w-none text-gray-700 space-y-4">
+          <p className="text-base leading-relaxed">
+            Do you have a passion for gardening and a desire to make a real
+            difference in your community? We are looking for enthusiastic and
+            friendly volunteers to help senior Australians maintain their gardens
+            and stay in the homes they love.
+          </p>
+
+          <p className="text-base leading-relaxed">
+            As a volunteer gardener, you&apos;ll work in a team to provide
+            essential gardening services such as weeding, pruning, and mulching.
+            Your efforts will directly contribute to creating safe and tidy
+            outdoor spaces for elderly individuals, helping them to live
+            independently for longer.
+          </p>
+
+          <div>
+            <h2 className="text-lg font-semibold mb-2">
+              <u>What you&apos;ll be doing:</u>
+            </h2>
+            <ul className="list-disc pl-5 space-y-1.5 text-base">
+              <li>Working in small teams to tidy up gardens</li>
+              <li>Weeding garden beds and pathways</li>
+              <li>Pruning shrubs and small trees</li>
+              <li>Spreading mulch to improve soil health and presentation</li>
+              <li>
+                Creating a safer and more enjoyable outdoor environment for
+                seniors
+              </li>
+              <li>Building meaningful connections with the elderly community</li>
+            </ul>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold mb-2">
+              <u>What you&apos;ll gain:</u>
+            </h2>
+            <ul className="list-disc pl-5 space-y-1.5 text-base">
+              <li>
+                The satisfaction of making a difference in the lives of senior
+                Australians
+              </li>
+              <li>
+                The opportunity to connect with and learn from the elderly
+                community
+              </li>
+              <li>
+                A chance to contribute to your local community in a meaningful way
+              </li>
+              <li>
+                The enjoyment of working outdoors and sharing your gardening
+                skills
+              </li>
+            </ul>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-base font-semibold mb-1">
+              No prior professional gardening experience is necessary!
+            </h3>
+            <p className="text-sm">
+              We welcome anyone with a willingness to help and a positive
+              attitude.
+            </p>
+          </div>
+
+          <div className="flex gap-1 items-center mt-6">
+            <Button
+              className={`${
+                appliedEvents.includes("4")
+                  ? "bg-green-600 hover:bg-green-600"
+                  : "bg-blue-600 hover:bg-blue-700"
+              }  h-8 px-5 font-normal text-sm text-white`}
+              onClick={handleApplyClick}
+              disabled={appliedEvents.includes("4")}
+            >
+              {appliedEvents.includes("4") ? "Applied" : "Apply Now"}
+            </Button>
+            <Star className="h-5 w-5 text-yellow-400 fill-current" />
           </div>
         </div>
 
@@ -389,7 +504,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
               appliedEvents.includes("1")
                 ? "bg-green-600 hover:bg-green-600"
                 : "bg-blue-600 hover:bg-blue-700"
-            }  h-8 px-5 font-normal text-[10px] text-white`}
+            }  h-8 px-5 font-normal text-sm text-white`}
             onClick={handleApplyClick}
             disabled={appliedEvents.includes("1")}
           >
