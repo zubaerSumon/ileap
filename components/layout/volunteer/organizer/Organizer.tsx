@@ -14,13 +14,13 @@ export default function Organizer({ organizerId }: OrganizerProps) {
         </div>
       )}
 
-      {organizerId === "easy-care-gardening" && (
+      {(organizerId === "easy-care-gardening" || organizerId === "4") && (
         <div className=" px-4 mb-8 pt-20">
           <EasyCareGardening />
         </div>
       )}
 
-      {!["clean-up-australia", "easy-care-gardening"].includes(organizerId) && (
+      {!["clean-up-australia", "easy-care-gardening", "4"].includes(organizerId) && (
         <div className="px-4 mb-8 pt-20">
           <h1 className="text-2xl font-bold">Organizer not found</h1>
         </div>

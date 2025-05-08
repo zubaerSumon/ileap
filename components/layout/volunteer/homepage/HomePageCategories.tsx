@@ -12,7 +12,7 @@ import { trpc } from "@/utils/trpc";
 import fileIcon from "../../../../public/icons/file-icon.svg";
 import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
 import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
-import { Star } from "lucide-react";
+import { Star, Users } from "lucide-react";
 
 type OpportunityDetails = {
   id: string;
@@ -77,6 +77,22 @@ export default function Categories({
       logoSrc: "/Clean.svg",
     },
     {
+      id: "4",
+      title: "Easy Care Gardening",
+      popup_title: "Tree plantation Volunteer",
+      organization: "Easy Care Gardening",
+      location: "Sydney, Australia",
+      type: "One off",
+      date: "24/05/2025",
+      time: "01:00 PM - 04:00 PM",
+      matchingAvailability: true,
+      matchedSkills: 3,
+      categories: ["Seniors & Aged Care"],
+      description:
+        "Do you have a passion for gardening and a desire to make a real difference in your community?...",
+      logoSrc: "/Easy.svg",
+    },
+    {
       id: "3",
       title: "Clean Up Australia",
       popup_title: "Clean Up volunteer",
@@ -97,7 +113,7 @@ export default function Categories({
   // Filter opportunities based on customizedFor parameter
   const filteredOpportunities = customizedFor
     ? customizedFor.toLowerCase() === "easy care"
-      ? opportunities.filter((opp) => opp.id === "1")
+      ? opportunities.filter((opp) => ["1", "4"].includes(opp.id))
       : customizedFor.toLowerCase() === "clean up"
       ? opportunities.filter((opp) => ["2", "3"].includes(opp.id))
       : opportunities
@@ -153,17 +169,26 @@ export default function Categories({
                     </div>
                   </div>
 
-                  <div className="flex items-center w-[150px] rounded-[4px] bg-[#EBF8F4] p-1">
-                    <Image
-                      src={mapPinGrayIcon}
-                      height={16}
-                      width={16}
-                      className="mr-1"
-                      alt="Map pin gray icon"
-                    />
-                    <span className="text-sm text-green-600">
-                      Matching location
-                    </span>
+                  <div className="flex items-center gap-x-2">
+                    <div className="flex items-center w-[150px] rounded-[4px] bg-[#EBF8F4] p-1">
+                      <Image
+                        src={mapPinGrayIcon}
+                        height={16}
+                        width={16}
+                        className="mr-1"
+                        alt="Map pin gray icon"
+                      />
+                      <span className="text-sm text-green-600">
+                        Matching location
+                      </span>
+                    </div>
+                    <div className="flex items-center w-[110px] rounded-[4px] bg-[#EBF8F4] p-1">
+                    <div className="flex items-center text-gray-600">
+                      <Users className="w-4 h-4 mr-1" />
+                      <span className="text-sm">
+                         {opportunity.organization === "Clean Up Australia" ? "20" : "10"} persons
+                      </span>
+                    </div></div>
                   </div>
 
                   <div className="flex flex-wrap gap-1">

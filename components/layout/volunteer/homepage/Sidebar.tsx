@@ -14,6 +14,17 @@ interface OpportunityDetails {
 
 export function Sidebar({ opportunityId }: { opportunityId?: string }) {
   const getOpportunityDetails = (id?: string): OpportunityDetails => {
+    if (id === "4") {
+      return {
+        logo: "/Easy.svg",
+        logoAlt: "Easy Care Gardening",
+        category: "Environmental Management",
+        location: "Hyde Park, Sydney",
+        date: "24/05/2025",
+        time: "01:00 PM - 04:00 PM (3 hours)",
+        requirements: "No specific requirements"
+      };
+    }
     if (id === "3") {
       return {
         logo: "/Clean.svg",
