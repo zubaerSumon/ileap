@@ -129,6 +129,10 @@ export default function Categories({
 
   return (
     <section className="w-full md:w-[57%] relative">
+       <h1 className="text-[#101010] font-inter text-xxl font-bold text-center mt-8 mb-5">
+       Volunteering Opportunities during National Volunteer Week 2025 (19 - 25 May)
+        </h1>
+
       <div className="flex flex-col gap-6">
         {filteredOpportunities.map((opportunity) => (
           <Card

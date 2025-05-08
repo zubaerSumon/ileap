@@ -121,9 +121,6 @@ export function ConfirmationModal({
              Click the button below to secure your volunteer role
             </p>
 
-            <p className="text-[#DA3131] text-sm sm:text-[14px] break-words mt-2">
-              Please note: We have a 1-week cancellation policy
-            </p>
 
             <div className="flex items-center justify-center gap-2 mt-4 mb-6">
               <input
