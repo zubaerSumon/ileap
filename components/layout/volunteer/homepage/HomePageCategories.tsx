@@ -12,7 +12,7 @@ import { trpc } from "@/utils/trpc";
 import fileIcon from "../../../../public/icons/file-icon.svg";
 import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
 import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
-import { Star, Users } from "lucide-react";
+import { Star } from "lucide-react";
 
 type OpportunityDetails = {
   id: string;
