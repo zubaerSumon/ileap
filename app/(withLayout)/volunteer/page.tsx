@@ -16,7 +16,7 @@ const VolunteerPage = () => {
           We have some new volunteering opportunities available for you
         </p>
         {/* Update layout to flex-row for horizontal alignment on larger screens */}
-        <div className="flex flex-col md:flex-row justify-between space-y-5 w-full">
+        <div className="flex flex-col md:flex-row justify-between space-y-5 w-full gap-10">
           <Categories />
           <MiniGallery />
         </div>
