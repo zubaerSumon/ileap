@@ -57,7 +57,7 @@ export default function Categories({
       matchedSkills: 3,
       categories: ["Seniors & Aged Care"],
       description:
-        "Do you have a passion for gardening and a desire to make a real difference in your community?...",
+        "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
     },
     {
@@ -73,7 +73,7 @@ export default function Categories({
       matchedSkills: 2,
       categories: ["Environmental Management"],
       description:
-        "Want to help protect Australia's parks, beaches, and waterways from litter and waste?...",
+        "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy. You'll work together to remove litter, protect our natural environment, and make a positive impact on your local community.",
       logoSrc: "/Clean.svg",
     },
     {
@@ -105,7 +105,7 @@ export default function Categories({
       matchedSkills: 2,
       categories: ["Environmental Management"],
       description:
-        "Want to help protect Australia's parks, beaches, and waterways from litter and waste?...",
+        "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy",
       logoSrc: "/Clean.svg",
     },
   ];
@@ -121,7 +121,7 @@ export default function Categories({
 
   return (
     <section className="w-full md:w-[57%] relative">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="flex flex-col gap-6">
         {filteredOpportunities.map((opportunity) => (
             <Card 
               key={opportunity.id}
@@ -169,27 +169,7 @@ export default function Categories({
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-x-2">
-                    <div className="flex items-center w-[150px] rounded-[4px] bg-[#EBF8F4] p-1">
-                      <Image
-                        src={mapPinGrayIcon}
-                        height={16}
-                        width={16}
-                        className="mr-1"
-                        alt="Map pin gray icon"
-                      />
-                      <span className="text-sm text-green-600">
-                        Matching location
-                      </span>
-                    </div>
-                    <div className="flex items-center w-[110px] rounded-[4px] bg-[#EBF8F4] p-1">
-                    <div className="flex items-center text-gray-600">
-                      <Users className="w-4 h-4 mr-1" />
-                      <span className="text-sm">
-                         {opportunity.organization === "Clean Up Australia" ? "20" : "10"} persons
-                      </span>
-                    </div></div>
-                  </div>
+                
 
                   <div className="flex flex-wrap gap-1">
                     {opportunity.categories.map((category, idx) => (
@@ -201,9 +181,21 @@ export default function Categories({
                         {category}
                       </Badge>
                     ))}
+                      <div className="flex items-center w-[150px] rounded-[4px] bg-[#EBF8F4] p-1">
+                    <Image
+                      src={mapPinGrayIcon}
+                      height={16}
+                      width={16}
+                      className="mr-1"
+                      alt="Map pin gray icon"
+                    />
+                    <span className="text-sm text-green-600">
+                      Matching location
+                    </span>
+                  </div>
                   </div>
 
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 line-clamp-4">
                     {opportunity.description}
                     <Link
                       href={`/volunteer/opportunities/${opportunity.id}`}

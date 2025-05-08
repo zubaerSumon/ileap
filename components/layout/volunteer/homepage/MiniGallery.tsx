@@ -21,85 +21,154 @@ const MiniGallery: React.FC<MiniGalleryProps> = ({
     "/mg6.svg",
   ];
 
-  const imageWidths = ["110px", "110px", "77px", "60px", "105px", "125px"];
-
-  const imageHeight = "100px";
-
   return (
     <>
       {/* Desktop version */}
-      <div className="hidden sm:flex items-center  w-[340px] space-y-5 flex-col">
-        <h2 className="text-sm font-semibold  ">{title}</h2>
+      <div className="hidden sm:block w-full max-w-[500px]">
+        <h2 className="text-2xl font-bold text-gray-800 mb-8 relative">
+          {title}
+          <div className="absolute -bottom-2 left-0 w-20 h-1 bg-blue-500 rounded-full"></div>
+        </h2>
 
-        <div className="flex flex-wrap gap-3 items-start justify-center">
-          {galleryImages.map((src, index) => (
-            <div
-              key={index}
-              className="relative rounded-xl overflow-hidden"
-              style={{
-                height: imageHeight,
-                width: `${parseInt(imageWidths[index]) * 0.9}px`,
-              }}
-            >
+        <div className="relative h-[400px]">
+          {/* Main large image */}
+          <div className="absolute top-0 left-0 w-[60%] h-[70%] z-10 transform hover:scale-105 transition-transform duration-300">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src={src}
-                alt={`Gallery image ${index + 1}`}
+                src={galleryImages[0]}
+                alt="Team member 1"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          </div>
+
+          {/* Overlapping images */}
+          <div className="absolute top-[10%] right-0 w-[45%] h-[45%] z-20 transform hover:scale-105 transition-transform duration-300">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src={galleryImages[1]}
+                alt="Team member 2"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          </div>
+
+          <div className="absolute bottom-0 right-[10%] w-[40%] h-[40%] z-30 transform hover:scale-105 transition-transform duration-300">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src={galleryImages[2]}
+                alt="Team member 3"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          </div>
+
+          <div className="absolute bottom-[15%] left-[20%] w-[35%] h-[35%] z-40 transform hover:scale-105 transition-transform duration-300">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src={galleryImages[3]}
+                alt="Team member 4"
+                fill
+                className="object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 text-center">
+          <Link
+            href={seeMoreLink}
+            className="inline-flex items-center px-8 py-3 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+           See more
+            <svg
+              className="w-5 h-5 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
+            </svg>
+          </Link>
+        </div>
+      </div>
+
+      {/* Mobile version */}
+      <div className="sm:hidden">
+        <h2 className="text-xl font-bold text-gray-800 mb-6 relative">
+          {title}
+          <div className="absolute -bottom-2 left-0 w-16 h-1 bg-blue-500 rounded-full"></div>
+        </h2>
+
+        <div className="relative h-[300px]">
+          {/* Main image */}
+          <div className="absolute top-0 left-0 w-[70%] h-[60%] z-10">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-lg">
+              <Image
+                src={galleryImages[0]}
+                alt="Team member 1"
                 fill
                 className="object-cover"
               />
             </div>
-          ))}
+          </div>
+
+          {/* Overlapping images */}
+          <div className="absolute top-[10%] right-0 w-[50%] h-[45%] z-20">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-lg">
+              <Image
+                src={galleryImages[1]}
+                alt="Team member 2"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+
+          <div className="absolute bottom-0 right-[15%] w-[45%] h-[40%] z-30">
+            <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-lg">
+              <Image
+                src={galleryImages[2]}
+                alt="Team member 3"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
         </div>
 
-        <Link
-          href={seeMoreLink}
-          className="flex px-[18px] py-[6px] justify-center items-center gap-[6px] rounded-[6px] bg-[#2563EB] text-white text-sm font-medium hover:bg-blue-600 transition-colors w-[120px]"
-        >
-          See more
-        </Link>
-      </div>
-
-      {/* Mobile version */}
-      <div className="sm:hidden bg-[#254A9B] rounded-[51px]  pb-3 pt-3 px-4 flex flex-col">
-        <h2 className="text-white text-center font-inter text-sm font-normal leading-normal pb-4 pt-2 px-2">
-          {title}
-        </h2>
-
-        <div className="bg-[#F5F8FF] rounded-[51px] p-3 flex-1 flex flex-col">
-          <div className="flex flex-wrap  gap-3 flex-1 justify-center items-start pt-3">
-            {galleryImages
-              .map((src, index) => (
-                <div
-                  key={index}
-                  className="relative rounded-xl overflow-hidden"
-                  style={{
-                    height: imageHeight,
-                    width:
-                      index === 0 ? "250px" : index === 1 ? "150px" : "70px",
-                    marginRight: index === 2 ? "0" : "0.5rem",
-                    marginBottom: "0.5rem",
-                  }}
-                >
-                  <Image
-                    src={src}
-                    alt={`Gallery image ${index + 1}`}
-                    fill
-                    className="object-cover"
-                    sizes="50vw"
-                  />
-                </div>
-              ))
-              .slice(0, 3)}
-          </div>
-
-          <div className=" flex mt-3 justify-center w-[150px] mx-auto pb-4">
-            <Link
-              href={seeMoreLink}
-              className="flex px-[18px] py-[6px] justify-center items-center gap-[6px] flex-[1_0_0] rounded-[6px] bg-[#2563EB] text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+        <div className="mt-6 text-center">
+          <Link
+            href={seeMoreLink}
+            className="inline-flex items-center px-6 py-2.5 rounded-full bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-medium hover:from-blue-700 hover:to-blue-800 transition-all duration-300 shadow-md"
+          >
+            View Team
+            <svg
+              className="w-4 h-4 ml-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
             >
-              See more
-            </Link>
-          </div>
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
+            </svg>
+          </Link>
         </div>
       </div>
     </>
