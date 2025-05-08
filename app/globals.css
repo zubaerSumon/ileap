@@ -2,8 +2,7 @@
 
 
 @plugin "tailwindcss-animate";
-@import 'swiper/css';
-
+ 
 
 @custom-variant dark (&:is(.dark *));
 

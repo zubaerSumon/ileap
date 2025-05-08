@@ -1,5 +1,5 @@
 
-import { MapPin, Calendar, Clock } from "lucide-react";
+import { MapPin, Calendar, Clock, Tag } from "lucide-react";
 import Image from "next/image";
 
 interface OpportunityDetails {
@@ -14,6 +14,17 @@ interface OpportunityDetails {
 
 export function Sidebar({ opportunityId }: { opportunityId?: string }) {
   const getOpportunityDetails = (id?: string): OpportunityDetails => {
+    if (id === "4") {
+      return {
+        logo: "/Easy.svg",
+        logoAlt: "Easy Care Gardening",
+        category: "Environmental Management",
+        location: "Hyde Park, Sydney",
+        date: "24/05/2025",
+        time: "01:00 PM - 04:00 PM (3 hours)",
+        requirements: "No specific requirements"
+      };
+    }
     if (id === "3") {
       return {
         logo: "/Clean.svg",
@@ -72,6 +83,11 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
           <div className="flex items-center gap-2 text-gray-600">
             <MapPin className="w-5 h-5 text-blue-500" />
             <span>{details.location}</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-gray-600">
+            <Tag className="w-5 h-5 text-blue-500" />
+            <span>One-off</span>
           </div>
 
           <div className="flex items-center gap-2 text-gray-600">
