@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -12,7 +12,7 @@ import { trpc } from "@/utils/trpc";
 import fileIcon from "../../../../public/icons/file-icon.svg";
 import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
 import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
-import { Star } from "lucide-react";
+import { Star, Users } from "lucide-react";
 
 type OpportunityDetails = {
   id: string;
@@ -59,6 +59,8 @@ export default function Categories({
       description:
         "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
+      totalSpots: 10,
+      spotsAvailable: 8
     },
     {
       id: "4",
@@ -75,6 +77,8 @@ export default function Categories({
       description:
         "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
+      totalSpots: 10,
+      spotsAvailable: 7
     },
     {
       id: "2",
@@ -91,8 +95,9 @@ export default function Categories({
       description:
         "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy. You'll work together to remove litter, protect our natural environment, and make a positive impact on your local community.",
       logoSrc: "/Clean.svg",
+      totalSpots: 20,
+      spotsAvailable: 15
     },
-   
     {
       id: "3",
       title: "Clean Up Australia",
@@ -108,6 +113,8 @@ export default function Categories({
       description:
         "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy",
       logoSrc: "/Clean.svg",
+      totalSpots: 20,
+      spotsAvailable: 12
     },
   ];
 
@@ -133,13 +140,23 @@ export default function Categories({
           >
             <CardContent className="px-4 pt-4">
               <div className="space-y-3">
-                <Image
-                  src={opportunity.logoSrc}
-                  alt={opportunity.organization}
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
+                <div className="flex justify-between items-center">
+                  <Image
+                    src={opportunity.logoSrc}
+                    alt={opportunity.organization}
+                    width={40}
+                    height={40}
+                    className="rounded-full"
+                  />
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center text-gray-600">
+                      <Users className="h-5 w-5 mr-1" />
+                      <span className="text-sm">
+                        <span className="font-medium text-green-600">{opportunity.spotsAvailable}</span> of <span className="font-medium">{opportunity.totalSpots}</span> spots left
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
                 <h3 className="text-lg font-semibold line-clamp-1">
                   {opportunity.title}
@@ -194,15 +211,11 @@ export default function Categories({
                   </div>
                 </div>
 
-                <div className="text-sm text-gray-600 line-clamp-4">
-                  {opportunity.description}
-                  <Link
-                    href={`/volunteer/opportunities/${opportunity.id}`}
-                    className="text-blue-600 hover:text-blue-700 text-sm ml-1"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Read more
-                  </Link>
+                <div className="space-y-1">
+                  <div className="text-sm text-gray-600 line-clamp-3">
+                    {opportunity.description}
+                  </div>
+                 
                 </div>
               </div>
             </CardContent>

@@ -1,5 +1,5 @@
 
-import { MapPin, Calendar, Clock } from "lucide-react";
+import { MapPin, Calendar, Clock, Tag } from "lucide-react";
 import Image from "next/image";
 
 interface OpportunityDetails {
@@ -83,6 +83,11 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
           <div className="flex items-center gap-2 text-gray-600">
             <MapPin className="w-5 h-5 text-blue-500" />
             <span>{details.location}</span>
+          </div>
+
+          <div className="flex items-center gap-2 text-gray-600">
+            <Tag className="w-5 h-5 text-blue-500" />
+            <span>One-off</span>
           </div>
 
           <div className="flex items-center gap-2 text-gray-600">
