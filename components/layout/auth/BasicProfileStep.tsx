@@ -29,7 +29,6 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
     return () => subscription.unsubscribe();
   }, [form]);
 
-  const currentArea = suburbs.find((area) => area.value === form.watch("area"));
 
   return (
     <>

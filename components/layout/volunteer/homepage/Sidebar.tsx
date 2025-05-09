@@ -30,7 +30,7 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
         logo: "/Clean.svg",
         logoAlt: "Clean Up Australia",
         category: "Environmental Management",
-        location: "Hyde Park, Sydney",
+        location: "Victoria Park, Sydney",
         date: "24/05/2025",
         time: "01:00 PM - 04:00 PM (3 hours)",
         requirements: "No specific requirements"
