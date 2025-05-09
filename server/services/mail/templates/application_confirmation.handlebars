@@ -5,7 +5,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome Email</title>
+    <title>Application Confirmation - Ausleap</title>
     <style>
       body {
         font-family: 'Inter', sans-serif;
@@ -91,7 +91,7 @@
     <div class="container">
       <!-- Header -->
       <div class="header">
-        <img src="https://i.ibb.co.com/s5jJM5S/Group-1-1.png" alt="Group-1-1" />
+        <img src="https://res.cloudinary.com/daclvkrk0/image/upload/v1746711168/ausleap_e3cvnn.svg" alt="Ausleap Logo" style="width:140px; height:18px;"/>
       </div>
 
       <!-- Hero Image -->
@@ -102,19 +102,20 @@
       />
 
       <!-- Main Content -->
-      <h1>Thanks for signing up</h1>
+      <h1>Hey {{userName}}</h1>
       <p>
-        You are almost set to start using all of our features. Simply click the
-        verify email button below to complete the verification process.
+        Thank you for applying to the "{{opportunity}}" opportunity posted by {{organization}}.
+        Your application has been received and is being processed.
       </p>
-      <p>This link expires in 48 hours.</p>
 
-      <!-- Button -->
-      <a href="{{verifyEmailUrl}}" class="button">Verify your email</a>
-
+      <p>
+        If you did not apply for this opportunity or believe this email was sent to you in error, you can safely ignore it.
+      </p>
+      
+      <p>Thank you,<br />Ausleap team</p>
       <!-- Support Section -->
       <p>
-        Our team is always ready to support. If you need support,
+        Our team is always ready to support. If you need assistance,
         <a href="{{supportUrl}}" style="color: #5764f2; text-decoration: none"
           >Contact us!</a
         >
@@ -122,23 +123,23 @@
 
       <!-- Social Icons -->
       <div class="social-icons">
-        <a href="https://facebook.com/">
-          <img src="https://i.ibb.co.com/9T6PM2K/Frame.png" alt="Frame" /></a>
-        <a href="https://linkedin.com/">
-          <img src="https://i.ibb.co.com/MZF9X9H/Frame-1.png" alt="Frame-1" /></a>
-        <a href="https://instagram.com/">
-          <img src="https://i.ibb.co.com/XCKGccJ/Frame-2.png" alt="Frame-2" /></a>
+        <a href="https://facebook.com/"
+          ><img src="https://i.ibb.co.com/9T6PM2K/Frame.png" alt="Facebook"
+        /></a>
+        <a href="https://linkedin.com/"
+          ><img src="https://i.ibb.co.com/MZF9X9H/Frame-1.png" alt="LinkedIn"
+        /></a>
+        <a href="https://instagram.com/"
+          ><img src="https://i.ibb.co.com/XCKGccJ/Frame-2.png" alt="Instagram"
+        /></a>
       </div>
 
       <!-- Footer -->
       <div class="footer">
-        <c>Copyright &copy; 2024 Fradragsjakt,</c>
-        <footer>
-          Fradragsjakt is a comprehensive tax management solution that assists
-          freelancers, gig workers, independent contractors, family, and small
-          business owners in tracking expenses and identifying tax
-          write-offs.
-        </footer>
+        <c>Copyright &copy; 2024 Ausleap,</c><br />
+        <footer
+          >Ausleap is a platform connecting talented individuals with opportunities to advance their careers and achieve their professional goals.</footer
+        >
       </div>
     </div>
   </body>

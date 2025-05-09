@@ -38,7 +38,7 @@ export function ConfirmationModal({
   const applyToEventMutation = trpc.users.applyToEvent.useMutation({
     onSuccess: (data) => {
       if (!data.alreadyApplied) {
-        toast.success("You have successfully applied to this opportunity. ");
+        toast.success("You have successfully applied! We'll confirm your registration via email - please check your inbox.");
       }
       utils.users.profileCheckup.invalidate();
       onClose();

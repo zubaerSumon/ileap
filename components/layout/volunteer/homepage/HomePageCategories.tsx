@@ -42,6 +42,25 @@ export default function Categories({
       setAppliedEvents(profileData.volunteerProfile.applied_events);
     }
   }, [profileData]);
+  
+  // Get volunteers data to calculate available spots
+  const { data: volunteersData } = trpc.volunteers.getVolunteersWithAppliedEvents.useQuery(
+    { eventId: '' }, // Empty string to get all volunteers with applied events
+    { enabled: true }
+  );
+  
+  // Function to calculate available spots based on applied events
+  const calculateAvailableSpots = (opportunityId: string, totalSpots: number) => {
+    if (!volunteersData) return totalSpots;
+    
+    // Count how many volunteers have applied to this opportunity
+    const appliedCount = volunteersData.filter(volunteer => 
+      volunteer.applied_events && volunteer.applied_events.includes(opportunityId)
+    ).length;
+    
+    // Calculate remaining spots
+    return Math.max(0, totalSpots - appliedCount);
+  };
 
   const opportunities = [
     {
@@ -60,7 +79,7 @@ export default function Categories({
         "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
       totalSpots: 10,
-      spotsAvailable: 8
+      spotsAvailable: 0 // Will be calculated dynamically
     },
     {
       id: "4",
@@ -78,7 +97,7 @@ export default function Categories({
         "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
       totalSpots: 10,
-      spotsAvailable: 7
+      spotsAvailable: 0 // Will be calculated dynamically
     },
     {
       id: "2",
@@ -96,7 +115,7 @@ export default function Categories({
         "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy. You'll work together to remove litter, protect our natural environment, and make a positive impact on your local community.",
       logoSrc: "/Clean.svg",
       totalSpots: 20,
-      spotsAvailable: 15
+      spotsAvailable: 0 // Will be calculated dynamically
     },
     {
       id: "3",
@@ -114,18 +133,24 @@ export default function Categories({
         "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy",
       logoSrc: "/Clean.svg",
       totalSpots: 20,
-      spotsAvailable: 12
+      spotsAvailable: 0 // Will be calculated dynamically
     },
   ];
+
+  // Calculate available spots for each opportunity
+  const opportunitiesWithSpots = opportunities.map(opportunity => ({
+    ...opportunity,
+    spotsAvailable: calculateAvailableSpots(opportunity.id, opportunity.totalSpots)
+  }));
 
   // Filter opportunities based on customizedFor parameter
   const filteredOpportunities = customizedFor
     ? customizedFor.toLowerCase() === "easy care"
-      ? opportunities.filter((opp) => ["1", "4"].includes(opp.id))
+      ? opportunitiesWithSpots.filter((opp) => ["1", "4"].includes(opp.id))
       : customizedFor.toLowerCase() === "clean up"
-      ? opportunities.filter((opp) => ["2", "3"].includes(opp.id))
-      : opportunities
-    : opportunities;
+      ? opportunitiesWithSpots.filter((opp) => ["2", "3"].includes(opp.id))
+      : opportunitiesWithSpots
+    : opportunitiesWithSpots;
 
   return (
     <section className="w-full md:w-[57%] relative">
@@ -228,7 +253,7 @@ export default function Categories({
                       ? "bg-green-600 hover:bg-green-600"
                       : "bg-blue-600 hover:bg-blue-700"
                   } text-white h-8 px-6 rounded-md text-sm font-medium`}
-                  disabled={appliedEvents.includes(opportunity.id)}
+                  disabled={appliedEvents.includes(opportunity.id) || opportunity.spotsAvailable <= 0}
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedOpportunity({

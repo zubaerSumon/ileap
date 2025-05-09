@@ -19,7 +19,7 @@ const sendEmail = async (
 ): Promise<boolean> => {
   try {
     const mailOptions: MailOptions = {
-      from: '"Email Verification"',
+      from: 'Email Verification',
       to: receiverEmail,
       subject: context.subject,
       template: template,  
