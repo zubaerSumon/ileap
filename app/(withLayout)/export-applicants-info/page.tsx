@@ -46,6 +46,7 @@ const EVENT_OPTIONS: EventOption[] = [
   { id: "1", label: "Gardening Volunteer(20.05.2025)" },
   { id: "2", label: "Clean Up Volunteer(21.05.2025)" },
   { id: "3", label: "Clean Up Volunteer(24.05.2025)" },
+  { id: "4", label: "Gardening Volunteer(20.05.2025)[2]" },
 ];
 
 const ExportApplicantsInfoPage: React.FC = () => {
@@ -153,7 +154,9 @@ const ExportApplicantsInfoPage: React.FC = () => {
           ? "Gardening_Volunteer_20.05.2025"
           : selectedEvent === "2"
           ? "CleanUp_Volunteer_21.05.2025"
-          : "CleanUp_Volunteer_24.05.2025"
+          : selectedEvent === "3"
+          ? "CleanUp_Volunteer_24.05.2025"
+          : "Gardening_Volunteer_20.05.2025(2)"
       }.csv`
     );
   };
@@ -180,7 +183,9 @@ const ExportApplicantsInfoPage: React.FC = () => {
           ? "Gardening_Volunteer_20.05.2025"
           : selectedEvent === "2"
           ? "CleanUp_Volunteer_21.05.2025"
-          : "CleanUp_Volunteer_24.05.2025"
+          : selectedEvent === "3"
+          ? "CleanUp_Volunteer_24.05.2025"
+          : "Gardening_Volunteer_20.05.2025(2)"
       }.xlsx`
     );
   };
