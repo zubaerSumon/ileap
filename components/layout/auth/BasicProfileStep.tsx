@@ -30,7 +30,6 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
   }, [form]);
 
   const currentArea = suburbs.find((area) => area.value === form.watch("area"));
-  const availablePostcodes = currentArea?.postcodes || [];
 
   return (
     <>
