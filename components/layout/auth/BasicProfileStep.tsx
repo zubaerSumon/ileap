@@ -88,39 +88,23 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
           options={locations}
         />
 
-        <FormSelect
+        <FormField
           label="Suburb"
           id="area"
-          placeholder="Select your suburb"
-          control={form.control}
+          placeholder="Enter your suburb"
+          register={form.register}
           registerName="area"
           error={form.formState.errors.area?.message}
-          options={suburbs}
         />
 
-        {availablePostcodes.length > 1 ? (
-          <FormSelect
-            label="Postcode"
-            id="postcode"
-            placeholder="Select your postcode"
-            control={form.control}
-            registerName="postcode"
-            error={form.formState.errors.postcode?.message}
-            options={availablePostcodes.map((postcode) => ({
-              value: postcode,
-              label: postcode,
-            }))}
-          />
-        ) : (
-          <FormField
-            label="Postcode"
-            id="postcode"
-            placeholder="e.g. 2000"
-            register={form.register}
-            registerName="postcode"
-            error={form.formState.errors.postcode?.message}
-          />
-        )}
+        <FormField
+          label="Postcode"
+          id="postcode"
+          placeholder="e.g. 2000"
+          register={form.register}
+          registerName="postcode"
+          error={form.formState.errors.postcode?.message}
+        />
       </div>
     </>
   );

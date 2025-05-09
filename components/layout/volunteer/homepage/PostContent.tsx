@@ -22,12 +22,13 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
     if (id === "4") {
       return {
         id: "4",
-        title: "Tree Plantation Volunteer",
+        title: "Gardening Volunteer",
         organization: "Easy Care Gardening",
-        date: "24/05/2025",
-        time: "01:00 PM - 04:00 PM",
+        date: "20/05/2025",
+        time: "10:00 AM - 02:00 PM",
         location: "Hyde Park, Sydney",
         logo: "/images/easy-care-gardening-logo.png",
+
       };
     }
     if (id === "2") {
@@ -299,14 +300,14 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
       <div className="flex-1 max-w-3xl">
         <div className="w-full h-[200px] relative mb-6">
           <Image
-            src="/garden0.svg"
+            src="/garden.svg"
             alt="Gardening Volunteer Banner"
             fill
             className="object-cover rounded-lg"
           />
         </div>
 
-        <h1 className="text-2xl font-bold mb-4">Tree Plantation Volunteer</h1>
+        <h1 className="text-2xl font-bold mb-4">Gardening Volunteer</h1>
 
         <div className="text-sm text-gray-600 mb-3">
           Posted by

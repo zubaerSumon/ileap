@@ -60,12 +60,12 @@ export default function Categories({
         "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
       totalSpots: 10,
-      spotsAvailable: 8
+      spotsAvailable: 10
     },
     {
       id: "4",
       title: "Easy Care Gardening",
-      popup_title: "Tree plantation Volunteer",
+      popup_title: "Gardening Volunteer",
       organization: "Easy Care Gardening",
       location: "Sydney, Australia",
       type: "One off",
@@ -75,10 +75,10 @@ export default function Categories({
       matchedSkills: 3,
       categories: ["Seniors & Aged Care"],
       description:
-        "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
+      "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
       totalSpots: 10,
-      spotsAvailable: 7
+      spotsAvailable: 10
     },
     {
       id: "2",
@@ -96,7 +96,7 @@ export default function Categories({
         "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy. You'll work together to remove litter, protect our natural environment, and make a positive impact on your local community.",
       logoSrc: "/Clean.svg",
       totalSpots: 20,
-      spotsAvailable: 15
+      spotsAvailable: 20
     },
     {
       id: "3",
@@ -114,7 +114,7 @@ export default function Categories({
         "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy",
       logoSrc: "/Clean.svg",
       totalSpots: 20,
-      spotsAvailable: 12
+      spotsAvailable: 20
     },
   ];
 

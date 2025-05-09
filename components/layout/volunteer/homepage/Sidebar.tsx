@@ -18,7 +18,7 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
       return {
         logo: "/Easy.svg",
         logoAlt: "Easy Care Gardening",
-        category: "Environmental Management",
+        category: "Seniors & Aged Care",
         location: "Hyde Park, Sydney",
         date: "24/05/2025",
         time: "01:00 PM - 04:00 PM (3 hours)",
