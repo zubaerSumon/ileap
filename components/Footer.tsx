@@ -77,22 +77,30 @@ export default function Footer() {
           {/* Find us section */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-[#2563EB]">Find us</h3>
-            <div className="flex space-x-4">
+            <div className="flex flex-col space-y-4">
+              <div className="flex space-x-4">
+                <a 
+                  href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-[#2563EB] transition-colors"
+                >
+                  <Instagram className="h-6 w-6" />
+                </a>
+                <a 
+                  href="https://www.linkedin.com/company/ausleap/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-[#2563EB] transition-colors"
+                >
+                  <Linkedin className="h-6 w-6" />
+                </a>
+              </div>
               <a 
-                href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#2563EB] transition-colors"
+                href="mailto:ausleap@uts.edu.au"
+                className="text-sm text-gray-400 hover:text-[#2563EB] transition-colors"
               >
-                <Instagram className="h-6 w-6" />
-              </a>
-              <a 
-                href="https://www.linkedin.com/company/ausleap/" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#2563EB] transition-colors"
-              >
-                <Linkedin className="h-6 w-6" />
+                ausleap@uts.edu.au
               </a>
             </div>
           </div>

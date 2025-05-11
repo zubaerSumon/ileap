@@ -84,12 +84,12 @@ export default function Categories({
     {
       id: "4",
       title: "Easy Care Gardening",
-      popup_title: "Tree plantation Volunteer",
+      popup_title: "Gardening Volunteer", // Changed from "Tree plantation Volunteer"
       organization: "Easy Care Gardening",
-      location: "Sydney, Australia",
+      location: "Hyde Park, Sydney", // Different location
       type: "One off",
-      date: "24/05/2025",
-      time: "01:00 PM - 04:00 PM",
+      date: "20/05/2025", // Changed to match id 1
+      time: "10:00 AM - 02:00 PM", // Changed to match id 1
       matchingAvailability: true,
       matchedSkills: 3,
       categories: ["Seniors & Aged Care"],

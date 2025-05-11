@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { BsTelephone } from 'react-icons/bs';
+// import { BsTelephone } from 'react-icons/bs';
 import { AiOutlineInstagram } from 'react-icons/ai';
 import { FaLinkedin } from 'react-icons/fa';
 
@@ -23,28 +23,36 @@ export default function UpdatedFooter() {
           {/* Find us section */}
           <div className="md:text-right text-center">
             <h3 className="text-[#2563EB] font-semibold text-lg mb-4">Find us</h3>
-            <div className="flex gap-4 md:justify-end justify-center">
+            <div className="flex flex-col md:items-end items-center gap-4">
+              <div className="flex gap-4">
+                {/* <Link 
+                  href="tel:+61295142000"
+                  className="text-gray-400 hover:text-[#2563EB] transition-colors"
+                >
+                  <BsTelephone size={24} />
+                </Link> */}
+                <Link 
+                  href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-[#2563EB] transition-colors"
+                >
+                  <AiOutlineInstagram size={24} />
+                </Link>
+                <Link 
+                  href="https://www.linkedin.com/company/ausleap/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-[#2563EB] transition-colors"
+                >
+                  <FaLinkedin size={24} />
+                </Link>
+              </div>
               <Link 
-                href="tel:+61295142000"
-                className="text-gray-400 hover:text-[#2563EB] transition-colors"
+                href="mailto:ausleap@uts.edu.au"
+                className="text-sm text-gray-600 hover:text-[#2563EB] transition-colors"
               >
-                <BsTelephone size={24} />
-              </Link>
-              <Link 
-                href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#2563EB] transition-colors"
-              >
-                <AiOutlineInstagram size={24} />
-              </Link>
-              <Link 
-                href="https://www.linkedin.com/company/ausleap/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#2563EB] transition-colors"
-              >
-                <FaLinkedin size={24} />
+                ausleap@uts.edu.au
               </Link>
             </div>
           </div>
