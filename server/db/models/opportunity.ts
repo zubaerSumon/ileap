@@ -34,6 +34,19 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
       required: true,
     },
     is_recurring: { type: Boolean, default: false },
+    recurrence: {
+      type: { type: String },  
+      days: { type: [String] },  
+      date_range: {
+        start_date: { type: Date },
+        end_date: { type: Date },
+      },
+      time_range: {
+        start_time: { type: String },
+        end_time: { type: String },
+      },
+      occurrences: { type: Number },  
+    },
   },
   { timestamps: true }
 );

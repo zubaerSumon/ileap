@@ -26,4 +26,17 @@ export interface IOpportunity extends Document {
   internal_reference?: string;
   organization: Types.ObjectId;  
   is_recurring: boolean;
+  recurrence?: {
+    type: string; // 'daily', 'weekly', 'monthly', 'yearly'
+    days?: string[]; // ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']
+    date_range: {
+      start_date: Date;
+      end_date?: Date;
+    };
+    time_range: {
+      start_time: string;
+      end_time: string;
+    };
+    occurrences?: number; // Number of occurrences before ending
+  };
 }

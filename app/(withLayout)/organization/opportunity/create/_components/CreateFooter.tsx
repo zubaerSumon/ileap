@@ -1,14 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+ 
+interface CreateFooterProps {
+  step: number;
+  onNext?: () => void;
+}
 
-export default function CreateFooter({ step }: { step: number }) {
-  const router = useRouter();
-
+export default function CreateFooter({ step, onNext }: CreateFooterProps) {
+ 
   const handleNext = () => {
-    if (step === 1) {
-      router.push("/organization/opportunity/create/schedule");
+    if (onNext) {
+      onNext();
     }
   };
 
