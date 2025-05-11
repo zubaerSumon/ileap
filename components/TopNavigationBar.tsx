@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { Menu, X, LogOut } from "lucide-react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, /* useSearchParams */ } from "next/navigation";
 import Logo from "../public/AusLeap.png";
 // import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
@@ -71,8 +71,8 @@ export default function TopNavigationBar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { isAuthenticated } = useAuthCheck();
-  const searchParams = useSearchParams();
-  const paramRole = searchParams?.get("role");
+  //const searchParams = useSearchParams();
+  //const paramRole = searchParams?.get("role");
   const isAuthPath =
     pathname?.includes("signin") ||
     pathname?.includes("signup") ||
@@ -299,11 +299,11 @@ export default function TopNavigationBar() {
                     <>
                       {isAuthPath && !pathname?.includes("signin") ? (
                         <div className="flex items-center text-sm space-x-3">
-                          <p>
+                          {/* <p>
                             {paramRole === "organization"
                               ? "Want to help out?"
                               : ""}{" "}
-                          </p>
+                          </p> */}
                           {/* <Link
                             href={
                               paramRole === "organization"
