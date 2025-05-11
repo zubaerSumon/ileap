@@ -35,12 +35,12 @@ const publicNavOptions = [
   },
 ];
 
-const desktopMenus = [
-  {
-    title: "About AusLEAP",
-    href: "/ausleap/about"
-  },
-];
+// const desktopMenus = [
+//   {
+//     // title: "About AusLEAP",
+//     // href: "/ausleap/about"
+//   },
+// ];
 
 const staticLinks = [
   { label: "About Us", href: "/about" },
@@ -91,15 +91,15 @@ export default function TopNavigationBar() {
 
   const renderDesktopNavMenus = () => (
     <>
-      {desktopMenus.map((menu, index) => (
-        <Link
-          key={index}
-          href={menu.href}
-          className="text-sm font-medium hover:text-blue-600"
-        >
-          {menu.title}
-        </Link>
-      ))}
+      {/* {desktopMenus.map((menu, index) => (
+        // <Link
+        //   key={index}
+        //   href={menu.href}
+        //   className="text-sm font-medium hover:text-blue-600"
+        // >
+        //   {menu.title}
+        // </Link>
+      ))} */}
 
       {staticLinks.map((link, index) => (
         <Link
@@ -120,7 +120,7 @@ export default function TopNavigationBar() {
       }`}
     >
       <div className="px-4 py-3 space-y-3 border-t border-gray-800">
-        {desktopMenus.map((menu, index) => (
+        {/* {desktopMenus.map((menu, index) => (
           <Link
             key={index}
             href={menu.href}
@@ -128,7 +128,7 @@ export default function TopNavigationBar() {
           >
             {menu.title}
           </Link>
-        ))}
+        ))} */}
 
         {staticLinks.map((link, index) => (
           <Link
