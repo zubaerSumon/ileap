@@ -18,18 +18,18 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
       return {
         logo: "/Easy.svg",
         logoAlt: "Easy Care Gardening",
-        category: "Environmental Management",
+        category: "Seniors & Aged Care",
         location: "Hyde Park, Sydney",
-        date: "24/05/2025",
-        time: "01:00 PM - 04:00 PM (3 hours)",
-        requirements: "No specific requirements"
+        date: "20/05/2025",
+        time: "10:00 AM - 02:00 PM (4 hours)",
+        requirements: "Police Check"
       };
     }
     if (id === "3") {
       return {
         logo: "/Clean.svg",
         logoAlt: "Clean Up Australia",
-        category: "Environmental Management",
+        category: "Seniors & Aged Care",
         location: "Hyde Park, Sydney",
         date: "24/05/2025",
         time: "01:00 PM - 04:00 PM (3 hours)",

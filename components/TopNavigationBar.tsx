@@ -8,13 +8,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import Logo from "../public/AusLeap.png";
 // import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
   Menubar,
@@ -36,33 +29,23 @@ const publicNavOptions = [
   //   className: "hover:underline hidden md:inline",
   // },
   {
-    label: "Volunteer Sign up",
+    label: "Volunteer-Sign up",
     href: "/signup?role=volunteer",
     className: "hover:underline hidden md:inline",
   },
 ];
 
 const desktopMenus = [
-  // {
-  //   title: "Fast volunteer opportunities",
-  //   items: [
-  //     { label: "Search Opportunities", href: "/opportunities/search" },
-  //     { label: "Featured Opportunities", href: "/opportunities/featured" },
-  //   ],
-  // },
   {
-    title: "AusLEAP",
-    items: [
-      { label: "About AusLEAP", href: "/ausleap/about" },
-      // { label: "Testimonials", href: "/ausleap/testimonials" },
-      { label: "Gallery", href: "/ausleap/gallery" },
-    ],
+    title: "About AusLEAP",
+    href: "/ausleap/about"
   },
 ];
 
 const staticLinks = [
   { label: "About Us", href: "/about" },
   { label: "FAQs", href: "/faq" },
+  { label: "Gallery", href: "/ausleap/gallery" },
 ];
 
 export default function TopNavigationBar() {
@@ -109,28 +92,13 @@ export default function TopNavigationBar() {
   const renderDesktopNavMenus = () => (
     <>
       {desktopMenus.map((menu, index) => (
-        <NavigationMenu key={index}>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger className="bg-transparent hover:bg-transparent hover:text-blue-600 text-sm font-medium focus:bg-transparent">
-                {menu.title}
-              </NavigationMenuTrigger>
-              <NavigationMenuContent className="bg-black border border-gray-800 rounded-lg z-50">
-                <div className="w-48 p-2">
-                  {menu.items.map((item, idx) => (
-                    <Link
-                      key={idx}
-                      href={item.href}
-                      className="block px-4 py-2 hover:bg-blue-600 rounded text-sm text-white"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <Link
+          key={index}
+          href={menu.href}
+          className="text-sm font-medium hover:text-blue-600"
+        >
+          {menu.title}
+        </Link>
       ))}
 
       {staticLinks.map((link, index) => (
@@ -147,24 +115,19 @@ export default function TopNavigationBar() {
 
   const renderMobileMenu = () => (
     <div
-      className={`md:hidden bg-black  text-white overflow-hidden transition-all duration-300 ease-in-out ${
+      className={`md:hidden bg-black text-white overflow-hidden transition-all duration-300 ease-in-out ${
         isMenuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"
       }`}
     >
       <div className="px-4 py-3 space-y-3 border-t border-gray-800">
         {desktopMenus.map((menu, index) => (
-          <div key={index} className="py-2">
-            <div className="font-medium mb-2">{menu.title}</div>
-            {menu.items.map((item, idx) => (
-              <Link
-                key={idx}
-                href={item.href}
-                className="block px-4 py-2 hover:bg-blue-600 rounded text-sm"
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
+          <Link
+            key={index}
+            href={menu.href}
+            className="block py-2 hover:text-blue-600"
+          >
+            {menu.title}
+          </Link>
         ))}
 
         {staticLinks.map((link, index) => (
