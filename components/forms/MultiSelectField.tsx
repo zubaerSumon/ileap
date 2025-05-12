@@ -3,6 +3,7 @@
 import { FieldValues, Path, UseFormRegister, UseFormSetValue, PathValue } from "react-hook-form";
 import Select from "react-select";
 import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
 
 interface Option {
   value: string;
@@ -19,6 +20,7 @@ interface MultiSelectFieldProps<T extends FieldValues> {
   options: Option[];
   setValue: UseFormSetValue<T>;
   value?: string[];
+  className?:string;
 }
 
 export const MultiSelectField = <T extends FieldValues>({
@@ -29,12 +31,13 @@ export const MultiSelectField = <T extends FieldValues>({
   error,
   options,
   setValue,
+  className="",
   value = [],
 }: MultiSelectFieldProps<T>) => {
   const selectedOptions = options.filter((option) => value.includes(option.value));
 
   return (
-    <div className="space-y-2">
+    <div className={cn("space-y-2", className)}>
       <Label htmlFor={id}>{label}</Label>
       <Select
         isMulti

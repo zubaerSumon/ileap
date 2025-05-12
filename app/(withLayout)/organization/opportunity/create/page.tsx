@@ -51,7 +51,13 @@ export default function CreateOpportunityPage() {
       email_contact: "",
       phone_contact: "",
       is_recurring: false,
-      recurrence: undefined,
+      recurrence: {
+        type: "weekly",
+        days: [],
+        date_range: { start_date: "", end_date: "" },
+        time_range: { start_time: "", end_time: "" },
+        occurrences: undefined,
+      },
     },
   });
 

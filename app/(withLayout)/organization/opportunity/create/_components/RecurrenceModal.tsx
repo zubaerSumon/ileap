@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { UseFormReturn, Path } from "react-hook-form";
 import type { OpportunityFormValues } from "./BasicInformation";
 import { FormInput } from "@/components/forms/FormInput";
-import { MultiSelectField } from "@/components/forms/MultiSelectField";
 import { RECURRENCE_TYPES, WEEKDAYS } from "@/utils/constants/opportunities";
 
 interface RecurrenceModalProps {
@@ -68,7 +67,7 @@ export default function RecurrenceModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[900px] max-h-[800px] overflow-y-auto">
+      <DialogContent className="sm:max-w-[900px] max-h-[586px] overflow-y-auto">
         <DialogTitle>Recurrence Settings</DialogTitle>
         
         <div className="px-6 pt-6">
@@ -104,17 +103,33 @@ export default function RecurrenceModal({
           {/* Recur Days - Only show for weekly recurrence */}
           {form.watch("recurrence.type") === "weekly" && (
             <div>
-              <p className="text-sm mb-4">Recur days that you select</p>
-              <MultiSelectField
-                label="Days"
-                id="recurrence.days"
-                placeholder="Select days"
-                register={form.register}
-                registerName={"recurrence.days" as Path<OpportunityFormValues>}
-                options={[...WEEKDAYS]}
-                setValue={form.setValue}
-                value={form.watch("recurrence.days")}
-              />
+              <p className="text-sm mb-2">Recur days that you select</p>
+              <div className="flex flex-row flex-wrap gap-6">
+                {WEEKDAYS.map((day) => (
+                  <label
+                    key={day.value}
+                    className="flex items-center space-x-2 text-base font-medium"
+                  >
+                    <input
+                      type="checkbox"
+                      className="form-checkbox rounded-full w-4 h-4 accent-blue-600"
+                      checked={form.watch("recurrence.days")?.includes(day.value)}
+                      onChange={() => {
+                        const days = form.watch("recurrence.days") || [];
+                        if (days.includes(day.value)) {
+                          form.setValue(
+                            "recurrence.days",
+                            days.filter((d) => d !== day.value)
+                          );
+                        } else {
+                          form.setValue("recurrence.days", [...days, day.value]);
+                        }
+                      }}
+                    />
+                    <span>{day.label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
           )}
 

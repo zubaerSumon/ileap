@@ -129,6 +129,7 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 ]}
                 setValue={form.setValue}
                 value={form.watch("category")}
+                className="w-[382px]"
               />
             </div>
             {/* Required skills */}
@@ -156,6 +157,7 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 ]}
                 setValue={form.setValue}
                 value={form.watch("required_skills")}
+                className="w-[382px]"
               />
             </div>
             {/* Extra conditions/question if required */}
@@ -175,11 +177,10 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                     label="Extra Condition"
                     placeholder="Some special conditions for volunteering include:"
                     control={form.control}
-                    className="min-h-[50px] w-[382px]"
+                    className="min-h-[40px] w-[382px]"
                   />
                   <div>
-                    <div className="border rounded-md p-3">
-                       
+                        
                       <FormSelect
                         label="Answer type"
                         id="extra_conditions.0.answer_type"
@@ -193,8 +194,7 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                           { value: "paragraph", label: "Paragraph" },
                         ]}
                       />
-                    </div>
-                  </div>
+                   </div>
                 </div>
                 {/* Example answers UI, not connected to form for now */}
                 <div>
