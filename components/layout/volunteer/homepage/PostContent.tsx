@@ -24,10 +24,11 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
         id: "4",
         title: "Gardening Volunteer",
         organization: "Easy Care Gardening",
-        date: "24/05/2025",
-        time: "01:00 PM - 04:00 PM",
-        location: "Hyde Park, Sydney",
+        date: "20/05/2025",
+        time: "10:00 AM - 02:00 PM",
+        location: "West Pymble, NSW, 2073",
         logo: "/images/easy-care-gardening-logo.png",
+
       };
     }
     if (id === "2") {
@@ -47,7 +48,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
       organization: "Easy Care Gardening",
       date: "20/05/2025",
       time: "10:00 AM - 02:00 PM",
-      location: "Hyde Park, Sydney",
+      location: "Putney, NSW,  2112",
       logo: "/images/easy-care-gardening-logo.png",
     };
   };

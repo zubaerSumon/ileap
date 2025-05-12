@@ -68,7 +68,9 @@ export default function UpdatedFooter() {
 
         <div className="w-full h-[1px] bg-gray-200 my-8"></div>
 
-        <div className="text-center text-xs text-gray-400">© iLEAP 2025</div>
+        <div className="text-center text-xs text-gray-400">
+          © iLeap 2025
+        </div>
       </div>
     </footer>
   );
