@@ -278,7 +278,7 @@ export default function TopNavigationBar() {
                   <div className="flex items-center space-x-4">
                     {session?.user?.role === 'organization' && (
                       <Link
-                        href="/organization/post-opportunity"
+                        href={`/${session?.user?.role}/opportunity/create`}
                         className="flex h-[33px] px-3 justify-center items-center gap-[6px] rounded-[6px] bg-[#2563EB] text-white hover:bg-blue-700 transition-colors"
                       >
                         <Image
