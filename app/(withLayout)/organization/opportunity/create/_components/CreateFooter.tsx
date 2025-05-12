@@ -1,15 +1,17 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
  
 interface CreateFooterProps {
   step: number;
   onNext?: () => void;
   onSaveDraft?: () => void;
   onCreate?: () => void;
+  isLoading?: boolean;
 }
 
-export default function CreateFooter({ step, onNext, onSaveDraft, onCreate }: CreateFooterProps) {
+export default function CreateFooter({ step, onNext, onSaveDraft, onCreate, isLoading }: CreateFooterProps) {
  
   const handleNext = () => {
     if (onNext) {
@@ -32,8 +34,19 @@ export default function CreateFooter({ step, onNext, onSaveDraft, onCreate }: Cr
               Next
             </Button>
           ) : (
-            <Button className="bg-blue-600 hover:bg-blue-700" onClick={onCreate}>
-              Create Opportunity
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700" 
+              onClick={onCreate}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Creating...
+                </div>
+              ) : (
+                "Create Opportunity"
+              )}
             </Button>
           )}
         </div>

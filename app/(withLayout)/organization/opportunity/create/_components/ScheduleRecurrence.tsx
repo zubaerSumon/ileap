@@ -17,10 +17,6 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
-      <RecurrenceModal
-        isOpen={isRecurrenceModalOpen}
-        onClose={() => setIsRecurrenceModalOpen(false)}
-      />
       <div className="container mx-auto py-12">
         <button
           onClick={onBack}
@@ -61,8 +57,8 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                     <input
                       type="radio"
                       value="oneoff"
-                      {...form.register("commitmentType" as Path<OpportunityFormValues>)}
-                      checked={form.watch("commitmentType") === "oneoff"}
+                      {...form.register("commitment_type" as Path<OpportunityFormValues>)}
+                      checked={form.watch("commitment_type") === "oneoff"}
                     />
                     <span>One off</span>
                   </label>
@@ -70,8 +66,8 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                     <input
                       type="radio"
                       value="regular"
-                      {...form.register("commitmentType" as Path<OpportunityFormValues>)}
-                      checked={form.watch("commitmentType") === "regular"}
+                      {...form.register("commitment_type" as Path<OpportunityFormValues>)}
+                      checked={form.watch("commitment_type") === "regular"}
                     />
                     <span>Regular</span>
                   </label>
@@ -110,7 +106,7 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                   supporting.
                 </p>
                 <FormInput
-                  name={"numberOfVolunteers" as Path<OpportunityFormValues>}
+                  name={"number_of_volunteers" as Path<OpportunityFormValues>}
                   label="Number of volunteers"
                   placeholder="20"
                   type="number"
@@ -134,7 +130,7 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                     <label>Date</label>
                     <div className="flex items-center gap-2 mt-1">
                       <FormInput
-                        name={"dateStart" as Path<OpportunityFormValues>}
+                        name={"date.start_date" as Path<OpportunityFormValues>}
                         label=""
                         placeholder=""
                         type="date"
@@ -143,7 +139,7 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                       />
                       <span>-</span>
                       <FormInput
-                        name={"dateEnd" as Path<OpportunityFormValues>}
+                        name={"date.end_date" as Path<OpportunityFormValues>}
                         label=""
                         placeholder=""
                         type="date"
@@ -156,7 +152,7 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                     <label>Time</label>
                     <div className="flex items-center gap-2 mt-1">
                       <FormInput
-                        name={"timeStart" as Path<OpportunityFormValues>}
+                        name={"time.start_time" as Path<OpportunityFormValues>}
                         label=""
                         placeholder=""
                         type="time"
@@ -165,7 +161,7 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                       />
                       <span>-</span>
                       <FormInput
-                        name={"timeEnd" as Path<OpportunityFormValues>}
+                        name={"time.end_time" as Path<OpportunityFormValues>}
                         label=""
                         placeholder=""
                         type="time"
@@ -187,7 +183,7 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                 </p>
                 <div className="space-y-4">
                   <FormInput
-                    name={"email" as Path<OpportunityFormValues>}
+                    name={"email_contact" as Path<OpportunityFormValues>}
                     label="Email"
                     placeholder="arif@spotify.com"
                     type="email"
@@ -200,7 +196,7 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                       help keep track of it.
                     </p>
                     <FormInput
-                      name={"phone" as Path<OpportunityFormValues>}
+                      name={"phone_contact" as Path<OpportunityFormValues>}
                       label="Phone"
                       placeholder="+61 1243 5978"
                       type="tel"
@@ -214,6 +210,11 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
           </div>
         </div>
       </div>
+      <RecurrenceModal
+        isOpen={isRecurrenceModalOpen}
+        onClose={() => setIsRecurrenceModalOpen(false)}
+        form={form}
+      />
     </div>
   );
 }

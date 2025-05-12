@@ -1,18 +1,24 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 // import { BsTelephone } from 'react-icons/bs';
-import { AiOutlineInstagram } from 'react-icons/ai';
-import { FaLinkedin } from 'react-icons/fa';
+import { AiOutlineInstagram } from "react-icons/ai";
+import { FaLinkedin } from "react-icons/fa";
 
 export default function UpdatedFooter() {
+  const path = usePathname();
+  const isHidden = path.includes("/opportunity/create");
   return (
-    <footer className="bg-[#F5F7FA] border-t py-12">
+    <footer className={cn("bg-[#F5F7FA] border-t py-12", isHidden && "hidden")}>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Contact us section */}
           <div className="md:text-left text-center">
-            <h3 className="text-[#2563EB] font-semibold text-lg mb-4">Contact us</h3>
+            <h3 className="text-[#2563EB] font-semibold text-lg mb-4">
+              Contact us
+            </h3>
             <div className="text-sm text-gray-600 space-y-1">
               <p>Broadway Ultimo, NSW 2007,</p>
               <p>University of Technology Sydney</p>
@@ -22,7 +28,9 @@ export default function UpdatedFooter() {
 
           {/* Find us section */}
           <div className="md:text-right text-center">
-            <h3 className="text-[#2563EB] font-semibold text-lg mb-4">Find us</h3>
+            <h3 className="text-[#2563EB] font-semibold text-lg mb-4">
+              Find us
+            </h3>
             <div className="flex flex-col md:items-end items-center gap-4">
               <div className="flex gap-4">
                 {/* <Link 
@@ -31,7 +39,7 @@ export default function UpdatedFooter() {
                 >
                   <BsTelephone size={24} />
                 </Link> */}
-                <Link 
+                <Link
                   href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -39,7 +47,7 @@ export default function UpdatedFooter() {
                 >
                   <AiOutlineInstagram size={24} />
                 </Link>
-                <Link 
+                <Link
                   href="https://www.linkedin.com/company/ausleap/"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -48,7 +56,7 @@ export default function UpdatedFooter() {
                   <FaLinkedin size={24} />
                 </Link>
               </div>
-              <Link 
+              <Link
                 href="mailto:ausleap@uts.edu.au"
                 className="text-sm text-gray-600 hover:text-[#2563EB] transition-colors"
               >
@@ -60,9 +68,7 @@ export default function UpdatedFooter() {
 
         <div className="w-full h-[1px] bg-gray-200 my-8"></div>
 
-        <div className="text-center text-xs text-gray-400">
-          © iLEAP 2025
-        </div>
+        <div className="text-center text-xs text-gray-400">© iLEAP 2025</div>
       </div>
     </footer>
   );

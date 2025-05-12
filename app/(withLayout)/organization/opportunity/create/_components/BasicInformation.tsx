@@ -7,25 +7,49 @@ import { FormInput } from "@/components/forms/FormInput";
 import { FormTextarea } from "@/components/forms/FormTextarea";
 import { FormSelect } from "@/components/forms/FormSelect";
 import { UseFormReturn, Path } from "react-hook-form";
+import { MultiSelectField } from "@/components/forms/MultiSelectField";
+import { FormRichTextEditor } from "@/components/forms/FormRichTextEditor";
 
 // Define the form type to match the useForm defaultValues in page.tsx
 export type OpportunityFormValues = {
   title: string;
   description: string;
-  category: string;
-  skills: string;
-  extraCondition: string;
-  answerType: string;
-  answers: string[];
-  commitmentType: string;
+  category: string[];
+  required_skills: string[];
+  extra_conditions: {
+    question: string;
+    answer_type: string;
+    options?: string[];
+  }[];
+  commitment_type: string;
   location: string;
-  numberOfVolunteers: string;
-  dateStart: string;
-  dateEnd: string;
-  timeStart: string;
-  timeEnd: string;
-  email: string;
-  phone: string;
+  number_of_volunteers: number;
+  date: {
+    start_date: string;
+    end_date?: string;
+  };
+  time: {
+    start_time: string;
+    end_time: string;
+  };
+  email_contact: string;
+  phone_contact?: string;
+  internal_reference?: string;
+  organization?: string;
+  is_recurring: boolean;
+  recurrence?: {
+    type: string;
+    days: string[];
+    date_range: {
+      start_date: string;
+      end_date?: string;
+    };
+    time_range: {
+      start_time: string;
+      end_time: string;
+    };
+    occurrences?: number;
+  };
 };
 
 export default function BasicInformation({ form }: { form: UseFormReturn<OpportunityFormValues> }) {
@@ -70,7 +94,7 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                   control={form.control}
                   className="w-[382px]"
                 />
-                <FormTextarea
+                <FormRichTextEditor
                   name={"description" as Path<OpportunityFormValues>}
                   label="Description"
                   placeholder="Describe the opportunity"
@@ -90,11 +114,11 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 this to help find opportunities they are interested in
                 supporting.
               </p>
-              <FormSelect
+              <MultiSelectField
                 label="Category"
                 id="category"
-                placeholder="Select category"
-                control={form.control}
+                placeholder="Select categories"
+                register={form.register}
                 registerName={"category" as Path<OpportunityFormValues>}
                 options={[
                   { value: "education", label: "Education & Literacy" },
@@ -103,6 +127,8 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                   { value: "community", label: "Community Development" },
                   { value: "humanRights", label: "Human Rights" },
                 ]}
+                setValue={form.setValue}
+                value={form.watch("category")}
               />
             </div>
             {/* Required skills */}
@@ -115,12 +141,12 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 Which skillset might match this opportunity? Volunteers use this
                 to help find opportunities they are interested in supporting.
               </p>
-              <FormSelect
+              <MultiSelectField
                 label="Required skills"
-                id="skills"
+                id="required_skills"
                 placeholder="Select skills"
-                control={form.control}
-                registerName={"skills" as Path<OpportunityFormValues>}
+                register={form.register}
+                registerName={"required_skills" as Path<OpportunityFormValues>}
                 options={[
                   { value: "communication", label: "Communication" },
                   { value: "leadership", label: "Leadership" },
@@ -128,6 +154,8 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                   { value: "teaching", label: "Teaching" },
                   { value: "language", label: "Language Skills" },
                 ]}
+                setValue={form.setValue}
+                value={form.watch("required_skills")}
               />
             </div>
             {/* Extra conditions/question if required */}
@@ -143,7 +171,7 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
               <div className="space-y-4">
                 <div className="flex gap-4">
                   <FormTextarea
-                    name={"extraCondition" as Path<OpportunityFormValues>}
+                    name={"extra_conditions.0.question" as Path<OpportunityFormValues>}
                     label="Extra Condition"
                     placeholder="Some special conditions for volunteering include:"
                     control={form.control}
@@ -151,15 +179,13 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                   />
                   <div>
                     <div className="border rounded-md p-3">
-                      <label className="text-sm text-gray-500">
-                        Answer type
-                      </label>
+                       
                       <FormSelect
                         label="Answer type"
-                        id="answerType"
+                        id="extra_conditions.0.answer_type"
                         placeholder="Checkbox"
                         control={form.control}
-                        registerName={"answerType" as Path<OpportunityFormValues>}
+                        registerName={"extra_conditions.0.answer_type" as Path<OpportunityFormValues>}
                         options={[
                           { value: "checkbox", label: "Checkbox" },
                           { value: "dropdown", label: "Dropdown" },

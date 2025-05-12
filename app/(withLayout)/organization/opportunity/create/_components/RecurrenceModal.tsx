@@ -5,16 +5,67 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { UseFormReturn, Path } from "react-hook-form";
+import type { OpportunityFormValues } from "./BasicInformation";
+import { FormInput } from "@/components/forms/FormInput";
+import { MultiSelectField } from "@/components/forms/MultiSelectField";
+import { RECURRENCE_TYPES, WEEKDAYS } from "@/utils/constants/opportunities";
 
 interface RecurrenceModalProps {
   isOpen: boolean;
   onClose: () => void;
+  form: UseFormReturn<OpportunityFormValues>;
 }
 
 export default function RecurrenceModal({
   isOpen,
   onClose,
+  form,
 }: RecurrenceModalProps) {
+  const handleSave = () => {
+    const recurrenceType = form.getValues("recurrence.type");
+    const recurrenceDays = form.getValues("recurrence.days");
+    const dateRange = form.getValues("recurrence.date_range");
+    const timeRange = form.getValues("recurrence.time_range");
+    const occurrences = form.getValues("recurrence.occurrences");
+
+    // Validate required fields
+    if (!recurrenceType || !dateRange.start_date || !timeRange.start_time) {
+      form.setError("recurrence", {
+        type: "manual",
+        message: "Please fill in all required fields",
+      });
+      return;
+    }
+
+    // For weekly recurrence, days are required
+    if (recurrenceType === "weekly" && (!recurrenceDays || recurrenceDays.length === 0)) {
+      form.setError("recurrence.days", {
+        type: "manual",
+        message: "Please select at least one day for weekly recurrence",
+      });
+      return;
+    }
+
+    // Set the recurrence data
+    form.setValue("is_recurring", true);
+    form.setValue("recurrence", {
+      type: recurrenceType,
+      days: recurrenceType === "weekly" ? recurrenceDays : [],
+      date_range: {
+        start_date: dateRange.start_date,
+        end_date: dateRange.end_date || undefined,
+      },
+      time_range: {
+        start_time: timeRange.start_time,
+        end_time: timeRange.end_time || timeRange.start_time,
+      },
+      occurrences: occurrences || undefined,
+    });
+
+    onClose();
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[900px] max-h-[800px] overflow-y-auto">
@@ -33,32 +84,39 @@ export default function RecurrenceModal({
             <RadioGroup
               defaultValue="weekly"
               className="grid grid-cols-4 gap-4"
+              onValueChange={(value) => {
+                form.setValue("recurrence.type", value);
+                // Clear days if not weekly
+                if (value !== "weekly") {
+                  form.setValue("recurrence.days", []);
+                }
+              }}
             >
-              {["daily", "weekly", "monthly", "yearly"].map((value) => (
+              {RECURRENCE_TYPES.map(({ value, label }) => (
                 <div key={value} className="flex items-center space-x-2">
                   <RadioGroupItem value={value} id={value} />
-                  <Label htmlFor={value}>
-                    {value.charAt(0).toUpperCase() + value.slice(1)}
-                  </Label>
+                  <Label htmlFor={value}>{label}</Label>
                 </div>
               ))}
             </RadioGroup>
           </div>
 
-          {/* Recur Days */}
-          <div>
-            <p className="text-sm mb-4">Recur days that you select</p>
-            <RadioGroup defaultValue="tue" className="grid grid-cols-7 gap-4">
-              {["mon", "tue", "wed", "thu", "fri", "sat", "sun"].map((day) => (
-                <div key={day} className="flex items-center space-x-2">
-                  <RadioGroupItem value={day} id={day} />
-                  <Label htmlFor={day}>
-                    {day.charAt(0).toUpperCase() + day.slice(1)}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
-          </div>
+          {/* Recur Days - Only show for weekly recurrence */}
+          {form.watch("recurrence.type") === "weekly" && (
+            <div>
+              <p className="text-sm mb-4">Recur days that you select</p>
+              <MultiSelectField
+                label="Days"
+                id="recurrence.days"
+                placeholder="Select days"
+                register={form.register}
+                registerName={"recurrence.days" as Path<OpportunityFormValues>}
+                options={[...WEEKDAYS]}
+                setValue={form.setValue}
+                value={form.watch("recurrence.days")}
+              />
+            </div>
+          )}
 
           {/* Recurrence Date & Time */}
           <div>
@@ -71,34 +129,46 @@ export default function RecurrenceModal({
             <div className="space-y-4">
               <div className="flex gap-4">
                 <div>
-                  <Label>Date</Label>
-                  <div className="flex items-center gap-2 mt-1 border rounded-md p-2">
-                    <Input
+                  <Label>Date Range</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <FormInput
+                      name={"recurrence.date_range.start_date" as Path<OpportunityFormValues>}
+                      label=""
+                      placeholder=""
                       type="date"
-                      className="w-[150px] border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                      defaultValue="2025-01-07"
+                      control={form.control}
+                      className="w-[150px]"
                     />
                     <span>-</span>
-                    <Input
+                    <FormInput
+                      name={"recurrence.date_range.end_date" as Path<OpportunityFormValues>}
+                      label=""
+                      placeholder=""
                       type="date"
-                      className="w-[150px] border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                      defaultValue="2025-01-17"
+                      control={form.control}
+                      className="w-[150px]"
                     />
                   </div>
                 </div>
                 <div>
-                  <Label>Time</Label>
-                  <div className="flex items-center gap-2 mt-1 border rounded-md p-2">
-                    <Input
+                  <Label>Time Range</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <FormInput
+                      name={"recurrence.time_range.start_time" as Path<OpportunityFormValues>}
+                      label=""
+                      placeholder=""
                       type="time"
-                      className="w-[120px] border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                      defaultValue="16:00"
+                      control={form.control}
+                      className="w-[120px]"
                     />
                     <span>-</span>
-                    <Input
+                    <FormInput
+                      name={"recurrence.time_range.end_time" as Path<OpportunityFormValues>}
+                      label=""
+                      placeholder=""
                       type="time"
-                      className="w-[120px] border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                      defaultValue="17:30"
+                      control={form.control}
+                      className="w-[120px]"
                     />
                   </div>
                 </div>
@@ -106,10 +176,26 @@ export default function RecurrenceModal({
 
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <input type="radio" id="endAfter" name="endType" />
+                  <input 
+                    type="radio" 
+                    id="endAfter" 
+                    name="endType"
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        form.setValue("recurrence.occurrences", 10);
+                      }
+                    }}
+                  />
                   <Label htmlFor="endAfter">End after</Label>
                 </div>
-                <Input type="number" placeholder="10" className="w-[80px]" />
+                <FormInput
+                  name={"recurrence.occurrences" as Path<OpportunityFormValues>}
+                  label=""
+                  placeholder="10"
+                  type="number"
+                  control={form.control}
+                  className="w-[80px]"
+                />
                 <span>Occurrences</span>
               </div>
             </div>
@@ -143,7 +229,12 @@ export default function RecurrenceModal({
 
           {/* Save Button */}
           <div className="mt-6">
-            <Button className="bg-blue-600 hover:bg-blue-700">Save</Button>
+            <Button 
+              className="bg-blue-600 hover:bg-blue-700"
+              onClick={handleSave}
+            >
+              Save
+            </Button>
           </div>
         </div>
       </DialogContent>
