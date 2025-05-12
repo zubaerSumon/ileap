@@ -79,13 +79,13 @@ export default function Categories({
         "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
       totalSpots: 10,
-      spotsAvailable: 0 // Will be calculated dynamically
-    },
+       spotsAvailable: 0 // Will be calculated dynamically
+      },
     {
       id: "4",
       title: "Easy Care Gardening",
-      popup_title: "Gardening Volunteer", // Changed from "Tree plantation Volunteer"
-      organization: "Easy Care Gardening",
+       popup_title: "Gardening Volunteer", // Changed from "Tree plantation Volunteer"
+        organization: "Easy Care Gardening",
       location: "Hyde Park, Sydney", // Different location
       type: "One off",
       date: "20/05/2025", // Changed to match id 1
@@ -94,11 +94,11 @@ export default function Categories({
       matchedSkills: 3,
       categories: ["Seniors & Aged Care"],
       description:
-        "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
+      "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
       logoSrc: "/Easy.svg",
       totalSpots: 10,
-      spotsAvailable: 0 // Will be calculated dynamically
-    },
+       spotsAvailable: 0 // Will be calculated dynamically
+      },
     {
       id: "2",
       title: "Clean Up Australia",
@@ -115,7 +115,8 @@ export default function Categories({
         "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy. You'll work together to remove litter, protect our natural environment, and make a positive impact on your local community.",
       logoSrc: "/Clean.svg",
       totalSpots: 20,
-      spotsAvailable: 0 // Will be calculated dynamically
+       spotsAvailable: 0 // Will be calculated dynamically
+ 
     },
     {
       id: "3",
@@ -133,7 +134,8 @@ export default function Categories({
         "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy",
       logoSrc: "/Clean.svg",
       totalSpots: 20,
-      spotsAvailable: 0 // Will be calculated dynamically
+       spotsAvailable: 0 // Will be calculated dynamically
+  
     },
   ];
 
@@ -154,6 +156,10 @@ export default function Categories({
 
   return (
     <section className="w-full md:w-[57%] relative">
+       <h1 className="text-[#101010] font-inter text-xxl font-bold text-center mt-8 mb-5">
+       Volunteering Opportunities during National Volunteer Week 2025 (19 - 25 May)
+        </h1>
+
       <div className="flex flex-col gap-6">
         {filteredOpportunities.map((opportunity) => (
           <Card

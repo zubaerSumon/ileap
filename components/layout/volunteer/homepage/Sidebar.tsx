@@ -19,7 +19,8 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
         logo: "/Easy.svg",
         logoAlt: "Easy Care Gardening",
         category: "Seniors & Aged Care",
-        location: "Hyde Park, Sydney",
+         location: "Hyde Park, Sydney",
+ 
         date: "20/05/2025",
         time: "10:00 AM - 02:00 PM (4 hours)",
         requirements: "Police Check"
@@ -29,8 +30,10 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
       return {
         logo: "/Clean.svg",
         logoAlt: "Clean Up Australia",
+ 
         category: "Seniors & Aged Care",
         location: "Hyde Park, Sydney",
+ 
         date: "24/05/2025",
         time: "01:00 PM - 04:00 PM (3 hours)",
         requirements: "No specific requirements"
@@ -52,7 +55,7 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
       logo: "/Easy.svg",
       logoAlt: "Easy Care",
       category: "Seniors & Aged Care",
-      location: "Sydney, Australia",
+      location: "Putney, NSW,  2112",
       date: "20/05/2025",
       time: "10:00 AM - 02:00 PM (4 hours)",
       requirements: "Police Check"
