@@ -23,11 +23,11 @@ import { useAuthCheck } from "@/hooks/useAuthCheck";
 
 const publicNavOptions = [
   { label: "Log in", href: "/signin", className: "hover:underline" },
-  // {
-  //   label: "Organisation Sign up",
-  //   href: "/signup?role=organization",
-  //   className: "hover:underline hidden md:inline",
-  // },
+  {
+    label: "Organisation Sign up",
+    href: "/signup?role=organization",
+    className: "hover:underline hidden md:inline",
+  },
   {
     label: "Volunteer-Sign up",
     href: "/signup?role=volunteer",
@@ -199,7 +199,7 @@ export default function TopNavigationBar() {
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center space-x-6">
                 <Link
-                  href={session ? "/volunteer" : "/"}
+                  href={session ? (session.user?.role === 'organization' ? '/organization' : '/volunteer') : '/'}
                   className="flex items-center"
                 >
                   <Image
@@ -211,26 +211,6 @@ export default function TopNavigationBar() {
                     priority
                   />
                 </Link>
-                {/* Social media icons commented out
-                <div className="hidden md:flex items-center justify-center space-x-4">
-                  <a
-                    href="https://www.instagram.com/aus_leap?igsh=cmxsc3lhZXphcmZu"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-gray-300"
-                  >
-                    <FaInstagram className="h-4 w-4" />
-                  </a>
-                  <a
-                    href="https://www.linkedin.com/company/ausleap/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-gray-300"
-                  >
-                    <FaLinkedin className="h-4 w-4" />
-                  </a>
-                </div>
-                */}
               </div>
 
               {isAuthPath ? (
@@ -296,49 +276,63 @@ export default function TopNavigationBar() {
               ) : isProtectedPath ? (
                 <div className="flex items-center space-x-6">
                   <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="ring-2 ring-blue-500 border border-white">
-                        <AvatarImage src={session?.user?.image || ""} />
-                        <AvatarFallback className="bg-yellow-400 text-black">
-                          {session?.user?.name
-                            ? session.user.name[0].toUpperCase()
-                            : "U"}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-medium truncate max-w-[120px]">
-                          {session?.user?.name
-                            ? session.user.name.split(" ")[0]
-                            : "User"}
-                        </span>
-                        <span className="text-xs text-white hidden md:block truncate max-w-[120px]">
-                          {session?.user?.email}
-                        </span>
-                      </div>
-
+                    {session?.user?.role === 'organization' && (
+                      <Link
+                        href="/organization/post-opportunity"
+                        className="flex h-[33px] px-3 justify-center items-center gap-[6px] rounded-[6px] bg-[#2563EB] text-white hover:bg-blue-700 transition-colors"
+                      >
+                        <Image
+                          src="/opp.svg"
+                          alt="Post opportunity"
+                          width={20}
+                          height={20}
+                        />
+                        <span>Post an opportunity</span>
+                      </Link>
+                    )}
+                    <div className="hidden md:flex flex-col mr-3">
+                      <span className="text-sm font-medium text-white">
+                        {session?.user?.name || "User"}
+                      </span>
+                      <span className="text-xs text-gray-300">
+                        {session?.user?.email}
+                      </span>
+                    </div>
+                    <div className="flex items-center">
                       <Menubar className="p-0 bg-transparent border-none">
                         <MenubarMenu>
-                          <MenubarTrigger className="p-0 bg-transparent border-none rounded-full hover:bg-gray-800 px-2">
-                            <Menu className="h-5 w-5" />
+                          <MenubarTrigger className="p-0 data-[state=open]:bg-gray-800 bg-transparent border-none rounded-full hover:bg-gray-800 cursor-pointer">
+                            <Avatar className="ring-2 ring-blue-500 border border-white">
+                              <AvatarImage src={session?.user?.image || ""} />
+                              <AvatarFallback className="bg-yellow-400 text-black">
+                                {session?.user?.name
+                                  ? session.user.name[0].toUpperCase()
+                                  : "U"}
+                              </AvatarFallback>
+                            </Avatar>
                           </MenubarTrigger>
                           <MenubarContent className="bg-white border border-gray-800">
+                            <MenubarItem className="md:hidden">
+                              <div className="flex flex-col py-2">
+                                <span className="text-sm font-medium text-gray-900">
+                                  {session?.user?.name || "User"}
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  {session?.user?.email}
+                                </span>
+                              </div>
+                            </MenubarItem>
+                            <MenubarSeparator className="md:hidden" />
                             <MenubarItem>
-                              <Link
-                                href="/volunteer/profile"
-                                className="w-full"
-                              >
+                              <Link href="/volunteer/profile" className="w-full">
                                 Edit Profile
                               </Link>
                             </MenubarItem>
                             <MenubarSeparator />
-                            <MenubarItem
-                              onClick={() =>
-                                signOut({ callbackUrl: "/signin" })
-                              }
-                            >
+                            <MenubarItem onClick={() => signOut({ callbackUrl: "/signin" })}>
                               Sign out{" "}
                               <MenubarShortcut>
-                                <LogOut />
+                                <LogOut className="h-4 w-4" />
                               </MenubarShortcut>
                             </MenubarItem>
                           </MenubarContent>
