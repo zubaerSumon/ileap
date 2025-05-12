@@ -26,7 +26,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
         organization: "Easy Care Gardening",
         date: "20/05/2025",
         time: "10:00 AM - 02:00 PM",
-        location: "Hyde Park, Sydney",
+        location: "West Pymble, NSW, 2073",
         logo: "/images/easy-care-gardening-logo.png",
 
       };
@@ -48,7 +48,7 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
       organization: "Easy Care Gardening",
       date: "20/05/2025",
       time: "10:00 AM - 02:00 PM",
-      location: "Hyde Park, Sydney",
+      location: "Putney, NSW,  2112",
       logo: "/images/easy-care-gardening-logo.png",
     };
   };
