@@ -63,24 +63,24 @@ export default function Categories({
   };
 
   const opportunities = [
-    {
-      id: "1",
-      title: "Easy Care Gardening",
-      popup_title: "Gardening Volunteer",
-      organization: "Easy Care Gardening",
-      location: "Sydney, Australia",
-      type: "One off",
-      date: "20/05/2025",
-      time: "10:00 AM - 02:00 PM",
-      matchingAvailability: true,
-      matchedSkills: 3,
-      categories: ["Seniors & Aged Care"],
-      description:
-        "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
-      logoSrc: "/Easy.svg",
-      totalSpots: 10,
-       spotsAvailable: 0 // Will be calculated dynamically
-      },
+    // {
+    //   id: "1",
+    //   title: "Easy Care Gardening",
+    //   popup_title: "Gardening Volunteer",
+    //   organization: "Easy Care Gardening",
+    //   location: "Sydney, Australia",
+    //   type: "One off",
+    //   date: "20/05/2025",
+    //   time: "10:00 AM - 02:00 PM",
+    //   matchingAvailability: true,
+    //   matchedSkills: 3,
+    //   categories: ["Seniors & Aged Care"],
+    //   description:
+    //     "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
+    //   logoSrc: "/Easy.svg",
+    //   totalSpots: 10,
+    //   spotsAvailable: 10
+    // },
     {
       id: "4",
       title: "Easy Care Gardening",
@@ -118,25 +118,24 @@ export default function Categories({
        spotsAvailable: 0 // Will be calculated dynamically
  
     },
-    {
-      id: "3",
-      title: "Clean Up Australia",
-      popup_title: "Clean Up volunteer",
-      organization: "Clean Up Australia",
-      location: "Sydney, Australia",
-      type: "One off",
-      date: "24/05/2025",
-      time: "01:00 PM - 04:00 PM",
-      matchingAvailability: true,
-      matchedSkills: 2,
-      categories: ["Environmental Management"],
-      description:
-        "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy",
-      logoSrc: "/Clean.svg",
-      totalSpots: 20,
-       spotsAvailable: 0 // Will be calculated dynamically
-  
-    },
+    // {
+    //   id: "3",
+    //   title: "Clean Up Australia",
+    //   popup_title: "Clean Up volunteer",
+    //   organization: "Clean Up Australia",
+    //   location: "Sydney, Australia",
+    //   type: "One off",
+    //   date: "24/05/2025",
+    //   time: "01:00 PM - 04:00 PM",
+    //   matchingAvailability: true,
+    //   matchedSkills: 2,
+    //   categories: ["Environmental Management"],
+    //   description:
+    //     "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy",
+    //   logoSrc: "/Clean.svg",
+    //   totalSpots: 20,
+    //   spotsAvailable: 20
+    // },
   ];
 
   // Calculate available spots for each opportunity
