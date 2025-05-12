@@ -1,15 +1,18 @@
 "use client";
 
 import { ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useState } from "react";
 import RecurrenceModal from "./RecurrenceModal";
+import { FormInput } from "@/components/forms/FormInput";
+import { UseFormReturn, Path } from "react-hook-form";
+import type { OpportunityFormValues } from "./BasicInformation";
 
-export default function ScheduleRecurrence() {
-  const router = useRouter();
+interface ScheduleRecurrenceProps {
+  form: UseFormReturn<OpportunityFormValues>;
+  onBack?: () => void;
+}
+
+export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceProps) {
   const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
 
   return (
@@ -20,7 +23,7 @@ export default function ScheduleRecurrence() {
       />
       <div className="container mx-auto py-12">
         <button
-          onClick={() => router.back()}
+          onClick={onBack}
           className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
         >
           <ChevronLeft className="h-4 w-4 mr-1" />
@@ -53,19 +56,27 @@ export default function ScheduleRecurrence() {
                   How much time does the volunteer need to commit to? Volunteers
                   use this to help find suitable opportunities.
                 </p>
-
-                <RadioGroup defaultValue="regular" className="flex gap-4">
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="oneoff" id="oneoff" />
-                    <Label htmlFor="oneoff">One off</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="regular" id="regular" />
-                    <Label htmlFor="regular">Regular</Label>
-                  </div>
-                </RadioGroup>
+                <div className="flex gap-4">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      value="oneoff"
+                      {...form.register("commitmentType" as Path<OpportunityFormValues>)}
+                      checked={form.watch("commitmentType") === "oneoff"}
+                    />
+                    <span>One off</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="radio"
+                      value="regular"
+                      {...form.register("commitmentType" as Path<OpportunityFormValues>)}
+                      checked={form.watch("commitmentType") === "regular"}
+                    />
+                    <span>Regular</span>
+                  </label>
+                </div>
               </div>
-
               {/* Location */}
               <div>
                 <h2 className="text-lg font-medium mb-1 flex items-center">
@@ -79,12 +90,14 @@ export default function ScheduleRecurrence() {
                   remotely? You can select up to 8 locations and only one state
                   or territory.
                 </p>
-                <Input
+                <FormInput
+                  name={"location" as Path<OpportunityFormValues>}
+                  label="Location"
                   placeholder="21 Darling Dr, Sydney, Australia"
+                  control={form.control}
                   className="w-[382px]"
                 />
               </div>
-
               {/* Number of volunteers */}
               <div>
                 <h2 className="text-lg font-medium mb-1 flex items-center">
@@ -96,9 +109,15 @@ export default function ScheduleRecurrence() {
                   use this to help find opportunities they are interested in
                   supporting.
                 </p>
-                <Input type="number" placeholder="20" className="w-[382px]" />
+                <FormInput
+                  name={"numberOfVolunteers" as Path<OpportunityFormValues>}
+                  label="Number of volunteers"
+                  placeholder="20"
+                  type="number"
+                  control={form.control}
+                  className="w-[382px]"
+                />
               </div>
-
               {/* Select date & time */}
               <div>
                 <h2 className="text-lg font-medium mb-1 flex items-center">
@@ -112,40 +131,51 @@ export default function ScheduleRecurrence() {
                 </p>
                 <div className="flex gap-4">
                   <div>
-                    <Label>Date</Label>
+                    <label>Date</label>
                     <div className="flex items-center gap-2 mt-1">
-                      <Input
+                      <FormInput
+                        name={"dateStart" as Path<OpportunityFormValues>}
+                        label=""
+                        placeholder=""
                         type="date"
+                        control={form.control}
                         className="w-[150px]"
-                        defaultValue="2025-01-07"
                       />
                       <span>-</span>
-                      <Input
+                      <FormInput
+                        name={"dateEnd" as Path<OpportunityFormValues>}
+                        label=""
+                        placeholder=""
                         type="date"
+                        control={form.control}
                         className="w-[150px]"
-                        defaultValue="2025-01-17"
                       />
                     </div>
                   </div>
                   <div>
-                    <Label>Time</Label>
+                    <label>Time</label>
                     <div className="flex items-center gap-2 mt-1">
-                      <Input
+                      <FormInput
+                        name={"timeStart" as Path<OpportunityFormValues>}
+                        label=""
+                        placeholder=""
                         type="time"
+                        control={form.control}
                         className="w-[120px]"
-                        defaultValue="16:00"
                       />
                       <span>-</span>
-                      <Input
+                      <FormInput
+                        name={"timeEnd" as Path<OpportunityFormValues>}
+                        label=""
+                        placeholder=""
                         type="time"
+                        control={form.control}
                         className="w-[120px]"
-                        defaultValue="17:30"
                       />
                     </div>
                   </div>
                 </div>
               </div>
-
               {/* Add your email/contact */}
               <div>
                 <h2 className="text-lg font-medium mb-1 flex items-center">
@@ -156,9 +186,12 @@ export default function ScheduleRecurrence() {
                   Which email address should we send applications to?
                 </p>
                 <div className="space-y-4">
-                  <Input
-                    type="email"
+                  <FormInput
+                    name={"email" as Path<OpportunityFormValues>}
+                    label="Email"
                     placeholder="arif@spotify.com"
+                    type="email"
+                    control={form.control}
                     className="w-[382px]"
                   />
                   <div>
@@ -166,9 +199,12 @@ export default function ScheduleRecurrence() {
                       You can enter your own internal reference number here to
                       help keep track of it.
                     </p>
-                    <Input
-                      type="tel"
+                    <FormInput
+                      name={"phone" as Path<OpportunityFormValues>}
+                      label="Phone"
                       placeholder="+61 1243 5978"
+                      type="tel"
+                      control={form.control}
                       className="w-[382px]"
                     />
                   </div>

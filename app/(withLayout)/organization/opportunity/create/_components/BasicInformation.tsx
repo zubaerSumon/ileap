@@ -3,22 +3,33 @@
 import { Card } from "@/components/ui/card";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useState } from "react";
+import { FormInput } from "@/components/forms/FormInput";
+import { FormTextarea } from "@/components/forms/FormTextarea";
+import { FormSelect } from "@/components/forms/FormSelect";
+import { UseFormReturn, Path } from "react-hook-form";
 
-export default function BasicInformation() {
+// Define the form type to match the useForm defaultValues in page.tsx
+export type OpportunityFormValues = {
+  title: string;
+  description: string;
+  category: string;
+  skills: string;
+  extraCondition: string;
+  answerType: string;
+  answers: string[];
+  commitmentType: string;
+  location: string;
+  numberOfVolunteers: string;
+  dateStart: string;
+  dateEnd: string;
+  timeStart: string;
+  timeEnd: string;
+  email: string;
+  phone: string;
+};
+
+export default function BasicInformation({ form }: { form: UseFormReturn<OpportunityFormValues> }) {
   const router = useRouter();
-  const [] = useState<string[]>([]);
-  const [] = useState<string[]>([]);
 
   return (
     <div className="container mx-auto py-12">
@@ -51,40 +62,23 @@ export default function BasicInformation() {
                 Ensure your role title is succinct and easily understood by the
                 volunteer e.g. Retail Assistant, Marketing Support, Driver.
               </p>
-
               <div className="space-y-4">
-                <div>
-                  <Label htmlFor="title">Title</Label>
-                  <Input
-                    id="title"
-                    placeholder="Enter opportunity title"
-                    className="mt-1 w-[382px]"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="description">Description</Label>
-                  <p className="text-[14px] text-gray-500 mb-2">
-                    Here&apos;s your opportunity to say more. Include a detailed
-                    outline of... <br />
-                    <u>
-                      key duties you need the volunteer to do, skills and
-                      experience needed to do the role, organisational
-                      background, confirm whether all potential volunteers are
-                      required to complete a mandatory training or orientation
-                      process before commencing their assigned role within your
-                      organization.
-                    </u>{" "}
-                  </p>
-                  <Textarea
-                    id="description"
-                    placeholder="Describe the opportunity"
-                    className="min-h-[150px] mt-1 w-[382px]"
-                  />
-                </div>
+                <FormInput
+                  name={"title" as Path<OpportunityFormValues>}
+                  label="Title"
+                  placeholder="Enter opportunity title"
+                  control={form.control}
+                  className="w-[382px]"
+                />
+                <FormTextarea
+                  name={"description" as Path<OpportunityFormValues>}
+                  label="Description"
+                  placeholder="Describe the opportunity"
+                  control={form.control}
+                  className="min-h-[150px] w-[382px]"
+                />
               </div>
             </div>
-
             {/* Category */}
             <div>
               <h2 className="text-lg font-medium mb-1 flex items-center">
@@ -96,25 +90,21 @@ export default function BasicInformation() {
                 this to help find opportunities they are interested in
                 supporting.
               </p>
-
-              <Select>
-                <SelectTrigger className="w-[382px]">
-                  <SelectValue placeholder="2 items selected" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="education">
-                    Education & Literacy
-                  </SelectItem>
-                  <SelectItem value="health">Health & Medicine</SelectItem>
-                  <SelectItem value="environment">Environment</SelectItem>
-                  <SelectItem value="community">
-                    Community Development
-                  </SelectItem>
-                  <SelectItem value="humanRights">Human Rights</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormSelect
+                label="Category"
+                id="category"
+                placeholder="Select category"
+                control={form.control}
+                registerName={"category" as Path<OpportunityFormValues>}
+                options={[
+                  { value: "education", label: "Education & Literacy" },
+                  { value: "health", label: "Health & Medicine" },
+                  { value: "environment", label: "Environment" },
+                  { value: "community", label: "Community Development" },
+                  { value: "humanRights", label: "Human Rights" },
+                ]}
+              />
             </div>
-
             {/* Required skills */}
             <div>
               <h2 className="text-lg font-medium mb-1 flex items-center">
@@ -125,64 +115,64 @@ export default function BasicInformation() {
                 Which skillset might match this opportunity? Volunteers use this
                 to help find opportunities they are interested in supporting.
               </p>
-
-              <Select>
-                <SelectTrigger className="w-[382px]">
-                  <SelectValue placeholder="2 items selected" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="communication">Communication</SelectItem>
-                  <SelectItem value="leadership">Leadership</SelectItem>
-                  <SelectItem value="technical">Technical</SelectItem>
-                  <SelectItem value="teaching">Teaching</SelectItem>
-                  <SelectItem value="language">Language Skills</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormSelect
+                label="Required skills"
+                id="skills"
+                placeholder="Select skills"
+                control={form.control}
+                registerName={"skills" as Path<OpportunityFormValues>}
+                options={[
+                  { value: "communication", label: "Communication" },
+                  { value: "leadership", label: "Leadership" },
+                  { value: "technical", label: "Technical" },
+                  { value: "teaching", label: "Teaching" },
+                  { value: "language", label: "Language Skills" },
+                ]}
+              />
             </div>
-
             {/* Extra conditions/question if required */}
             <div>
               <h2 className="text-lg font-medium mb-1 flex items-center">
                 Extra conditions/question if required
                 <span className="text-gray-400 text-sm ml-2">(optional)</span>
               </h2>
-
               <p className="text-sm text-gray-500 mb-4">
                 Provide any extra question if needed to qualify the volunteer
                 and also select which pattern of question suits most.
               </p>
-
               <div className="space-y-4">
                 <div className="flex gap-4">
-                  <Textarea
+                  <FormTextarea
+                    name={"extraCondition" as Path<OpportunityFormValues>}
+                    label="Extra Condition"
                     placeholder="Some special conditions for volunteering include:"
+                    control={form.control}
                     className="min-h-[50px] w-[382px]"
                   />
-
                   <div>
                     <div className="border rounded-md p-3">
-                      <Label className="text-sm text-gray-500">
+                      <label className="text-sm text-gray-500">
                         Answer type
-                      </Label>
-                      <Select>
-                        <SelectTrigger className="w-[142px] border-0 p-0 mt-1 shadow-0">
-                          <SelectValue placeholder="Checkbox" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="checkbox">Checkbox</SelectItem>
-                          <SelectItem value="dropdown">Dropdown</SelectItem>
-                          <SelectItem value="multiple">
-                            Multiple choice
-                          </SelectItem>
-                          <SelectItem value="paragraph">Paragraph</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      </label>
+                      <FormSelect
+                        label="Answer type"
+                        id="answerType"
+                        placeholder="Checkbox"
+                        control={form.control}
+                        registerName={"answerType" as Path<OpportunityFormValues>}
+                        options={[
+                          { value: "checkbox", label: "Checkbox" },
+                          { value: "dropdown", label: "Dropdown" },
+                          { value: "multiple", label: "Multiple choice" },
+                          { value: "paragraph", label: "Paragraph" },
+                        ]}
+                      />
                     </div>
                   </div>
                 </div>
-
+                {/* Example answers UI, not connected to form for now */}
                 <div>
-                  <Label>Select answers</Label>
+                  <label>Select answers</label>
                   <div className="space-y-2 mt-2 w-[382px]">
                     <div className="flex items-start space-x-2 p-3 border rounded-md">
                       <div className="mt-1">1.</div>
