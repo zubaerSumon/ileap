@@ -19,7 +19,7 @@ export function Sidebar({ opportunityId }: { opportunityId?: string }) {
         logo: "/Easy.svg",
         logoAlt: "Easy Care Gardening",
         category: "Seniors & Aged Care",
-         location: "Hyde Park, Sydney",
+         location: "West Pymble, NSW, 2073",
  
         date: "20/05/2025",
         time: "10:00 AM - 02:00 PM (4 hours)",
