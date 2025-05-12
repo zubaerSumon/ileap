@@ -4,11 +4,11 @@ import React from "react";
 import MiniGallery from "@/components/layout/volunteer/homepage/MiniGallery";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
- 
+
 const VolunteerPage = () => {
   return (
     <ProtectedLayout>
-      <div className="px-4 flex flex-col items-center pb-40">
+      <div className="px-4 flex flex-col items-center pb-40 max-w-[1240px] mx-auto">
         <h1 className="text-[#101010] font-inter text-3xl font-bold text-center mt-8 mb-2">
           Welcome 2025 AusLeap Participants
         </h1>
@@ -22,8 +22,8 @@ const VolunteerPage = () => {
           <Categories />
           <MiniGallery />
         </div>
-      </div>{" "}
-     </ProtectedLayout>
+      </div>
+    </ProtectedLayout>
   );
 };
 
