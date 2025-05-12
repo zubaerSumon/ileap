@@ -6,6 +6,7 @@ import { userValidation } from "./users.validation";
 import bcrypt from "bcryptjs";
 import { publicProcedure, router } from "@/server/trpc";
 import Volunteer from "@/server/db/models/volunteer";
+import { sendApplicationConfirmationMail } from "@/utils/helpers/sendApplicationConfirmationMail";
 
 export const userRouter = router({
   updateUser: protectedProcedure
@@ -147,7 +148,6 @@ export const userRouter = router({
         throw new Error("Volunteer profile not found.");
       }
 
-      // Check if already applied
       const alreadyApplied = volunteer.applied_events?.includes(input.eventId);
       if (alreadyApplied) {
         return {
@@ -157,7 +157,6 @@ export const userRouter = router({
         };
       }
 
-      // Add the event ID to applied_events array
       const updatedVolunteer = await Volunteer.findOneAndUpdate(
         { user: sessionUser.id },
         { $addToSet: { applied_events: input.eventId } },
@@ -167,7 +166,11 @@ export const userRouter = router({
       if (!updatedVolunteer) {
         throw new Error("Failed to apply for the event");
       }
-
+      sendApplicationConfirmationMail(
+        sessionUser.email,
+        sessionUser.name,
+        input.eventId
+      );
       return {
         success: true,
         message: "Successfully applied to the event",

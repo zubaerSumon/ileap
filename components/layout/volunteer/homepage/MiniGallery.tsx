@@ -10,7 +10,7 @@ interface MiniGalleryProps {
 
 const MiniGallery: React.FC<MiniGalleryProps> = ({
   title = "Check out our past program successes",
-  seeMoreLink = "/ausleap/gallery",
+  seeMoreLink = "/volunteer/gallery",
 }) => {
   const galleryImages = [
     "/mg1.svg",
