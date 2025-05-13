@@ -86,7 +86,7 @@ export default function Categories({
       title: "Easy Care Gardening",
        popup_title: "Gardening Volunteer", // Changed from "Tree plantation Volunteer"
         organization: "Easy Care Gardening",
-      location: "Hyde Park, Sydney", // Different location
+      location: "West Pymble, Sydney", // Different location
       type: "One off",
       date: "20/05/2025", // Changed to match id 1
       time: "10:00 AM - 02:00 PM", // Changed to match id 1
@@ -104,7 +104,7 @@ export default function Categories({
       title: "Clean Up Australia",
       popup_title: "Clean Up volunteer",
       organization: "Clean Up Australia",
-      location: "Sydney, Australia",
+      location: "Hyde Park, Sydney",
       type: "One off",
       date: "21/05/2025",
       time: "01:00 PM - 04:00 PM",
