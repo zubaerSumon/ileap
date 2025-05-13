@@ -1,11 +1,10 @@
 import { FormField } from "@/components/forms/FormField";
-import { MultiSelectField } from "@/components/forms/MultiSelectField";
 import { PhoneField } from "@/components/forms/PhoneField";
 import { UseFormReturn } from "react-hook-form";
 import { OrgSignupFormData } from "@/types/auth";
 import { FormSelect } from "@/components/forms/FormSelect";
 import { suburbs } from "@/utils/constants/suburb";
-import { locations, organizationTypes, volunteerTypes } from "@/utils/constants/select-options";
+import { locations } from "@/utils/constants/select-options";
 
 interface OrgProfileStepProps {
   form: UseFormReturn<OrgSignupFormData>;
@@ -47,39 +46,6 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
         />
 
         <FormSelect
-          label="Organization type"
-          id="type"
-          placeholder="Select organization type"
-          control={form.control}
-          registerName="type"
-          error={form.formState.errors.type?.message}
-          options={organizationTypes}
-        />
-
-        <MultiSelectField
-          label={`What type of volunteer work you’re providing?`}
-          id="opportunity_types"
-          placeholder="Select volunteer work"
-          register={form.register}
-          registerName="opportunity_types"
-          error={form.formState.errors.opportunity_types?.message}
-          options={volunteerTypes}
-          setValue={form.setValue}
-          value={form.watch("opportunity_types")}
-        />
-        <MultiSelectField
-          label={`What are the skills you prefering?`}
-          id="required_skills"
-          placeholder="Select prefered skills"
-          register={form.register}
-          registerName="required_skills"
-          error={form.formState.errors.required_skills?.message}
-          options={volunteerTypes}
-          setValue={form.setValue}
-          value={form.watch("required_skills")}
-        />
-
-        <FormSelect
           label="State"
           id="state"
           placeholder="Select your location"
@@ -87,6 +53,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           registerName="state"
           error={form.formState.errors.state?.message}
           options={locations}
+          searchEnabled
         />
 
         <FormSelect
@@ -97,6 +64,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           registerName="area"
           error={form.formState.errors.area?.message}
           options={suburbs}
+          searchEnabled
         />
 
         <FormField
@@ -106,16 +74,6 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           register={form.register}
           registerName="abn"
           error={form.formState.errors.abn?.message}
-          className="h-12"
-        />
-
-        <FormField
-          label="Website"
-          id="website"
-          placeholder="e.g. www.charity.ausralia.com"
-          register={form.register}
-          registerName="website"
-          error={form.formState.errors.website?.message}
           className="h-12"
         />
       </div>

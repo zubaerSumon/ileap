@@ -75,6 +75,7 @@ const organizationSchema = z.object({
   abn: z.string().nonempty("ABN is required"),
   website: z.string().optional(),
   profile_img: z.string().optional(),
+  cover_img: z.string().optional(),
   user: z.string().optional(),
 });
 

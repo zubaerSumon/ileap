@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { UserRole } from "@/server/db/interfaces/user";
 import { OrgProfileStep } from "./OrgProfileStep";
 import { OrgSignupStep } from "./OrgSignupStep";
+import { OrgDetailsStep } from "./OrgDetailsStep";
 import { Loader2 } from "lucide-react";
 
 export default function  OrganizationSignup() {
@@ -67,11 +68,19 @@ export default function  OrganizationSignup() {
     } else if (step === 2) {
       fieldsToValidate = [
         "bio",
-        "opportunity_types",
         "phone_number",
         "state",
         "area",
         "abn",
+      ];
+    } else if (step === 3) {
+      fieldsToValidate = [
+        "type",
+        "opportunity_types",
+        "required_skills",
+        "website",
+        "profile_img",
+        "cover_img"
       ];
     }
 
@@ -81,6 +90,8 @@ export default function  OrganizationSignup() {
       if (step === 1) {
         await onSubmit(form.getValues());
       } else if (step === 2) {
+        setStep(step + 1);
+      } else if (step === 3) {
         try {
           setIsProfileLoading(true);
           const formData = form.getValues();
@@ -96,13 +107,14 @@ export default function  OrganizationSignup() {
             type: formData.type,
             website: formData.website,
             required_skills: formData.required_skills,
+            profile_img: formData.profile_img,
+            cover_img: formData.cover_img,
           });
         } catch (err) {
           console.error("Profile setup error:", err);
         } finally {
           setIsProfileLoading(false);
         }
-        setStep(step + 1);
       }
     }
   };
@@ -190,6 +202,7 @@ export default function  OrganizationSignup() {
             />
           )}
           {step === 2 && <OrgProfileStep form={form} />}
+          {step === 3 && <OrgDetailsStep form={form} />}
 
           <div className="fixed bottom-0 left-0 right-0 bg-gray-50 py-4 px-6 border-t border-gray-200">
             <div className="container mx-auto px-4">
@@ -220,6 +233,8 @@ export default function  OrganizationSignup() {
                     </div>
                   ) : step === 1 ? (
                     "Signup & Continue"
+                  ) : step === 2 ? (
+                    "Continue"
                   ) : (
                     "Complete"
                   )}
