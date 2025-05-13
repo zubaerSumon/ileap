@@ -10,5 +10,6 @@ export interface IOrgnization extends Document {
   abn: string;
   website: string;
   profile_img: string;
+  cover_img: string;
   user: Types.ObjectId;
 }

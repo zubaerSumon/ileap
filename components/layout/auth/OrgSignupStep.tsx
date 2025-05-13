@@ -154,6 +154,7 @@ export function OrgSignupStep({
                 setTermsError(null);
               }
             }}
+            className="mr-2"
           />
           <label
             htmlFor="terms"

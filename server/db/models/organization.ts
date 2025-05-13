@@ -13,6 +13,7 @@ const OrganizationSchema: Schema = new Schema<IOrgnization>(
     abn: { type: String },
     website: { type: String },
     profile_img: { type: String },
+    cover_img: { type: String },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
