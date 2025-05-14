@@ -5,7 +5,7 @@ import { publicProcedure, router } from "@/server/trpc";
 import { volunteerValidation } from "./volunteers.valdation";
 import connectDB from "@/server/config/mongoose";
 import mongoose from "mongoose";
-import Volunteer from "@/server/db/models/volunteer";
+import Volunteer from "@/server/db/models/volunteer-profile";
 
 export const volunteerRouter = router({
   updateVolunteerProfile: protectedProcedure
@@ -73,7 +73,7 @@ export const volunteerRouter = router({
           await import("@/server/db/models/user");
         }
         if (!mongoose.models.volunteer) {
-          await import("@/server/db/models/volunteer");
+          await import("@/server/db/models/volunteer-profile");
         }
 
         const volunteers = await Volunteer.find({

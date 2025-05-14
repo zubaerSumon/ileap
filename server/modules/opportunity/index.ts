@@ -4,7 +4,7 @@ import { TRPCError } from "@trpc/server";
 import Opportunity from "@/server/db/models/opportunity";
 import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
-import Organization from "@/server/db/models/organization";
+import OrganizationProfile from "@/server/db/models/organization-profile";
 import { z } from "zod";
 
 export const opportunityRouter = router({
@@ -20,7 +20,7 @@ export const opportunityRouter = router({
       }
 
       // Verify organization exists and belongs to the user
-      const organization = await Organization.findOne({
+      const organization = await OrganizationProfile.findOne({
         _id: input.organization,
         user: sessionUser.id
       });
@@ -96,7 +96,7 @@ export const opportunityRouter = router({
       }
 
       try {
-        const organization = await Organization.findOne({ user: sessionUser.id });
+        const organization = await OrganizationProfile.findOne({ user: sessionUser.id });
         if (!organization) {
           throw new TRPCError({
             code: "NOT_FOUND",

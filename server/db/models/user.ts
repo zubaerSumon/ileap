@@ -25,8 +25,15 @@ const UserSchema: Schema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
+    volunteerProfile: {
+      type: Schema.Types.ObjectId,
+      ref: "volunteer",
+    },
+    organizationProfile: {
+      type: Schema.Types.ObjectId,
+      ref: "organization_profile",
+    },
   },
-
   { timestamps: true }
 );
 

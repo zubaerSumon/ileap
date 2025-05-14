@@ -1,13 +1,8 @@
 import mongoose, { Schema, model } from "mongoose";
-import { IVolunteer } from "../interfaces/volunteer";
+import { IVolunteerProfile } from "../interfaces/volunteer-profile";
 
-const VolunteerSchema = new Schema<IVolunteer>(
+const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-      required: true,
-    },
     bio: {
       type: String,
       required: true,
@@ -67,6 +62,6 @@ const VolunteerSchema = new Schema<IVolunteer>(
   }
 );
 
-const Volunteer =
-  mongoose.models.volunteer || model<IVolunteer>("volunteer", VolunteerSchema);
-export default Volunteer;
+const VolunteerProfile =
+  mongoose.models.volunteer_profile || model<IVolunteerProfile>("volunteer_profile", VolunteerProfileSchema);
+export default VolunteerProfile;

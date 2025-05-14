@@ -1,11 +1,11 @@
 import User from "@/server/db/models/user";
-import Organization from "@/server/db/models/organization";
+import OrganizationProfile from "@/server/db/models/organization-profile";
 import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
 import { userValidation } from "./users.validation";
 import bcrypt from "bcryptjs";
 import { publicProcedure, router } from "@/server/trpc";
-import Volunteer from "@/server/db/models/volunteer";
+import Volunteer from "@/server/db/models/volunteer-profile";
 import { sendApplicationConfirmationMail } from "@/utils/helpers/sendApplicationConfirmationMail";
 
 export const userRouter = router({
@@ -42,16 +42,16 @@ export const userRouter = router({
       throw new Error("You must be logged in to check profile.");
     }
 
-    const [volunteer, organization] = await Promise.all([
+    const [volunteer, organizationProfile] = await Promise.all([
       Volunteer.findOne({ user: sessionUser.id }),
-      Organization.findOne({ user: sessionUser.id }),
+      OrganizationProfile.findOne({ user: sessionUser.id }),
     ]);
 
     return {
       hasVolunteerProfile: !!volunteer,
-      hasOrganizationProfile: !!organization,
+      hasOrganizationProfile: !!organizationProfile,
       volunteerProfile: volunteer,
-      organizationProfile: organization,
+      organizationProfile: organizationProfile,
     };
   }),
 
@@ -88,23 +88,23 @@ export const userRouter = router({
         throw new Error("You must be logged in to setup your profile.");
       }
 
-      const existingProfile = await Organization.findOne({
+      const existingProfile = await OrganizationProfile.findOne({
         user: sessionUser.id,
       });
       if (existingProfile) {
         throw new Error("Organization profile already exists.");
       }
 
-      const organization = await Organization.create({
+      const organizationProfile = await OrganizationProfile.create({
         ...input,
         user: sessionUser.id,
       });
 
-      if (!organization) {
+      if (!organizationProfile) {
         throw new Error("Failed to create organization profile");
       }
 
-      return organization;
+      return organizationProfile;
     }),
 
   resetPassword: publicProcedure
