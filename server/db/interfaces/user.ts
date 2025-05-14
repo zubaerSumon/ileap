@@ -1,4 +1,5 @@
 import { Document} from "mongoose";
+import mongoose from "mongoose";
 
 export enum UserRole {
   ADMIN = "admin",
@@ -19,4 +20,6 @@ export interface IUser extends Document {
   provider: AuthProvider;
   is_verified: boolean;
   referred_by: string;
+  volunteerProfile?: mongoose.Types.ObjectId;
+  organizationProfile?: mongoose.Types.ObjectId;
 }
