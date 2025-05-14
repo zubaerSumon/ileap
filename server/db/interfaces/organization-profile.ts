@@ -1,5 +1,7 @@
-import { Types } from "mongoose";
-export interface IOrgnization extends Document {
+import { Document, Types } from "mongoose";
+
+export interface IOrgnizationPofile extends Document {
+  user: Types.ObjectId;
   phone_number: string;
   bio: string;
   type: string;
@@ -11,5 +13,4 @@ export interface IOrgnization extends Document {
   website: string;
   profile_img: string;
   cover_img: string;
-  user: Types.ObjectId;
 }

@@ -13,6 +13,8 @@ import { useAuthCheck } from "@/hooks/useAuthCheck";
 import toast from "react-hot-toast";
 import { BasicProfileStep } from "./BasicProfileStep";
 import { Form } from "@/components/ui/form";
+import { UserRole } from "@/server/db/interfaces/user";
+import { Loader2 } from "lucide-react";
 
 export default function VolunteerSignup() {
   const searchParams = useSearchParams();
@@ -26,21 +28,36 @@ export default function VolunteerSignup() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
   const [mediaConsent, setMediaConsent] = useState(false);
-  const [mediaConsentError, setMediaConsentError] = useState<string | null>(
-    null
-  );
+  const [mediaConsentError, setMediaConsentError] = useState<string | null>(null);
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
-  const showStudentStep = true; // Changed from searchParams?.get("referral") === "ausleap2025"
+
+  const updateUser = trpc.users.updateUser.useMutation();
   const setupVolunteerProfile = trpc.users.setupVolunteerProfile.useMutation({
-    onSuccess: () => {
-      utils.users.profileCheckup.invalidate();
-      toast.success("Profile setup completed successfully!");
-      setIsProfileSetupComplete(true);
-      const role = session?.user?.role;
-      if (!isLoading && role && isAuthenticated) {
-        router.push(`/${role}`);
+    onSuccess: async (data) => {
+      try {
+        await updateUser.mutate({
+          volunteerProfile: data._id
+        });
+        
+        utils.users.profileCheckup.invalidate();
+        toast.success("Profile setup completed successfully!");
+        setIsProfileSetupComplete(true);
+        
+        // Force a session update to ensure we have the latest role
+        await utils.users.profileCheckup.invalidate();
+        
+        // Redirect after a short delay to ensure session is updated
+        setTimeout(() => {
+          const role = session?.user?.role?.toLowerCase();
+          if (role) {
+            router.replace(`/${role}`);
+          }
+        }, 1000);
+      } catch (error) {
+        console.error("Error updating user with profile:", error);
+        toast.error("Failed to complete profile setup");
       }
     },
     onError: (error) => {
@@ -93,26 +110,21 @@ export default function VolunteerSignup() {
     const isValid = await form.trigger(fieldsToValidate);
 
     if (isValid) {
-      // Only runs if form.trigger returns true
       if (step === 1) {
         await onSubmit(form.getValues());
       } else if (step === 2) {
-        // Remove the !showStudentStep condition since we always want to go to step 3
-        setStep(step + 1); // Just move to step 3 without creating profile
+        setStep(step + 1);
       } else if (step === 3) {
-        // Remove the showStudentStep condition since it's always true now
-        // Check media consent in the last step
         if (!mediaConsent) {
           setMediaConsentError(
             "You must grant media consent to complete your profile"
           );
           return;
         }
-        // Handle profile setup
         try {
           setIsProfileLoading(true);
           const formData = form.getValues();
-          await setupVolunteerProfile.mutateAsync({
+          await setupVolunteerProfile.mutate({
             bio: formData.bio,
             interested_on: formData.interested_on,
             phone_number: formData.phone_number,
@@ -132,7 +144,6 @@ export default function VolunteerSignup() {
         } finally {
           setIsProfileLoading(false);
         }
-        setStep(step + 1);
       }
     }
   };
@@ -142,14 +153,19 @@ export default function VolunteerSignup() {
   };
 
   useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated && session?.user?.role) {
-        router.replace(`/${session.user.role.toLowerCase()}`);
-      } else if (session?.user && !isAuthenticated) {
-        setStep(2);
-        setIsLoggedIn(true);
+    const handleRedirection = async () => {
+      if (!isLoading) {
+        if (isAuthenticated && session?.user?.role) {
+          const role = session.user.role.toLowerCase();
+          await router.replace(`/${role}`);
+        } else if (session?.user && !isAuthenticated) {
+          setStep(2);
+          setIsLoggedIn(true);
+        }
       }
-    }
+    };
+
+    handleRedirection();
   }, [isLoading, isAuthenticated, session, router]);
 
   const onSubmit = async (data: VolunteerSignupForm) => {
@@ -164,6 +180,7 @@ export default function VolunteerSignup() {
         email: data.email,
         password: data.password,
         name: data.name,
+        role: UserRole.VOLUNTEER,
         redirect: false,
         action: "signup",
         referred_by: referral || undefined,
@@ -251,36 +268,15 @@ export default function VolunteerSignup() {
                   >
                     {isSignupLoading || isProfileLoading ? (
                       <div className="flex items-center">
-                        <svg
-                          className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        {step === 1
-                          ? "Creating account..."
-                          : "Saving profile..."}
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        {step === 1 ? "Creating account..." : "Saving profile..."}
                       </div>
                     ) : step === 1 ? (
                       "Signup & Continue"
-                    ) : step === (showStudentStep ? 3 : 2) ? (
-                      "Complete"
-                    ) : (
+                    ) : step === 2 ? (
                       "Continue"
+                    ) : (
+                      "Complete"
                     )}
                   </Button>
                 </div>

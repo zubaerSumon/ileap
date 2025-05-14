@@ -1,8 +1,13 @@
 import mongoose, { Schema } from "mongoose";
-import { IOrgnization } from "../interfaces/organization";
+import { IOrgnizationPofile } from "../interfaces/organization-profile";
 
-const OrganizationSchema: Schema = new Schema<IOrgnization>(
+const OrganizationProfileSchema: Schema = new Schema<IOrgnizationPofile>(
   {
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
     phone_number: { type: String },
     bio: { type: String },
     type: { type: String },
@@ -14,15 +19,10 @@ const OrganizationSchema: Schema = new Schema<IOrgnization>(
     website: { type: String },
     profile_img: { type: String },
     cover_img: { type: String },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
-      required: true,
-    },
   },
   { timestamps: true }
 );
 
-const Organization = mongoose.models.organization || mongoose.model<IOrgnization>("organization", OrganizationSchema);
+const OrganizationProfile = mongoose.models.organization_profile || mongoose.model<IOrgnizationPofile>("organization_profile", OrganizationProfileSchema);
 
-export default Organization;
+export default OrganizationProfile;

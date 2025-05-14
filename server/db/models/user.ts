@@ -31,7 +31,7 @@ const UserSchema: Schema = new Schema<IUser>(
     },
     organizationProfile: {
       type: Schema.Types.ObjectId,
-      ref: "organization",
+      ref: "organization_profile",
     },
   },
   { timestamps: true }

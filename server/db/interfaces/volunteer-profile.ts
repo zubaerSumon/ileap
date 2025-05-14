@@ -1,6 +1,6 @@
-import { Document, Types } from "mongoose";
+import { Document } from "mongoose";
 
-export interface IVolunteer extends Document {
+export interface IVolunteerProfile extends Document {
   // Basic Profile (Step 2)
   bio: string;
   interested_on: string[];
@@ -30,7 +30,6 @@ export interface IVolunteer extends Document {
     end_time?: string;
   };
   applied_events?:string[];
-  user: Types.ObjectId;
-  createdAt: Date;
+   createdAt: Date;
   updatedAt: Date;
 }

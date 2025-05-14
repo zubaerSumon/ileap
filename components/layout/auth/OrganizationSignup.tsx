@@ -15,7 +15,7 @@ import { OrgSignupStep } from "./OrgSignupStep";
 import { OrgDetailsStep } from "./OrgDetailsStep";
 import { Loader2 } from "lucide-react";
 
-export default function  OrganizationSignup() {
+export default function OrganizationSignup() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const utils = trpc.useUtils();
@@ -30,14 +30,25 @@ export default function  OrganizationSignup() {
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
 
+  const updateUser = trpc.users.updateUser.useMutation();
   const setupOrgProfile = trpc.users.setupOrgProfile.useMutation({
-    onSuccess: () => {
-      utils.users.profileCheckup.invalidate();
-      toast.success("Profile setup completed successfully!");
-      setIsProfileSetupComplete(true);
-      const role = session?.user?.role;
-      if (!isLoading && role && isAuthenticated) {
-        router.push(`/${role}`);
+    onSuccess: async (data) => {
+      // After creating the organization profile, update the user with the profile reference
+      try {
+        await updateUser.mutate({
+          organizationProfile: data._id
+        });
+        
+        utils.users.profileCheckup.invalidate();
+        toast.success("Profile setup completed successfully!");
+        setIsProfileSetupComplete(true);
+        const role = session?.user?.role;
+        if (!isLoading && role && isAuthenticated) {
+          router.push(`/${role}`);
+        }
+      } catch (error) {
+        console.error("Error updating user with profile:", error);
+        toast.error("Failed to complete profile setup");
       }
     },
     onError: (error) => {
@@ -97,7 +108,7 @@ export default function  OrganizationSignup() {
           const formData = form.getValues();
           console.log("__formData__", { formData });
 
-          await setupOrgProfile.mutateAsync({
+          await setupOrgProfile.mutate({
             bio: formData.bio,
             opportunity_types: formData.opportunity_types,
             phone_number: formData.phone_number,
