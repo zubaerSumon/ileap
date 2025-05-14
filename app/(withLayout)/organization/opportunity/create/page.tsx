@@ -18,7 +18,6 @@ export default function CreateOpportunityPage() {
   const router = useRouter();
   const utils = trpc.useUtils();
 
-  const { data: profileCheck } = trpc.users.profileCheckup.useQuery();
   const createOpportunity = trpc.opportunities.createOpportunity.useMutation({
     onSuccess: () => {
       toast.success("Opportunity created successfully!");
@@ -72,18 +71,12 @@ export default function CreateOpportunityPage() {
   };
 
   const handleCreateOpportunity = async () => {
-    if (!profileCheck?.organizationProfile?._id) {
-      toast.error("Organization profile not found");
-      return;
-    }
-
     const formData = form.getValues();
     console.log({formData});
     
     await createOpportunity.mutateAsync({
       ...formData,
       number_of_volunteers: Number(formData.number_of_volunteers),
-      organization: profileCheck.organizationProfile._id,
     });
   };
 

@@ -7,6 +7,7 @@ export function useAuthCheck() {
   const { data: profileCheck, isLoading: isProfileLoading } = trpc.users.profileCheckup.useQuery(undefined, {
     enabled: status === "authenticated",
   });
+console.log({profileCheck});
 
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);

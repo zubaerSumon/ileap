@@ -25,11 +25,11 @@ const UserSchema: Schema = new Schema<IUser>(
       type: Boolean,
       default: false,
     },
-    volunteerProfile: {
+    volunteer_profile: {
       type: Schema.Types.ObjectId,
-      ref: "volunteer",
+      ref: "volunteer_profile",
     },
-    organizationProfile: {
+    organization_profile: {
       type: Schema.Types.ObjectId,
       ref: "organization_profile",
     },

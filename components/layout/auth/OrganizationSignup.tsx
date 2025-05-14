@@ -36,7 +36,7 @@ export default function OrganizationSignup() {
       // After creating the organization profile, update the user with the profile reference
       try {
         await updateUser.mutate({
-          organizationProfile: data._id
+          organization_profile: data._id
         });
         
         utils.users.profileCheckup.invalidate();
