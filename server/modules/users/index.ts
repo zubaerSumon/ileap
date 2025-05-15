@@ -41,17 +41,21 @@ export const userRouter = router({
     if (!sessionUser || !sessionUser?.id) {
       throw new Error("You must be logged in to check profile.");
     }
-
-    const [volunteer, organizationProfile] = await Promise.all([
-      Volunteer.findOne({ user: sessionUser.id }),
-      OrganizationProfile.findOne({ user: sessionUser.id }),
-    ]);
-
+    console.log("sessionUser", sessionUser);
+    
+    const user = await User.findOne({ email: sessionUser.email }) 
+      .populate('volunteer_profile')
+       
+    if (!user) {
+      throw new Error("User not found.");
+    }
+    console.log({user});
+    
     return {
-      hasVolunteerProfile: !!volunteer,
-      hasOrganizationProfile: !!organizationProfile,
-      volunteerProfile: volunteer,
-      organizationProfile: organizationProfile,
+      hasVolunteerProfile: !!user.volunteer_profile,
+      hasOrganizationProfile: !!user.organization_profile,
+      volunteerProfile: user.volunteer_profile,
+      organizationProfile: user.organization_profile,
     };
   }),
 

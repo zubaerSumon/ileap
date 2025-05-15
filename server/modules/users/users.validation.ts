@@ -27,8 +27,8 @@ const updateUserSchema = z.object({
     .optional(),
   reffered_by: z.string().optional(),
   is_verified: z.boolean().optional(),
-  volunteerProfile: z.string().optional(),
-  organizationProfile: z.string().optional(),
+  volunteer_profile: z.string().optional(),
+  organization_profile: z.string().optional(),
 });
 
 const resetPasswordSchema = z

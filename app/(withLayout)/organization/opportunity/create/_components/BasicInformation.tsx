@@ -35,7 +35,6 @@ export type OpportunityFormValues = {
   email_contact: string;
   phone_contact?: string;
   internal_reference?: string;
-  organization?: string;
   is_recurring: boolean;
   recurrence?: {
     type: string;

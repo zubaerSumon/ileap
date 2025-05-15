@@ -20,6 +20,6 @@ export interface IUser extends Document {
   provider: AuthProvider;
   is_verified: boolean;
   referred_by: string;
-  volunteerProfile?: mongoose.Types.ObjectId;
-  organizationProfile?: mongoose.Types.ObjectId;
+  volunteer_profile?: mongoose.Types.ObjectId;
+  organization_profile?: mongoose.Types.ObjectId;
 }

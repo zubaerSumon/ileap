@@ -24,7 +24,6 @@ const createOpportunitySchema = z.object({
   email_contact: z.string().email("Invalid email address"),
   phone_contact: z.string().optional(),
   internal_reference: z.string().optional(),
-  organization: z.string().min(1, "Organization ID is required"),
   is_recurring: z.boolean().default(false),
   recurrence: z.object({
     type: z.string(),

@@ -22,6 +22,8 @@ export default function VolunteerSignup() {
   const utils = trpc.useUtils();
   const { data: session } = useSession();
   const { isLoading, isAuthenticated } = useAuthCheck();
+  console.log({isLoading, isAuthenticated});
+  
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,7 +40,7 @@ export default function VolunteerSignup() {
     onSuccess: async (data) => {
       try {
         await updateUser.mutate({
-          volunteerProfile: data._id
+          volunteer_profile: data._id
         });
         
         utils.users.profileCheckup.invalidate();

@@ -6,6 +6,7 @@ import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
 import OrganizationProfile from "@/server/db/models/organization-profile";
 import { z } from "zod";
+import User from "@/server/db/models/user";
 
 export const opportunityRouter = router({
   createOpportunity: protectedProcedure
@@ -19,37 +20,46 @@ export const opportunityRouter = router({
         });
       }
 
-      // Verify organization exists and belongs to the user
-      const organization = await OrganizationProfile.findOne({
-        _id: input.organization,
-        user: sessionUser.id
-      });
-
-      if (!organization) {
+      const user = await User.findById(sessionUser.id);
+      if (!user) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Organization not found or you don't have permission to create opportunities for it",
+          message: "User not found",
+        });
+      }
+
+      if (!user.organization_profile) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Organization profile not found. Please complete your organization profile first.",
         });
       }
 
       try {
-        const opportunity = await Opportunity.create({
+        const opportunityData = {
           ...input,
+          organization_profile: user.organization_profile,
+          created_by: sessionUser.id,
           date: {
-            start_date: new Date(input.date.start_date),
-            end_date: input.date.end_date ? new Date(input.date.end_date) : undefined
-          },
-          recurrence: input.recurrence ? {
+            start_date: input.date.start_date,
+            end_date: input.date.end_date
+          }
+        };
+
+        if (input.recurrence) {
+          opportunityData.recurrence = {
             ...input.recurrence,
             date_range: {
-              start_date: new Date(input.recurrence.date_range.start_date),
-              end_date: input.recurrence.date_range.end_date ? new Date(input.recurrence.date_range.end_date) : undefined
+              start_date: input.recurrence.date_range.start_date,
+              end_date: input.recurrence.date_range.end_date
             }
-          } : undefined
-        });
+          };
+        }
 
+        const opportunity = await Opportunity.create(opportunityData);
         return opportunity;
       } catch (error) {
+        console.error('Opportunity creation error:', error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create opportunity",
@@ -105,6 +115,25 @@ export const opportunityRouter = router({
         }
 
         const opportunities = await Opportunity.find({ organization: organization._id })
+          .sort({ createdAt: -1 });
+
+        return opportunities;
+      } catch (error) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch opportunities",
+          cause: error,
+        });
+      }
+    }),
+
+  getAllOpportunities: protectedProcedure
+    .query(async () => {
+      try {
+        const opportunities = await Opportunity.find()
+          .populate({
+            path: "organization_profile", 
+          })
           .sort({ createdAt: -1 });
 
         return opportunities;

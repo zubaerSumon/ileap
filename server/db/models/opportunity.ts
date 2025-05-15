@@ -28,11 +28,7 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
     email_contact: { type: String, required: true },
     phone_contact: { type: String },
     internal_reference: { type: String },
-    organization: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "organization",
-      required: true,
-    },
+   
     is_recurring: { type: Boolean, default: false },
     recurrence: {
       type: { type: String },  
@@ -46,6 +42,17 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
         end_time: { type: String },
       },
       occurrences: { type: Number },  
+    },
+    banner_img: { type: String },
+    organization_profile: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "organization_profile",
+      required: true,
+    },
+    created_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
     },
   },
   { timestamps: true }
