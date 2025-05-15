@@ -25,7 +25,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
 
       <div className="space-y-6">
         <FormField
-          label="Motivation"
+          label="About us"
           id="bio"
           type="textarea"
           placeholder="We are a community-driven volunteer organization dedicated to ....."

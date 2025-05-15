@@ -57,6 +57,7 @@ export default function CreateOpportunityPage() {
         time_range: { start_time: "", end_time: "" },
         occurrences: undefined,
       },
+      banner_img: "",
     },
   });
 

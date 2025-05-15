@@ -18,10 +18,10 @@ import {
     align = 'center',
   }: TooltipProps) {
     return (
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>{visibleContent}</TooltipTrigger>
-          <TooltipContent align={align} className="bg-white shadow-lg">
+      <TooltipProvider >
+        <Tooltip >
+          <TooltipTrigger  asChild>{visibleContent}</TooltipTrigger>
+          <TooltipContent  align={align} className="bg-white shadow-lg p-0">
             <div className="bg-white">{children}</div>
           </TooltipContent>
         </Tooltip>

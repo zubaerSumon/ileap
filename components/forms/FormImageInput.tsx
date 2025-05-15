@@ -155,7 +155,7 @@ export function FormImageInput({
   };
 
   return (
-    <>
+    <div>
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-2">
           {label}
@@ -195,12 +195,12 @@ export function FormImageInput({
         )}
       </div>
       {error && (
-        <div className="flex items-center space-x-2 text-red-500">
+        <div className="flex items-center space-x-2 text-red-500 mt-1">
           <AlertCircle size={16} />
           <span className="text-sm">{error}</span>
         </div>
       )}
-      {renderPreview()}
-    </>
+         {renderPreview()}
+     </div>
   );
 }

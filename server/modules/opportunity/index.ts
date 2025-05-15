@@ -43,7 +43,8 @@ export const opportunityRouter = router({
           date: {
             start_date: input.date.start_date,
             end_date: input.date.end_date
-          }
+          },
+          banner_img: input.banner_img || undefined
         };
 
         if (input.recurrence) {
