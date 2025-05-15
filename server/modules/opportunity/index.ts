@@ -31,7 +31,8 @@ export const opportunityRouter = router({
       if (!user.organization_profile) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Organization profile not found. Please complete your organization profile first.",
+          message:
+            "Organization profile not found. Please complete your organization profile first.",
         });
       }
 
@@ -42,9 +43,9 @@ export const opportunityRouter = router({
           created_by: sessionUser.id,
           date: {
             start_date: input.date.start_date,
-            end_date: input.date.end_date
+            end_date: input.date.end_date,
           },
-          banner_img: input.banner_img || undefined
+          banner_img: input.banner_img || undefined,
         };
 
         if (input.recurrence) {
@@ -52,15 +53,15 @@ export const opportunityRouter = router({
             ...input.recurrence,
             date_range: {
               start_date: input.recurrence.date_range.start_date,
-              end_date: input.recurrence.date_range.end_date
-            }
+              end_date: input.recurrence.date_range.end_date,
+            },
           };
         }
 
         const opportunity = await Opportunity.create(opportunityData);
         return opportunity;
       } catch (error) {
-        console.error('Opportunity creation error:', error);
+        console.error("Opportunity creation error:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to create opportunity",
@@ -74,10 +75,8 @@ export const opportunityRouter = router({
     .query(async ({ input: opportunityId }) => {
       try {
         const opportunity = await Opportunity.findById(opportunityId)
-          .populate({
-            path: "organization",
-            select: "name email phone_number",
-          });
+          .populate("organization_profile")
+          .populate("created_by");
 
         if (!opportunity) {
           throw new TRPCError({
@@ -88,6 +87,7 @@ export const opportunityRouter = router({
 
         return opportunity;
       } catch (error) {
+        console.error("Error fetching opportunity:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to fetch opportunity",
@@ -96,54 +96,54 @@ export const opportunityRouter = router({
       }
     }),
 
-  getOrganizationOpportunities: protectedProcedure
-    .query(async ({ ctx }) => {
-      const sessionUser = ctx.user as JwtPayload;
-      if (!sessionUser || !sessionUser?.id) {
+  getOrganizationOpportunities: protectedProcedure.query(async ({ ctx }) => {
+    const sessionUser = ctx.user as JwtPayload;
+    if (!sessionUser || !sessionUser?.id) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You must be logged in to view opportunities",
+      });
+    }
+
+    try {
+      const organization = await OrganizationProfile.findOne({
+        user: sessionUser.id,
+      });
+      if (!organization) {
         throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You must be logged in to view opportunities",
+          code: "NOT_FOUND",
+          message: "Organization profile not found",
         });
       }
 
-      try {
-        const organization = await OrganizationProfile.findOne({ user: sessionUser.id });
-        if (!organization) {
-          throw new TRPCError({
-            code: "NOT_FOUND",
-            message: "Organization profile not found",
-          });
-        }
+      const opportunities = await Opportunity.find({
+        organization: organization._id,
+      }).sort({ createdAt: -1 });
 
-        const opportunities = await Opportunity.find({ organization: organization._id })
-          .sort({ createdAt: -1 });
+      return opportunities;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch opportunities",
+        cause: error,
+      });
+    }
+  }),
 
-        return opportunities;
-      } catch (error) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to fetch opportunities",
-          cause: error,
-        });
-      }
-    }),
+  getAllOpportunities: protectedProcedure.query(async () => {
+    try {
+      const opportunities = await Opportunity.find()
+        .populate("organization_profile")
+        .populate("created_by")
+        .sort({ createdAt: -1 });
 
-  getAllOpportunities: protectedProcedure
-    .query(async () => {
-      try {
-        const opportunities = await Opportunity.find()
-          .populate({
-            path: "organization_profile", 
-          })
-          .sort({ createdAt: -1 });
-
-        return opportunities;
-      } catch (error) {
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to fetch opportunities",
-          cause: error,
-        });
-      }
-    })
-}); 
+      return opportunities;
+    } catch (error) {
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch opportunities",
+        cause: error,
+      });
+    }
+  }),
+});

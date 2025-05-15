@@ -47,11 +47,9 @@ export default function VolunteerSignup() {
         toast.success("Profile setup completed successfully!");
         setIsProfileSetupComplete(true);
         
-        // Force a session update to ensure we have the latest role
-        await utils.users.profileCheckup.invalidate();
+         await utils.users.profileCheckup.invalidate();
         
-        // Redirect after a short delay to ensure session is updated
-        setTimeout(() => {
+         setTimeout(() => {
           const role = session?.user?.role?.toLowerCase();
           if (role) {
             router.replace(`/${role}`);

@@ -3,11 +3,6 @@ import { IOrgnizationPofile } from "../interfaces/organization-profile";
 
 const OrganizationProfileSchema: Schema = new Schema<IOrgnizationPofile>(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "user",
-      required: true,
-    },
     phone_number: { type: String },
     bio: { type: String },
     type: { type: String },

@@ -1,7 +1,7 @@
 import { authValidation } from "@/server/modules/auth/auth.validation";
 import { userValidation } from "@/server/modules/users/users.validation";
 import { z } from "zod";
-import { volunteerValidation } from "@/server/modules/volunteers/volunteers.valdation";
+import { volunteerValidation } from "@/server/modules/volunteer-profile/volunteer-profile.valdation";
 export const SignupFormSchema = authValidation.signupSchema;
 export type SignupForm = z.infer<typeof SignupFormSchema>;
 

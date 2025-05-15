@@ -1,7 +1,6 @@
-import { Document, Types } from "mongoose";
+import { Document } from "mongoose";
 
 export interface IOrgnizationPofile extends Document {
-  user: Types.ObjectId;
   phone_number: string;
   bio: string;
   type: string;

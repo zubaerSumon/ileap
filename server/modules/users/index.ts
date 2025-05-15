@@ -42,15 +42,16 @@ export const userRouter = router({
       throw new Error("You must be logged in to check profile.");
     }
     console.log("sessionUser", sessionUser);
-    
-    const user = await User.findOne({ email: sessionUser.email }) 
-      .populate('volunteer_profile').populate('organization_profile')
-       
+
+    const user = await User.findOne({ email: sessionUser.email })
+      .populate("volunteer_profile")
+      .populate("organization_profile");
+
     if (!user) {
       throw new Error("User not found.");
     }
-    console.log({user});
-    
+    console.log({ user });
+
     return {
       hasVolunteerProfile: !!user.volunteer_profile,
       hasOrganizationProfile: !!user.organization_profile,
@@ -67,14 +68,8 @@ export const userRouter = router({
         throw new Error("You must be logged in to setup your profile.");
       }
 
-      const existingProfile = await VolunteerProfile.findOne({ user: sessionUser.id });
-      if (existingProfile) {
-        throw new Error("Profile already exists.");
-      }
-
-      const volunteerProfile= await VolunteerProfile.create({
+      const volunteerProfile = await VolunteerProfile.create({
         ...input,
-        user: sessionUser.id,
       });
 
       if (!volunteerProfile) {
@@ -92,16 +87,8 @@ export const userRouter = router({
         throw new Error("You must be logged in to setup your profile.");
       }
 
-      const existingProfile = await OrganizationProfile.findOne({
-        user: sessionUser.id,
-      });
-      if (existingProfile) {
-        throw new Error("Organization profile already exists.");
-      }
-
       const organizationProfile = await OrganizationProfile.create({
         ...input,
-        user: sessionUser.id,
       });
 
       if (!organizationProfile) {
@@ -147,7 +134,9 @@ export const userRouter = router({
         throw new Error("You must be logged in to apply for events.");
       }
 
-      const volunteer = await VolunteerProfile.findOne({ user: sessionUser.id });
+      const volunteer = await VolunteerProfile.findOne({
+        user: sessionUser.id,
+      });
       if (!volunteer) {
         throw new Error("Volunteer profile not found.");
       }
