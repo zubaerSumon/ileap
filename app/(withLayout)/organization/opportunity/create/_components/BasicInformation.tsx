@@ -9,6 +9,7 @@ import { FormSelect } from "@/components/forms/FormSelect";
 import { UseFormReturn, Path } from "react-hook-form";
 import { MultiSelectField } from "@/components/forms/MultiSelectField";
 import { FormRichTextEditor } from "@/components/forms/FormRichTextEditor";
+import { FormImageInput } from "@/components/forms/FormImageInput";
 
 // Define the form type to match the useForm defaultValues in page.tsx
 export type OpportunityFormValues = {
@@ -49,10 +50,19 @@ export type OpportunityFormValues = {
     };
     occurrences?: number;
   };
+  banner_img?: string;
 };
 
 export default function BasicInformation({ form }: { form: UseFormReturn<OpportunityFormValues> }) {
   const router = useRouter();
+
+  const handleSetValue = (name: string, value: string | { link: string; mimeType: string }) => {
+    if (typeof value === 'string') {
+      form.setValue(name as Path<OpportunityFormValues>, value);
+    } else {
+      form.setValue(name as Path<OpportunityFormValues>, value.link);
+    }
+  };
 
   return (
     <div className="container mx-auto py-12">
@@ -179,21 +189,20 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                     className="min-h-[40px] w-[382px]"
                   />
                   <div>
-                        
-                      <FormSelect
-                        label="Answer type"
-                        id="extra_conditions.0.answer_type"
-                        placeholder="Checkbox"
-                        control={form.control}
-                        registerName={"extra_conditions.0.answer_type" as Path<OpportunityFormValues>}
-                        options={[
-                          { value: "checkbox", label: "Checkbox" },
-                          { value: "dropdown", label: "Dropdown" },
-                          { value: "multiple", label: "Multiple choice" },
-                          { value: "paragraph", label: "Paragraph" },
-                        ]}
-                      />
-                   </div>
+                    <FormSelect
+                      label="Answer type"
+                      id="extra_conditions.0.answer_type"
+                      placeholder="Checkbox"
+                      control={form.control}
+                      registerName={"extra_conditions.0.answer_type" as Path<OpportunityFormValues>}
+                      options={[
+                        { value: "checkbox", label: "Checkbox" },
+                        { value: "dropdown", label: "Dropdown" },
+                        { value: "multiple", label: "Multiple choice" },
+                        { value: "paragraph", label: "Paragraph" },
+                      ]}
+                    />
+                  </div>
                 </div>
                 {/* Example answers UI, not connected to form for now */}
                 <div>
@@ -217,7 +226,17 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 </div>
               </div>
             </div>
-          </div>
+            
+              <FormImageInput
+                name="banner_img"
+                label="Banner Image"
+                setValue={handleSetValue}
+                defaultValue={form.watch("banner_img")}
+                customClassName="w-[382px]"
+
+              />
+            </div>
+       
         </div>
       </Card>
     </div>

@@ -11,18 +11,32 @@ const connectToDatabase = async () => {
     await mongoose.connect(process.env.MONGODB_URI, {
       maxPoolSize: 10,
       minPoolSize: 5,
-      connectTimeoutMS: 10000,
+      connectTimeoutMS: 30000,
       socketTimeoutMS: 45000,
-      serverSelectionTimeoutMS: 10000,
-      heartbeatFrequencyMS: 5000,
+      serverSelectionTimeoutMS: 30000,
+      heartbeatFrequencyMS: 10000,
+      retryWrites: true,
+      retryReads: true,
     });
 
     mongoose.connection.on('error', (err) => {
       console.error('MongoDB connection error:', err);
+       setTimeout(() => {
+        console.log('Attempting to reconnect to MongoDB...');
+        connectToDatabase();
+      }, 5000);
     });
 
     mongoose.connection.on('disconnected', () => {
       console.warn('MongoDB disconnected. Retrying connection...');
+       setTimeout(() => {
+        console.log('Attempting to reconnect to MongoDB...');
+        connectToDatabase();
+      }, 5000);
+    });
+
+     mongoose.connection.on('connected', () => {
+      console.log('MongoDB connected successfully');
     });
 
     console.log('MongoDB connected');
@@ -32,8 +46,7 @@ const connectToDatabase = async () => {
   }
 };
 
-// Cache the promise to prevent multiple connection attempts
-let dbPromise: Promise<void> | null = null;
+ let dbPromise: Promise<void> | null = null;
 
 export default async function connectDB() {
   if (!dbPromise) {

@@ -5,7 +5,7 @@ import { JwtPayload } from "jsonwebtoken";
 import { userValidation } from "./users.validation";
 import bcrypt from "bcryptjs";
 import { publicProcedure, router } from "@/server/trpc";
-import Volunteer from "@/server/db/models/volunteer-profile";
+import VolunteerProfile from "@/server/db/models/volunteer-profile";
 import { sendApplicationConfirmationMail } from "@/utils/helpers/sendApplicationConfirmationMail";
 
 export const userRouter = router({
@@ -44,7 +44,7 @@ export const userRouter = router({
     console.log("sessionUser", sessionUser);
     
     const user = await User.findOne({ email: sessionUser.email }) 
-      .populate('volunteer_profile')
+      .populate('volunteer_profile').populate('organization_profile')
        
     if (!user) {
       throw new Error("User not found.");
@@ -67,21 +67,21 @@ export const userRouter = router({
         throw new Error("You must be logged in to setup your profile.");
       }
 
-      const existingProfile = await Volunteer.findOne({ user: sessionUser.id });
+      const existingProfile = await VolunteerProfile.findOne({ user: sessionUser.id });
       if (existingProfile) {
         throw new Error("Profile already exists.");
       }
 
-      const volunteer = await Volunteer.create({
+      const volunteerProfile= await VolunteerProfile.create({
         ...input,
         user: sessionUser.id,
       });
 
-      if (!volunteer) {
+      if (!volunteerProfile) {
         throw new Error("Failed to create volunteer profile");
       }
 
-      return volunteer;
+      return volunteerProfile;
     }),
 
   setupOrgProfile: protectedProcedure
@@ -147,7 +147,7 @@ export const userRouter = router({
         throw new Error("You must be logged in to apply for events.");
       }
 
-      const volunteer = await Volunteer.findOne({ user: sessionUser.id });
+      const volunteer = await VolunteerProfile.findOne({ user: sessionUser.id });
       if (!volunteer) {
         throw new Error("Volunteer profile not found.");
       }
@@ -161,7 +161,7 @@ export const userRouter = router({
         };
       }
 
-      const updatedVolunteer = await Volunteer.findOneAndUpdate(
+      const updatedVolunteer = await VolunteerProfile.findOneAndUpdate(
         { user: sessionUser.id },
         { $addToSet: { applied_events: input.eventId } },
         { new: true }

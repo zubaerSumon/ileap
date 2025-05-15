@@ -37,7 +37,8 @@ const createOpportunitySchema = z.object({
       end_time: z.string()
     }),
     occurrences: z.number().optional()
-  }).optional()
+  }).optional(),
+  banner_img: z.string().optional()
 });
 
 export const opportunityValidation = {
