@@ -1,117 +1,101 @@
-
-import { MapPin, Calendar, Clock, Tag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import Image from "next/image";
+import Link from "next/link";
 
-interface OpportunityDetails {
-  logo: string;
-  logoAlt: string;
-  category: string;
+type Opportunity = {
+  _id: string;
+  title: string;
+  description: string;
+  category: string[];
+  required_skills: string[];
+  commitment_type: string;
   location: string;
-  date: string;
-  time: string;
-  requirements: string;
-}
-
-export function Sidebar({ opportunityId }: { opportunityId?: string }) {
-  const getOpportunityDetails = (id?: string): OpportunityDetails => {
-    if (id === "4") {
-      return {
-        logo: "/Easy.svg",
-        logoAlt: "Easy Care Gardening",
-        category: "Seniors & Aged Care",
-         location: "West Pymble, NSW, 2073",
- 
-        date: "20/05/2025",
-        time: "10:00 AM - 02:00 PM (4 hours)",
-        requirements: "Police Check"
-      };
-    }
-    if (id === "3") {
-      return {
-        logo: "/Clean.svg",
-        logoAlt: "Clean Up Australia",
- 
-        category: "Seniors & Aged Care",
-        location: "Hyde Park, Sydney",
- 
-        date: "24/05/2025",
-        time: "01:00 PM - 04:00 PM (3 hours)",
-        requirements: "No specific requirements"
-      };
-    }
-    if (id === "2") {
-      return {
-        logo: "/Clean.svg",
-        logoAlt: "Clean Up Australia",
-        category: "Environmental Management",
-        location: "Hyde Park, Sydney",
-        date: "21/05/2025",
-        time: "01:00 PM - 04:00 PM (3 hours)",
-        requirements: "No specific requirements"
-      };
-    }
-    // Default case (id === "1")
-    return {
-      logo: "/Easy.svg",
-      logoAlt: "Easy Care",
-      category: "Seniors & Aged Care",
-      location: "Putney, NSW,  2112",
-      date: "20/05/2025",
-      time: "10:00 AM - 02:00 PM (4 hours)",
-      requirements: "Police Check"
-    };
+  number_of_volunteers: number;
+  date: {
+    start_date: Date;
+    end_date?: Date;
   };
+  time: {
+    start_time: string;
+    end_time: string;
+  };
+  organization_profile: {
+    _id: string;
+    name: string;
+    profile_img?: string;
+  };
+  created_by?: {
+    _id: string;
+    name: string;
+  };
+  banner_img?: string;
+};
 
-  const details = getOpportunityDetails(opportunityId);
-
+export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
   return (
-    <div className="hidden lg:block w-[300px]">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col items-start gap-3 mb-2">
-          <Image
-            src={details.logo}
-            alt={details.logoAlt}
-            width={64}
-            height={64}
-            className="rounded-lg"
-          />
-          <div className="text-start">
-            <div className={`flex ${opportunityId === "2" ? "h-[15px] px-1 justify-center items-center gap-1 rounded-[2px] bg-[#F0F0F0] text-[#4A4A4A] font-inter text-[13px] font-normal" : "font-medium text-m"}`}>
-              {details.category}
-            </div>
+    <div className="w-[350px] space-y-4">
+      <Card className="p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="relative w-12 h-12">
+            <Image
+              src={opportunity?.organization_profile?.profile_img || '/default-org-logo.svg'}
+              alt={opportunity?.created_by?.name || opportunity?.organization_profile?.name || 'Organization Logo'}
+              fill
+              className="object-cover rounded-full"
+            />
+          </div>
+          <div>
+            <h3 className="font-semibold">{opportunity.organization_profile.name}</h3>
+            <p className="text-sm text-gray-600">
+              {opportunity.commitment_type === 'oneoff' ? 'One-off' : 'Regular'} Opportunity
+            </p>
           </div>
         </div>
 
-        <div className="space-y-4">
-          <div className="flex items-center gap-2 text-gray-600">
-            <MapPin className="w-5 h-5 text-blue-500" />
-            <span>{details.location}</span>
+        <div className="space-y-3">
+          <div>
+            <h4 className="text-sm font-medium mb-1">Location</h4>
+            <p className="text-sm text-gray-600">{opportunity.location}</p>
           </div>
 
-          <div className="flex items-center gap-2 text-gray-600">
-            <Tag className="w-5 h-5 text-blue-500" />
-            <span>One-off</span>
+          <div>
+            <h4 className="text-sm font-medium mb-1">Date</h4>
+            <p className="text-sm text-gray-600">
+              {new Date(opportunity.date.start_date).toLocaleDateString('en-GB')}
+              {opportunity.date.end_date && ` - ${new Date(opportunity.date.end_date).toLocaleDateString('en-GB')}`}
+            </p>
           </div>
 
-          <div className="flex items-center gap-2 text-gray-600">
-            <Calendar className="w-5 h-5 text-blue-500" />
-            <span>{details.date}</span>
+          <div>
+            <h4 className="text-sm font-medium mb-1">Time</h4>
+            <p className="text-sm text-gray-600">
+              {opportunity.time.start_time} - {opportunity.time.end_time}
+            </p>
           </div>
 
-          <div className="flex items-center gap-2 text-gray-600">
-            <Clock className="w-5 h-5 text-blue-500" />
-            <span>{details.time}</span>
+          <div>
+            <h4 className="text-sm font-medium mb-1">Available Spots</h4>
+            <p className="text-sm text-gray-600">{opportunity.number_of_volunteers} spots</p>
           </div>
         </div>
 
-        {/* <div className="mt-4">
-          <h3 className="font-medium mb-3 text-gray-900">Requirements</h3>
-          <div className="flex items-center gap-2 text-gray-600">
-            <CheckSquare className="w-5 h-5 text-blue-500" />
-            <span>{details.requirements}</span>
-          </div>
-        </div> */}
-      </div>
+        <div className="mt-4 pt-4 border-t">
+          <Link href={`/volunteer/organizer/${opportunity.organization_profile._id}`}>
+            <Button variant="outline" className="w-full">
+              View Organization Profile
+            </Button>
+          </Link>
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <h3 className="font-semibold mb-3">Similar Opportunities</h3>
+        <div className="space-y-3">
+          {/* Similar opportunities will be populated dynamically */}
+          <p className="text-sm text-gray-600">No similar opportunities found.</p>
+        </div>
+      </Card>
     </div>
   );
 }

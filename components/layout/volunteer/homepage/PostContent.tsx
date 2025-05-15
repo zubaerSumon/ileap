@@ -6,7 +6,36 @@ import { useState, useEffect } from "react";
 import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
 import { trpc } from "@/utils/trpc";
 
-export function PostContent({ opportunityId }: { opportunityId?: string }) {
+type Opportunity = {
+  _id: string;
+  title: string;
+  description: string;
+  category: string[];
+  required_skills: string[];
+  commitment_type: string;
+  location: string;
+  number_of_volunteers: number;
+  date: {
+    start_date: Date;
+    end_date?: Date;
+  };
+  time: {
+    start_time: string;
+    end_time: string;
+  };
+  organization_profile: {
+    _id: string;
+    name: string;
+    profile_img?: string;
+  };
+  created_by?: {
+    _id: string;
+    name: string;
+  };
+  banner_img?: string;
+};
+
+export function PostContent({ opportunity }: { opportunity: Opportunity }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [appliedEvents, setAppliedEvents] = useState<string[]>([]);
 
@@ -18,508 +47,95 @@ export function PostContent({ opportunityId }: { opportunityId?: string }) {
     }
   }, [profileData]);
 
-  const getOpportunityDetails = (id?: string) => {
-    if (id === "4") {
-      return {
-        id: "4",
-        title: "Gardening Volunteer",
-        organization: "Easy Care Gardening",
-        date: "20/05/2025",
-        time: "10:00 AM - 02:00 PM",
-        location: "West Pymble, NSW, 2073",
-        logo: "/images/easy-care-gardening-logo.png",
-
-      };
-    }
-    if (id === "2") {
-      return {
-        id: "2",
-        title: "Clean Up Volunteer",
-        organization: "Clean Up Australia",
-        date: "21/05/2025",
-        time: "01:00 PM - 04:00 PM",
-        location: "Hyde Park, Sydney",
-        logo: "/images/clean-up-australia-logo.png",
-      };
-    }
-    return {
-      id: "1",
-      title: "Gardening Volunteer",
-      organization: "Easy Care Gardening",
-      date: "20/05/2025",
-      time: "10:00 AM - 02:00 PM",
-      location: "Putney, NSW,  2112",
-      logo: "/images/easy-care-gardening-logo.png",
-    };
-  };
-
   const handleApplyClick = () => {
     setIsModalOpen(true);
   };
-
-  if (opportunityId === "2") {
-    return (
-      <div className="flex-1 max-w-3xl">
-        <div className="w-full h-[200px] relative mb-6">
-          <Image
-            src="/clean0.svg"
-            alt="Clean Up Volunteer Banner"
-            fill
-            className="object-cover rounded-lg"
-          />
-        </div>
-        
-        <h1 className="text-2xl font-bold mb-4">Clean Up Volunteer</h1>
-
-        <div className="text-sm text-gray-600 mb-3">
-          Posted by
-          <Link href="/volunteer/organizer/clean-up-australia">
-            <span className="text-blue-600 hover:underline cursor-pointer">
-              {" "}
-              Clean Up Australia
-            </span>
-          </Link>
-        </div>
-
-        <div className="prose max-w-none text-gray-700 space-y-4">
-          <p className="text-base leading-relaxed">
-            Want to help protect Australia&apos;s parks, beaches, and waterways
-            from litter and waste? Clean Up Australia is looking for
-            enthusiastic volunteers to help clean up general waste from our
-            parks, beaches, and other public spaces.
-          </p>
-
-          <p className="text-base leading-relaxed">
-            As a volunteer, you&apos;ll join a nationwide movement of people
-            dedicated to keeping Australia clean and healthy. You&apos;ll work
-            together to remove litter, protect our natural environment, and make
-            a positive impact on your local community.
-          </p>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-2">
-              What you&apos;ll be doing:
-            </h2>
-            <ul className="list-disc pl-5 space-y-1.5 text-base">
-              <li>
-                Participating in clean-up events at various public locations
-              </li>
-              <li>Collecting and bagging general waste and litter</li>
-              <li>
-                Helping to keep our parks, beaches, bushlands, and waterways
-                tidy
-              </li>
-              <li>
-                Contributing to a cleaner and safer environment for everyone
-              </li>
-              <li>
-                Connecting with community members who share your passion for the
-                environment
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-2">
-              What you&apos;ll gain:
-            </h2>
-            <ul className="list-disc pl-5 space-y-1.5 text-base">
-              <li>
-                The satisfaction of making a tangible difference to the
-                Australian environment
-              </li>
-              <li>An opportunity to enjoy the outdoors and be active</li>
-              <li>
-                A chance to meet new people and connect with your community
-              </li>
-              <li>
-                The rewarding feeling of contributing to a cleaner, healthier
-                Australia
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-base font-semibold mb-1">
-              No prior experience is needed!
-            </h3>
-            <p className="text-sm">
-              All you need is a willingness to help and a passion for a cleaner
-              Australia. We provide the necessary equipment like bags and
-              gloves.
-            </p>
-          </div>
-
-          <div className="flex gap-1 items-center mt-6">
-            <Button
-              className={`${
-                appliedEvents.includes("2")
-                  ? "bg-green-600 hover:bg-green-600"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }   h-8 px-5 font-normal text-sm text-white`}
-              onClick={handleApplyClick}
-              disabled={appliedEvents.includes("2")}
-            >
-              {appliedEvents.includes("2") ? "Applied" : "Apply Now"}
-            </Button>
-            <Star className="h-5 w-5 text-yellow-400 fill-current" />
-          </div>
-        </div>
-
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          opportunityDetails={getOpportunityDetails(opportunityId)}
-        />
-      </div>
-    );
-  }
-
-  if (opportunityId === "3") {
-    return (
-      <div className="flex-1 max-w-3xl">
-        <div className="w-full h-[200px] relative mb-6">
-          <Image
-            src="/clean1.svg"
-            alt="Clean Up Volunteer Banner"
-            fill
-            className="object-cover rounded-lg"
-          />
-        </div>
-
-        <h1 className="text-2xl font-bold mb-4">Clean Up Volunteer</h1>
-
-        <div className="text-sm text-gray-600 mb-3">
-          Posted by
-          <Link href="/volunteer/organizer/clean-up-australia">
-            <span className="text-blue-600 hover:underline cursor-pointer">
-              {" "}
-              Clean Up Australia
-            </span>
-          </Link>
-        </div>
-
-        <div className="prose max-w-none text-gray-700 space-y-4">
-          <p className="text-base leading-relaxed">
-            Want to help protect Australia&apos;s parks, beaches, and waterways
-            from litter and waste? Clean Up Australia is looking for
-            enthusiastic volunteers to help clean up general waste from our
-            parks, beaches, and other public spaces.
-          </p>
-
-          <p className="text-base leading-relaxed">
-            As a volunteer, you&apos;ll join a nationwide movement of people
-            dedicated to keeping Australia clean and healthy. You&apos;ll work
-            together to remove litter, protect our natural environment, and make
-            a positive impact on your local community.
-          </p>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-2">
-              What you&apos;ll be doing:
-            </h2>
-            <ul className="list-disc pl-5 space-y-1.5 text-base">
-              <li>
-                Participating in clean-up events at various public locations
-              </li>
-              <li>Collecting and bagging general waste and litter</li>
-              <li>
-                Helping to keep our parks, beaches, bushlands, and waterways
-                tidy
-              </li>
-              <li>
-                Contributing to a cleaner and safer environment for everyone
-              </li>
-              <li>
-                Connecting with community members who share your passion for the
-                environment
-              </li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-2">
-              What you&apos;ll gain:
-            </h2>
-            <ul className="list-disc pl-5 space-y-1.5 text-base">
-              <li>
-                The satisfaction of making a tangible difference to the
-                Australian environment
-              </li>
-              <li>An opportunity to enjoy the outdoors and be active</li>
-              <li>
-                A chance to meet new people and connect with your community
-              </li>
-              <li>
-                The rewarding feeling of contributing to a cleaner, healthier
-                Australia
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-base font-semibold mb-1">
-              No prior experience is needed!
-            </h3>
-            <p className="text-sm">
-              All you need is a willingness to help and a passion for a cleaner
-              Australia. We provide the necessary equipment like bags and
-              gloves.
-            </p>
-          </div>
-
-          <div className="flex gap-1 items-center mt-6">
-            <Button
-              className={`${
-                appliedEvents.includes("3")
-                  ? "bg-green-600 hover:bg-green-600"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }   h-8 px-5 font-normal text-sm text-white`}
-              onClick={handleApplyClick}
-              disabled={appliedEvents.includes("3")}
-            >
-              {appliedEvents.includes("3") ? "Applied" : "Apply Now"}
-            </Button>
-            <Button variant="ghost" size="icon" className="text-yellow-400 h-8 pointer-events-none">
-              <Star className="h-5 w-5 fill-current" />
-            </Button>
-          </div>
-        </div>
-
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          opportunityDetails={getOpportunityDetails(opportunityId)}
-        />
-      </div>
-    );
-  }
-
-  if (opportunityId === "4") {
-    return (
-      <div className="flex-1 max-w-3xl">
-        <div className="w-full h-[200px] relative mb-6">
-          <Image
-            src="/garden.svg"
-            alt="Gardening Volunteer Banner"
-            fill
-            className="object-cover rounded-lg"
-          />
-        </div>
-
-        <h1 className="text-2xl font-bold mb-4">Gardening Volunteer</h1>
-
-        <div className="text-sm text-gray-600 mb-3">
-          Posted by
-          <Link href="/volunteer/organizer/easy-care-gardening">
-            <span className="text-blue-600 hover:underline cursor-pointer">
-              {" "}
-              Easy Care Gardening
-            </span>
-          </Link>
-        </div>
-
-        <div className="prose max-w-none text-gray-700 space-y-4">
-          <p className="text-base leading-relaxed">
-            Do you have a passion for gardening and a desire to make a real
-            difference in your community? We are looking for enthusiastic and
-            friendly volunteers to help senior Australians maintain their gardens
-            and stay in the homes they love.
-          </p>
-
-          <p className="text-base leading-relaxed">
-            As a volunteer gardener, you&apos;ll work in a team to provide
-            essential gardening services such as weeding, pruning, and mulching.
-            Your efforts will directly contribute to creating safe and tidy
-            outdoor spaces for elderly individuals, helping them to live
-            independently for longer.
-          </p>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-2">
-              <u>What you&apos;ll be doing:</u>
-            </h2>
-            <ul className="list-disc pl-5 space-y-1.5 text-base">
-              <li>Working in small teams to tidy up gardens</li>
-              <li>Weeding garden beds and pathways</li>
-              <li>Pruning shrubs and small trees</li>
-              <li>Spreading mulch to improve soil health and presentation</li>
-              <li>
-                Creating a safer and more enjoyable outdoor environment for
-                seniors
-              </li>
-              <li>Building meaningful connections with the elderly community</li>
-            </ul>
-          </div>
-
-          <div>
-            <h2 className="text-lg font-semibold mb-2">
-              <u>What you&apos;ll gain:</u>
-            </h2>
-            <ul className="list-disc pl-5 space-y-1.5 text-base">
-              <li>
-                The satisfaction of making a difference in the lives of senior
-                Australians
-              </li>
-              <li>
-                The opportunity to connect with and learn from the elderly
-                community
-              </li>
-              <li>
-                A chance to contribute to your local community in a meaningful way
-              </li>
-              <li>
-                The enjoyment of working outdoors and sharing your gardening
-                skills
-              </li>
-            </ul>
-          </div>
-
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-base font-semibold mb-1">
-              No prior professional gardening experience is necessary!
-            </h3>
-            <p className="text-sm">
-              We welcome anyone with a willingness to help and a positive
-              attitude.
-            </p>
-          </div>
-
-          <div className="flex gap-1 items-center mt-6">
-            <Button
-              className={`${
-                appliedEvents.includes("4")
-                  ? "bg-green-600 hover:bg-green-600"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }  h-8 px-5 font-normal text-sm text-white`}
-              onClick={handleApplyClick}
-              disabled={appliedEvents.includes("4")}
-            >
-              {appliedEvents.includes("4") ? "Applied" : "Apply Now"}
-            </Button>
-            <Star className="h-5 w-5 text-yellow-400 fill-current" />
-          </div>
-        </div>
-
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          opportunityDetails={getOpportunityDetails(opportunityId)}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="flex-1 max-w-3xl">
       <div className="w-full h-[200px] relative mb-6">
         <Image
-          src="/garden.svg"
-          alt="Gardening Volunteer Banner"
+          src={opportunity.banner_img || '/default-banner.svg'}
+          alt={`${opportunity.title} Banner`}
           fill
           className="object-cover rounded-lg"
         />
       </div>
 
-      <h1 className="text-2xl font-bold mb-4">Gardening Volunteer</h1>
+      <h1 className="text-2xl font-bold mb-4">{opportunity.title}</h1>
 
       <div className="text-sm text-gray-600 mb-3">
         Posted by
-        <Link href="/volunteer/organizer/easy-care-gardening">
+        <Link href={`/volunteer/organizer/${opportunity.organization_profile._id}`}>
           <span className="text-blue-600 hover:underline cursor-pointer">
             {" "}
-            Easy Care Gardening
+            {opportunity?.created_by?.name || "Organization name"}
           </span>
         </Link>
       </div>
 
       <div className="prose max-w-none text-gray-700 space-y-4">
-        <p className="text-base leading-relaxed">
-          Do you have a passion for gardening and a desire to make a real
-          difference in your community? We are looking for enthusiastic and
-          friendly volunteers to help senior Australians maintain their gardens
-          and stay in the homes they love.
-        </p>
-
-        <p className="text-base leading-relaxed">
-          As a volunteer gardener, you&apos;ll work in a team to provide
-          essential gardening services such as weeding, pruning, and mulching.
-          Your efforts will directly contribute to creating safe and tidy
-          outdoor spaces for elderly individuals, helping them to live
-          independently for longer.
-        </p>
+        <div 
+          className="text-base leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: opportunity.description }}
+        />
 
         <div>
           <h2 className="text-lg font-semibold mb-2">
-            <u>What you&apos;ll be doing:</u>
+            Required Skills:
           </h2>
           <ul className="list-disc pl-5 space-y-1.5 text-base">
-            <li>Working in small teams to tidy up gardens</li>
-            <li>Weeding garden beds and pathways</li>
-            <li>Pruning shrubs and small trees</li>
-            <li>Spreading mulch to improve soil health and presentation</li>
-            <li>
-              Creating a safer and more enjoyable outdoor environment for
-              seniors
-            </li>
-            <li>Building meaningful connections with the elderly community</li>
-          </ul>
-        </div>
-
-        <div>
-          <h2 className="text-lg font-semibold mb-2">
-            <u>What you&apos;ll gain:</u>
-          </h2>
-          <ul className="list-disc pl-5 space-y-1.5 text-base">
-            <li>
-              The satisfaction of making a difference in the lives of senior
-              Australians
-            </li>
-            <li>
-              The opportunity to connect with and learn from the elderly
-              community
-            </li>
-            <li>
-              A chance to contribute to your local community in a meaningful way
-            </li>
-            <li>
-              The enjoyment of working outdoors and sharing your gardening
-              skills
-            </li>
+            {opportunity.required_skills.map((skill, index) => (
+              <li key={index}>{skill}</li>
+            ))}
           </ul>
         </div>
 
         <div className="bg-gray-50 p-4 rounded-lg">
           <h3 className="text-base font-semibold mb-1">
-            No prior professional gardening experience is necessary!
+            Opportunity Details
           </h3>
           <p className="text-sm">
-            We welcome anyone with a willingness to help and a positive
-            attitude.
+            Type: {opportunity.commitment_type === 'oneoff' ? 'One-off' : 'Regular'}
+            <br />
+            Location: {opportunity.location}
+            <br />
+            Date: {new Date(opportunity.date.start_date).toLocaleDateString('en-GB')}
+            {opportunity.date.end_date && ` - ${new Date(opportunity.date.end_date).toLocaleDateString('en-GB')}`}
+            <br />
+            Time: {opportunity.time.start_time} - {opportunity.time.end_time}
           </p>
         </div>
 
-        <div className="flex gap-1 items-center mt-6">
+        <div className="flex items-center gap-2">
           <Button
             className={`${
-              appliedEvents.includes("1")
+              appliedEvents.includes(opportunity._id)
                 ? "bg-green-600 hover:bg-green-600"
                 : "bg-blue-600 hover:bg-blue-700"
             }  h-8 px-5 font-normal text-sm text-white`}
             onClick={handleApplyClick}
-            disabled={appliedEvents.includes("1")}
+            disabled={appliedEvents.includes(opportunity._id)}
           >
-            {appliedEvents.includes("1") ? "Applied" : "Apply Now"}
+            {appliedEvents.includes(opportunity._id) ? "Applied" : "Apply Now"}
           </Button>
           <Star className="h-5 w-5 text-yellow-400 fill-current" />
         </div>
-
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          opportunityDetails={getOpportunityDetails(opportunityId)}
-        />
       </div>
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        opportunityDetails={{
+          id: opportunity._id,
+          title: opportunity.title,
+          organization: opportunity.organization_profile.name,
+          date: new Date(opportunity.date.start_date).toLocaleDateString('en-GB'),
+          time: `${opportunity.time.start_time} - ${opportunity.time.end_time}`,
+          location: opportunity.location,
+          logo: opportunity.organization_profile.profile_img || '/default-org-logo.svg',
+        }}
+      />
     </div>
   );
 }

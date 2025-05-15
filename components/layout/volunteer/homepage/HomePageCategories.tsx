@@ -1,6 +1,5 @@
 "use client";
 
-
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -37,143 +36,91 @@ export default function Categories({
 
   const { data: profileData } = trpc.users.profileCheckup.useQuery();
 
+  // Fetch all opportunities
+  const { data: opportunities } =
+    trpc.opportunities.getAllOpportunities.useQuery();
+
   useEffect(() => {
     if (profileData?.volunteerProfile?.applied_events) {
       setAppliedEvents(profileData.volunteerProfile.applied_events);
     }
   }, [profileData]);
-  
+
   // Get volunteers data to calculate available spots
-  const { data: volunteersData } = trpc.volunteers.getVolunteersWithAppliedEvents.useQuery(
-    { eventId: '' }, // Empty string to get all volunteers with applied events
-    { enabled: true }
-  );
-  
+  const { data: volunteersData } =
+    trpc.volunteers.getVolunteersWithAppliedEvents.useQuery(
+      { eventId: "" }, // Empty string to get all volunteers with applied events
+      { enabled: true }
+    );
+
   // Function to calculate available spots based on applied events
-  const calculateAvailableSpots = (opportunityId: string, totalSpots: number) => {
+  const calculateAvailableSpots = (
+    opportunityId: string,
+    totalSpots: number
+  ) => {
     if (!volunteersData) return totalSpots;
-    
+
     // Count how many volunteers have applied to this opportunity
-    const appliedCount = volunteersData.filter(volunteer => 
-      volunteer.applied_events && volunteer.applied_events.includes(opportunityId)
+    const appliedCount = volunteersData.filter(
+      (volunteer) =>
+        volunteer.applied_events &&
+        volunteer.applied_events.includes(opportunityId)
     ).length;
-    
+
     // Calculate remaining spots
     return Math.max(0, totalSpots - appliedCount);
   };
 
-  const opportunities = [
-    // {
-    //   id: "1",
-    //   title: "Easy Care Gardening",
-    //   popup_title: "Gardening Volunteer",
-    //   organization: "Easy Care Gardening",
-    //   location: "Sydney, Australia",
-    //   type: "One off",
-    //   date: "20/05/2025",
-    //   time: "10:00 AM - 02:00 PM",
-    //   matchingAvailability: true,
-    //   matchedSkills: 3,
-    //   categories: ["Seniors & Aged Care"],
-    //   description:
-    //     "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
-    //   logoSrc: "/Easy.svg",
-    //   totalSpots: 10,
-    //   spotsAvailable: 10
-    // },
-    {
-      id: "4",
-      title: "Easy Care Gardening",
-       popup_title: "Gardening Volunteer", // Changed from "Tree plantation Volunteer"
-        organization: "Easy Care Gardening",
-      location: "Hyde Park, Sydney", // Different location
-      type: "One off",
-      date: "20/05/2025", // Changed to match id 1
-      time: "10:00 AM - 02:00 PM", // Changed to match id 1
-      matchingAvailability: true,
-      matchedSkills: 3,
-      categories: ["Seniors & Aged Care"],
-      description:
-      "Do you have a passion for gardening and a desire to make a real difference in your community? We are looking for enthusiastic and friendly volunteers to help senior Australians maintain their gardens and stay in the homes they love. As a volunteer gardener, you'll work in a team to provide essential gardening services such as weeding, pruning, and mulching. Your efforts will directly contribute to creating safe and tidy outdoor spaces for elderly individuals, helping them to live independently for longer.",
-      logoSrc: "/Easy.svg",
-      totalSpots: 10,
-       spotsAvailable: 0 // Will be calculated dynamically
-      },
-    {
-      id: "2",
-      title: "Clean Up Australia",
-      popup_title: "Clean Up volunteer",
-      organization: "Clean Up Australia",
-      location: "Sydney, Australia",
-      type: "One off",
-      date: "21/05/2025",
-      time: "01:00 PM - 04:00 PM",
-      matchingAvailability: true,
-      matchedSkills: 2,
-      categories: ["Environmental Management"],
-      description:
-        "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy. You'll work together to remove litter, protect our natural environment, and make a positive impact on your local community.",
-      logoSrc: "/Clean.svg",
-      totalSpots: 20,
-       spotsAvailable: 0 // Will be calculated dynamically
- 
-    },
-    // {
-    //   id: "3",
-    //   title: "Clean Up Australia",
-    //   popup_title: "Clean Up volunteer",
-    //   organization: "Clean Up Australia",
-    //   location: "Sydney, Australia",
-    //   type: "One off",
-    //   date: "24/05/2025",
-    //   time: "01:00 PM - 04:00 PM",
-    //   matchingAvailability: true,
-    //   matchedSkills: 2,
-    //   categories: ["Environmental Management"],
-    //   description:
-    //     "Want to help protect Australia's parks, beaches, and waterways from litter and waste? Clean Up Australia is looking for enthusiastic volunteers to help clean up general waste from our parks, beaches, and other public spaces. As a volunteer, you'll join a nationwide movement of people dedicated to keeping Australia clean and healthy",
-    //   logoSrc: "/Clean.svg",
-    //   totalSpots: 20,
-    //   spotsAvailable: 20
-    // },
-  ];
-
   // Calculate available spots for each opportunity
-  const opportunitiesWithSpots = opportunities.map(opportunity => ({
-    ...opportunity,
-    spotsAvailable: calculateAvailableSpots(opportunity.id, opportunity.totalSpots)
-  }));
+  const opportunitiesWithSpots =
+    opportunities?.map((opportunity) => ({
+      ...opportunity,
+      spotsAvailable: calculateAvailableSpots(
+        opportunity._id.toString(),
+        opportunity.number_of_volunteers
+      ),
+    })) || [];
 
   // Filter opportunities based on customizedFor parameter
   const filteredOpportunities = customizedFor
     ? customizedFor.toLowerCase() === "easy care"
-      ? opportunitiesWithSpots.filter((opp) => ["1", "4"].includes(opp.id))
+      ? opportunitiesWithSpots.filter((opp) =>
+          opp.organization_profile?.name?.toLowerCase().includes("easy care")
+        )
       : customizedFor.toLowerCase() === "clean up"
-      ? opportunitiesWithSpots.filter((opp) => ["2", "3"].includes(opp.id))
+      ? opportunitiesWithSpots.filter((opp) =>
+          opp.organization_profile?.name?.toLowerCase().includes("clean up")
+        )
       : opportunitiesWithSpots
     : opportunitiesWithSpots;
 
   return (
     <section className="w-full md:w-[57%] relative">
-       <h1 className="text-[#101010] font-inter text-xxl font-bold text-center mt-8 mb-5">
-       Volunteering Opportunities during National Volunteer Week 2025 (19 - 25 May)
-        </h1>
+      <h1 className="text-[#101010] font-inter text-xxl font-bold text-center mt-8 mb-5">
+        Volunteering Opportunities during National Volunteer Week 2025 (19 - 25
+        May)
+      </h1>
 
       <div className="flex flex-col gap-6">
         {filteredOpportunities.map((opportunity) => (
           <Card
-            key={opportunity.id}
+            key={opportunity._id}
             className="rounded-lg overflow-hidden w-full py-0 h-[340px] cursor-pointer hover:shadow-lg transition-shadow relative"
             onClick={() =>
-              router.push(`/volunteer/opportunities/${opportunity.id}`)
+              router.push(`/volunteer/opportunities/${opportunity._id}`)
             }
           >
             <CardContent className="px-4 pt-4">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <Image
-                    src={opportunity.logoSrc}
-                    alt={opportunity.organization}
+                    src={
+                      opportunity?.organization_profile?.profile_img ||
+                      "/default-org-logo.svg"
+                    }
+                    alt={
+                      opportunity?.created_by?.name || "Unknown Organization"
+                    }
                     width={40}
                     height={40}
                     className="rounded-full"
@@ -182,7 +129,14 @@ export default function Categories({
                     <div className="flex items-center text-gray-600">
                       <Users className="h-5 w-5 mr-1" />
                       <span className="text-sm">
-                        <span className="font-medium text-green-600">{opportunity.spotsAvailable}</span> of <span className="font-medium">{opportunity.totalSpots}</span> spots left
+                        <span className="font-medium text-green-600">
+                          {opportunity.spotsAvailable}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-medium">
+                          {opportunity.number_of_volunteers}
+                        </span>{" "}
+                        spots left
                       </span>
                     </div>
                   </div>
@@ -212,13 +166,19 @@ export default function Categories({
                       alt="File icon"
                     />
                     <span className="">
-                      {opportunity.type}; {opportunity.date}
+                      {opportunity.commitment_type === "oneoff"
+                        ? "One off"
+                        : "Regular"}
+                      ;{" "}
+                      {new Date(opportunity.date.start_date).toLocaleDateString(
+                        "en-GB"
+                      )}
                     </span>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-1">
-                  {opportunity.categories.map((category, idx) => (
+                  {opportunity.category.map((category: string, idx: number) => (
                     <Badge
                       key={idx}
                       variant="secondary"
@@ -242,10 +202,12 @@ export default function Categories({
                 </div>
 
                 <div className="space-y-1">
-                  <div className="text-sm text-gray-600 line-clamp-3">
-                    {opportunity.description}
-                  </div>
-                 
+                  <div
+                    className="text-sm text-gray-600 line-clamp-3"
+                    dangerouslySetInnerHTML={{
+                      __html: opportunity.description,
+                    }}
+                  />
                 </div>
               </div>
             </CardContent>
@@ -254,26 +216,33 @@ export default function Categories({
               <div className="flex items-center gap-2">
                 <Button
                   className={`${
-                    appliedEvents.includes(opportunity.id)
+                    appliedEvents.includes(opportunity._id.toString())
                       ? "bg-green-600 hover:bg-green-600"
                       : "bg-blue-600 hover:bg-blue-700"
                   } text-white h-8 px-6 rounded-md text-sm font-medium`}
-                  disabled={appliedEvents.includes(opportunity.id) || opportunity.spotsAvailable <= 0}
+                  disabled={
+                    appliedEvents.includes(opportunity._id.toString()) ||
+                    opportunity.spotsAvailable <= 0
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedOpportunity({
-                      id: opportunity.id,
-                      title: opportunity.popup_title || opportunity.title,
-                      organization: opportunity.organization,
-                      date: opportunity.date,
-                      time: opportunity.time,
+                      id: opportunity._id.toString(),
+                      title: opportunity.title,
+                      organization:
+                        opportunity.organization_profile?.name ||
+                        "Unknown Organization",
+                      date: new Date(
+                        opportunity.date.start_date
+                      ).toLocaleDateString("en-GB"),
+                      time: `${opportunity.time.start_time} - ${opportunity.time.end_time}`,
                       location: opportunity.location,
-                      logo: opportunity.logoSrc,
+                      logo: opportunity.banner_img || "/default-org-logo.svg",
                     });
                     setIsModalOpen(true);
                   }}
                 >
-                  {appliedEvents.includes(opportunity.id)
+                  {appliedEvents.includes(opportunity._id.toString())
                     ? "Applied"
                     : "Apply now"}
                 </Button>
