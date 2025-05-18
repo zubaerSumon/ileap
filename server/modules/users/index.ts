@@ -6,8 +6,7 @@ import { userValidation } from "./users.validation";
 import bcrypt from "bcryptjs";
 import { publicProcedure, router } from "@/server/trpc";
 import VolunteerProfile from "@/server/db/models/volunteer-profile";
-import { sendApplicationConfirmationMail } from "@/utils/helpers/sendApplicationConfirmationMail";
-
+ 
 export const userRouter = router({
   updateUser: protectedProcedure
     .input(userValidation.updateUserSchema)
@@ -61,7 +60,7 @@ export const userRouter = router({
   }),
 
   setupVolunteerProfile: protectedProcedure
-    .input(userValidation.volunteerSchema)
+    .input(userValidation.volunteerProfileSchema)
     .mutation(async ({ ctx, input }) => {
       const sessionUser = ctx.user as JwtPayload;
       if (!sessionUser || !sessionUser?.id) {
@@ -80,7 +79,7 @@ export const userRouter = router({
     }),
 
   setupOrgProfile: protectedProcedure
-    .input(userValidation.organizationSchema)
+    .input(userValidation.organizationProfileSchema)
     .mutation(async ({ ctx, input }) => {
       const sessionUser = ctx.user as JwtPayload;
       if (!sessionUser || !sessionUser?.id) {
@@ -126,48 +125,5 @@ export const userRouter = router({
       };
     }),
 
-  applyToEvent: protectedProcedure
-    .input(userValidation.applyToEventSchema)
-    .mutation(async ({ ctx, input }) => {
-      const sessionUser = ctx.user as JwtPayload;
-      if (!sessionUser || !sessionUser?.id) {
-        throw new Error("You must be logged in to apply for events.");
-      }
-
-      const volunteer = await VolunteerProfile.findOne({
-        user: sessionUser.id,
-      });
-      if (!volunteer) {
-        throw new Error("Volunteer profile not found.");
-      }
-
-      const alreadyApplied = volunteer.applied_events?.includes(input.eventId);
-      if (alreadyApplied) {
-        return {
-          success: true,
-          message: "Already applied to this event",
-          alreadyApplied: true,
-        };
-      }
-
-      const updatedVolunteer = await VolunteerProfile.findOneAndUpdate(
-        { user: sessionUser.id },
-        { $addToSet: { applied_events: input.eventId } },
-        { new: true }
-      );
-
-      if (!updatedVolunteer) {
-        throw new Error("Failed to apply for the event");
-      }
-      sendApplicationConfirmationMail(
-        sessionUser.email,
-        sessionUser.name,
-        input.eventId
-      );
-      return {
-        success: true,
-        message: "Successfully applied to the event",
-        alreadyApplied: false,
-      };
-    }),
+   
 });

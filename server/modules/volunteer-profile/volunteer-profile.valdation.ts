@@ -9,11 +9,16 @@ const updateVolunteerProfileSchema = z.object({
   area: z.string().optional(),
 });
 
-const getVolunteersWithAppliedEventsSchema = z.object({
-  eventId: z.string(),
+const applyToOpportunitySchema = z.object({
+  opportunityId: z.string(),
+});
+
+const getApplicationStatusSchema = z.object({
+  opportunityId: z.string(),
 });
 
 export const volunteerValidation = {
   updateVolunteerProfileSchema,
-  getVolunteersWithAppliedEventsSchema,
+  applyToOpportunitySchema,
+  getApplicationStatusSchema,
 };

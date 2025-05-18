@@ -1,6 +1,8 @@
 import { Document } from "mongoose";
 
 export interface IOrgnizationPofile extends Document {
+  title: string;
+  contact_email: string;
   phone_number: string;
   bio: string;
   type: string;

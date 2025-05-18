@@ -53,9 +53,7 @@ const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
     referral_source_other: {
       type: String,
     },
-    applied_events: {
-      type: [String],
-    },
+    
   },
   {
     timestamps: true,

@@ -3,6 +3,8 @@ import { IOrgnizationPofile } from "../interfaces/organization-profile";
 
 const OrganizationProfileSchema: Schema = new Schema<IOrgnizationPofile>(
   {
+    title: { type: String },
+    contact_email: { type: String },
     phone_number: { type: String },
     bio: { type: String },
     type: { type: String },

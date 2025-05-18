@@ -1,11 +1,8 @@
-import { Button } from "@/components/ui/button";
 import { Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
-import { ConfirmationModal } from "@/components/modals/ConfirmationModal";
-import { trpc } from "@/utils/trpc";
-
+import { ApplyButton } from "@/components/buttons/ApplyButton";
+ 
 type Opportunity = {
   _id: string;
   title: string;
@@ -25,7 +22,7 @@ type Opportunity = {
   };
   organization_profile: {
     _id: string;
-    name: string;
+    title: string;
     profile_img?: string;
   };
   created_by?: {
@@ -36,19 +33,16 @@ type Opportunity = {
 };
 
 export function PostContent({ opportunity }: { opportunity: Opportunity }) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [appliedEvents, setAppliedEvents] = useState<string[]>([]);
-
-  const { data: profileData } = trpc.users.profileCheckup.useQuery();
-
-  useEffect(() => {
-    if (profileData?.volunteerProfile?.applied_events) {
-      setAppliedEvents(profileData.volunteerProfile.applied_events);
-    }
-  }, [profileData]);
-
-  const handleApplyClick = () => {
-    setIsModalOpen(true);
+  const opportunityDetails = {
+    id: opportunity._id,
+    title: opportunity.title,
+    organization: {
+      title: opportunity.organization_profile.title,
+      id: opportunity.organization_profile._id,
+    },
+    date: new Date(opportunity.date.start_date).toLocaleDateString('en-GB'),
+    time: `${opportunity.time.start_time} - ${opportunity.time.end_time}`,
+    location: opportunity.location,
   };
 
   return (
@@ -108,34 +102,14 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button
-            className={`${
-              appliedEvents.includes(opportunity._id)
-                ? "bg-green-600 hover:bg-green-600"
-                : "bg-blue-600 hover:bg-blue-700"
-            }  h-8 px-5 font-normal text-sm text-white`}
-            onClick={handleApplyClick}
-            disabled={appliedEvents.includes(opportunity._id)}
-          >
-            {appliedEvents.includes(opportunity._id) ? "Applied" : "Apply Now"}
-          </Button>
+          <ApplyButton 
+            opportunityId={opportunity._id}
+            opportunityDetails={opportunityDetails}
+            className="bg-blue-600 hover:bg-blue-700 h-8 px-5 font-normal text-sm text-white"
+          />
           <Star className="h-5 w-5 text-yellow-400 fill-current" />
         </div>
       </div>
-
-      <ConfirmationModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        opportunityDetails={{
-          id: opportunity._id,
-          title: opportunity.title,
-          organization: opportunity.organization_profile.name,
-          date: new Date(opportunity.date.start_date).toLocaleDateString('en-GB'),
-          time: `${opportunity.time.start_time} - ${opportunity.time.end_time}`,
-          location: opportunity.location,
-          logo: opportunity.organization_profile.profile_img || '/default-org-logo.svg',
-        }}
-      />
     </div>
   );
 }
