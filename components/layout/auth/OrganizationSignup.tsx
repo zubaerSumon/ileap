@@ -78,6 +78,8 @@ export default function OrganizationSignup() {
       fieldsToValidate = ["name", "email", "password", "confirm_password"];
     } else if (step === 2) {
       fieldsToValidate = [
+        "title",
+        "contact_email",
         "bio",
         "phone_number",
         "state",
@@ -109,6 +111,8 @@ export default function OrganizationSignup() {
           console.log("__formData__", { formData });
 
           await setupOrgProfile.mutate({
+            title: formData.title,
+            contact_email: formData.contact_email,
             bio: formData.bio,
             opportunity_types: formData.opportunity_types,
             phone_number: formData.phone_number,

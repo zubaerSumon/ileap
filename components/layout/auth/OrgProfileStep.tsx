@@ -25,6 +25,23 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
 
       <div className="space-y-6">
         <FormField
+          label="Organization Name"
+          id="title"
+          placeholder={`Enter your organization name`}
+          register={form.register}
+          registerName="title"
+          error={form.formState.errors.title?.message}
+        />
+        <FormField
+          label="Contact email"
+          id="contact_email"
+          type="email"
+          placeholder={`Enter your organization email `}
+          register={form.register}
+          registerName="contact_email"
+          error={form.formState.errors.contact_email?.message}
+        />
+        <FormField
           label="About us"
           id="bio"
           type="textarea"
@@ -80,5 +97,3 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
     </>
   );
 }
-
- 

@@ -7,7 +7,7 @@ export const signupBaseSchema = userValidation.userSchema.pick({
   password: true,
 });
 
-export const profileBasicSchema = userValidation.volunteerSchema.pick({
+export const profileBasicSchema = userValidation.volunteerProfileSchema.pick({
   bio: true,
   interested_on: true,
   phone_number: true,
@@ -16,7 +16,7 @@ export const profileBasicSchema = userValidation.volunteerSchema.pick({
   postcode: true,
 });
 
-export const profileDetailSchema = userValidation.volunteerSchema.pick({
+export const profileDetailSchema = userValidation.volunteerProfileSchema.pick({
   student_type: true,
   home_country: true,
   course: true,
@@ -26,7 +26,7 @@ export const profileDetailSchema = userValidation.volunteerSchema.pick({
   referral_source_other: true,
 });
 
-export const orgProfileSchema = userValidation.organizationSchema;
+export const orgProfileSchema = userValidation.organizationProfileSchema;
 export const volunteerSignupSchema = z
   .object({
     ...signupBaseSchema.shape,
@@ -53,10 +53,8 @@ export const volunteerSignupSchema = z
         path: ["home_country"],
       });
     }
-    // Only validate home country if student_type is "yes"
-    if (data.student_type === "no") {
-      // Skip home country validation for non-international students
-      delete data.home_country;
+     if (data.student_type === "no") {
+       delete data.home_country;
     }
     if (data.referral_source === "other" && !data.referral_source_other) {
       ctx.addIssue({

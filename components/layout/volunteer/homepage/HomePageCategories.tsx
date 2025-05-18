@@ -1,98 +1,52 @@
 "use client";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { Star, Users } from "lucide-react";
+import { ApplyButton } from "@/components/buttons/ApplyButton";
 import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { ConfirmationModal } from "../../../modals/ConfirmationModal";
+import Image from "next/image";
+import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
 import { trpc } from "@/utils/trpc";
 import fileIcon from "../../../../public/icons/file-icon.svg";
 import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
-import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
-import { Star, Users } from "lucide-react";
 
-type OpportunityDetails = {
+export type OpportunityDetails = {
   id: string;
   title: string;
-  organization: string;
+  organization: {
+    title: string;
+    id: string;
+  };
   date: string;
   time: string;
   location: string;
-  logo: string;
 };
 
-export default function Categories({
-  customizedFor,
-}: {
-  customizedFor?: string;
-}) {
+export default function Categories() {
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedOpportunity, setSelectedOpportunity] =
-    useState<OpportunityDetails | null>(null);
-  const [appliedEvents, setAppliedEvents] = useState<string[]>([]);
-
-  const { data: profileData } = trpc.users.profileCheckup.useQuery();
 
   // Fetch all opportunities
-  const { data: opportunities } =
-    trpc.opportunities.getAllOpportunities.useQuery();
-
-  useEffect(() => {
-    if (profileData?.volunteerProfile?.applied_events) {
-      setAppliedEvents(profileData.volunteerProfile.applied_events);
-    }
-  }, [profileData]);
-
-  // Get volunteers data to calculate available spots
-  const { data: volunteersData } =
-    trpc.volunteers.getVolunteersWithAppliedEvents.useQuery(
-      { eventId: "" }, // Empty string to get all volunteers with applied events
-      { enabled: true }
-    );
-
-  // Function to calculate available spots based on applied events
-  const calculateAvailableSpots = (
-    opportunityId: string,
-    totalSpots: number
-  ) => {
-    if (!volunteersData) return totalSpots;
-
-    // Count how many volunteers have applied to this opportunity
-    const appliedCount = volunteersData.filter(
-      (volunteer) =>
-        volunteer.applied_events &&
-        volunteer.applied_events.includes(opportunityId)
-    ).length;
-
-    // Calculate remaining spots
-    return Math.max(0, totalSpots - appliedCount);
-  };
+  const { data: opportunities } = trpc.opportunities.getAllOpportunities.useQuery();
+  
+  // Fetch all applications to calculate available spots
+  const { data: applications } = trpc.volunteers.getVolunteerApplications.useQuery();
 
   // Calculate available spots for each opportunity
-  const opportunitiesWithSpots =
-    opportunities?.map((opportunity) => ({
+  const opportunitiesWithSpots = opportunities?.map((opportunity) => {
+    const appliedCount = (applications as Array<{ opportunity: string; status: string }> | undefined)?.filter(
+      (app) => 
+        app.opportunity === opportunity._id.toString() && 
+        (app.status === 'pending' || app.status === 'approved')
+    ).length || 0;
+    
+    const spotsAvailable = Math.max(0, opportunity.number_of_volunteers - appliedCount);
+    
+    return {
       ...opportunity,
-      spotsAvailable: calculateAvailableSpots(
-        opportunity._id.toString(),
-        opportunity.number_of_volunteers
-      ),
-    })) || [];
-
-  // Filter opportunities based on customizedFor parameter
-  const filteredOpportunities = customizedFor
-    ? customizedFor.toLowerCase() === "easy care"
-      ? opportunitiesWithSpots.filter((opp) =>
-          opp.organization_profile?.name?.toLowerCase().includes("easy care")
-        )
-      : customizedFor.toLowerCase() === "clean up"
-      ? opportunitiesWithSpots.filter((opp) =>
-          opp.organization_profile?.name?.toLowerCase().includes("clean up")
-        )
-      : opportunitiesWithSpots
-    : opportunitiesWithSpots;
+      spotsAvailable,
+    };
+  }) || [];
 
   return (
     <section className="w-full md:w-[57%] relative">
@@ -102,7 +56,7 @@ export default function Categories({
       </h1>
 
       <div className="flex flex-col gap-6">
-        {filteredOpportunities.map((opportunity) => (
+        {opportunitiesWithSpots.map((opportunity) => (
           <Card
             key={opportunity._id}
             className="rounded-lg overflow-hidden w-full py-0 h-[340px] cursor-pointer hover:shadow-lg transition-shadow relative"
@@ -214,52 +168,30 @@ export default function Categories({
 
             <CardFooter className="absolute bottom-0 left-0 right-0 flex items-center px-4 pb-5">
               <div className="flex items-center gap-2">
-                <Button
-                  className={`${
-                    appliedEvents.includes(opportunity._id.toString())
-                      ? "bg-green-600 hover:bg-green-600"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  } text-white h-8 px-6 rounded-md text-sm font-medium`}
-                  disabled={
-                    appliedEvents.includes(opportunity._id.toString()) ||
-                    opportunity.spotsAvailable <= 0
-                  }
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedOpportunity({
+                <div onClick={(e) => e.stopPropagation()}>
+                  <ApplyButton
+                    opportunityId={opportunity._id.toString()}
+                    opportunityDetails={{
                       id: opportunity._id.toString(),
                       title: opportunity.title,
-                      organization:
-                        opportunity.organization_profile?.name ||
-                        "Unknown Organization",
+                      organization: {
+                        title: opportunity.organization_profile?.title || "",
+                        id: opportunity.organization_profile?._id || "",
+                      },
                       date: new Date(
                         opportunity.date.start_date
                       ).toLocaleDateString("en-GB"),
                       time: `${opportunity.time.start_time} - ${opportunity.time.end_time}`,
                       location: opportunity.location,
-                      logo: opportunity.banner_img || "/default-org-logo.svg",
-                    });
-                    setIsModalOpen(true);
-                  }}
-                >
-                  {appliedEvents.includes(opportunity._id.toString())
-                    ? "Applied"
-                    : "Apply now"}
-                </Button>
+                    }}
+                   />
+                </div>
                 <Star className="h-5 w-5 text-yellow-400 fill-current" />
               </div>
             </CardFooter>
           </Card>
         ))}
       </div>
-
-      {selectedOpportunity && (
-        <ConfirmationModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          opportunityDetails={selectedOpportunity}
-        />
-      )}
     </section>
   );
 }

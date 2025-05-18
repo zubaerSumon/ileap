@@ -8,22 +8,16 @@ import {
 } from "@/components/ui/dialog";
 import { MapPin, Calendar, Clock } from "lucide-react";
 import { trpc } from "@/utils/trpc";
-import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import React from "react";
+import { OpportunityDetails } from "../layout/volunteer/homepage/HomePageCategories";
+import toast from "react-hot-toast";
 
 interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  opportunityDetails: {
-    id: string;
-    title: string;
-    organization: string;
-    date: string;
-    time: string;
-    location: string;
-    logo: string;
-  };
+  opportunityDetails: OpportunityDetails;
 }
 
 export function ConfirmationModal({
@@ -32,23 +26,32 @@ export function ConfirmationModal({
   opportunityDetails,
 }: ConfirmationModalProps) {
   const logoSrc = "/collab.svg";
-  const utils = trpc.useUtils();
   const [isChecked, setIsChecked] = React.useState(false);
+  const router = useRouter();
+  const utils = trpc.useUtils();
 
-  const applyToEventMutation = trpc.users.applyToEvent.useMutation({
-    onSuccess: (data) => {
-      if (!data.alreadyApplied) {
-        toast.success("You have successfully applied! We'll confirm your registration via email - please check your inbox.");
-      }
-      utils.users.profileCheckup.invalidate();
+  const applyMutation = trpc.volunteers.applyToOpportunity.useMutation({
+    onSuccess: () => {
+      toast.success(
+        `Successfully applied to "${opportunityDetails.title}"!`,
+        {}
+      );
+      utils.volunteers.getApplicationStatus.invalidate();
       onClose();
+      router.refresh();
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to apply for this opportunity.");
+      toast.error(
+        error.message || "You have already applied for this opportunity."
+      );
     },
   });
 
-  console.log({ opportunityDetails });
+  const handleApply = () => {
+    if (!isChecked) return;
+    console.log("Applying to opportunity:", opportunityDetails.id);
+    applyMutation.mutate({ opportunityId: opportunityDetails.id });
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -57,7 +60,7 @@ export function ConfirmationModal({
           <DialogTitle className="sr-only">Volunteer Opportunity</DialogTitle>
           <Image
             src={logoSrc}
-            alt={opportunityDetails.organization}
+            alt={opportunityDetails.organization?.title}
             width={150}
             height={52}
             className="mb-3 rounded-lg"
@@ -79,14 +82,10 @@ export function ConfirmationModal({
               </Link>{" "}
               with{" "}
               <Link
-                href={`/volunteer/organizer/${
-                  opportunityDetails.id === "2" || opportunityDetails.id === "3"
-                    ? "clean-up-australia"
-                    : "easy-care-gardening"
-                }`}
+                href={`/volunteer/organizer/${opportunityDetails.organization?.id}`}
                 className="text-blue-600 font-semibold"
               >
-                {opportunityDetails.organization}
+                {opportunityDetails.organization?.title}
               </Link>
             </p>
 
@@ -109,7 +108,9 @@ export function ConfirmationModal({
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="w-5 h-5 text-blue-500" />
                 <div>
-                  <strong className="block text-gray-900 text-sm">Location</strong>
+                  <strong className="block text-gray-900 text-sm">
+                    Location
+                  </strong>
                   <span className="text-sm">{opportunityDetails.location}</span>
                 </div>
               </div>
@@ -118,9 +119,8 @@ export function ConfirmationModal({
 
           <div className="text-center mt-6 px-4">
             <p className="text-sm sm:text-[14px] text-gray-600 break-words">
-             Click the button below to secure your volunteer role
+              Click the button below to secure your volunteer role
             </p>
-
 
             <div className="flex items-center justify-center gap-2 mt-4 mb-6">
               <input
@@ -130,19 +130,20 @@ export function ConfirmationModal({
                 checked={isChecked}
                 onChange={(e) => setIsChecked(e.target.checked)}
               />
-              <label htmlFor="understand-checkbox" className="text-gray-600 text-sm">
+              <label
+                htmlFor="understand-checkbox"
+                className="text-gray-600 text-sm"
+              >
                 I understand
               </label>
             </div>
 
             <Button
               className="bg-blue-600 hover:bg-blue-700 text-white w-full max-w-[250px] h-10 text-sm font-medium"
-              onClick={() => {
-                applyToEventMutation.mutate({ eventId: opportunityDetails.id });
-              }}
-              disabled={applyToEventMutation.isPending || !isChecked}
+              onClick={handleApply}
+              disabled={!isChecked || applyMutation.isPending}
             >
-              {applyToEventMutation.isPending ? "Applying..." : "Count me in!!"}
+              {applyMutation.isPending ? "Applying..." : "Count me in!!"}
             </Button>
           </div>
         </div>

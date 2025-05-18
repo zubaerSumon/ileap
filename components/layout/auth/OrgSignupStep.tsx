@@ -92,18 +92,18 @@ export function OrgSignupStep({
 
       <div className="space-y-6">
         <FormField
-          label="Organization name"
+          label="Name"
           id="name"
-          placeholder={`Enter your organization name `}
+          placeholder={`Enter your name `}
           register={form.register}
           registerName="name"
           error={form.formState.errors.name?.message}
         />
         <FormField
-          label="Organization email"
+          label="Email"
           id="email"
           type="email"
-          placeholder={`Enter your organization email `}
+          placeholder={`Enter your email `}
           register={form.register}
           registerName="email"
           error={form.formState.errors.email?.message}

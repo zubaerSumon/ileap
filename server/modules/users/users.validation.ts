@@ -44,7 +44,7 @@ const resetPasswordSchema = z
     path: ["confirmPassword"],
   });
 
-const volunteerSchema = z.object({
+const volunteerProfileSchema = z.object({
   bio: z.string().nonempty("Your motivation is required"),
   interested_on: z
     .array(z.string())
@@ -64,7 +64,9 @@ const volunteerSchema = z.object({
   user: z.string().optional(),
 });
 
-const organizationSchema = z.object({
+const organizationProfileSchema = z.object({
+  title: z.string().nonempty("Title is required"),
+  contact_email: z.string().email("Invalid email address"),
   phone_number: z.string().nonempty("Phone number is required"),
   bio: z.string().nonempty("Motivation is required"),
   type: z.string().nonempty("Type is required"),
@@ -88,8 +90,8 @@ const applyToEventSchema = z.object({
 export const userValidation = {
   userSchema,
   updateUserSchema,
-  volunteerSchema,
-  organizationSchema,
+  volunteerProfileSchema,
+  organizationProfileSchema,
   resetPasswordSchema,
   applyToEventSchema,
 };

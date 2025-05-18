@@ -11,12 +11,13 @@ export default function OpportunityDetailPage() {
   const params = useParams();
   const opportunityId = params.id as string;
 
-  const { data: opportunity, isLoading, error } = trpc.opportunities.getOpportunity.useQuery(
-    opportunityId,
-    {
-      enabled: !!opportunityId,
-    }
-  );
+  const {
+    data: opportunity,
+    isLoading,
+    error,
+  } = trpc.opportunities.getOpportunity.useQuery(opportunityId, {
+    enabled: !!opportunityId,
+  });
 
   if (!opportunityId) {
     return (
@@ -37,7 +38,9 @@ export default function OpportunityDetailPage() {
   if (error || !opportunity) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <p className="text-red-600">Error loading opportunity. Please try again later.</p>
+        <p className="text-red-600">
+          Error loading opportunity. Please try again later.
+        </p>
       </div>
     );
   }
@@ -45,7 +48,7 @@ export default function OpportunityDetailPage() {
   return (
     <ProtectedLayout>
       <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-8">
+        <div className="flex gap-8 justify-center ">
           <PostContent opportunity={opportunity} />
           <Sidebar opportunity={opportunity} />
         </div>

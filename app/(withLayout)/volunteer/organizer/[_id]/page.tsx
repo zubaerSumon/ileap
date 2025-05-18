@@ -74,7 +74,7 @@ export default function OrganizerDetailPage() {
               <div className="w-full h-[200px] relative rounded-lg overflow-hidden">
                 <Image
                   src={organizationProfile.cover_img || "/pfbg2.svg"}
-                  alt={`${user.name} Cover`}
+                  alt={`${organizationProfile.title} Cover`}
                   fill
                   className="object-cover"
                 />
@@ -82,7 +82,7 @@ export default function OrganizerDetailPage() {
                 <div className="absolute bottom-4 left-4 w-[80px] h-[80px] rounded-lg overflow-hidden border-4 border-white bg-white">
                   <Image
                     src={organizationProfile.profile_img || "/Easy.svg"}
-                    alt={`${user.name} Logo`}
+                    alt={`${organizationProfile.title} Logo`}
                     width={80}
                     height={80}
                     className="object-contain"
@@ -93,7 +93,7 @@ export default function OrganizerDetailPage() {
 
             <div className="flex flex-col md:flex-row md:justify-between md:items-start items-center text-center md:text-left gap-6 md:gap-0">
               <div className="flex flex-col items-center md:items-start gap-1 md:w-1/3">
-                <h1 className="text-2xl font-bold">{user.name}</h1>
+                <h1 className="text-2xl font-bold">{organizationProfile?.title}</h1>
                 <div className="flex items-center text-gray-600">
                   <span className="mr-1">📍</span>
                   <span>{organizationProfile.area}, {organizationProfile.state}</span>
@@ -135,7 +135,7 @@ export default function OrganizerDetailPage() {
                         href={`mailto:${user.email}`}
                         className="text-blue-600 hover:underline"
                       >
-                        {user.email}
+                        {organizationProfile.contact_email}
                       </a>
                     </p>
                   )}
