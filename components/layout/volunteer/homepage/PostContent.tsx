@@ -4,7 +4,10 @@ import Image from "next/image";
 import { ApplyButton } from "@/components/buttons/ApplyButton";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
- 
+import { EditorContent, useEditor } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import Underline from "@tiptap/extension-underline";
+
 type Opportunity = {
   _id: string;
   title: string;
@@ -36,8 +39,32 @@ type Opportunity = {
 
 export function PostContent({ opportunity }: { opportunity: Opportunity }) {
   const { data: session } = useSession();
-  const isOrganization = session?.user?.role === 'organization';
+  const isOrganization = session?.user?.role === "organization";
   const router = useRouter();
+
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+          HTMLAttributes: {
+            class: "list-disc pl-5 space-y-1.5",
+          },
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+          HTMLAttributes: {
+            class: "list-decimal pl-5 space-y-1.5",
+          },
+        },
+      }),
+      Underline,
+    ],
+    content: opportunity.description,
+    editable: false,
+  });
 
   const opportunityDetails = {
     id: opportunity._id,
@@ -46,24 +73,24 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
       title: opportunity.organization_profile.title,
       id: opportunity.organization_profile._id,
     },
-    date: new Date(opportunity.date.start_date).toLocaleDateString('en-GB'),
+    date: new Date(opportunity.date.start_date).toLocaleDateString("en-GB"),
     time: `${opportunity.time.start_time} - ${opportunity.time.end_time}`,
     location: opportunity.location,
   };
 
   return (
     <div className="flex-1 max-w-3xl">
-      <button 
-        onClick={() => router.back()} 
-        className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4" 
-      > 
-        <ChevronLeft className="h-4 w-4 mr-1" /> 
-        Back 
+      <button
+        onClick={() => router.back()}
+        className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
+      >
+        <ChevronLeft className="h-4 w-4 mr-1" />
+        Back
       </button>
 
       <div className="w-full h-[200px] relative mb-6">
         <Image
-          src={opportunity.banner_img || '/default-banner.svg'}
+          src={opportunity.banner_img || "/default-banner.svg"}
           alt={`${opportunity.title} Banner`}
           fill
           className="object-cover rounded-lg"
@@ -74,7 +101,9 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
 
       <div className="text-sm text-gray-600 mb-3">
         Posted by
-        <Link href={`/volunteer/organizer/${opportunity.organization_profile._id}`}>
+        <Link
+          href={`/volunteer/organizer/${opportunity.organization_profile._id}`}
+        >
           <span className="text-blue-600 hover:underline cursor-pointer">
             {" "}
             {opportunity?.created_by?.name || "Organization name"}
@@ -83,25 +112,34 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
       </div>
 
       <div className="prose max-w-none text-gray-700 space-y-4">
-        <div 
-          className="text-base leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: opportunity.description }}
-        />
-
-        <div>
-          <h2 className="text-lg font-semibold mb-2">
-            Required Skills:
-          </h2>
-          <ul className="list-disc pl-5 space-y-1.5 text-base">
-            {opportunity.required_skills.map((skill, index) => (
-              <li key={index}>{skill}</li>
-            ))}
-          </ul>
+        <div className="text-base leading-relaxed">
+          <EditorContent editor={editor} />
+          <style jsx global>{`
+            .ProseMirror ul {
+              list-style-type: disc;
+              padding-left: 1.5rem;
+              margin: 0.5rem 0;
+            }
+            .ProseMirror ol {
+              list-style-type: decimal;
+              padding-left: 1.5rem;
+              margin: 0.5rem 0;
+            }
+            .ProseMirror li {
+              margin: 0.25rem 0;
+            }
+            .ProseMirror p {
+              margin: 0.5rem 0;
+            }
+            .ProseMirror u {
+              text-decoration: underline;
+            }
+          `}</style>
         </div>
 
         {!isOrganization && (
           <div className="flex items-center gap-2">
-            <ApplyButton 
+            <ApplyButton
               opportunityId={opportunity._id}
               opportunityDetails={opportunityDetails}
               className="bg-blue-600 hover:bg-blue-700 h-8 px-5 font-normal text-sm text-white"
