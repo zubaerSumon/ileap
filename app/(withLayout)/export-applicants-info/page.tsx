@@ -1,11 +1,11 @@
 import React from 'react'
 
-export const page = () => {
+const ExportApplicantsInfoPage = () => {
   return (
-    <div>page</div>
+    <div>ExportApplicantsInfoPage</div>
   )
 }
-
+export default ExportApplicantsInfoPage;
 /* "use client";
 
 import React, { useState } from "react";
