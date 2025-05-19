@@ -324,7 +324,14 @@ export default function TopNavigationBar() {
                             </MenubarItem>
                             <MenubarSeparator className="md:hidden" />
                             <MenubarItem>
-                              <Link href="/volunteer/profile" className="w-full">
+                              <Link 
+                                href={
+                                  session?.user?.role === pathname?.split('/')[1] 
+                                    ? `/${session?.user?.role}/profile`
+                                    : `/${session?.user?.role}`
+                                } 
+                                className="w-full"
+                              >
                                 Edit Profile
                               </Link>
                             </MenubarItem>

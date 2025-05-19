@@ -1,7 +1,9 @@
-import { Star } from "lucide-react";
+import { Star, ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ApplyButton } from "@/components/buttons/ApplyButton";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
  
 type Opportunity = {
   _id: string;
@@ -33,6 +35,10 @@ type Opportunity = {
 };
 
 export function PostContent({ opportunity }: { opportunity: Opportunity }) {
+  const { data: session } = useSession();
+  const isOrganization = session?.user?.role === 'organization';
+  const router = useRouter();
+
   const opportunityDetails = {
     id: opportunity._id,
     title: opportunity.title,
@@ -47,6 +53,14 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
 
   return (
     <div className="flex-1 max-w-3xl">
+      <button 
+        onClick={() => router.back()} 
+        className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4" 
+      > 
+        <ChevronLeft className="h-4 w-4 mr-1" /> 
+        Back 
+      </button>
+
       <div className="w-full h-[200px] relative mb-6">
         <Image
           src={opportunity.banner_img || '/default-banner.svg'}
@@ -85,16 +99,16 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
           </ul>
         </div>
 
-         
-
-        <div className="flex items-center gap-2">
-          <ApplyButton 
-            opportunityId={opportunity._id}
-            opportunityDetails={opportunityDetails}
-            className="bg-blue-600 hover:bg-blue-700 h-8 px-5 font-normal text-sm text-white"
-          />
-          <Star className="h-5 w-5 text-yellow-400 fill-current" />
-        </div>
+        {!isOrganization && (
+          <div className="flex items-center gap-2">
+            <ApplyButton 
+              opportunityId={opportunity._id}
+              opportunityDetails={opportunityDetails}
+              className="bg-blue-600 hover:bg-blue-700 h-8 px-5 font-normal text-sm text-white"
+            />
+            <Star className="h-5 w-5 text-yellow-400 fill-current" />
+          </div>
+        )}
       </div>
     </div>
   );
