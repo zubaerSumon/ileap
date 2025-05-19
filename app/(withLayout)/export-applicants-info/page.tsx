@@ -1,4 +1,12 @@
-"use client";
+import React from 'react'
+
+const ExportApplicantsInfoPage = () => {
+  return (
+    <div>ExportApplicantsInfoPage</div>
+  )
+}
+export default ExportApplicantsInfoPage;
+/* "use client";
 
 import React, { useState } from "react";
 import { saveAs } from "file-saver";
@@ -351,3 +359,4 @@ const ExportApplicantsInfoPage: React.FC = () => {
 };
 
 export default ExportApplicantsInfoPage;
+ */
