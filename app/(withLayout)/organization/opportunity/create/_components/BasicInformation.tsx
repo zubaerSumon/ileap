@@ -84,9 +84,9 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
         </div>
         <div className="pt-16 px-6 pb-6">
           <h2 id="basic-info-title" className="sr-only">Basic Information Form - Step 1</h2>
+          
           <div className="space-y-8">
-            {/* Opportunity title & description */}
-            <div>
+             <div>
               <h2 className="text-lg font-medium mb-1 flex items-center">
                 Opportunity title & description
                 <span className="text-red-500 ml-1">*</span>
@@ -112,8 +112,8 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 />
               </div>
             </div>
-            {/* Category */}
-            <div>
+
+             <div>
               <h2 className="text-lg font-medium mb-1 flex items-center">
                 Category
                 <span className="text-red-500 ml-1">*</span>

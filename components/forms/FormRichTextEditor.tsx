@@ -5,7 +5,7 @@ import {
   Path,
   ControllerRenderProps,
 } from "react-hook-form";
-import { EditorContent, useEditor, Editor } from "@tiptap/react";
+import { EditorContent, useEditor, Editor, Extension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
@@ -13,7 +13,6 @@ import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
-import Heading from "@tiptap/extension-heading";
 import {
   FormField,
   FormItem,
@@ -35,6 +34,32 @@ import {
   Image as ImageIcon,
   Link as LinkIcon,
 } from "lucide-react";
+
+// Custom FontSize extension
+const FontSize = Extension.create({
+  name: 'fontSize',
+  addGlobalAttributes() {
+    return [
+      {
+        types: ['textStyle'],
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: element => element.style.fontSize,
+            renderHTML: attributes => {
+              if (!attributes.fontSize) {
+                return {}
+              }
+              return {
+                style: `font-size: ${attributes.fontSize}`
+              }
+            },
+          },
+        },
+      },
+    ]
+  },
+});
 
 // ─────────────────────────────────────────────
 // ToolbarButton component
@@ -112,11 +137,32 @@ function TiptapEditor<T extends FieldValues>({
 }) {
   const editor = useEditor({
     extensions: [
-      StarterKit,
+      StarterKit.configure({
+        bulletList: {
+          keepMarks: true,
+          keepAttributes: false,
+          HTMLAttributes: {
+            class: 'list-disc pl-4',
+          },
+        },
+        orderedList: {
+          keepMarks: true,
+          keepAttributes: false,
+          HTMLAttributes: {
+            class: 'list-decimal pl-4',
+          },
+        },
+        heading: {
+          levels: [1, 2, 3],
+          HTMLAttributes: {
+            class: 'font-bold',
+          },
+        },
+      }),
       Underline,
-      Heading,
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       TextStyle,
+      FontSize,
       Color,
       Link.configure({
         openOnClick: false,
@@ -134,7 +180,7 @@ function TiptapEditor<T extends FieldValues>({
     },
     editorProps: {
       attributes: {
-        class: "prose prose-sm focus:outline-none min-h-[100px]",
+        class: "prose prose-sm focus:outline-none min-h-[100px] p-4",
         ...(placeholder ? { "data-placeholder": placeholder } : {}),
       },
     },
@@ -161,6 +207,34 @@ function TiptapEditor<T extends FieldValues>({
           style={{ overflow: "visible" }}
         />
         <style>{`
+          .ProseMirror {
+            outline: none;
+          }
+          .ProseMirror p {
+            margin: 0.5em 0;
+          }
+          .ProseMirror h1 {
+            font-size: 2em;
+            margin: 0.5em 0;
+          }
+          .ProseMirror h2 {
+            font-size: 1.5em;
+            margin: 0.5em 0;
+          }
+          .ProseMirror h3 {
+            font-size: 1.17em;
+            margin: 0.5em 0;
+          }
+          .ProseMirror ul {
+            list-style-type: disc;
+            padding-left: 1.5em;
+            margin: 0.5em 0;
+          }
+          .ProseMirror ol {
+            list-style-type: decimal;
+            padding-left: 1.5em;
+            margin: 0.5em 0;
+          }
           .ProseMirror img {
             display: block;
             max-width: 100%;
@@ -174,6 +248,12 @@ function TiptapEditor<T extends FieldValues>({
             cursor: pointer;
             word-break: break-word;
           }
+          .ProseMirror .font-size {
+            font-size: inherit;
+          }
+          .ProseMirror .ProseMirror-selectednode {
+            outline: 2px solid #2563eb;
+          }
         `}</style>
       </div>
       <TiptapToolbar editor={editor} />
@@ -183,6 +263,7 @@ function TiptapEditor<T extends FieldValues>({
 
 function TiptapToolbar({ editor }: { editor: Editor | null }) {
   const [openDropdown, setOpenDropdown] = useState<null | 'fontSize' | 'textStyle' | 'color'>(null);
+  const [currentFontSize, setCurrentFontSize] = useState("14");
 
   const COLORS = [
     "#000000",
@@ -192,7 +273,7 @@ function TiptapToolbar({ editor }: { editor: Editor | null }) {
     "#FFA500",
     "#800080",
   ];
-  const FONT_SIZES = [12, 14, 16, 18, 24, 32];
+  const FONT_SIZES = ["12", "14", "16", "18", "24", "32"];
   const TEXT_STYLES = [
     { label: "Normal", value: "paragraph" },
     { label: "Heading 1", value: "heading1" },
@@ -200,15 +281,46 @@ function TiptapToolbar({ editor }: { editor: Editor | null }) {
     { label: "Heading 3", value: "heading3" },
   ];
 
+  // Update current font size when selection changes
+  useEffect(() => {
+    if (!editor) return;
+
+    const updateFontSize = () => {
+      const { fontSize } = editor.getAttributes('textStyle');
+      if (fontSize) {
+        const size = fontSize.replace('px', '');
+        setCurrentFontSize(size);
+      } else {
+        setCurrentFontSize("14"); // Default size
+      }
+    };
+
+    editor.on('selectionUpdate', updateFontSize);
+    editor.on('update', updateFontSize);
+
+    return () => {
+      editor.off('selectionUpdate', updateFontSize);
+      editor.off('update', updateFontSize);
+    };
+  }, [editor]);
+
   if (!editor) return null;
 
   const setTextStyle = (style: string) => {
     const chain = editor.chain().focus();
-    if (style === "paragraph") chain.setParagraph().run();
-    else if (style.startsWith("heading")) {
-      const level = Math.max(1, Math.min(6, parseInt(style.replace("heading", "")))) as 1 | 2 | 3 | 4 | 5 | 6;
-      chain.toggleHeading({ level }).run();
+    if (style === "paragraph") {
+      chain.setParagraph().run();
+    } else if (style.startsWith("heading")) {
+      const level = parseInt(style.replace("heading", "")) as 1 | 2 | 3;
+      chain.setHeading({ level }).run();
     }
+  };
+
+  const setFontSize = (size: string) => {
+    editor.chain().focus().setMark('textStyle', { 
+      fontSize: `${size}px`
+    }).run();
+    setCurrentFontSize(size);
   };
 
   return (
@@ -221,7 +333,7 @@ function TiptapToolbar({ editor }: { editor: Editor | null }) {
           className="text-xs px-1 text-gray-500"
           title="Font Size"
         >
-          {parseInt(editor.getAttributes("textStyle").fontSize) || 14}
+          {currentFontSize}
         </button>
         {openDropdown === 'fontSize' && (
           <div className="absolute bottom-full left-0 mb-1 p-2 bg-white rounded shadow-lg border z-50 flex flex-col gap-1">
@@ -229,13 +341,9 @@ function TiptapToolbar({ editor }: { editor: Editor | null }) {
               <button
                 key={size}
                 type="button"
-                className="text-xs   py-1 hover:bg-gray-100 rounded"
+                className="text-xs py-1 hover:bg-gray-100 rounded"
                 onClick={() => {
-                  editor
-                    .chain()
-                    .focus()
-                    .setMark("textStyle", { fontSize: `${size}px` })
-                    .run();
+                  setFontSize(size);
                   setOpenDropdown(null);
                 }}
               >
@@ -251,7 +359,7 @@ function TiptapToolbar({ editor }: { editor: Editor | null }) {
         <button
           type="button"
           onClick={() => setOpenDropdown(openDropdown === 'textStyle' ? null : 'textStyle')}
-          className="text-base ms-1   py-1 text-gray-700 "
+          className="text-base ms-1 py-1 text-gray-700"
           title="Text Style"
         >
           T
@@ -262,7 +370,7 @@ function TiptapToolbar({ editor }: { editor: Editor | null }) {
               <button
                 key={style.value}
                 type="button"
-                className="text-xs  py-1 hover:bg-gray-100 rounded text-left"
+                className="text-xs py-1 hover:bg-gray-100 rounded text-left"
                 onClick={() => {
                   setTextStyle(style.value);
                   setOpenDropdown(null);
@@ -305,7 +413,7 @@ function TiptapToolbar({ editor }: { editor: Editor | null }) {
         )}
       </div>
 
-      {/* Formatting buttons - Lucide icons */}
+      {/* Formatting buttons */}
       <ToolbarButton
         onClick={() => editor.chain().focus().toggleBold().run()}
         isActive={editor.isActive("bold")}
