@@ -80,7 +80,9 @@ export default function CreateOpportunityPage() {
       number_of_volunteers: Number(formData.number_of_volunteers),
     });
   };
-
+  const description = form.watch("description");
+  console.log({description});
+  
   return (
     <ProtectedLayout>
       <div className="bg-[#F5F7FA] ">

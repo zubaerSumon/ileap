@@ -85,21 +85,7 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
           </ul>
         </div>
 
-        <div className="bg-gray-50 p-4 rounded-lg">
-          <h3 className="text-base font-semibold mb-1">
-            Opportunity Details
-          </h3>
-          <p className="text-sm">
-            Type: {opportunity.commitment_type === 'oneoff' ? 'One-off' : 'Regular'}
-            <br />
-            Location: {opportunity.location}
-            <br />
-            Date: {new Date(opportunity.date.start_date).toLocaleDateString('en-GB')}
-            {opportunity.date.end_date && ` - ${new Date(opportunity.date.end_date).toLocaleDateString('en-GB')}`}
-            <br />
-            Time: {opportunity.time.start_time} - {opportunity.time.end_time}
-          </p>
-        </div>
+         
 
         <div className="flex items-center gap-2">
           <ApplyButton 

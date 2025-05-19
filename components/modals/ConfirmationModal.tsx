@@ -37,6 +37,8 @@ export function ConfirmationModal({
         {}
       );
       utils.volunteers.getApplicationStatus.invalidate();
+      utils.opportunities.getAllOpportunities.invalidate();
+      utils.volunteers.getVolunteerApplications.invalidate();
       onClose();
       router.refresh();
     },
