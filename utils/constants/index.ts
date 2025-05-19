@@ -5,7 +5,7 @@ import { volunteerValidation } from "@/server/modules/volunteer-profile/voluntee
 export const SignupFormSchema = authValidation.signupSchema;
 export type SignupForm = z.infer<typeof SignupFormSchema>;
 
-export const VolunteerProfileFormSchema = userValidation.volunteerSchema;
+export const VolunteerProfileFormSchema = userValidation.volunteerProfileSchema;
 export type VolunteerProfileForm = z.infer<typeof VolunteerProfileFormSchema>;
 
 export const VolunteerProfileUpdateSchema =
