@@ -64,7 +64,8 @@ export default function TopNavigationBar() {
     pathname?.includes("volunteer") ||
     pathname?.includes("organization") ||
     pathname?.includes("opportunities") ||
-    pathname?.includes("find-volunteer");
+    pathname?.includes("find-volunteer") ||
+    pathname?.includes("messaging");
 
   const isResetPasswordPath = pathname?.endsWith("reset-password");
 

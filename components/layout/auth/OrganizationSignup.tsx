@@ -33,7 +33,6 @@ export default function OrganizationSignup() {
   const updateUser = trpc.users.updateUser.useMutation();
   const setupOrgProfile = trpc.users.setupOrgProfile.useMutation({
     onSuccess: async (data) => {
-      // After creating the organization profile, update the user with the profile reference
       try {
         await updateUser.mutate({
           organization_profile: data._id
@@ -42,9 +41,14 @@ export default function OrganizationSignup() {
         utils.users.profileCheckup.invalidate();
         toast.success("Profile setup completed successfully!");
         setIsProfileSetupComplete(true);
-        const role = session?.user?.role;
-        if (!isLoading && role && isAuthenticated) {
-          router.push(`/${role}`);
+        
+        // Wait for profile check to update
+        await utils.users.profileCheckup.invalidate();
+        
+        // Redirect to organization dashboard
+        const role = session?.user?.role?.toLowerCase();
+        if (role) {
+          router.replace(`/${role}`);
         }
       } catch (error) {
         console.error("Error updating user with profile:", error);
@@ -108,7 +112,6 @@ export default function OrganizationSignup() {
         try {
           setIsProfileLoading(true);
           const formData = form.getValues();
-          console.log("__formData__", { formData });
 
           await setupOrgProfile.mutate({
             title: formData.title,
@@ -151,7 +154,6 @@ export default function OrganizationSignup() {
 
   const onSubmit = async (data: OrgSignupFormData) => {
     if (form.formState.isSubmitting) return;
-    console.log("__data__", { data });
 
     try {
       setError(null);
@@ -168,8 +170,6 @@ export default function OrganizationSignup() {
       });
 
       if (signInResult?.error) {
-        console.log("__signInResult__", { signInResult });
-        
         if (signInResult.error) {
           toast.error(
             "Account with this email already exists. Please provide the correct password."
@@ -219,42 +219,40 @@ export default function OrganizationSignup() {
           {step === 2 && <OrgProfileStep form={form} />}
           {step === 3 && <OrgDetailsStep form={form} />}
 
-          <div className="fixed bottom-0 left-0 right-0 bg-gray-50 py-4 px-6 border-t border-gray-200">
-            <div className="container mx-auto px-4">
-              <div className="flex justify-between">
-                <div>
-                  {step > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleBack}
-                      disabled={isSignupLoading || isProfileLoading}
-                      className="cursor-pointer"
-                    >
-                      Back
-                    </Button>
-                  )}
-                </div>
-                <Button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={isSignupLoading || isProfileLoading}
-                  className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                >
-                  {isSignupLoading || isProfileLoading ? (
-                    <div className="flex items-center">
-                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                      {step === 1 ? "Creating account..." : "Saving profile..."}
-                    </div>
-                  ) : step === 1 ? (
-                    "Signup & Continue"
-                  ) : step === 2 ? (
-                    "Continue"
-                  ) : (
-                    "Complete"
-                  )}
-                </Button>
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between">
+              <div>
+                {step > 1 && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleBack}
+                    disabled={isSignupLoading || isProfileLoading}
+                    className="cursor-pointer"
+                  >
+                    Back
+                  </Button>
+                )}
               </div>
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={isSignupLoading || isProfileLoading}
+                className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
+              >
+                {isSignupLoading || isProfileLoading ? (
+                  <div className="flex items-center">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    {step === 1 ? "Creating account..." : "Saving profile..."}
+                  </div>
+                ) : step === 1 ? (
+                  "Signup & Continue"
+                ) : step === 2 ? (
+                  "Continue"
+                ) : (
+                  "Complete"
+                )}
+              </Button>
             </div>
           </div>
         </form>
