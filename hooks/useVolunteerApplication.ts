@@ -6,7 +6,7 @@ export const useVolunteerApplication = (opportunityId: string) => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Query to check if user has already applied
-  const { data: applicationStatus, isPending: isStatusPending } = trpc.volunteers.getApplicationStatus.useQuery(
+  const { data: applicationStatus, isPending: isStatusPending } = trpc.applications.getApplicationStatus.useQuery(
     { opportunityId }
   );
   console.log({applicationStatus});
@@ -20,7 +20,7 @@ export const useVolunteerApplication = (opportunityId: string) => {
   }, [applicationStatus, isStatusPending]);
 
   // Mutation to apply for opportunity
-  const applyMutation = trpc.volunteers.applyToOpportunity.useMutation({
+  const applyMutation = trpc.applications.applyToOpportunity.useMutation({
     onSuccess: () => {
       setIsApplied(true);
     },

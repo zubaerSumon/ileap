@@ -1,20 +1,21 @@
 // /server/router.ts
 import { authRouter } from './modules/auth';
 import { userRouter } from './modules/users';
-import { volunteerRouter } from './modules/volunteer-profile';
+import { volunteerProfileRouter } from './modules/volunteer-profile';
 import { opportunityRouter } from './modules/opportunity';
 import { router } from './trpc';
 import { uploadRouter } from './modules/upload';
 import { organizationProfileRouter } from './modules/organization-profile';
-  
+import { volunteerApplicationRouter } from './modules/volunteer-application';
 
 export const appRouter = router({
   users: userRouter,
   auth: authRouter,
-  volunteers: volunteerRouter,
+  volunteers: volunteerProfileRouter,
   opportunities: opportunityRouter,
   upload: uploadRouter,
-  organizationProfile: organizationProfileRouter
-});
+  organizations: organizationProfileRouter,
+  applications: volunteerApplicationRouter,
+ });
 
 export type AppRouter = typeof appRouter;

@@ -13,7 +13,7 @@ export default function OrganizerDetailPage() {
   const params = useParams();
   const organizerId = params?._id;
 
-  const { data, isLoading, error } = trpc.organizationProfile.getOrganizationProfile.useQuery(
+  const { data, isLoading, error } = trpc.organizations.getOrganizationProfile.useQuery(
     organizerId as string,
     {
       enabled: !!organizerId,
