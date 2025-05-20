@@ -30,15 +30,15 @@ export function ConfirmationModal({
   const router = useRouter();
   const utils = trpc.useUtils();
 
-  const applyMutation = trpc.volunteers.applyToOpportunity.useMutation({
+  const applyMutation = trpc.applications.applyToOpportunity.useMutation({
     onSuccess: () => {
       toast.success(
         `Successfully applied to "${opportunityDetails.title}"!`,
         {}
       );
-      utils.volunteers.getApplicationStatus.invalidate();
+      utils.applications.getApplicationStatus.invalidate();
       utils.opportunities.getAllOpportunities.invalidate();
-      utils.volunteers.getVolunteerApplications.invalidate();
+      utils.applications.getVolunteerApplications.invalidate();
       onClose();
       router.refresh();
     },

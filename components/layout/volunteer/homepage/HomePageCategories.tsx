@@ -2,8 +2,9 @@
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Star, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { ApplyButton } from "@/components/buttons/ApplyButton";
+import { FavoriteButton } from "@/components/buttons/FavoriteButton";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
@@ -28,31 +29,15 @@ export type OpportunityDetails = {
 export default function Categories() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
-  const [favorites, setFavorites] = useState<string[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('favoriteOpportunities');
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
 
   // Fetch all opportunities
   const { data: opportunities } = trpc.opportunities.getAllOpportunities.useQuery();
   
   // Fetch all applications to calculate available spots
-  const { data: applications } = trpc.volunteers.getVolunteerApplications.useQuery();
+  const { data: applications } = trpc.applications.getVolunteerApplications.useQuery();
 
-  const toggleFavorite = (opportunityId: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setFavorites(prev => {
-      const newFavorites = prev.includes(opportunityId)
-        ? prev.filter(id => id !== opportunityId)
-        : [...prev, opportunityId];
-      
-      localStorage.setItem('favoriteOpportunities', JSON.stringify(newFavorites));
-      return newFavorites;
-    });
-  };
+  // Fetch user's favorite opportunities
+  const { data: favoriteOpportunities } = trpc.volunteers.getFavoriteOpportunities.useQuery();
 
   // Calculate available spots for each opportunity
   const opportunitiesWithSpots = opportunities?.map((opportunity) => {
@@ -71,7 +56,9 @@ export default function Categories() {
   }) || [];
 
   const filteredOpportunities = activeTab === "favorites"
-    ? opportunitiesWithSpots.filter(opp => favorites.includes(opp._id.toString()))
+    ? opportunitiesWithSpots.filter(opp => 
+        favoriteOpportunities?.some(fav => fav.opportunity === opp._id.toString())
+      )
     : opportunitiesWithSpots;
 
   return (
@@ -93,7 +80,7 @@ export default function Categories() {
             value="favorites" 
             onClick={() => setActiveTab("favorites")}
           >
-            Favorites ({favorites.length})
+            Favorites ({favoriteOpportunities?.length || 0})
           </TabsTrigger>
         </TabsList>
       </Tabs>
@@ -209,8 +196,8 @@ export default function Categories() {
               </div>
             </CardContent>
 
-            <CardFooter className="absolute bottom-0 left-0 right-0 flex items-center px-4 pb-5">
-              <div className="flex items-center gap-2">
+            <CardFooter  className="absolute bottom-0 left-0 right-0 flex items-center px-4 pb-5">
+              <div onClick={(e) => e.stopPropagation()} className="flex items-center  gap-2">
                 <div onClick={(e) => e.stopPropagation()}>
                   <ApplyButton
                     opportunityId={opportunity._id.toString()}
@@ -229,14 +216,9 @@ export default function Categories() {
                     }}
                   />
                 </div>
-                <Star 
-                  className={`h-5 w-5 cursor-pointer ${
-                    favorites.includes(opportunity._id.toString())
-                      ? "text-yellow-400 fill-current"
-                      : "text-gray-400"
-                  }`}
-                  onClick={(e) => toggleFavorite(opportunity._id.toString(), e)}
-                />
+                <div onClick={(e) => e.stopPropagation()}>
+                  <FavoriteButton opportunityId={opportunity._id} />
+                </div>
               </div>
             </CardFooter>
           </Card>

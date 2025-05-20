@@ -29,7 +29,7 @@ export default function Categories() {
   const { data: opportunities } = trpc.opportunities.getAllOpportunities.useQuery();
   
   // Fetch all applications to calculate available spots
-  const { data: applications } = trpc.volunteers.getVolunteerApplications.useQuery();
+  const { data: applications } = trpc.applications.getVolunteerApplications.useQuery();
 
   // Calculate available spots for each opportunity
   const opportunitiesWithSpots = opportunities?.map((opportunity) => {
