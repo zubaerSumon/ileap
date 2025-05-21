@@ -4,7 +4,6 @@ import { TRPCError } from "@trpc/server";
 import Opportunity from "@/server/db/models/opportunity";
 import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
-import OrganizationProfile from "@/server/db/models/organization-profile";
 import { z } from "zod";
 import User from "@/server/db/models/user";
 
@@ -106,10 +105,15 @@ export const opportunityRouter = router({
     }
 
     try {
-      const organization = await OrganizationProfile.findOne({
-        user: sessionUser.id,
-      });
-      if (!organization) {
+      const user = await User.findById(sessionUser.id);
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      if (!user.organization_profile) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Organization profile not found",
@@ -117,11 +121,14 @@ export const opportunityRouter = router({
       }
 
       const opportunities = await Opportunity.find({
-        organization: organization._id,
-      }).sort({ createdAt: -1 });
+        organization_profile: user.organization_profile,
+      })
+        .populate("organization_profile")
+        .sort({ createdAt: -1 });
 
       return opportunities;
     } catch (error) {
+      console.error("Error fetching opportunities:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to fetch opportunities",

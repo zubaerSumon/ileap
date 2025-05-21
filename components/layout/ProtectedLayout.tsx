@@ -40,7 +40,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   return (
     <Fragment>
       <TopNavigationBar />
-      <div className="min-h-screen mx-auto w-[1280px]">{children}</div>
+      <div className="min-h-screen mx-auto ">{children}</div>
       <UpdatedFooter />
     </Fragment>
   );

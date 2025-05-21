@@ -22,7 +22,7 @@ export default function OpportunityTabs({ activeTab, onTabChange }: OpportunityT
   ];
 
   return (
-    <div className="grid grid-cols-4 mb-6 w-full max-w-full overflow-hidden bg-[#F1F1F2] rounded-[30px] p-1">
+    <div className="grid grid-cols-4 mb-6 w-full max-w-full   overflow-hidden bg-[#F1F1F2] rounded-[30px] ">
       {tabs.map((tab) => (
         <Button
           key={tab.value}

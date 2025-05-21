@@ -28,11 +28,21 @@ export type Opportunity = {
   email_contact: string;
   phone_contact?: string;
   internal_reference?: string;
-  organization: {
+  organization_profile: {
     _id: string;
-    name: string;
-    email: string;
+    title: string;
+    profile_img?: string;
+    contact_email: string;
     phone_number: string;
+    bio: string;
+    type: string;
+    opportunity_types: string[];
+    required_skills: string[];
+    state: string;
+    area: string;
+    abn: string;
+    website: string;
+    cover_img?: string;
   };
   is_recurring: boolean;
   recurrence?: {
