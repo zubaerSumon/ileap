@@ -26,29 +26,40 @@ export default function Categories() {
   const router = useRouter();
 
   // Fetch all opportunities
-  const { data: opportunities } = trpc.opportunities.getAllOpportunities.useQuery();
-  
+  const { data: opportunities } =
+    trpc.opportunities.getAllOpportunities.useQuery();
+
   // Fetch all applications to calculate available spots
-  const { data: applications } = trpc.applications.getVolunteerApplications.useQuery();
+  const { data: applications } =
+    trpc.applications.getVolunteerApplications.useQuery();
 
   // Calculate available spots for each opportunity
-  const opportunitiesWithSpots = opportunities?.map((opportunity) => {
-    const appliedCount = (applications as Array<{ opportunity: string; status: string }> | undefined)?.filter(
-      (app) => 
-        app.opportunity === opportunity._id.toString() && 
-        (app.status === 'pending' || app.status === 'approved')
-    ).length || 0;
-    
-    const spotsAvailable = Math.max(0, opportunity.number_of_volunteers - appliedCount);
-    
-    return {
-      ...opportunity,
-      spotsAvailable,
-    };
-  }) || [];
+  const opportunitiesWithSpots =
+    opportunities?.map((opportunity) => {
+      const appliedCount =
+        (
+          applications as
+            | Array<{ opportunity: string; status: string }>
+            | undefined
+        )?.filter(
+          (app) =>
+            app.opportunity === opportunity._id.toString() &&
+            (app.status === "pending" || app.status === "approved")
+        ).length || 0;
+
+      const spotsAvailable = Math.max(
+        0,
+        opportunity.number_of_volunteers - appliedCount
+      );
+
+      return {
+        ...opportunity,
+        spotsAvailable,
+      };
+    }) || [];
 
   return (
-    <section className="w-full md:w-[57%] relative">
+    <section className="w-[1280px] mx-auto  md:w-[57%] relative">
       <h1 className="text-[#101010] font-inter text-xxl font-bold text-center mt-8 mb-5">
         Volunteering Opportunities during National Volunteer Week 2025 (19 - 25
         May)
