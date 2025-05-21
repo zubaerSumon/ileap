@@ -26,7 +26,9 @@ export const userRouter = router({
         _id: { $ne: currentUser._id },
         role: "organization",
       };
-      const users = await User.find(query).select("name avatar role");
+      const users = await User.find(query)
+        .select("name avatar role")
+        .populate("organization_profile");
       return users;
     }
     if (currentUser.role === "organization") {
@@ -34,11 +36,17 @@ export const userRouter = router({
         _id: { $ne: currentUser._id },
         role: "volunteer",
       };
-      const users = await User.find(query).select("name avatar role");
+      console.log('Query for volunteers:', query);
+      const users = await User.find(query)
+        .select("name avatar role")
+        .populate({
+          path: "volunteer_profile",
+          select: "student_type course availability_date interested_on bio"
+        });
+      console.log('Found users:', JSON.stringify(users, null, 2));
       return users;
     }
 
- 
     return [];
   }),
   updateUser: protectedProcedure
