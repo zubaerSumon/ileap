@@ -114,27 +114,7 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
       <div className="prose max-w-none text-gray-700 space-y-4">
         <div className="text-base leading-relaxed">
           <EditorContent editor={editor} />
-          <style jsx global>{`
-            .ProseMirror ul {
-              list-style-type: disc;
-              padding-left: 1.5rem;
-              margin: 0.5rem 0;
-            }
-            .ProseMirror ol {
-              list-style-type: decimal;
-              padding-left: 1.5rem;
-              margin: 0.5rem 0;
-            }
-            .ProseMirror li {
-              margin: 0.25rem 0;
-            }
-            .ProseMirror p {
-              margin: 0.5rem 0;
-            }
-            .ProseMirror u {
-              text-decoration: underline;
-            }
-          `}</style>
+          
         </div>
 
         {!isOrganization && (

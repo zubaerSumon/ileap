@@ -1,13 +1,13 @@
 "use client";
 import React from "react";
-import { FormField } from "@/components/forms/FormField";
+import { FormField } from "@/components/form-input/FormField";
 import { UseFormReturn } from "react-hook-form";
 import { VolunteerSignupForm } from "@/types/auth";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import countryList from "react-select-country-list";
 import { useMemo } from "react";
-import { FormSelect } from "@/components/forms/FormSelect";
+import { FormSelect } from "@/components/form-input/FormSelect";
 interface DetailedProfileStepProps {
   form: UseFormReturn<VolunteerSignupForm>;
   mediaConsent: boolean;

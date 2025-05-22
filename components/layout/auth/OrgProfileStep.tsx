@@ -1,8 +1,8 @@
-import { FormField } from "@/components/forms/FormField";
-import { PhoneField } from "@/components/forms/PhoneField";
+import { FormField } from "@/components/form-input/FormField";
+import { PhoneField } from "@/components/form-input/PhoneField";
 import { UseFormReturn } from "react-hook-form";
 import { OrgSignupFormData } from "@/types/auth";
-import { FormSelect } from "@/components/forms/FormSelect";
+import { FormSelect } from "@/components/form-input/FormSelect";
 import { suburbs } from "@/utils/constants/suburb";
 import { locations } from "@/utils/constants/select-options";
 

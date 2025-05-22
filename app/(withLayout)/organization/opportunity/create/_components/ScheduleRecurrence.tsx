@@ -3,7 +3,7 @@
 import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import RecurrenceModal from "./RecurrenceModal";
-import { FormInput } from "@/components/forms/FormInput";
+import { FormInput } from "@/components/form-input/FormInput";
 import { UseFormReturn, Path } from "react-hook-form";
 import type { OpportunityFormValues } from "./BasicInformation";
 

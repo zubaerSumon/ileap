@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { UseFormReturn, Path } from "react-hook-form";
 import type { OpportunityFormValues } from "./BasicInformation";
-import { FormInput } from "@/components/forms/FormInput";
+import { FormInput } from "@/components/form-input/FormInput";
 import { RECURRENCE_TYPES, WEEKDAYS } from "@/utils/constants/opportunities";
 
 interface RecurrenceModalProps {

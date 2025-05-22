@@ -3,13 +3,13 @@
 import { Card } from "@/components/ui/card";
 import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FormInput } from "@/components/forms/FormInput";
-import { FormTextarea } from "@/components/forms/FormTextarea";
-import { FormSelect } from "@/components/forms/FormSelect";
+import { FormInput } from "@/components/form-input/FormInput";
+import { FormTextarea } from "@/components/form-input/FormTextarea";
+import { FormSelect } from "@/components/form-input/FormSelect";
 import { UseFormReturn, Path } from "react-hook-form";
-import { MultiSelectField } from "@/components/forms/MultiSelectField";
-import { FormRichTextEditor } from "@/components/forms/FormRichTextEditor";
-import { FormImageInput } from "@/components/forms/FormImageInput";
+import { MultiSelectField } from "@/components/form-input/MultiSelectField";
+import { FormRichTextEditor } from "@/components/form-input/FormRichTextEditor";
+import { FormImageInput } from "@/components/form-input/FormImageInput";
 
 // Define the form type to match the useForm defaultValues in page.tsx
 export type OpportunityFormValues = {

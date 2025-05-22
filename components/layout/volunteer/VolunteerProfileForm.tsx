@@ -5,15 +5,15 @@ import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
-import { FormInput } from "@/components/forms/FormInput";
-import { FormTextarea } from "@/components/forms/FormTextarea";
+import { FormInput } from "@/components/form-input/FormInput";
+import { FormTextarea } from "@/components/form-input/FormTextarea";
 import { Button } from "@/components/ui/button";
 import {
   VolunteerProfileUpdateData,
   VolunteerProfileUpdateSchema,
 } from "@/utils/constants";
-import { MultiSelectField } from "@/components/forms/MultiSelectField";
-import { PhoneField } from "@/components/forms/PhoneField";
+import { MultiSelectField } from "@/components/form-input/MultiSelectField";
+import { PhoneField } from "@/components/form-input/PhoneField";
 import { trpc } from "@/utils/trpc";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
