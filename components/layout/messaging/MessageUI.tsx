@@ -200,6 +200,16 @@ const ChatArea = React.memo(({
   onMenuClick: () => void;
   session: { user?: { id?: string } } | null;
 }) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]); // Scroll when messages change
+
   return (
     <div className="flex flex-col h-full">
       {selectedConversation && (
@@ -225,6 +235,7 @@ const ChatArea = React.memo(({
                     isOwnMessage={message.sender._id === session?.user?.id}
                   />
                 ))}
+                <div ref={messagesEndRef} data-messages-end /> {/* Invisible element at the bottom */}
               </div>
             )}
           </div>
@@ -425,7 +436,11 @@ export const MessageUI: React.FC = () => {
 
   // Queries
   const { data: conversations, isLoading: isLoadingConversations } = trpc.messages.getConversations.useQuery(undefined, {
-    enabled: !!session
+    enabled: !!session,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount if we have cached data
   });
 
   const { data: messages, isLoading: isLoadingMessages } = trpc.messages.getMessages.useQuery(
@@ -442,6 +457,11 @@ export const MessageUI: React.FC = () => {
     onSuccess: () => {
       utils.messages.getMessages.invalidate({ userId: selectedUserId || "" });
       utils.messages.getConversations.invalidate();
+      // Scroll to bottom after sending message
+      setTimeout(() => {
+        const messagesEnd = document.querySelector('[data-messages-end]');
+        messagesEnd?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
     },
     onError: (error) => {
       toast.error(error.message || "Failed to send message");
@@ -449,9 +469,11 @@ export const MessageUI: React.FC = () => {
   });
 
   const markMessagesAsReadMutation = trpc.messages.markAsRead.useMutation({
-    onSuccess: () => {
-      utils.messages.getMessages.invalidate({ userId: selectedUserId || "" });
-      utils.messages.getConversations.invalidate();
+    onSuccess: (data) => {
+      if (data.updatedCount > 0) {
+        utils.messages.getMessages.invalidate({ userId: selectedUserId || "" });
+        utils.messages.getConversations.invalidate();
+      }
     },
     onError: (error) => {
       toast.error(error.message || "Failed to mark messages as read");
@@ -478,12 +500,18 @@ export const MessageUI: React.FC = () => {
 
   // Effects
   useEffect(() => {
-    if (messages?.length && session?.user?.id) {
-      const hasUnreadMessages = messages.some(
+    if (messages?.length && session?.user?.id && selectedUserId) {
+      const recentMessages = messages.slice(-20);
+      const hasUnreadMessages = recentMessages.some(
         (msg: Message) => !msg.isRead && msg.receiver._id === session.user.id
       );
+      
       if (hasUnreadMessages) {
-        markMessagesAsReadMutation.mutate({ conversationId: selectedUserId || "" });
+        const timeoutId = setTimeout(() => {
+          markMessagesAsReadMutation.mutate({ conversationId: selectedUserId });
+        }, 1000);
+
+        return () => clearTimeout(timeoutId);
       }
     }
   }, [messages, session?.user?.id, selectedUserId, markMessagesAsReadMutation]);

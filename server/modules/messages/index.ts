@@ -206,19 +206,25 @@ export const messagesRouter = router({
 
         const currentUserId = user._id;
 
-        // Update all unread messages in this conversation
-        await Message.updateMany(
+        // Only update messages that are actually unread
+        const result = await Message.updateMany(
           {
             sender: new Types.ObjectId(conversationId),
             receiver: new Types.ObjectId(currentUserId),
             isRead: false,
+            createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Only update messages from last 24 hours
           },
           {
             $set: { isRead: true },
           }
         );
 
-        return { success: true };
+        // Only invalidate if we actually updated something
+        if (result.modifiedCount > 0) {
+          return { success: true, updatedCount: result.modifiedCount };
+        }
+
+        return { success: true, updatedCount: 0 };
       } catch (error: any) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

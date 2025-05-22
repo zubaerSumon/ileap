@@ -72,7 +72,11 @@ export default function TopNavigationBar() {
 
   // Fetch conversations to get total unread count
   const { data: conversations } = trpc.messages.getConversations.useQuery(undefined, {
-    enabled: isAuthenticated
+    enabled: isAuthenticated,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount if we have cached data
   });
 
   // Calculate total unread messages
