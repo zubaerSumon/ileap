@@ -7,6 +7,7 @@ import User from "../../db/models/user";
 import { JwtPayload } from "jsonwebtoken";
 import { router } from "@/server/trpc";
 import { protectedProcedure } from "@/server/middlewares/with-auth";
+import { z } from "zod";
 
 export const messagesRouter = router({
   sendMessage: protectedProcedure
@@ -133,6 +134,20 @@ export const messagesRouter = router({
               ],
             },
             lastMessage: { $first: "$$ROOT" },
+            unreadCount: {
+              $sum: {
+                $cond: [
+                  {
+                    $and: [
+                      { $eq: ["$receiver", new Types.ObjectId(currentUserId)] },
+                      { $eq: ["$isRead", false] },
+                    ],
+                  },
+                  1,
+                  0,
+                ],
+              },
+            },
           },
         },
         {
@@ -154,6 +169,7 @@ export const messagesRouter = router({
             "lastMessage.content": 1,
             "lastMessage.createdAt": 1,
             "lastMessage.isRead": 1,
+            unreadCount: 1,
           },
         },
       ]);
@@ -166,4 +182,48 @@ export const messagesRouter = router({
       });
     }
   }),
+
+  markAsRead: protectedProcedure
+    .input(z.object({ conversationId: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const { conversationId } = input;
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to mark messages as read",
+          });
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        const currentUserId = user._id;
+
+        // Update all unread messages in this conversation
+        await Message.updateMany(
+          {
+            sender: new Types.ObjectId(conversationId),
+            receiver: new Types.ObjectId(currentUserId),
+            isRead: false,
+          },
+          {
+            $set: { isRead: true },
+          }
+        );
+
+        return { success: true };
+      } catch (error: any) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error?.message || "Failed to mark messages as read",
+        });
+      }
+    }),
 });

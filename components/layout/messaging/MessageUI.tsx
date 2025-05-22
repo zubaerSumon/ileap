@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent } from "@/components/ui/card";
 import { Menu, X } from "lucide-react";
+import toast from "react-hot-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 type Message = {
   _id: string;
   content: string;
-  createdAt: Date;
+  createdAt: string;
+  isRead: boolean;
   sender: {
     _id: string;
     name: string;
@@ -29,19 +31,6 @@ type Message = {
   };
 };
 
-type Conversation = {
-  _id: string;
-  user: {
-    _id: string;
-    name: string;
-    avatar: string;
-    role?: string;
-  };
-  lastMessage: {
-    content: string;
-  };
-};
-
 export const MessageUI: React.FC = () => {
   const { data: session, status: sessionStatus } = useSession();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
@@ -49,29 +38,28 @@ export const MessageUI: React.FC = () => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [activeTab, setActiveTab] = useState("conversations");
 
+  // Get user role from session - moved up before its usage
+  const userRole = session?.user?.role;
+
   const utils = trpc.useUtils();
-  const { data: conversations, isLoading: isLoadingConversations, error: conversationsError } = trpc.messages.getConversations.useQuery<Conversation[]>(undefined, {
+  const { data: conversations, isLoading: isLoadingConversations, error: conversationsError } = trpc.messages.getConversations.useQuery(undefined, {
     enabled: sessionStatus === "authenticated"
   });
   
-  const { data: messages, isLoading: isLoadingMessages, error: messagesError } = trpc.messages.getMessages.useQuery<Message[]>(
+  const { data: messages, isLoading: isLoadingMessages, error: messagesError } = trpc.messages.getMessages.useQuery(
     { userId: selectedUserId || "" },
     { enabled: !!selectedUserId && sessionStatus === "authenticated" }
   );
 
-  const { data: availableUsers, isLoading: isLoadingUsers } = trpc.users.getAvailableUsers.useQuery(undefined, {
-    enabled: sessionStatus === "authenticated"
+  const markMessagesAsReadMutation = trpc.messages.markAsRead.useMutation({
+    onSuccess: () => {
+      utils.messages.getMessages.invalidate({ userId: selectedUserId || "" });
+      utils.messages.getConversations.invalidate();
+    },
   });
 
-  // Get user role from session
-  const userRole = session?.user?.role;
-
-  // Debug logging
-  console.log('MessageUI Debug:', {
-    sessionStatus,
-    userRole,
-    availableUsers,
-    isLoadingUsers
+  const { data: availableUsers, isLoading: isLoadingUsers } = trpc.users.getAvailableUsers.useQuery(undefined, {
+    enabled: sessionStatus === "authenticated" && userRole !== "volunteer"
   });
 
   // Determine the label based on user role
@@ -82,6 +70,10 @@ export const MessageUI: React.FC = () => {
       utils.messages.getMessages.invalidate({ userId: selectedUserId || "" });
       utils.messages.getConversations.invalidate();
     },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send message");
+      // No need to setNewMessage(newMessage) here, input is already controlled
+    }
   });
 
   const handleSendMessage = (e: React.FormEvent) => {
@@ -95,6 +87,18 @@ export const MessageUI: React.FC = () => {
 
     setNewMessage("");
   };
+
+  // Handle marking messages as read
+  useEffect(() => {
+    if (messages?.length && session?.user?.id) {
+      const hasUnreadMessages = messages.some(
+        (msg: Message) => !msg.isRead && msg.receiver._id === session.user.id
+      );
+      if (hasUnreadMessages) {
+        markMessagesAsReadMutation.mutate({ conversationId: selectedUserId || "" });
+      }
+    }
+  }, [messages, session?.user?.id, selectedUserId]);
 
   return (
     <div className="flex h-[800px] bg-white relative m-4 border rounded-lg overflow-hidden">
@@ -128,7 +132,9 @@ export const MessageUI: React.FC = () => {
           <div className="px-4 pt-2">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="conversations">Conversations</TabsTrigger>
-              <TabsTrigger value="applicants">{secondTabLabel}</TabsTrigger>
+              {userRole !== "volunteer" && (
+                <TabsTrigger value="applicants">{secondTabLabel}</TabsTrigger>
+              )}
             </TabsList>
           </div>
 
@@ -158,10 +164,17 @@ export const MessageUI: React.FC = () => {
                           height={40}
                           className="rounded-full"
                         />
-                        <div>
-                          <h3 className="font-medium">{conversation.user.name}</h3>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-medium">{conversation.user.name}</h3>
+                            {conversation.unreadCount > 0 && (
+                              <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+                                {conversation.unreadCount}
+                              </span>
+                            )}
+                          </div>
                           <p className="text-xs text-gray-400">{conversation.user.role}</p>
-                          <p className="text-sm text-gray-500 truncate">
+                          <p className={`text-sm truncate ${conversation.lastMessage.isRead ? 'text-gray-500' : 'text-gray-900 font-medium'}`}>
                             {conversation.lastMessage.content}
                           </p>
                         </div>
@@ -172,37 +185,39 @@ export const MessageUI: React.FC = () => {
               )}
             </TabsContent>
 
-            <TabsContent value="applicants" className="mt-0">
-              {isLoadingUsers ? (
-                <div className="p-4 text-center text-gray-500">Loading {secondTabLabel.toLowerCase()}...</div>
-              ) : availableUsers?.length === 0 ? (
-                <div className="p-4 text-center text-gray-500">No {secondTabLabel.toLowerCase()} found</div>
-              ) : (
-                availableUsers?.map((user) => (
-                  <Card
-                    key={user._id}
-                    className="mx-2 my-1 shadow-none border-0 hover:bg-gray-50 cursor-pointer"
-                    onClick={() => setSelectedUserId(user._id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <Image
-                          src={user.avatar || "/avatar.svg"}
-                          alt={user.name}
-                          width={40}
-                          height={40}
-                          className="rounded-full"
-                        />
-                        <div>
-                          <h3 className="font-medium">{user.name}</h3>
-                          <p className="text-xs text-gray-400">{user.role}</p>
+            {userRole !== "volunteer" && (
+              <TabsContent value="applicants" className="mt-0">
+                {isLoadingUsers ? (
+                  <div className="p-4 text-center text-gray-500">Loading {secondTabLabel.toLowerCase()}...</div>
+                ) : availableUsers?.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500">No {secondTabLabel.toLowerCase()} found</div>
+                ) : (
+                  availableUsers?.map((user) => (
+                    <Card
+                      key={user._id}
+                      className="mx-2 my-1 shadow-none border-0 hover:bg-gray-50 cursor-pointer"
+                      onClick={() => setSelectedUserId(user._id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
+                          <Image
+                            src={user.avatar || "/avatar.svg"}
+                            alt={user.name}
+                            width={40}
+                            height={40}
+                            className="rounded-full"
+                          />
+                          <div>
+                            <h3 className="font-medium">{user.name}</h3>
+                            <p className="text-xs text-gray-400">{user.role}</p>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              )}
-            </TabsContent>
+                      </CardContent>
+                    </Card>
+                  ))
+                )}
+              </TabsContent>
+            )}
           </ScrollArea>
         </Tabs>
       </div>
@@ -230,7 +245,10 @@ export const MessageUI: React.FC = () => {
                           conversations.find((c) => c._id === selectedUserId)
                             ?.user.avatar || "/avatar.svg"
                         }
-                        alt="User"
+                        alt={
+                          conversations.find((c) => c._id === selectedUserId)
+                            ?.user.name || "User"
+                        }
                         width={40}
                         height={40}
                         className="rounded-full"
@@ -238,7 +256,7 @@ export const MessageUI: React.FC = () => {
                       <div>
                         <h2 className="font-semibold">
                           {conversations.find((c) => c._id === selectedUserId)
-                            ?.user.name}
+                            ?.user.name || ""}
                         </h2>
                       </div>
                     </>

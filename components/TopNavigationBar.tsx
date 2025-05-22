@@ -20,6 +20,7 @@ import {
 } from "./ui/menubar";
 import { signOut, useSession } from "next-auth/react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
+import { trpc } from "@/utils/trpc";
 
 const publicNavOptions = [
   { label: "Log in", href: "/signin", className: "hover:underline" },
@@ -68,6 +69,14 @@ export default function TopNavigationBar() {
     pathname?.includes("messaging");
 
   const isResetPasswordPath = pathname?.endsWith("reset-password");
+
+  // Fetch conversations to get total unread count
+  const { data: conversations } = trpc.messages.getConversations.useQuery(undefined, {
+    enabled: isAuthenticated
+  });
+
+  // Calculate total unread messages
+  const totalUnreadCount = conversations?.reduce((total, conv) => total + (conv.unreadCount || 0), 0) || 0;
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -293,7 +302,7 @@ export default function TopNavigationBar() {
                     )}
                     <Link
                       href="/messaging"
-                      className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-800 transition-colors"
+                      className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-800 transition-colors relative"
                     >
                       <svg
                         width="24"
@@ -310,6 +319,11 @@ export default function TopNavigationBar() {
                           strokeLinejoin="round"
                         />
                       </svg>
+                      {totalUnreadCount > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          {totalUnreadCount}
+                        </span>
+                      )}
                     </Link>
                     <div className="hidden md:flex flex-col mr-3">
                       <span className="text-sm font-medium text-white">
