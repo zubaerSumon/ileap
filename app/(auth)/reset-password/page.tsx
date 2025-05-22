@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { PasswordField } from "@/components/forms/PasswordField";
+import { PasswordField } from "@/components/form-input/PasswordField";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -17,7 +17,7 @@ import {
 import { useState } from "react";
 import { AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { FormField } from "@/components/forms/FormField";
+import { FormField } from "@/components/form-input/FormField";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { ResetPasswordFormData, ResetPasswordSchema } from "@/utils/constants";

@@ -1,14 +1,14 @@
-import { FormField } from "@/components/forms/FormField";
-import { MultiSelectField } from "@/components/forms/MultiSelectField";
+import { FormField } from "@/components/form-input/FormField";
+import { MultiSelectField } from "@/components/form-input/MultiSelectField";
 import { UseFormReturn } from "react-hook-form";
 import { OrgSignupFormData } from "@/types/auth";
-import { FormSelect } from "@/components/forms/FormSelect";
+import { FormSelect } from "@/components/form-input/FormSelect";
 import {
   organizationTypes,
   volunteerTypes,
 } from "@/utils/constants/select-options";
-import { FormImageInput } from "@/components/forms/FormImageInput";
-import { ProfilePhotoInput } from "@/components/forms/ProfilePhotoInput";
+import { FormImageInput } from "@/components/form-input/FormImageInput";
+import { ProfilePhotoInput } from "@/components/form-input/ProfilePhotoInput";
 
 interface OrgDetailsStepProps {
   form: UseFormReturn<OrgSignupFormData>;

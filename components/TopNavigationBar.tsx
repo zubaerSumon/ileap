@@ -3,8 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { Menu, X, LogOut } from "lucide-react";
-import { usePathname, /* useSearchParams */ } from "next/navigation";
+import { Menu, X, LogOut, FileUser } from "lucide-react";
+import { usePathname /* useSearchParams */ } from "next/navigation";
 import Logo from "../public/AusLeap.png";
 // import { FaInstagram, FaLinkedin } from "react-icons/fa";
 
@@ -199,7 +199,13 @@ export default function TopNavigationBar() {
             <div className="container mx-auto flex justify-between items-center">
               <div className="flex items-center space-x-6">
                 <Link
-                  href={session ? (session.user?.role === 'organization' ? '/organization' : '/volunteer') : '/'}
+                  href={
+                    session
+                      ? session.user?.role === "organization"
+                        ? "/organization"
+                        : "/volunteer"
+                      : "/"
+                  }
                   className="flex items-center"
                 >
                   <Image
@@ -211,6 +217,14 @@ export default function TopNavigationBar() {
                     priority
                   />
                 </Link>
+                {session?.user?.role === "organization" && isProtectedPath && (
+                  <Link
+                    href="/organization/opportunities"
+                    className="text-xs flex items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium  hover:text-blue-500 "
+                  >
+                    <FileUser className="h-4 w-4" /> Opportunities
+                  </Link>
+                )}
               </div>
 
               {isAuthPath ? (
@@ -276,7 +290,7 @@ export default function TopNavigationBar() {
               ) : isProtectedPath ? (
                 <div className="flex items-center space-x-6">
                   <div className="flex items-center space-x-4">
-                    {session?.user?.role === 'organization' && (
+                    {session?.user?.role === "organization" && (
                       <Link
                         href={`/${session?.user?.role}/opportunity/create`}
                         className="flex h-[33px] px-3 justify-center items-center gap-[6px] rounded-[6px] bg-[#2563EB] text-white hover:bg-blue-700 transition-colors"
@@ -324,19 +338,24 @@ export default function TopNavigationBar() {
                             </MenubarItem>
                             <MenubarSeparator className="md:hidden" />
                             <MenubarItem>
-                              <Link 
+                              <Link
                                 href={
-                                  session?.user?.role === pathname?.split('/')[1] 
+                                  session?.user?.role ===
+                                  pathname?.split("/")[1]
                                     ? `/${session?.user?.role}/profile`
                                     : `/${session?.user?.role}`
-                                } 
+                                }
                                 className="w-full"
                               >
                                 Edit Profile
                               </Link>
                             </MenubarItem>
                             <MenubarSeparator />
-                            <MenubarItem onClick={() => signOut({ callbackUrl: "/signin" })}>
+                            <MenubarItem
+                              onClick={() =>
+                                signOut({ callbackUrl: "/signin" })
+                              }
+                            >
                               Sign out{" "}
                               <MenubarShortcut>
                                 <LogOut className="h-4 w-4" />

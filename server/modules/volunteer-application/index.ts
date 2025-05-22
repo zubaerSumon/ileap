@@ -185,4 +185,61 @@ export const volunteerApplicationRouter = router({
         throw error;
       }
     }),
-}); 
+
+  getOpportunityApplicants: protectedProcedure
+    .input(volunteerApplicationValidation.getOpportunityApplicantsSchema)
+    .query(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to view applicants.",
+          });
+        }
+
+        const applications = await VolunteerApplication.find({
+          opportunity: input.opportunityId,
+         })
+          .populate({
+            path: "volunteer",
+          })
+          .lean();
+
+        if (!applications) {
+          return [];
+        }
+
+        return applications.map((application) => {
+          const app = application as unknown as {
+            _id: { toString(): string };
+            volunteer: {
+              _id: { toString(): string };
+              name?: string;
+              profile_img?: string;
+              location?: string;
+              bio?: string;
+              skills?: string[];
+              completed_projects?: number;
+              availability?: string;
+            };
+          };
+
+          return {
+            id: app.volunteer._id.toString(),
+            name: app.volunteer.name || "",
+            profileImg: app.volunteer.profile_img || "/avatar.svg",
+            location: app.volunteer.location || "",
+            bio: app.volunteer.bio || "",
+            skills: app.volunteer.skills || [],
+            completedProjects: app.volunteer.completed_projects || 0,
+            availability: app.volunteer.availability || "",
+            applicationId: app._id.toString(),
+          } as const;
+        });
+      } catch (error) {
+        console.error("Error getting opportunity applicants:", error);
+        throw error;
+      }
+    }),
+});

@@ -1,9 +1,9 @@
-import { FormField } from "@/components/forms/FormField";
-import { MultiSelectField } from "@/components/forms/MultiSelectField";
-import { PhoneField } from "@/components/forms/PhoneField";
+import { FormField } from "@/components/form-input/FormField";
+import { MultiSelectField } from "@/components/form-input/MultiSelectField";
+import { PhoneField } from "@/components/form-input/PhoneField";
 import { UseFormReturn } from "react-hook-form";
 import { VolunteerSignupForm } from "@/types/auth";
-import { FormSelect } from "@/components/forms/FormSelect";
+import { FormSelect } from "@/components/form-input/FormSelect";
 import { useEffect } from "react";
 import { suburbs } from "@/utils/constants/suburb";
 import { locations, volunteerTypes } from "@/utils/constants/select-options";

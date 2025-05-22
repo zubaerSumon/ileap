@@ -7,8 +7,12 @@ const applyToOpportunitySchema = z.object({
 const getApplicationStatusSchema = z.object({
   opportunityId: z.string(),
 });
+const getOpportunityApplicantsSchema = z.object({
+  opportunityId: z.string(),
+});
 
 export const volunteerApplicationValidation = {
   applyToOpportunitySchema,
   getApplicationStatusSchema,
+  getOpportunityApplicantsSchema,
 }; 

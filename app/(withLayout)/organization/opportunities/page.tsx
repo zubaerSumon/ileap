@@ -5,7 +5,6 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
-import OpportunityTabs from "./components/OpportunityTabs";
 import {
   Pagination,
   PaginationContent,
@@ -32,8 +31,11 @@ import { MoreHorizontal } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import type { Opportunity } from "@/types/opportunities";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
+import OpportunityTabs from "@/components/layout/organization/opportunities/OpportunityTabs";
+import { useRouter } from "next/navigation";
 
 export default function OpportunitiesPage() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState("open");
   const [pageIndex, setPageIndex] = useState(0);
   const pageSize = 4;
@@ -98,15 +100,27 @@ export default function OpportunitiesPage() {
     columnHelper.display({
       id: "actions",
       header: "",
-      cell: () => (
+      cell: (info) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="ml-auto">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-auto cursor-pointer"
+            >
               <MoreHorizontal className="w-5 h-5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem>View Application</DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                router.push(
+                  `/organization/opportunities/${info.row.original._id}`
+                )
+              }
+            >
+              View Application
+            </DropdownMenuItem>
             <DropdownMenuItem>Edit</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
@@ -131,7 +145,7 @@ export default function OpportunitiesPage() {
     <ProtectedLayout>
       <div className="bg-[#F5F7FA] ">
         <div className="max-w-[1048px] p-8 h-[900px] mx-auto overflow-auto">
-          <div className="bg-white rounded-lg shadow-sm">
+          <div className="bg-white rounded-lg">
             <div className="px-4 pt-5">
               <h1 className="text-2xl font-semibold mb-1">Opportunities</h1>
               <p className="text-sm text-gray-500 mb-6">Posted tasks</p>

@@ -1,5 +1,5 @@
-import { FormField } from "@/components/forms/FormField";
-import { PasswordField } from "@/components/forms/PasswordField";
+import { FormField } from "@/components/form-input/FormField";
+import { PasswordField } from "@/components/form-input/PasswordField";
 import { UseFormReturn } from "react-hook-form";
 import { VolunteerSignupForm } from "@/types/auth";
 import { useState } from "react";
