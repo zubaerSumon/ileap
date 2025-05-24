@@ -85,16 +85,16 @@ export default function OpportunitiesPage() {
         );
       },
     }),
-    columnHelper.accessor("number_of_volunteers", {
+    columnHelper.accessor("applicantCount", {
       header: "Applicants",
       cell: (info) => (
-        <div className="w-full text-center">{info.getValue()}</div>
+        <div className="w-full text-center">{info.getValue() || 0}</div>
       ),
     }),
-    columnHelper.accessor("number_of_volunteers", {
+    columnHelper.accessor("recruitCount", {
       header: "Recruits",
       cell: (info) => (
-        <div className="w-full text-center">{info.getValue()}</div>
+        <div className="w-full text-center">{info.getValue() || 0}</div>
       ),
     }),
     columnHelper.display({
@@ -152,6 +152,7 @@ export default function OpportunitiesPage() {
               <OpportunityTabs
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
+                openCount={opportunities?.length || 0}
               />
             </div>
 

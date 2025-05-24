@@ -11,11 +11,12 @@ interface TabItem {
 interface OpportunityTabsProps {
   activeTab: string;
   onTabChange: (value: string) => void;
+  openCount?: number;
 }
 
-export default function OpportunityTabs({ activeTab, onTabChange }: OpportunityTabsProps) {
+export default function OpportunityTabs({ activeTab, onTabChange, openCount = 0 }: OpportunityTabsProps) {
   const tabs: TabItem[] = [
-    { label: "Open", count: 15, value: "open" },
+    { label: "Open", count: openCount, value: "open" },
     { label: "Draft", count: 0, value: "draft" },
     { label: "Recruited", count: 0, value: "recruited" },
     { label: "Archived", count: 0, value: "archived" },

@@ -15,4 +15,6 @@ export type Opportunity = CreateOpportunityInput & {
   > & {
     _id: string;
   };
+  applicantCount?: number;
+  recruitCount?: number;
 };

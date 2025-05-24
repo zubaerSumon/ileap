@@ -1,5 +1,6 @@
 import { APPLICATION_CONFIRMATION_TEMPLATE } from "@/server/services/mail/constants";
 import sendEmail from "@/server/services/mail/sendMail";
+import Opportunity from "@/server/db/models/opportunity";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sendApplicationConfirmationMail = async (
@@ -7,14 +8,21 @@ export const sendApplicationConfirmationMail = async (
   name: string,
   opportunityId: string
 ) => {
-  const organization = ["1", "4"].includes(opportunityId)
-    ? "Easy Care Gardening"
-    : "Clean Up Australia";
-  const opportunity = ["1", "4"].includes(opportunityId)
-    ? "Gardening Volunteer"
-    : "CleanUp Volunteer";
-
   try {
+    // Fetch opportunity details
+    const opportunity = await Opportunity.findById(opportunityId)
+      .populate({
+        path: 'organization_profile',
+        select: 'title'
+      });
+
+    if (!opportunity) {
+      throw new Error("Opportunity not found");
+    }
+
+    const organizationName = opportunity.organization_profile?.title || "Organization";
+    const opportunityTitle = opportunity.name || "Opportunity";
+
     const emailTemplate = APPLICATION_CONFIRMATION_TEMPLATE;
     sendEmail(
       [email],
@@ -22,8 +30,8 @@ export const sendApplicationConfirmationMail = async (
         subject: "Confirmation: Your Opportunity Application on Ausleap",
         data: {
           userName: name,
-          opportunity,
-          organization,
+          opportunity: opportunityTitle,
+          organization: organizationName,
         },
       },
       emailTemplate

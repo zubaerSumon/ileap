@@ -108,14 +108,14 @@ export default function OpportunityDetailsPage() {
                   className="rounded-full transition-colors data-[state=active]:bg-[#246BFD] data-[state=active]:text-white hover:bg-gray-200 data-[state=active]:hover:bg-[#246BFD] flex items-center gap-2"
                 >
                   <MessageCircleCode />
-                  Review Applications
+                  Applicants ({applicants?.length || 0})
                 </TabsTrigger>
                 <TabsTrigger
                   value="recruits"
                   className="rounded-full transition-colors data-[state=active]:bg-[#246BFD] data-[state=active]:text-white hover:bg-gray-200 data-[state=active]:hover:bg-[#246BFD] flex items-center gap-2"
                 >
                   <Hand />
-                  Recruits
+                  Recruits ({recruitedApplicants?.length || 0})
                 </TabsTrigger>
               </TabsList>
 

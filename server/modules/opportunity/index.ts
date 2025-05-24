@@ -6,6 +6,8 @@ import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
 import { z } from "zod";
 import User from "@/server/db/models/user";
+import VolunteerApplication from "@/server/db/models/volunteer-application";
+import OrganisationRecruitment from "@/server/db/models/organisation-recruitment";
 
 export const opportunityRouter = router({
   createOpportunity: protectedProcedure
@@ -126,7 +128,25 @@ export const opportunityRouter = router({
         .populate("organization_profile")
         .sort({ createdAt: -1 });
 
-      return opportunities;
+      // Get applicant and recruit counts for each opportunity
+      const opportunitiesWithCounts = await Promise.all(
+        opportunities.map(async (opportunity) => {
+          const [applicantCount, recruitCount] = await Promise.all([
+            VolunteerApplication.countDocuments({ opportunity: opportunity._id }),
+            OrganisationRecruitment.countDocuments({
+              application: { $in: await VolunteerApplication.find({ opportunity: opportunity._id }).select('_id') }
+            })
+          ]);
+
+          return {
+            ...opportunity.toObject(),
+            applicantCount,
+            recruitCount
+          };
+        })
+      );
+
+      return opportunitiesWithCounts;
     } catch (error) {
       console.error("Error fetching opportunities:", error);
       throw new TRPCError({
