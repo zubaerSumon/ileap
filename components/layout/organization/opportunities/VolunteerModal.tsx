@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
-interface Volunteer {
+export interface Volunteer {
   _id: string;
   name: string;
   avatar?: string;

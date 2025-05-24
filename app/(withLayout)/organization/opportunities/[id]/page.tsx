@@ -19,12 +19,16 @@ import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
 import VolunteerModal from "@/components/layout/organization/opportunities/VolunteerModal";
 import { useState } from "react";
+import { type Applicant } from "@/components/layout/organization/opportunities/ApplicantsCard";
+import MessageApplicantModal from "@/components/layout/organization/opportunities/MessageApplicantModal";
 
 export default function OpportunityDetailsPage() {
   const router = useRouter();
   const params = useParams();
   const opportunityId = params.id as string;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
 
   const {
     data: opportunity,
@@ -41,6 +45,26 @@ export default function OpportunityDetailsPage() {
     { opportunityId },
     { enabled: !!opportunityId }
   );
+
+  const handleOpenVolunteerModal = (applicant: Applicant) => {
+    setSelectedApplicant(applicant);
+    setIsModalOpen(true);
+  };
+
+  const handleOpenMessageModal = (applicant: Applicant) => {
+    setSelectedApplicant(applicant);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedApplicant(null);
+  };
+
+  const handleCloseMessageModal = () => {
+    setIsMessageModalOpen(false);
+    setSelectedApplicant(null);
+  };
 
   if (isLoading || isLoadingApplicants) {
     return (
@@ -143,7 +167,8 @@ export default function OpportunityDetailsPage() {
                   {applicants?.map((applicant) => (
                     <ApplicantsCard 
                       key={applicant.id} 
-                      setIsModalOpen={setIsModalOpen} 
+                      setIsModalOpen={() => handleOpenVolunteerModal(applicant)}
+                      onMessageClick={() => handleOpenMessageModal(applicant)}
                       hideRecruitButton={true}
                       applicant={applicant}
                     />
@@ -186,7 +211,8 @@ export default function OpportunityDetailsPage() {
                   {applicants?.map((applicant) => (
                     <ApplicantsCard 
                       key={applicant.id} 
-                      setIsModalOpen={setIsModalOpen} 
+                      setIsModalOpen={() => handleOpenVolunteerModal(applicant)}
+                      onMessageClick={() => handleOpenMessageModal(applicant)}
                       applicant={applicant}
                     />
                   ))}
@@ -198,7 +224,20 @@ export default function OpportunityDetailsPage() {
       </div>
       <VolunteerModal
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={handleCloseModal}
+        volunteer={selectedApplicant ? {
+          _id: selectedApplicant.id,
+          name: selectedApplicant.name,
+          avatar: selectedApplicant.profileImg,
+          status: 'pending',
+          appliedAt: new Date().toISOString(),
+          email: ''
+        } : null}
+      />
+      <MessageApplicantModal
+        isOpen={isMessageModalOpen}
+        onClose={handleCloseMessageModal}
+        applicant={selectedApplicant}
       />
     </ProtectedLayout>
   );

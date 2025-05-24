@@ -248,6 +248,11 @@ export const volunteerApplicationRouter = router({
         })
           .populate({
             path: "volunteer",
+            select: "name email volunteer_profile",
+            populate: {
+              path: "volunteer_profile",
+              select: "bio skills completed_projects availability state area postcode interested_on"
+            }
           })
           .lean();
 
@@ -260,26 +265,35 @@ export const volunteerApplicationRouter = router({
             _id: { toString(): string };
             volunteer: {
               _id: { toString(): string };
-              name?: string;
-              profile_img?: string;
-              location?: string;
-              bio?: string;
-              skills?: string[];
-              completed_projects?: number;
-              availability?: string;
+              name: string;
+              email: string;
+              volunteer_profile: {
+                bio?: string;
+                skills?: string[];
+                completed_projects?: number;
+                availability?: string;
+                state?: string;
+                area?: string;
+                postcode?: string;
+                interested_on?: string[];
+              };
             };
           };
 
           return {
             id: app.volunteer._id.toString(),
             name: app.volunteer.name || "",
-            profileImg: app.volunteer.profile_img || "/avatar.svg",
-            location: app.volunteer.location || "",
-            bio: app.volunteer.bio || "",
-            skills: app.volunteer.skills || [],
-            completedProjects: app.volunteer.completed_projects || 0,
-            availability: app.volunteer.availability || "",
+            profileImg: "/avatar.svg",
+            location: "",
+            bio: app.volunteer.volunteer_profile?.bio || "",
+            skills: app.volunteer.volunteer_profile?.skills || [],
+            completedProjects: app.volunteer.volunteer_profile?.completed_projects || 0,
+            availability: app.volunteer.volunteer_profile?.availability || "",
             applicationId: app._id.toString(),
+            state: app.volunteer.volunteer_profile?.state || "",
+            area: app.volunteer.volunteer_profile?.area || "",
+            postcode: app.volunteer.volunteer_profile?.postcode || "",
+            interested_on: app.volunteer.volunteer_profile?.interested_on || [],
           } as const;
         });
       } catch (error) {
