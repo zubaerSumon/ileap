@@ -206,13 +206,12 @@ export const messagesRouter = router({
 
         const currentUserId = user._id;
 
-        // Only update messages that are actually unread
+        // Update all unread messages without time restriction
         const result = await Message.updateMany(
           {
             sender: new Types.ObjectId(conversationId),
             receiver: new Types.ObjectId(currentUserId),
-            isRead: false,
-            createdAt: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) } // Only update messages from last 24 hours
+            isRead: false
           },
           {
             $set: { isRead: true },

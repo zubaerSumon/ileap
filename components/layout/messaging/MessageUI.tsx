@@ -507,11 +507,7 @@ export const MessageUI: React.FC = () => {
       );
       
       if (hasUnreadMessages) {
-        const timeoutId = setTimeout(() => {
-          markMessagesAsReadMutation.mutate({ conversationId: selectedUserId });
-        }, 1000);
-
-        return () => clearTimeout(timeoutId);
+        markMessagesAsReadMutation.mutate({ conversationId: selectedUserId });
       }
     }
   }, [messages, session?.user?.id, selectedUserId, markMessagesAsReadMutation]);
