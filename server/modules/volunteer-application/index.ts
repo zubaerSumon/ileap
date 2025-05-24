@@ -27,7 +27,7 @@ export const volunteerApplicationRouter = router({
 
         const application = (await VolunteerApplication.findOne({
           opportunity: input.opportunityId,
-          volunteer: user.volunteer_profile,
+          volunteer: user._id,
         }).lean()) as { status?: string } | null;
 
         return { status: application?.status || null };
@@ -64,10 +64,10 @@ export const volunteerApplicationRouter = router({
         }
 
         const user = await User.findOne({ email: sessionUser.email });
-        if (!user || !user.volunteer_profile) {
+        if (!user) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Volunteer profile not found.",
+            message: "User not found.",
           });
         }
 
@@ -81,7 +81,7 @@ export const volunteerApplicationRouter = router({
 
         const existingApplication = await VolunteerApplication.findOne({
           opportunity: input.opportunityId,
-          volunteer: user.volunteer_profile,
+          volunteer: user._id,
         });
 
         if (existingApplication) {
@@ -93,7 +93,7 @@ export const volunteerApplicationRouter = router({
 
         const application = await VolunteerApplication.create({
           opportunity: input.opportunityId,
-          volunteer: user.volunteer_profile,
+          volunteer: user._id,
         });
 
         if (!application) {
@@ -200,9 +200,14 @@ export const volunteerApplicationRouter = router({
 
         const applications = await VolunteerApplication.find({
           opportunity: input.opportunityId,
-         })
+        })
           .populate({
             path: "volunteer",
+            select: "name email",
+            populate: {
+              path: "volunteer_profile",
+              select: "profile_img location bio skills completed_projects availability"
+            }
           })
           .lean();
 
@@ -216,24 +221,28 @@ export const volunteerApplicationRouter = router({
             volunteer: {
               _id: { toString(): string };
               name?: string;
-              profile_img?: string;
-              location?: string;
-              bio?: string;
-              skills?: string[];
-              completed_projects?: number;
-              availability?: string;
+              email?: string;
+              volunteer_profile?: {
+                profile_img?: string;
+                location?: string;
+                bio?: string;
+                skills?: string[];
+                completed_projects?: number;
+                availability?: string;
+              };
             };
           };
 
           return {
             id: app.volunteer._id.toString(),
             name: app.volunteer.name || "",
-            profileImg: app.volunteer.profile_img || "/avatar.svg",
-            location: app.volunteer.location || "",
-            bio: app.volunteer.bio || "",
-            skills: app.volunteer.skills || [],
-            completedProjects: app.volunteer.completed_projects || 0,
-            availability: app.volunteer.availability || "",
+            email: app.volunteer.email || "",
+            profileImg: app.volunteer.volunteer_profile?.profile_img || "/avatar.svg",
+            location: app.volunteer.volunteer_profile?.location || "",
+            bio: app.volunteer.volunteer_profile?.bio || "",
+            skills: app.volunteer.volunteer_profile?.skills || [],
+            completedProjects: app.volunteer.volunteer_profile?.completed_projects || 0,
+            availability: app.volunteer.volunteer_profile?.availability || "",
             applicationId: app._id.toString(),
           } as const;
         });

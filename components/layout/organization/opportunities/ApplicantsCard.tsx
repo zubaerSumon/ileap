@@ -1,9 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MapPin, Star, UserCheck } from "lucide-react";
+import { MapPin, Star, UserCheck, Loader2, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { HiClipboardDocumentList } from "react-icons/hi2";
+import { trpc } from "@/utils/trpc";
+import toast from "react-hot-toast";
+import type { TRPCClientErrorLike } from "@trpc/client";
+import type { AppRouter } from "@/server";
+import { useRecruitmentStatus } from "@/hooks/useRecruitmentStatus";
 
 interface Applicant {
   id: string;
@@ -26,6 +31,30 @@ export function ApplicantsCard({
   hideRecruitButton?: boolean;
   applicant: Applicant;
 }) {
+  const utils = trpc.useUtils();
+  const { isRecruited, refetchRecruitmentStatus } = useRecruitmentStatus(
+    applicant.applicationId,
+    !hideRecruitButton
+  );
+
+  const recruitMutation = trpc.recruits.recruitApplicant.useMutation({
+    onSuccess: () => {
+      toast.success("Applicant has been recruited successfully.");
+      setIsModalOpen(false);
+      refetchRecruitmentStatus();
+      utils.recruits.getRecruitedApplicants.invalidate();
+    },
+    onError: (error: TRPCClientErrorLike<AppRouter>) => {
+      toast.error(error.message);
+    },
+  });
+
+  const handleRecruit = () => {
+    recruitMutation.mutate({
+      applicationId: applicant.applicationId,
+    });
+  };
+
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg p-6 border space-y-4">
@@ -60,7 +89,8 @@ export function ApplicantsCard({
                 {applicant.availability}
               </div>
               <div className="flex items-center gap-1 text-orange-600">
-                <UserCheck className="w-4 h-4 " /> {applicant.skills.length} matched skills
+                <UserCheck className="w-4 h-4 " /> {applicant.skills.length}{" "}
+                matched skills
               </div>
             </div>
 
@@ -75,9 +105,7 @@ export function ApplicantsCard({
               ))}
             </div>
 
-            <p className="text-sm text-gray-600 mt-3">
-              {applicant.bio}
-            </p>
+            <p className="text-sm text-gray-600 mt-3">{applicant.bio}</p>
 
             <div className="flex gap-3 mt-4">
               <div className="flex gap-2">
@@ -92,10 +120,27 @@ export function ApplicantsCard({
                   <Button
                     variant="ghost"
                     size="lg"
-                    className="bg-gray-100 hover:bg-gray-200 rounded-[6px] px-6 font-normal"
-                    onClick={() => setIsModalOpen(true)}
+                    className={`rounded-[6px] px-6 font-normal ${
+                      isRecruited
+                        ? "bg-green-50 text-green-600 hover:bg-green-100"
+                        : "bg-gray-100 hover:bg-gray-200"
+                    }`}
+                    onClick={handleRecruit}
+                    disabled={recruitMutation.isPending || isRecruited}
                   >
-                    Recruit
+                    {recruitMutation.isPending ? (
+                      <div className="flex items-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Recruiting...
+                      </div>
+                    ) : isRecruited ? (
+                      <div className="flex items-center gap-2">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Recruited
+                      </div>
+                    ) : (
+                      "Recruit"
+                    )}
                   </Button>
                 )}
               </div>
