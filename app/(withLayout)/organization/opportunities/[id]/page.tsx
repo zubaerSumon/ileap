@@ -42,7 +42,15 @@ export default function OpportunityDetailsPage() {
     { enabled: !!opportunityId }
   );
 
-  if (isLoading || isLoadingApplicants) {
+  const {
+    data: recruitedApplicants,
+    isLoading: isLoadingRecruitedApplicants,
+  } = trpc.recruits.getRecruitedApplicants.useQuery(
+    { opportunityId },
+    { enabled: !!opportunityId }
+  );
+
+  if (isLoading || isLoadingApplicants || isLoadingRecruitedApplicants) {
     return (
       <ProtectedLayout>
         <div className="bg-[#F5F7FA] py-12">
@@ -140,7 +148,7 @@ export default function OpportunityDetailsPage() {
                     </div>
                     <div className="w-full border-b border-[#F1F1F1]" />
                   </div>
-                  {applicants?.map((applicant) => (
+                  {recruitedApplicants?.map((applicant) => (
                     <ApplicantsCard 
                       key={applicant.id} 
                       setIsModalOpen={setIsModalOpen} 
@@ -148,6 +156,11 @@ export default function OpportunityDetailsPage() {
                       applicant={applicant}
                     />
                   ))}
+                  {recruitedApplicants?.length === 0 && (
+                    <div className="text-center text-gray-500 py-8">
+                      No recruited volunteers yet
+                    </div>
+                  )}
                 </div>
               </TabsContent>
 

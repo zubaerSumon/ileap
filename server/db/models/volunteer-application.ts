@@ -10,7 +10,7 @@ const VolunteerApplicationSchema = new Schema<IVolunteerApplication>(
     },
     volunteer: {
       type: Schema.Types.ObjectId,
-      ref: "volunteer_profile",
+      ref: "user",
       required: true,
     },
     status: {
