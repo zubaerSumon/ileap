@@ -64,10 +64,10 @@ export const volunteerApplicationRouter = router({
         }
 
         const user = await User.findOne({ email: sessionUser.email });
-        if (!user || !user.volunteer_profile) {
+        if (!user) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Volunteer profile not found.",
+            message: "User not found.",
           });
         }
 
@@ -81,7 +81,7 @@ export const volunteerApplicationRouter = router({
 
         const existingApplication = await VolunteerApplication.findOne({
           opportunity: input.opportunityId,
-          volunteer: user.volunteer_profile,
+          volunteer: user._id,
         });
 
         if (existingApplication) {
@@ -93,7 +93,7 @@ export const volunteerApplicationRouter = router({
 
         const application = await VolunteerApplication.create({
           opportunity: input.opportunityId,
-          volunteer: user.volunteer_profile,
+          volunteer: user._id,
         });
 
         if (!application) {
