@@ -1,357 +1,565 @@
-'use client'
-import React, { useState } from 'react';
-import Image from 'next/image';
-import { format } from 'date-fns';
-import NewMessageModal from './NewMessageModal';
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { 
-  Plus, 
-  Menu,
-  Paperclip,
-  Shield,
-  Trash2,
-  MoreVertical,
-  MapPin,
-  X,
-  User
-} from "lucide-react"
-import DeleteConversationModal from './DeleteConversationModal';
+"use client";
+import React, { useState, useEffect, useRef } from "react";
+import Image from "next/image";
+import { format } from "date-fns";
+import { useSession } from "next-auth/react";
+import { trpc } from "@/utils/trpc";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Menu, X } from "lucide-react";
+import toast from "react-hot-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
-interface Message {
-  id: string;
+type Message = {
+  _id: string;
   content: string;
-  timestamp: Date;
+  createdAt: string;
+  isRead: boolean;
   sender: {
+    _id: string;
     name: string;
     avatar: string;
+    role?: string;
   };
-}
-
-interface MessageUIProps {
-  currentUser: {
+  receiver: {
+    _id: string;
     name: string;
     avatar: string;
-    location?: string;
+    role?: string;
   };
-}
+};
 
-export const MessageUI: React.FC<MessageUIProps> = ({ currentUser }) => {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [, setFilter] = useState('All');
-  const [, setShowFilterDropdown] = useState(false);
-  const [showNewMessageModal, setShowNewMessageModal] = useState(false);
-  const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showRightSidebar, setShowRightSidebar] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-
-  const filterOptions = ['All', 'Unread', 'Favorites', 'Contacts', 'Archived', 'Groups'];
-
-  const sendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-
-    const message: Message = {
-      id: Date.now().toString(),
-      content: newMessage,
-      timestamp: new Date(),
-      sender: {
-        name: currentUser.name,
-        avatar: currentUser.avatar,
-      },
-    };
-
-    setMessages([...messages, message]);
-    setNewMessage('');
+type Conversation = {
+  _id: string;
+  user: {
+    name: string;
+    avatar: string;
+    role: string;
   };
-
-  const handleNewMessage = (recipient: string, message: string) => {
-    const newMsg: Message = {
-      id: Date.now().toString(),
-      content: message,
-      timestamp: new Date(),
-      sender: {
-        name: currentUser.name,
-        avatar: currentUser.avatar,
-      },
-    };
-    setMessages([...messages, newMsg]);
+  lastMessage: {
+    content: string;
+    isRead: boolean;
   };
+  unreadCount: number;
+};
 
-  const handleDeleteConversation = () => {
-    setMessages([]);
-    setShowDeleteModal(false);
-  };
+const getInitials = (name: string) => {
+  return name
+    .split(' ')
+    .map(word => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+};
+
+const getRandomColor = (name: string) => {
+  const colors = [
+    'bg-blue-500',
+    'bg-green-500',
+    'bg-purple-500',
+    'bg-pink-500',
+    'bg-indigo-500',
+    'bg-yellow-500',
+    'bg-red-500',
+    'bg-teal-500',
+  ];
+  const index = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+  return colors[index % colors.length];
+};
+
+const Avatar = ({ name, avatar, size = 40 }: { name: string; avatar?: string; size?: number }) => {
+  const initials = getInitials(name);
+  const bgColor = getRandomColor(name);
 
   return (
-    <div className="flex h-[800px] bg-white relative m-4 border rounded-lg overflow-hidden">
-      {/* Left Sidebar */}
-      <div className={`${showMobileMenu ? 'fixed inset-0 z-50 bg-white' : 'hidden'} md:relative md:block md:w-1/4 border-r flex flex-col`}>
-        <div className="p-4 border-b">
-          <div className="flex justify-between items-center">
-            <h1 className="text-xl font-semibold">Messages</h1>
-            <div className="flex gap-2">
-              <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={() => setShowNewMessageModal(true)}
-              >
-                <span className="sr-only">New Message</span>
-                <Plus className="h-4 w-4" />
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <span className="sr-only">Filter</span>
-                    <Menu className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  {filterOptions.map((option) => (
-                    <DropdownMenuItem
-                      key={option}
-                      onClick={() => {
-                        setFilter(option);
-                        setShowFilterDropdown(false);
-                      }}
-                    >
-                      {option}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="md:hidden"
-                onClick={() => setShowMobileMenu(false)}
-              >
-                <span className="sr-only">Close</span>
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-          <div className="mt-4">
-            <Input
-              type="text"
-              placeholder="Search messages"
-            />
-          </div>
-        </div>
-        
-        {/* Message List */}
-        <ScrollArea className="flex-1">
-          {messages.map((message) => (
-            <Card key={message.id} className="mx-2 my-1 shadow-none border-0 hover:bg-gray-50">
-              <CardContent className="p-4">
-                <div className="flex items-center gap-3">
-                  <Image
-                    src={message.sender.avatar}
-                    alt={message.sender.name}
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
-                  <div>
-                    <h3 className="font-medium">{message.sender.name}</h3>
-                    <p className="text-sm text-gray-500 truncate">{message.content}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </ScrollArea>
-      </div>
-
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col">
-        {/* Chat Header */}
-        <div className="p-4 border-b">
-          <CardContent className="p-4">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center gap-3">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="md:hidden"
-                  onClick={() => setShowMobileMenu(true)}
-                >
-                  <Menu className="h-4 w-4" />
-                </Button>
-                <Image
-                  src={currentUser.avatar}
-                  alt={currentUser.name}
-                  width={40}
-                  height={40}
-                  className="rounded-full"
-                />
-                <div>
-                  <h2 className="font-semibold">{currentUser.name}</h2>
-                  {currentUser.location && (
-                    <p className="text-sm text-gray-500">{currentUser.location}</p>
-                  )}
-                </div>
-              </div>
-             
-              <div className="flex gap-4">
-                <Button variant="ghost" size="icon">
-                  <span className="sr-only">Shield</span>
-                  <Shield className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={() => setShowDeleteModal(true)}
-                >
-                  <span className="sr-only">Trash</span>
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="icon"
-                  onClick={() => setShowRightSidebar(!showRightSidebar)}
-                  className="md:hidden"
-                >
-                  <span className="sr-only">Profile</span>
-                  <User className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon">
-                  <span className="sr-only">More</span>
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </div>
-
-        {/* Messages Container */}
-        <ScrollArea className="flex-1 px-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex mb-3 ${
-                message.sender.name === currentUser.name ? 'justify-end' : 'justify-start'
-              }`}
-            >
-              <Card className={`max-w-[70%] shadow-sm ${
-                message.sender.name === currentUser.name
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted'
-              }`}>
-                <CardContent className="p-3">
-                  <p>{message.content}</p>
-                  <span className="text-xs mt-1 block">
-                    {format(message.timestamp, 'h:mm a')}
-                  </span>
-                </CardContent>
-              </Card>
-            </div>
-          ))}
-        </ScrollArea>
-
-        {/* Message Input */}
-        <div className="p-4 border-t">
-          <form onSubmit={sendMessage}>
-            <div className="flex gap-2 items-center">
-              <Button type="button" variant="ghost" size="icon">
-                <Paperclip className="h-4 w-4" />
-              </Button>
-              <Input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                placeholder="Write message......"
-                className="h-10" // Added fixed height to match button
-              />
-              <Button type="submit">
-                Send
-              </Button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      {/* Right Sidebar - User Profile */}
-      <Card className={`${showRightSidebar ? 'fixed inset-0 z-50 bg-white' : 'hidden'} md:relative md:block md:w-1/4 rounded-none border-l border-r-0 border-t-0 border-b-0`}>
-        <CardContent className="p-4">
-          <div className="flex justify-between items-center md:hidden">
-            <h2 className="font-semibold">Profile</h2>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => setShowRightSidebar(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="text-center">
-            <Image
-              src={currentUser.avatar}
-              alt={currentUser.name}
-              width={80}
-              height={80}
-              className="rounded-full mx-auto"
-            />
-            <h2 className="mt-4 font-semibold text-xl">{currentUser.name}</h2>
-            {currentUser.location && (
-              <p className="text-gray-500 mt-1">
-                <MapPin className="h-4 w-4 inline mr-1" />
-                {currentUser.location}
-              </p>
-            )}
-            <Button className="mt-4 w-full">
-              View profile
-            </Button>
-          </div>
-
-          <div className="mt-8">
-            <h3 className="font-semibold mb-4">Interests</h3>
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">Homeless</Badge>
-              <Badge variant="secondary">Disaster Relief</Badge>
-              <Badge variant="secondary">Emergency & Safety</Badge>
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <h3 className="font-semibold mb-4">Language</h3>
-            <p>English</p>
-          </div>
-
-          <div className="mt-8">
-            <p className="text-sm text-gray-500">Member since June 4, 2024</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Add NewMessageModal */}
-      {showNewMessageModal && (
-        <NewMessageModal
-          onClose={() => setShowNewMessageModal(false)}
-          onSend={handleNewMessage}
-          currentUser={currentUser}
+    <div className={cn(
+      "relative rounded-full overflow-hidden",
+      "ring-2 ring-offset-2 ring-offset-white",
+      "flex items-center justify-center",
+      "font-medium text-white",
+      bgColor,
+      size === 40 ? "w-10 h-10 text-sm" : "w-8 h-8 text-xs"
+    )}>
+      {avatar ? (
+        <Image
+          src={avatar}
+          alt={name}
+          width={size}
+          height={size}
+          className="object-cover"
         />
-      )}
-      {/* Delete Modal */}
-      {showDeleteModal && (
-        <DeleteConversationModal
-          onClose={() => setShowDeleteModal(false)}
-          onDelete={handleDeleteConversation}
-        />
+      ) : (
+        <span>{initials}</span>
       )}
     </div>
   );
 };
 
+// Separate components for better organization
+const ConversationHeader = ({ user, onMenuClick }: { user: { name: string; avatar: string }; onMenuClick: () => void }) => (
+  <header className="p-4 border-b flex-shrink-0">
+    <div className="flex items-center gap-3">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden"
+        onClick={onMenuClick}
+      >
+        <Menu className="h-4 w-4" />
+      </Button>
+      <Avatar name={user.name} avatar={user.avatar} />
+      <div>
+        <h2 className="font-semibold">{user.name}</h2>
+      </div>
+    </div>
+  </header>
+);
+
+const MessageBubble = ({ message, isOwnMessage }: { message: Message; isOwnMessage: boolean }) => (
+  <div
+    className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
+  >
+    {!isOwnMessage && (
+      <Avatar name={message.sender.name} avatar={message.sender.avatar} size={32} />
+    )}
+    <div
+      className={cn(
+        "max-w-[70%] rounded-lg p-3 ml-2",
+        isOwnMessage ? "bg-blue-500 text-white" : "bg-gray-100"
+      )}
+    >
+      <p className="break-words">{message.content}</p>
+      <p className="text-xs mt-1 opacity-70">
+        {format(new Date(message.createdAt), "p")}
+      </p>
+    </div>
+    {isOwnMessage && (
+      <Avatar name={message.sender.name} avatar={message.sender.avatar} size={32} />
+    )}
+  </div>
+);
+
+const MessageInput = React.memo(({ 
+  newMessage, 
+  setNewMessage, 
+  handleSendMessage, 
+  isSending 
+}: { 
+  newMessage: string;
+  setNewMessage: (message: string) => void;
+  handleSendMessage: (e: React.FormEvent) => void;
+  isSending: boolean;
+}) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <form onSubmit={handleSendMessage} className="w-full">
+      <div className="flex items-center h-16 px-4 py-4 border-t">
+        <div className="flex-1 flex items-center gap-2">
+          <Input
+            ref={inputRef}
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type a message..."
+            className="h-10 flex-1"
+          />
+          <Button 
+            type="submit" 
+            disabled={!newMessage.trim() || isSending}
+            className="h-10"
+          >
+            {isSending ? (
+              <span className="flex items-center gap-2">
+                <span className="animate-spin">⏳</span>
+                Sending...
+              </span>
+            ) : (
+              "Send"
+            )}
+          </Button>
+        </div>
+      </div>
+    </form>
+  );
+});
+
+MessageInput.displayName = 'MessageInput';
+
+const ChatArea = React.memo(({ 
+  messages, 
+  isLoadingMessages,
+  selectedConversation,
+  onMenuClick,
+  session
+}: { 
+  messages: Message[] | undefined;
+  isLoadingMessages: boolean;
+  selectedConversation: Conversation | undefined;
+  onMenuClick: () => void;
+  session: { user?: { id?: string } } | null;
+}) => {
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]); // Scroll when messages change
+
+  return (
+    <div className="flex flex-col h-full">
+      {selectedConversation && (
+        <ConversationHeader 
+          user={selectedConversation.user} 
+          onMenuClick={onMenuClick}
+        />
+      )}
+
+      <div className="flex-1 min-h-[400px] max-h-[calc(100vh-16rem)]">
+        <ScrollArea className="h-full">
+          <div className="p-4">
+            {isLoadingMessages ? (
+              <div className="text-center text-gray-500">Loading messages...</div>
+            ) : messages?.length === 0 ? (
+              <div className="text-center text-gray-500">No messages yet</div>
+            ) : (
+              <div className="space-y-4">
+                {messages?.map((message: Message) => (
+                  <MessageBubble
+                    key={message._id}
+                    message={message}
+                    isOwnMessage={message.sender._id === session?.user?.id}
+                  />
+                ))}
+                <div ref={messagesEndRef} data-messages-end /> {/* Invisible element at the bottom */}
+              </div>
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+});
+
+ChatArea.displayName = 'ChatArea';
+
+const ConversationList = React.memo(({ 
+  conversations, 
+  selectedUserId, 
+  onSelectUser, 
+  isLoading 
+}: { 
+  conversations: Conversation[] | undefined;
+  selectedUserId: string | null;
+  onSelectUser: (userId: string) => void;
+  isLoading: boolean;
+}) => (
+  <ScrollArea className="h-[calc(100vh-16rem)]">
+    <div className="pr-4">
+      {isLoading ? (
+        <div className="p-4 text-center text-gray-500">Loading...</div>
+      ) : conversations?.length === 0 ? (
+        <div className="p-4 text-center text-gray-500">No conversations</div>
+      ) : (
+        <div className="divide-y">
+          {conversations?.map((conversation: Conversation) => (
+            <button
+              key={conversation._id}
+              onClick={() => onSelectUser(conversation._id)}
+              className={cn(
+                "w-full p-4 hover:bg-gray-50 transition-colors",
+                selectedUserId === conversation._id && "bg-gray-50"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <Avatar name={conversation.user.name} avatar={conversation.user.avatar} size={32} />
+                <div className="flex-1 min-w-0 text-left">
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-medium truncate">{conversation.user.name}</h3>
+                    {conversation.unreadCount > 0 && (
+                      <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
+                        {conversation.unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-400">{conversation.user.role}</p>
+                  <p className={cn(
+                    "text-sm truncate",
+                    conversation.lastMessage.isRead ? "text-gray-500" : "text-gray-900 font-medium"
+                  )}>
+                    {conversation.lastMessage.content}
+                  </p>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  </ScrollArea>
+));
+
+ConversationList.displayName = 'ConversationList';
+
+const UserList = React.memo(({ 
+  users, 
+  onSelectUser, 
+  isLoading 
+}: { 
+  users: { _id: string; name: string; avatar: string; role: string }[] | undefined;
+  onSelectUser: (userId: string) => void;
+  isLoading: boolean;
+}) => (
+  <ScrollArea className="h-[calc(100vh-16rem)]">
+    <div className="pr-4">
+      {isLoading ? (
+        <div className="p-4 text-center text-gray-500">Loading...</div>
+      ) : users?.length === 0 ? (
+        <div className="p-4 text-center text-gray-500">No users found</div>
+      ) : (
+        <div className="divide-y">
+          {users?.map((user) => (
+            <button
+              key={user._id}
+              onClick={() => onSelectUser(user._id)}
+              className="w-full p-4 hover:bg-gray-50 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar name={user.name} avatar={user.avatar} />
+                <div className="min-w-0 text-left">
+                  <h3 className="font-medium truncate">{user.name}</h3>
+                  <p className="text-xs text-gray-400">{user.role}</p>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  </ScrollArea>
+));
+
+UserList.displayName = 'UserList';
+
+const Sidebar = React.memo(({ 
+  showMobileMenu, 
+  onClose, 
+  activeTab, 
+  setActiveTab,
+  conversations,
+  selectedUserId,
+  onSelectUser,
+  isLoadingConversations,
+  availableUsers,
+  isLoadingUsers,
+  userRole
+}: {
+  showMobileMenu: boolean;
+  onClose: () => void;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  conversations: Conversation[] | undefined;
+  selectedUserId: string | null;
+  onSelectUser: (userId: string) => void;
+  isLoadingConversations: boolean;
+  availableUsers: { _id: string; name: string; avatar: string; role: string }[] | undefined;
+  isLoadingUsers: boolean;
+  userRole?: string;
+}) => (
+  <aside className={`${showMobileMenu ? 'fixed inset-0 z-50 bg-white' : 'hidden'} md:block md:col-span-1 border-r h-full`}>
+    <div className="flex flex-col h-full">
+      <div className="p-4 border-b flex-shrink-0">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Messages</h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={onClose}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="mt-4">
+          <Input placeholder="Search messages" />
+        </div>
+      </div>
+
+      <div className="flex-1 min-h-0">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <div className="px-4 pt-2 flex-shrink-0">
+            <TabsList className={`grid w-full ${userRole === "volunteer" ? "grid-cols-1" : "grid-cols-2"}`}>
+              <TabsTrigger value="conversations">Conversations</TabsTrigger>
+              {userRole !== "volunteer" && (
+                <TabsTrigger value="applicants">Volunteers</TabsTrigger>
+              )}
+            </TabsList>
+          </div>
+
+          <TabsContent value="conversations" className="mt-0 flex-1 min-h-0">
+            <ConversationList 
+              conversations={conversations}
+              selectedUserId={selectedUserId}
+              onSelectUser={onSelectUser}
+              isLoading={isLoadingConversations}
+            />
+          </TabsContent>
+
+          {userRole !== "volunteer" && (
+            <TabsContent value="applicants" className="mt-0 flex-1 min-h-0">
+              <UserList 
+                users={availableUsers}
+                onSelectUser={onSelectUser}
+                isLoading={isLoadingUsers}
+              />
+            </TabsContent>
+          )}
+        </Tabs>
+      </div>
+    </div>
+  </aside>
+));
+
+Sidebar.displayName = 'Sidebar';
+
+export const MessageUI: React.FC = () => {
+  const { data: session } = useSession();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [newMessage, setNewMessage] = useState("");
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [activeTab, setActiveTab] = useState("conversations");
+  const utils = trpc.useUtils();
+
+  // Queries
+  const { data: conversations, isLoading: isLoadingConversations } = trpc.messages.getConversations.useQuery(undefined, {
+    enabled: !!session,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount if we have cached data
+  });
+
+  const { data: messages, isLoading: isLoadingMessages } = trpc.messages.getMessages.useQuery(
+    { userId: selectedUserId || "" },
+    { enabled: !!selectedUserId && !!session }
+  );
+
+  const { data: availableUsers, isLoading: isLoadingUsers } = trpc.users.getAvailableUsers.useQuery(undefined, {
+    enabled: !!session && session.user?.role !== "volunteer"
+  });
+
+  // Mutations
+  const sendMessageMutation = trpc.messages.sendMessage.useMutation({
+    onSuccess: () => {
+      utils.messages.getMessages.invalidate({ userId: selectedUserId || "" });
+      utils.messages.getConversations.invalidate();
+      // Scroll to bottom after sending message
+      setTimeout(() => {
+        const messagesEnd = document.querySelector('[data-messages-end]');
+        messagesEnd?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send message");
+    }
+  });
+
+  const markMessagesAsReadMutation = trpc.messages.markAsRead.useMutation({
+    onSuccess: (data) => {
+      if (data.updatedCount > 0) {
+        utils.messages.getMessages.invalidate({ userId: selectedUserId || "" });
+        utils.messages.getConversations.invalidate();
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to mark messages as read");
+    }
+  });
+
+  // Handlers
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !selectedUserId) return;
+
+    sendMessageMutation.mutate({
+      receiverId: selectedUserId,
+      content: newMessage,
+    });
+
+    setNewMessage("");
+  };
+
+  const handleSelectUser = (userId: string) => {
+    setSelectedUserId(userId);
+    setShowMobileMenu(false);
+  };
+
+  // Effects
+  useEffect(() => {
+    if (messages?.length && session?.user?.id && selectedUserId) {
+      const recentMessages = messages.slice(-20);
+      const hasUnreadMessages = recentMessages.some(
+        (msg: Message) => !msg.isRead && msg.receiver._id === session.user.id
+      );
+      
+      if (hasUnreadMessages) {
+        const timeoutId = setTimeout(() => {
+          markMessagesAsReadMutation.mutate({ conversationId: selectedUserId });
+        }, 1000);
+
+        return () => clearTimeout(timeoutId);
+      }
+    }
+  }, [messages, session?.user?.id, selectedUserId, markMessagesAsReadMutation]);
+
+  const selectedConversation = conversations?.find((c) => c._id === selectedUserId);
+
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-4 h-full bg-white rounded-lg border">
+      <Sidebar
+        showMobileMenu={showMobileMenu}
+        onClose={() => setShowMobileMenu(false)}
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        conversations={conversations}
+        selectedUserId={selectedUserId}
+        onSelectUser={handleSelectUser}
+        isLoadingConversations={isLoadingConversations}
+        availableUsers={availableUsers}
+        isLoadingUsers={isLoadingUsers}
+        userRole={session?.user?.role}
+      />
+
+      <main className="col-span-1 md:col-span-3 flex flex-col h-full">
+        {selectedUserId ? (
+          <>
+            <ChatArea
+              messages={messages}
+              isLoadingMessages={isLoadingMessages}
+              selectedConversation={selectedConversation}
+              onMenuClick={() => setShowMobileMenu(true)}
+              session={session}
+            />
+            <MessageInput
+              newMessage={newMessage}
+              setNewMessage={setNewMessage}
+              handleSendMessage={handleSendMessage}
+              isSending={sendMessageMutation.isPending}
+            />
+          </>
+        ) : (
+          <div className="flex-1 flex items-center justify-center text-gray-500">
+            Select a conversation to start messaging
+          </div>
+        )}
+      </main>
+    </div>
+  );
+};
+
 export default MessageUI;
+

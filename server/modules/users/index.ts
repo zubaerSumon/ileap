@@ -7,7 +7,48 @@ import bcrypt from "bcryptjs";
 import { publicProcedure, router } from "@/server/trpc";
 import VolunteerProfile from "@/server/db/models/volunteer-profile";
  
+
 export const userRouter = router({
+  getAvailableUsers: protectedProcedure.query(async ({ ctx }) => {
+    const sessionUser = ctx.user as JwtPayload;
+    if (!sessionUser || !sessionUser?.id) {
+      throw new Error("You must be logged in to view available users.");
+    }
+
+    const currentUser = await User.findById(sessionUser.id);
+    if (!currentUser) {
+      throw new Error("Current user not found");
+    }
+
+    // If user is a volunteer, show organizations
+    if (currentUser.role === "volunteer") {
+      const query = {
+        _id: { $ne: currentUser._id },
+        role: "organization",
+      };
+      const users = await User.find(query)
+        .select("name avatar role")
+        .populate("organization_profile");
+      return users;
+    }
+    if (currentUser.role === "organization") {
+      const query = {
+        _id: { $ne: currentUser._id },
+        role: "volunteer",
+      };
+      console.log('Query for volunteers:', query);
+      const users = await User.find(query)
+        .select("name avatar role")
+        .populate({
+          path: "volunteer_profile",
+          select: "student_type course availability_date interested_on bio"
+        });
+      console.log('Found users:', JSON.stringify(users, null, 2));
+      return users;
+    }
+
+    return [];
+  }),
   updateUser: protectedProcedure
     .input(userValidation.updateUserSchema)
     .mutation(async ({ ctx, input }) => {
@@ -124,6 +165,4 @@ export const userRouter = router({
         message: "Password has been successfully reset",
       };
     }),
-
-   
 });

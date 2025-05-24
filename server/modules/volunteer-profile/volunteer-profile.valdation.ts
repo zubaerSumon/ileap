@@ -7,6 +7,10 @@ const updateVolunteerProfileSchema = z.object({
   interested_on: z.array(z.string()).optional(),
   state: z.string().optional(),
   area: z.string().optional(),
+  availability_date: z.object({
+    start_date: z.string().optional(),
+    end_date: z.string().optional()
+  }).optional()
 });
 
 const applyToOpportunitySchema = z.object({

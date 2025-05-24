@@ -1,183 +1,227 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Users } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { MessageCircle } from "lucide-react";
 import Image from "next/image";
-import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
 import { trpc } from "@/utils/trpc";
-import fileIcon from "../../../../public/icons/file-icon.svg";
-import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
-export type OpportunityDetails = {
-  id: string;
-  title: string;
-  organization: {
-    title: string;
-    id: string;
+import toast from "react-hot-toast";
+
+interface Volunteer {
+  _id: string;
+  name: string;
+  avatar?: string;
+  role: string;
+  volunteer_profile?: {
+    student_type?: "yes" | "no";
+    course?: string;
+    availability_date?: {
+      start_date?: string;
+      end_date?: string;
+    };
+    interested_on?: string[];
+    bio?: string;
   };
-  date: string;
-  time: string;
-  location: string;
-};
+}
 
-export default function Categories() {
-  const router = useRouter();
+export default function OrganizationHomepage() {
+  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(
+    null
+  );
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [message, setMessage] = useState("");
 
-  // Fetch all opportunities
-  const { data: opportunities } =
-    trpc.opportunities.getAllOpportunities.useQuery();
+  // Fetch all available volunteers
+  const { data: volunteers, isLoading } =
+    trpc.users.getAvailableUsers.useQuery();
 
-  // Fetch all applications to calculate available spots
-  const { data: applications } =
-    trpc.applications.getVolunteerApplications.useQuery();
+  // Debug logs
+  console.log("Volunteers data:", volunteers);
+  console.log("Is loading:", isLoading);
 
-  // Calculate available spots for each opportunity
-  const opportunitiesWithSpots =
-    opportunities?.map((opportunity) => {
-      const appliedCount =
-        (
-          applications as
-            | Array<{ opportunity: string; status: string }>
-            | undefined
-        )?.filter(
-          (app) =>
-            app.opportunity === opportunity._id.toString() &&
-            (app.status === "pending" || app.status === "approved")
-        ).length || 0;
+  // Get the send message mutation
+  const sendMessageMutation = trpc.messages.sendMessage.useMutation({
+    onSuccess: () => {
+      toast.success("Message sent successfully!");
+      setIsMessageModalOpen(false);
+      setMessage("");
 
-      const spotsAvailable = Math.max(
-        0,
-        opportunity.number_of_volunteers - appliedCount
-      );
+      setSelectedVolunteer(null);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send message");
+    },
+  });
 
-      return {
-        ...opportunity,
-        spotsAvailable,
-      };
-    }) || [];
+  const handleSendMessage = (volunteer: Volunteer) => {
+    setSelectedVolunteer(volunteer);
+    setIsMessageModalOpen(true);
+  };
+
+  const handleSubmitMessage = () => {
+    if (!selectedVolunteer) return;
+
+    // Send the message using the mutation
+    sendMessageMutation.mutate({
+      receiverId: selectedVolunteer._id,
+      content: message,
+    });
+  };
 
   return (
-    <section className="w-[1280px] mx-auto  md:w-[57%] relative">
-      <h1 className="text-[#101010] font-inter text-xxl font-bold text-center mt-8 mb-5">
-        Volunteering Opportunities during National Volunteer Week 2025 (19 - 25
-        May)
+    <section className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
+        Available Volunteers
       </h1>
 
-      <div className="flex flex-col gap-6">
-        {opportunitiesWithSpots.map((opportunity) => (
-          <Card
-            key={opportunity._id}
-            className="rounded-lg overflow-hidden w-full py-0 h-[340px] cursor-pointer hover:shadow-lg transition-shadow relative"
-            onClick={() =>
-              router.push(`/organization/opportunities/${opportunity._id}`)
-            }
-          >
-            <CardContent className="px-4 pt-4">
-              <div className="space-y-3">
-                <div className="flex justify-between items-center">
-                  <Image
-                    src={
-                      opportunity?.organization_profile?.profile_img ||
-                      "/default-org-logo.svg"
-                    }
-                    alt={
-                      opportunity?.created_by?.name || "Unknown Organization"
-                    }
-                    width={40}
-                    height={40}
-                    className="rounded-full"
-                  />
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center text-gray-600">
-                      <Users className="h-5 w-5 mr-1" />
-                      <span className="text-sm">
-                        <span className="font-medium text-green-600">
-                          {opportunity.spotsAvailable}
-                        </span>{" "}
-                        of{" "}
-                        <span className="font-medium">
-                          {opportunity.number_of_volunteers}
-                        </span>{" "}
-                        spots left
-                      </span>
+      <div className="flex flex-col gap-4">
+        {isLoading ? (
+          <div className="text-center py-12">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading volunteers...</p>
+          </div>
+        ) : volunteers?.length === 0 ? (
+          <div className="text-center py-12 bg-gray-50 rounded-lg">
+            <p className="text-gray-600 text-lg">
+              No volunteers available at the moment.
+            </p>
+            <p className="text-gray-500 text-sm mt-2">
+              Please check back later.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {volunteers?.map((volunteer) => (
+              <Card
+                key={volunteer._id}
+                className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 cursor-pointer relative bg-white"
+              >
+                <CardContent className="p-4">
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="relative w-12 h-12">
+                        <Image
+                          src="/avatar.svg"
+                          alt="Volunteer Avatar"
+                          width={48}
+                          height={48}
+                          className="rounded-full bg-gray-100"
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                          ✓ Available
+                        </span>
+                      </div>
+                    </div>
+
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                      {volunteer.name}
+                    </h3>
+
+                    <div className="flex items-center gap-3 mb-3 text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <span className="text-gray-600 text-sm">📍</span>
+                        <span className="text-sm">Sydney, Australia</span>
+                      </div>
+                      <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                      <div className="flex items-center gap-1">
+                        <span className="text-sm">🏆</span>
+                        <span className="text-sm">10 projects</span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {volunteer.volunteer_profile?.interested_on?.map((interest: string, index: number) => (
+                        <span
+                          key={index}
+                          className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
+                        >
+                          {interest.replace(/_/g, " ")}
+                        </span>
+                      ))}
+                    </div>
+
+                    {volunteer.volunteer_profile?.bio && (
+                      <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                        {volunteer.volunteer_profile.bio}
+                      </p>
+                    )}
+
+                    <div className="flex gap-2 mt-auto">
+                      <Button
+                        variant="outline"
+                        className="flex-1 flex items-center justify-center gap-1 text-sm h-9 border-gray-200"
+                      >
+                        View Profile
+                      </Button>
+                      <Button
+                        variant="default"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 text-sm h-9"
+                        onClick={() => handleSendMessage(volunteer)}
+                      >
+                        <MessageCircle className="h-4 w-4" />
+                        Connect
+                      </Button>
                     </div>
                   </div>
-                </div>
-
-                <h3 className="text-lg font-semibold line-clamp-1">
-                  {opportunity.title}
-                </h3>
-
-                <div className="flex items-center space-x-2 text-sm text-gray-500">
-                  <div className="flex items-center">
-                    <Image
-                      src={mapPinIcon}
-                      height={16}
-                      width={16}
-                      className="mr-1"
-                      alt="Map pin icon"
-                    />
-                    <span className="">{opportunity.location}</span>
-                  </div>
-                  <div className="flex items-center text-xs text-gray-500">
-                    <Image
-                      src={fileIcon}
-                      height={16}
-                      width={16}
-                      className="mr-1"
-                      alt="File icon"
-                    />
-                    <span className="">
-                      {opportunity.commitment_type === "oneoff"
-                        ? "One off"
-                        : "Regular"}
-                      ;{" "}
-                      {new Date(opportunity.date.start_date).toLocaleDateString(
-                        "en-GB"
-                      )}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-1">
-                  {opportunity.category.map((category: string, idx: number) => (
-                    <Badge
-                      key={idx}
-                      variant="secondary"
-                      className="text-sm bg-[#F0F0F0] rounded-[4px] font-normal"
-                    >
-                      {category}
-                    </Badge>
-                  ))}
-                  <div className="flex items-center w-[150px] rounded-[4px] bg-[#EBF8F4] p-1">
-                    <Image
-                      src={mapPinGrayIcon}
-                      height={16}
-                      width={16}
-                      className="mr-1"
-                      alt="Map pin gray icon"
-                    />
-                    <span className="text-sm text-green-600">
-                      Matching location
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <div
-                    className="text-sm text-gray-600 line-clamp-3"
-                    dangerouslySetInnerHTML={{
-                      __html: opportunity.description,
-                    }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
       </div>
+
+      <Dialog open={isMessageModalOpen} onOpenChange={setIsMessageModalOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">
+              Message {selectedVolunteer?.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <label
+                htmlFor="message"
+                className="text-sm font-medium text-gray-700"
+              >
+                Message
+              </label>
+              <Textarea
+                id="message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                placeholder="Type your message here..."
+                rows={4}
+                className="w-full"
+              />
+            </div>
+            <Button
+              className="w-full bg-blue-600 hover:bg-blue-700"
+              onClick={handleSubmitMessage}
+              disabled={!message.trim() || sendMessageMutation.isPending}
+            >
+              {sendMessageMutation.isPending ? (
+                <>
+                  <span className="animate-spin mr-2">⏳</span>
+                  Sending...
+                </>
+              ) : (
+                "Send Message"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </section>
   );
 }

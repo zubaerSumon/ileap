@@ -5,11 +5,13 @@ import OrganizationSignup from "@/components/layout/auth/OrganizationSignup";
 
 export default function SignupPage() {
   const searchParams = useSearchParams();
-  const paramRole = searchParams?.get("role");
+  const paramRole = searchParams?.get("role")?.toLowerCase();
 
-  return paramRole !== "organization" ? (
-    <VolunteerSignup />
-  ) : (
+  // If role is explicitly set to "organization", show organization signup
+  // Otherwise, show volunteer signup
+  return paramRole === "organization" ? (
     <OrganizationSignup />
+  ) : (
+    <VolunteerSignup />
   );
 }
