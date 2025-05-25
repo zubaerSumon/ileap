@@ -53,7 +53,14 @@ const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
     referral_source_other: {
       type: String,
     },
-    
+    availability_date: {
+      start_date: { type: String },
+      end_date: { type: String }
+    },
+    availability_time: {
+      start_time: { type: String },
+      end_time: { type: String }
+    },
   },
   {
     timestamps: true,

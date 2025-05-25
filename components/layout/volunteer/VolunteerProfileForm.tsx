@@ -17,6 +17,8 @@ import { PhoneField } from "@/components/form-input/PhoneField";
 import { trpc } from "@/utils/trpc";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
+import { VolunteerProfileFormData } from "@/types/volunteers";
+
 const volunteerTypes = [
   { value: "animal_welfare", label: "Animal welfare" },
   { value: "homeless", label: "Homelessness" },
@@ -25,6 +27,7 @@ const volunteerTypes = [
   { value: "health", label: "Health & Medicine" },
   { value: "seniors", label: "Seniors" },
 ];
+
 export function VolunteerProfileForm() {
   const { data: volunteerProfile } = trpc.volunteers.getVolunteerProfile.useQuery();
   const utils = trpc.useUtils();
@@ -41,8 +44,7 @@ export function VolunteerProfileForm() {
 
   console.log({volunteerProfile});
 
-
-  const form = useForm<VolunteerProfileUpdateData>({
+  const form = useForm<VolunteerProfileFormData>({
     resolver: zodResolver(VolunteerProfileUpdateSchema),
     defaultValues: {
       name: "",
@@ -51,6 +53,10 @@ export function VolunteerProfileForm() {
       interested_on: [],
       state: "",
       area: "",
+      availability_date: {
+        start_date: "",
+        end_date: ""
+      }
     },
   });
 
@@ -63,6 +69,7 @@ export function VolunteerProfileForm() {
         interested_on: volunteerProfile.interested_on,
         state: volunteerProfile.state?.replace(/_/g, ' '),
         area: volunteerProfile.area?.replace(/_/g, ' '),
+        availability_date: volunteerProfile.availability_date
       });
     }
   }, [volunteerProfile, form]);
@@ -183,6 +190,26 @@ export function VolunteerProfileForm() {
                   form.setValue('area', value);
                 }}
               />
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Availability</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormInput
+                    control={form.control}
+                    name="availability_date.start_date"
+                    label="Start Date"
+                    type="date"
+                    placeholder="Select start date"
+                  />
+                  <FormInput
+                    control={form.control}
+                    name="availability_date.end_date"
+                    label="End Date"
+                    type="date"
+                    placeholder="Select end date"
+                  />
+                </div>
+              </div>
 
               <Button 
                 type="submit" 

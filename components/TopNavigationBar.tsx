@@ -23,6 +23,18 @@ export default function TopNavigationBar() {
   const isProtectedPath = PROTECTED_PATHS.some(path => pathname?.includes(path));
   const isResetPasswordPath = pathname?.endsWith("reset-password");
 
+  // Fetch conversations to get total unread count
+  const { data: conversations } = trpc.messages.getConversations.useQuery(undefined, {
+    enabled: isAuthenticated,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    gcTime: 5 * 60 * 1000, // Cache for 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch on component mount if we have cached data
+  });
+
+  // Calculate total unread messages
+  const totalUnreadCount = conversations?.reduce((total, conv) => total + (conv.unreadCount || 0), 0) || 0;
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShowNav(!isProtectedPath || (isProtectedPath && isAuthenticated));
