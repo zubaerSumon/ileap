@@ -1,7 +1,6 @@
 import { Schema, model, models } from 'mongoose';
 import { IMessage } from '../interfaces/message';
 
-
 const messageSchema = new Schema<IMessage>(
   {
     sender: {
@@ -13,7 +12,13 @@ const messageSchema = new Schema<IMessage>(
     receiver: {
       type: Schema.Types.ObjectId,
       ref: 'user',
-      required: true,
+      required: false,
+      index: true,
+    },
+    group: {
+      type: Schema.Types.ObjectId,
+      ref: 'group',
+      required: false,
       index: true,
     },
     content: {
@@ -25,6 +30,17 @@ const messageSchema = new Schema<IMessage>(
       default: false,
       index: true,
     },
+    readBy: [{
+      user: {
+        type: Schema.Types.ObjectId,
+        ref: 'user',
+        required: true,
+      },
+      readAt: {
+        type: Date,
+        default: Date.now,
+      },
+    }],
   },
   {
     timestamps: true,
@@ -32,8 +48,7 @@ const messageSchema = new Schema<IMessage>(
 );
 
 messageSchema.index({ sender: 1, receiver: 1 });
-messageSchema.index({ receiver: 1, isRead: 1 });
+messageSchema.index({ group: 1 });
+messageSchema.index({ 'readBy.user': 1 });
 
-const Message = models.message || model<IMessage>('message', messageSchema);
-
-export default Message;
+export const Message = models.message || model('message', messageSchema);

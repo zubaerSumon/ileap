@@ -7,6 +7,7 @@ import {
   Hand,
   MessageCircleCode,
   SlidersHorizontal,
+  Users,
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -23,6 +24,14 @@ import { trpc } from "@/utils/trpc";
 import VolunteerModal from "@/components/layout/organization/opportunities/VolunteerModal";
 import { useState } from "react";
 import MessageApplicantModal from "@/components/layout/organization/opportunities/MessageApplicantModal";
+import toast from "react-hot-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function OpportunityDetailsPage() {
   const router = useRouter();
@@ -36,6 +45,9 @@ export default function OpportunityDetailsPage() {
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
     null
   );
+  const [isGroupMessageModalOpen, setIsGroupMessageModalOpen] = useState(false);
+  const [groupMessage, setGroupMessage] = useState("");
+  const [createdGroupId, setCreatedGroupId] = useState<string | null>(null);
 
   const {
     data: opportunity,
@@ -56,6 +68,58 @@ export default function OpportunityDetailsPage() {
       { opportunityId },
       { enabled: !!opportunityId }
     );
+
+  const createGroupMutation = trpc.messages.createGroup.useMutation({
+    onSuccess: (data) => {
+      toast.success("Group created successfully!");
+      setCreatedGroupId(data._id);
+      setIsGroupMessageModalOpen(true);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to create group");
+    },
+  });
+
+  const sendGroupMessageMutation = trpc.messages.sendGroupMessage.useMutation({
+    onSuccess: () => {
+      toast.success("Message sent successfully!");
+      setIsGroupMessageModalOpen(false);
+      setGroupMessage("");
+      // Redirect to messages page
+      router.push("/organization/messages");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send message");
+    },
+  });
+
+  const handleCreateGroup = () => {
+    if (!recruitedApplicants?.length) {
+      toast.error("No recruited volunteers to create a group");
+      return;
+    }
+
+    const memberIds = recruitedApplicants.map(applicant => applicant.id);
+    const groupName = `${opportunity?.title} Volunteers`;
+
+    createGroupMutation.mutate({
+      name: groupName,
+      description: `Group for volunteers of ${opportunity?.title}`,
+      memberIds,
+    });
+  };
+
+  const handleSendGroupMessage = () => {
+    if (!createdGroupId || !groupMessage.trim()) {
+      toast.error("Please enter a message");
+      return;
+    }
+
+    sendGroupMessageMutation.mutate({
+      groupId: createdGroupId,
+      content: groupMessage,
+    });
+  };
 
   const handleCloseMessageModal = () => {
     setIsMessageModalOpen(false);
@@ -155,13 +219,24 @@ export default function OpportunityDetailsPage() {
                           className="pl-10 bg-gray-50 border-0"
                         />
                       </div>
-                      <Button
-                        variant="outline"
-                        className="h-10 px-4 flex items-center gap-2"
-                      >
-                        <SlidersHorizontal />
-                        Filter
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          className="h-10 px-4 flex items-center gap-2"
+                          onClick={handleCreateGroup}
+                          disabled={!recruitedApplicants?.length}
+                        >
+                          <Users className="w-4 h-4" />
+                          Create Group
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="h-10 px-4 flex items-center gap-2"
+                        >
+                          <SlidersHorizontal />
+                          Filter
+                        </Button>
+                      </div>
                     </div>
                     <div className="w-full border-b border-[#F1F1F1]" />
                   </div>
@@ -242,6 +317,38 @@ export default function OpportunityDetailsPage() {
         onClose={handleCloseMessageModal}
         applicant={selectedApplicant}
       />
+      <Dialog open={isGroupMessageModalOpen} onOpenChange={setIsGroupMessageModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Send Welcome Message</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Textarea
+              placeholder="Type your welcome message to the group..."
+              value={groupMessage}
+              onChange={(e) => setGroupMessage(e.target.value)}
+              className="min-h-[100px]"
+            />
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsGroupMessageModalOpen(false);
+                  router.push("/messages");
+                }}
+              >
+                Skip
+              </Button>
+              <Button
+                onClick={handleSendGroupMessage}
+                disabled={!groupMessage.trim() || sendGroupMessageMutation.isPending}
+              >
+                {sendGroupMessageMutation.isPending ? "Sending..." : "Send & Go to Messages"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </ProtectedLayout>
   );
 }
