@@ -10,26 +10,24 @@ import type { TRPCClientErrorLike } from "@trpc/client";
 import type { AppRouter } from "@/server";
 import { useRecruitmentStatus } from "@/hooks/useRecruitmentStatus";
 
-export interface Applicant {
+interface Applicant {
   id: string;
   name: string;
-  bio: string;
-  location: string;
   profileImg: string;
+  location: string;
+  bio: string;
   skills: string[];
   completedProjects: number;
   availability: string;
   applicationId: string;
-  state: string;
-  area: string;
-  postcode: string;
-  interested_on: string[];
 }
 
-interface ApplicantsCardProps {
-  applicant: Applicant;
+export function ApplicantsCard({
+  setIsModalOpen,
+  hideRecruitButton = false,
+  applicant,
+}: {
   setIsModalOpen: (isOpen: boolean) => void;
-  onMessageClick: () => void;
   hideRecruitButton?: boolean;
   applicant: Applicant;
 }) {
