@@ -1,5 +1,5 @@
 import React from "react";
-import OrganizerHomePage from "@/components/layout/organization/home/OrganizationHomepage";
+import OrganizerHomePage from "@/components/layout/organisation/home/OrganizationHomepage";
 
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 

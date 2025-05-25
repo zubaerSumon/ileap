@@ -1,10 +1,17 @@
 import Image from "next/image";
-import { X, FileUser, MessageCircle, SettingsIcon, Layers2, LayoutDashboard } from "lucide-react";
+import {
+  X,
+  FileUser,
+  MessageCircle,
+  SettingsIcon,
+  Layers2,
+  LayoutDashboard,
+} from "lucide-react";
 import { Session } from "next-auth";
 import Logo from "../../public/AusLeap.png";
 import { PUBLIC_NAV_OPTIONS, STATIC_LINKS } from "@/utils/constants/navigation";
 import { NavLink } from "./NavLink";
- 
+
 interface MobileMenuProps {
   isMenuOpen: boolean;
   setIsMenuOpen: (isOpen: boolean) => void;
@@ -60,7 +67,9 @@ export function MobileMenu({
                   </div>
                   <div>
                     <p className="font-medium">{session.user?.name}</p>
-                    <p className="text-sm text-gray-400">{session.user?.email}</p>
+                    <p className="text-sm text-gray-400">
+                      {session.user?.email}
+                    </p>
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -108,7 +117,7 @@ export function MobileMenu({
                     onClick={handleCloseMenu}
                   />
                   <NavLink
-                    href="/organization/opportunity/create"
+                    href="/organization/opportunities/create"
                     label="Post an opportunity"
                     icon={FileUser}
                     className="bg-blue-600 hover:bg-blue-700"
@@ -118,7 +127,11 @@ export function MobileMenu({
               )}
               <div className="space-y-1">
                 <NavLink
-                  href={`/${session?.user?.role === "organization" ? "organisation" : session?.user?.role}/messages`}
+                  href={`/${
+                    session?.user?.role === "organization"
+                      ? "organisation"
+                      : session?.user?.role
+                  }/messages`}
                   label="Messages"
                   icon={MessageCircle}
                   showBadge
@@ -170,4 +183,4 @@ export function MobileMenu({
       </div>
     </div>
   );
-} 
+}

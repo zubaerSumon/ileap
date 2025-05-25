@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, FileUser, MessageCircle, Layers2, LayoutDashboard } from "lucide-react";
+import { Menu, X, FileUser, MessageCircle, LayoutDashboard,   } from "lucide-react";
 import { Session } from "next-auth";
 import { SessionUser } from "@/types/navigation";
 import Logo from "../../public/AusLeap.png";
@@ -125,7 +125,7 @@ export function TopBar({
             <div className="flex items-center space-x-4">
               {session?.user?.role === "organization" && (
                 <Link
-                  href={`/${session.user.role}/opportunity/create`}
+                  href={`/${session.user.role}/opportunities/create`}
                   className="hidden md:flex h-[33px] px-3 justify-center items-center gap-[6px] rounded-[6px] bg-[#2563EB] text-white hover:bg-blue-700 transition-colors"
                 >
                   <Image
