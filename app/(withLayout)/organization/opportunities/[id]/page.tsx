@@ -34,6 +34,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 export default function OpportunityDetailsPage() {
+  const utils = trpc.useUtils();
   const router = useRouter();
   const params = useParams();
   const opportunityId = params.id as string;
@@ -46,6 +47,7 @@ export default function OpportunityDetailsPage() {
     null
   );
   const [isGroupMessageModalOpen, setIsGroupMessageModalOpen] = useState(false);
+  const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
   const [groupMessage, setGroupMessage] = useState("");
   const [createdGroupId, setCreatedGroupId] = useState<string | null>(null);
 
@@ -85,6 +87,7 @@ export default function OpportunityDetailsPage() {
       toast.success("Message sent successfully!");
       setIsGroupMessageModalOpen(false);
       setGroupMessage("");
+      utils.messages.getGroups.invalidate();
       // Redirect to messages page
       router.push("/organization/messages");
     },
@@ -98,8 +101,11 @@ export default function OpportunityDetailsPage() {
       toast.error("No recruited volunteers to create a group");
       return;
     }
+    setIsCreateGroupModalOpen(true);
+  };
 
-    const memberIds = recruitedApplicants.map(applicant => applicant.id);
+  const handleConfirmCreateGroup = () => {
+    const memberIds = recruitedApplicants?.map(applicant => applicant.id) || [];
     const groupName = `${opportunity?.title} Volunteers`;
 
     createGroupMutation.mutate({
@@ -107,6 +113,7 @@ export default function OpportunityDetailsPage() {
       description: `Group for volunteers of ${opportunity?.title}`,
       memberIds,
     });
+    setIsCreateGroupModalOpen(false);
   };
 
   const handleSendGroupMessage = () => {
@@ -344,6 +351,33 @@ export default function OpportunityDetailsPage() {
                 disabled={!groupMessage.trim() || sendGroupMessageMutation.isPending}
               >
                 {sendGroupMessageMutation.isPending ? "Sending..." : "Send & Go to Messages"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isCreateGroupModalOpen} onOpenChange={setIsCreateGroupModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Group</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-600">
+              Create a group with all the recruited volunteers for this opportunity?
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateGroupModalOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmCreateGroup}
+                disabled={createGroupMutation.isPending}
+              >
+                {createGroupMutation.isPending ? "Creating..." : "Create Group"}
               </Button>
             </div>
           </div>
