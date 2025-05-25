@@ -47,6 +47,7 @@ type Conversation = {
   lastMessage: {
     content: string;
     isRead: boolean;
+    createdAt: string;
   };
   unreadCount: number;
 };
@@ -560,106 +561,130 @@ const ConversationList = React.memo(({
   isLoadingGroups: boolean;
   onCreateGroup: () => void;
   userRole?: string;
-}) => (
-  <ScrollArea className="h-[calc(100vh-16rem)]">
-    <div className="pr-4">
-      {isLoading || isLoadingGroups ? (
-        <div className="p-4 text-center text-gray-500">Loading...</div>
-      ) : (!conversations?.length && !groups?.length) ? (
-        <div className="p-4 text-center text-gray-500">No conversations</div>
-      ) : (
-        <div className="divide-y">
-          {/* Groups Section */}
-          <div className="p-4 flex items-center justify-between">
-            <h3 className="text-sm font-medium text-gray-500">Groups</h3>
-            {userRole !== "volunteer" && (
-              <CreateGroupDialog onGroupCreated={onCreateGroup} />
-            )}
-          </div>
-          {groups && groups.length > 0 && (
-            <>
-              {groups.map((group) => (
-                <button
-                  key={group._id}
-                  onClick={() => onSelectUser(group._id)}
-                  className={cn(
-                    "w-full p-4 hover:bg-gray-50 transition-colors",
-                    selectedUserId === group._id && "bg-gray-50"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Users className="h-4 w-4 text-blue-500" />
-                    </div>
-                    <div className="flex-1 min-w-0 text-left">
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-medium truncate">{group.name}</h3>
-                        {group.unreadCount > 0 && (
-                          <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
-                            {group.unreadCount}
-                          </span>
+}) => {
+  // Sort conversations by last message time
+  const sortedConversations = conversations?.sort((a, b) => {
+    const timeA = new Date(a.lastMessage.createdAt).getTime();
+    const timeB = new Date(b.lastMessage.createdAt).getTime();
+    return timeB - timeA;
+  });
+
+  // Sort groups by last message time
+  const sortedGroups = groups?.sort((a, b) => {
+    const timeA = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
+    const timeB = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
+    return timeB - timeA;
+  });
+
+  return (
+    <ScrollArea className="h-[calc(100vh-16rem)]">
+      <div className="pr-4">
+        {isLoading || isLoadingGroups ? (
+          <div className="p-4 text-center text-gray-500">Loading...</div>
+        ) : (!sortedConversations?.length && !sortedGroups?.length) ? (
+          <div className="p-4 text-center text-gray-500">No conversations</div>
+        ) : (
+          <div className="divide-y">
+            {/* Groups Section */}
+            <div className="p-4 flex items-center justify-between">
+              <h3 className="text-sm font-medium text-gray-500">Groups</h3>
+              {userRole !== "volunteer" && (
+                <CreateGroupDialog onGroupCreated={onCreateGroup} />
+              )}
+            </div>
+            {sortedGroups && sortedGroups.length > 0 && (
+              <>
+                {sortedGroups.map((group) => (
+                  <button
+                    key={group._id}
+                    onClick={() => onSelectUser(group._id)}
+                    className={cn(
+                      "w-full p-4 hover:bg-gray-50 transition-colors",
+                      selectedUserId === group._id && "bg-gray-50"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <Users className="h-4 w-4 text-blue-500" />
+                      </div>
+                      <div className="flex-1 min-w-0 text-left">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium truncate">{group.name}</h3>
+                          {group.unreadCount > 0 && (
+                            <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
+                              {group.unreadCount}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400">{group.members.length} members</p>
+                        {group.lastMessage && (
+                          <>
+                            <p className={cn(
+                              "text-sm truncate",
+                              group.lastMessage.isRead ? "text-gray-500" : "text-gray-900 font-medium"
+                            )}>
+                              {group.lastMessage.content}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {format(new Date(group.lastMessage.createdAt), "MMM d, h:mm a")}
+                            </p>
+                          </>
                         )}
                       </div>
-                      <p className="text-xs text-gray-400">{group.members.length} members</p>
-                      {group.lastMessage && (
+                    </div>
+                  </button>
+                ))}
+              </>
+            )}
+
+            {/* Individual Conversations Section */}
+            {sortedConversations && sortedConversations.length > 0 && (
+              <>
+                <div className="p-4">
+                  <h3 className="text-sm font-medium text-gray-500">Direct Messages</h3>
+                </div>
+                {sortedConversations.map((conversation) => (
+                  <button
+                    key={conversation._id}
+                    onClick={() => onSelectUser(conversation._id)}
+                    className={cn(
+                      "w-full p-4 hover:bg-gray-50 transition-colors",
+                      selectedUserId === conversation._id && "bg-gray-50"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Avatar name={conversation.user.name} avatar={conversation.user.avatar} size={32} />
+                      <div className="flex-1 min-w-0 text-left">
+                        <div className="flex justify-between items-start">
+                          <h3 className="font-medium truncate">{conversation.user.name}</h3>
+                          {conversation.unreadCount > 0 && (
+                            <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
+                              {conversation.unreadCount}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400">{conversation.user.role}</p>
                         <p className={cn(
                           "text-sm truncate",
-                          group.lastMessage.isRead ? "text-gray-500" : "text-gray-900 font-medium"
+                          conversation.lastMessage.isRead ? "text-gray-500" : "text-gray-900 font-medium"
                         )}>
-                          {group.lastMessage.content}
+                          {conversation.lastMessage.content}
                         </p>
-                      )}
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </>
-          )}
-
-          {/* Individual Conversations Section */}
-          {conversations && conversations.length > 0 && (
-            <>
-              <div className="p-4">
-                <h3 className="text-sm font-medium text-gray-500">Direct Messages</h3>
-              </div>
-              {conversations.map((conversation) => (
-                <button
-                  key={conversation._id}
-                  onClick={() => onSelectUser(conversation._id)}
-                  className={cn(
-                    "w-full p-4 hover:bg-gray-50 transition-colors",
-                    selectedUserId === conversation._id && "bg-gray-50"
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar name={conversation.user.name} avatar={conversation.user.avatar} size={32} />
-                    <div className="flex-1 min-w-0 text-left">
-                      <div className="flex justify-between items-start">
-                        <h3 className="font-medium truncate">{conversation.user.name}</h3>
-                        {conversation.unreadCount > 0 && (
-                          <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
-                            {conversation.unreadCount}
-                          </span>
-                        )}
+                        <p className="text-xs text-gray-400">
+                          {format(new Date(conversation.lastMessage.createdAt), "MMM d, h:mm a")}
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-400">{conversation.user.role}</p>
-                      <p className={cn(
-                        "text-sm truncate",
-                        conversation.lastMessage.isRead ? "text-gray-500" : "text-gray-900 font-medium"
-                      )}>
-                        {conversation.lastMessage.content}
-                      </p>
                     </div>
-                  </div>
-                </button>
-              ))}
-            </>
-          )}
-        </div>
-      )}
-    </div>
-  </ScrollArea>
-));
+                  </button>
+                ))}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+    </ScrollArea>
+  );
+});
 
 ConversationList.displayName = 'ConversationList';
 
@@ -814,13 +839,14 @@ export const MessageUI: React.FC = () => {
     },
   });
 
-  // Queries
+  // Queries with polling
   const { data: conversations, isLoading: isLoadingConversations } = trpc.messages.getConversations.useQuery(undefined, {
     enabled: !!session,
     staleTime: 30000,
     gcTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    refetchInterval: 5000, // Poll every 5 seconds
   });
 
   const { data: groups, isLoading: isLoadingGroups } = trpc.messages.getGroups.useQuery(undefined, {
@@ -829,6 +855,7 @@ export const MessageUI: React.FC = () => {
     gcTime: 5 * 60 * 1000,
     refetchOnWindowFocus: false,
     refetchOnMount: false,
+    refetchInterval: 5000, // Poll every 5 seconds
   }) as { data: Group[] | undefined; isLoading: boolean };
 
   const selectedConversation = conversations?.find((c) => c._id === selectedUserId);
@@ -845,6 +872,7 @@ export const MessageUI: React.FC = () => {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       staleTime: 5 * 60 * 1000, // 5 minutes
       gcTime: 10 * 60 * 1000, // 10 minutes
+      refetchInterval: 5000, // Poll every 5 seconds
     }
   );
 
@@ -858,6 +886,7 @@ export const MessageUI: React.FC = () => {
       getNextPageParam: (lastPage) => lastPage.nextCursor,
       staleTime: 5 * 60 * 1000,
       gcTime: 10 * 60 * 1000,
+      refetchInterval: 5000, // Poll every 5 seconds
     }
   );
 
