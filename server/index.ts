@@ -8,6 +8,7 @@ import { uploadRouter } from "./modules/upload";
 import { organizationProfileRouter } from "./modules/organization-profile";
 import { volunteerApplicationRouter } from "./modules/volunteer-application";
 import { organisationRecruitmentRouter } from "@/server/modules/organisation-recruitment";
+import { messsageRouter } from "./modules/message";
 
 export const appRouter = router({
   users: userRouter,
@@ -18,6 +19,7 @@ export const appRouter = router({
   organizations: organizationProfileRouter,
   applications: volunteerApplicationRouter,
   recruits: organisationRecruitmentRouter,
+  messages: messsageRouter,
 });
 
 export type AppRouter = typeof appRouter;

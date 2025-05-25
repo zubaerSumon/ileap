@@ -3,7 +3,7 @@ import { Fragment, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
-import TopNavigationBar from "@/components/TopNavigationBar";
+import TopNavigationBar from "@/components/navbar/TopNavigationBar";
 import UpdatedFooter from "../UpdatedFooter";
 
 interface ProtectedLayoutProps {
@@ -12,7 +12,7 @@ interface ProtectedLayoutProps {
 
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const router = useRouter();
-  const { isLoading, isAuthenticated, profileCheck } = useAuthCheck();
+  const { isLoading, isAuthenticated, profileCheck, session } = useAuthCheck();
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -21,12 +21,13 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
           profileCheck?.hasOrganizationProfile
       );
       if (hasRole) {
-        router.push("/signup");
+        const role = session?.user?.role?.toLowerCase();
+        router.push(`/signup?role=${role}`);
       } else {
         router.push("/signin");
       }
     }
-  }, [isLoading, isAuthenticated, router, profileCheck]);
+  }, [isLoading, isAuthenticated, router, profileCheck, session]);
 
   if (isLoading || !isAuthenticated) {
     return (

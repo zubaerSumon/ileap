@@ -1,6 +1,6 @@
 "use client";
 
-import TopNavigationBar from "@/components/TopNavigationBar";
+import TopNavigationBar from "@/components/navbar/TopNavigationBar";
 
 export default function AuthLayout({
   children,
