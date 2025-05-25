@@ -115,7 +115,7 @@ export default function OpportunitiesPage() {
             <DropdownMenuItem
               onClick={() =>
                 router.push(
-                  `/organisation/opportunities/${info.row.original._id}`
+                  `/organization/opportunities/${info.row.original._id}`
                 )
               }
             >
