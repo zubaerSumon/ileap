@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, FileUser, MessageCircle } from "lucide-react";
+import { Menu, X, FileUser, MessageCircle, Layers2, LayoutDashboard } from "lucide-react";
 import { Session } from "next-auth";
 import { SessionUser } from "@/types/navigation";
 import Logo from "../../public/AusLeap.png";
@@ -90,12 +90,20 @@ export function TopBar({
             />
           </Link>
           {session?.user?.role === "organization" && isProtectedPath && (
-            <Link
-              href="/organization/opportunities"
-              className="text-xs flex items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
-            >
-              <FileUser className="h-4 w-4" /> Opportunities
-            </Link>
+            <>
+              <Link
+                href="/organization/dashboard"
+                className="text-xs flex items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
+              >
+                <LayoutDashboard className="h-4 w-4" /> Dashboard
+              </Link>
+              <Link
+                href="/organization/opportunities"
+                className="text-xs flex items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
+              >
+                <FileUser className="h-4 w-4" /> Opportunities
+              </Link>
+            </>
           )}
         </div>
 

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { X, FileUser, MessageCircle, SettingsIcon, Layers2 } from "lucide-react";
+import { X, FileUser, MessageCircle, SettingsIcon, Layers2, LayoutDashboard } from "lucide-react";
 import { Session } from "next-auth";
 import Logo from "../../public/AusLeap.png";
 import { PUBLIC_NAV_OPTIONS, STATIC_LINKS } from "@/utils/constants/navigation";
@@ -95,6 +95,12 @@ export function MobileMenu({
             <div className="space-y-6">
               {session?.user?.role === "organization" && (
                 <div className="space-y-1">
+                  <NavLink
+                    href="/organization/dashboard"
+                    label="Dashboard"
+                    icon={LayoutDashboard}
+                    onClick={handleCloseMenu}
+                  />
                   <NavLink
                     href="/organization/opportunities"
                     label="Opportunities"
