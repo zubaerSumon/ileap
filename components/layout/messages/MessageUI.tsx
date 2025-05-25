@@ -185,7 +185,7 @@ const ConversationHeader = ({
 
 const MessageBubble = ({ message, isOwnMessage }: { message: Message; isOwnMessage: boolean }) => (
   <div
-    className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
+    className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-4`}
   >
     {!isOwnMessage && (
       <Avatar name={message.sender.name} avatar={message.sender.avatar} size={32} />
@@ -197,8 +197,11 @@ const MessageBubble = ({ message, isOwnMessage }: { message: Message; isOwnMessa
       )}
     >
       <p className="break-words">{message.content}</p>
-      <p className="text-xs mt-1 opacity-70">
-        {format(new Date(message.createdAt), "p")}
+      <p className={cn(
+        "text-xs mt-1",
+        isOwnMessage ? "text-blue-100" : "text-gray-500"
+      )}>
+        {format(new Date(message.createdAt), "MMM d, h:mm a")}
       </p>
     </div>
     {isOwnMessage && (
@@ -564,15 +567,15 @@ const ConversationList = React.memo(({
 }) => {
   // Sort conversations by last message time
   const sortedConversations = conversations?.sort((a, b) => {
-    const timeA = new Date(a.lastMessage.createdAt).getTime();
-    const timeB = new Date(b.lastMessage.createdAt).getTime();
+    const timeA = new Date(a.lastMessage?.createdAt || 0).getTime();
+    const timeB = new Date(b.lastMessage?.createdAt || 0).getTime();
     return timeB - timeA;
   });
 
   // Sort groups by last message time
   const sortedGroups = groups?.sort((a, b) => {
-    const timeA = a.lastMessage ? new Date(a.lastMessage.createdAt).getTime() : 0;
-    const timeB = b.lastMessage ? new Date(b.lastMessage.createdAt).getTime() : 0;
+    const timeA = new Date(a.lastMessage?.createdAt || 0).getTime();
+    const timeB = new Date(b.lastMessage?.createdAt || 0).getTime();
     return timeB - timeA;
   });
 
@@ -616,19 +619,21 @@ const ConversationList = React.memo(({
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-400">{group.members.length} members</p>
-                        {group.lastMessage && (
-                          <>
-                            <p className={cn(
-                              "text-sm truncate",
-                              group.lastMessage.isRead ? "text-gray-500" : "text-gray-900 font-medium"
-                            )}>
-                              {group.lastMessage.content}
-                            </p>
-                            <p className="text-xs text-gray-400">
+                        <div className="flex justify-between items-center">
+                          <p className="text-xs text-gray-400">{group.members.length} members</p>
+                          {group.lastMessage && (
+                            <p className="text-xs text-gray-500">
                               {format(new Date(group.lastMessage.createdAt), "MMM d, h:mm a")}
                             </p>
-                          </>
+                          )}
+                        </div>
+                        {group.lastMessage && (
+                          <p className={cn(
+                            "text-sm truncate mt-1",
+                            group.lastMessage.isRead ? "text-gray-500" : "text-gray-900 font-medium"
+                          )}>
+                            {group.lastMessage.content}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -663,15 +668,19 @@ const ConversationList = React.memo(({
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-gray-400">{conversation.user.role}</p>
+                        <div className="flex justify-between items-center">
+                          <p className="text-xs text-gray-400">{conversation.user.role}</p>
+                          {conversation.lastMessage && (
+                            <p className="text-xs text-gray-500">
+                              {format(new Date(conversation.lastMessage.createdAt), "MMM d, h:mm a")}
+                            </p>
+                          )}
+                        </div>
                         <p className={cn(
-                          "text-sm truncate",
+                          "text-sm truncate mt-1",
                           conversation.lastMessage.isRead ? "text-gray-500" : "text-gray-900 font-medium"
                         )}>
                           {conversation.lastMessage.content}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {format(new Date(conversation.lastMessage.createdAt), "MMM d, h:mm a")}
                         </p>
                       </div>
                     </div>
