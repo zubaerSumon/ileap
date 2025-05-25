@@ -99,7 +99,7 @@ function OpportunityCard({
   return (
     <div 
       className="border rounded-xl overflow-hidden w-[300px] h-[260px] cursor-pointer hover:border-blue-200 transition-colors"
-      onClick={() => router.push(`/organization/opportunity/${id}`)}
+      onClick={() => router.push(`/organisation/opportunity/${id}`)}
     >
       <div className="relative h-[102px] w-full">
         <Image
