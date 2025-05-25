@@ -1,4 +1,4 @@
-import MessageUI from "@/components/layout/messaging/MessageUI";
+import MessageUI from "@/components/layout/messages/MessageUI";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import React from "react";
 

@@ -3,7 +3,7 @@ import { Fragment, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
-import TopNavigationBar from "@/components/TopNavigationBar";
+import TopNavigationBar from "@/components/navbar/TopNavigationBar";
 import UpdatedFooter from "../UpdatedFooter";
 
 interface ProtectedLayoutProps {

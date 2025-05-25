@@ -185,7 +185,51 @@ export const volunteerApplicationRouter = router({
         throw error;
       }
     }),
+  getVolunteersByOpportunity: protectedProcedure
+    .input(volunteerApplicationValidation.getApplicationStatusSchema)
+    .query(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to view volunteers",
+          });
+        }
 
+        // Get all applications for this opportunity
+        const applications = await VolunteerApplication.find({
+          opportunity: input.opportunityId,
+        })
+          .populate({
+            path: "volunteer",
+            populate: {
+              path: "user",
+              select: "name email avatar",
+            },
+          })
+          .lean();
+
+        // Transform the data to include volunteer details
+        const volunteers = applications.map((app) => ({
+          _id: app.volunteer._id,
+          name: app.volunteer.user.name,
+          email: app.volunteer.user.email,
+          avatar: app.volunteer.user.avatar,
+          status: app.status,
+          appliedAt: app.createdAt,
+        }));
+
+        return volunteers;
+      } catch (error) {
+        console.error("Error fetching volunteers by opportunity:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch volunteers",
+          cause: error,
+        });
+      }
+    }),
   getOpportunityApplicants: protectedProcedure
     .input(volunteerApplicationValidation.getOpportunityApplicantsSchema)
     .query(async ({ ctx, input }) => {
@@ -206,8 +250,9 @@ export const volunteerApplicationRouter = router({
             select: "name email",
             populate: {
               path: "volunteer_profile",
-              select: "profile_img location bio skills completed_projects availability"
-            }
+              select:
+                "profile_img location bio skills completed_projects availability",
+            },
           })
           .lean();
 
@@ -237,11 +282,13 @@ export const volunteerApplicationRouter = router({
             id: app.volunteer._id.toString(),
             name: app.volunteer.name || "",
             email: app.volunteer.email || "",
-            profileImg: app.volunteer.volunteer_profile?.profile_img || "/avatar.svg",
+            profileImg:
+              app.volunteer.volunteer_profile?.profile_img || "/avatar.svg",
             location: app.volunteer.volunteer_profile?.location || "",
             bio: app.volunteer.volunteer_profile?.bio || "",
             skills: app.volunteer.volunteer_profile?.skills || [],
-            completedProjects: app.volunteer.volunteer_profile?.completed_projects || 0,
+            completedProjects:
+              app.volunteer.volunteer_profile?.completed_projects || 0,
             availability: app.volunteer.volunteer_profile?.availability || "",
             applicationId: app._id.toString(),
           } as const;

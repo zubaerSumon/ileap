@@ -1,34 +1,41 @@
 import { NavItem } from '@/types/navigation';
 
 export const PUBLIC_NAV_OPTIONS: NavItem[] = [
-  { label: "Log in", href: "/signin", className: "hover:underline" },
   {
-    label: "Organisation Sign up",
-    href: "/signup?role=organization",
-    className: "hover:underline hidden md:inline",
+    label: "Sign in",
+    href: "/signin",
+    className: "hover:text-blue-500",
   },
   {
-    label: "Volunteer-Sign up",
-    href: "/signup?role=volunteer",
-    className: "hover:underline hidden md:inline",
+    label: "Sign up",
+    href: "/signup",
+    className: "hover:text-blue-500",
   },
 ];
 
 export const STATIC_LINKS: NavItem[] = [
-  { label: "About Us", href: "/about" },
-  { label: "FAQs", href: "/faq" },
-  { label: "Gallery", href: "/ausleap/gallery" },
+  {
+    label: "About",
+    href: "/about",
+  },
+  {
+    label: "Contact",
+    href: "/contact",
+  },
+  {
+    label: "FAQ",
+    href: "/faq",
+  },
 ];
 
-export const PROTECTED_PATHS = [
-  'volunteer',
-  'organization',
-  'opportunities',
-  'find-volunteer'
-];
+export const PROTECTED_PATHS = ["/organization", "/volunteer", "/profile", "/settings", "/messages"];
 
-export const AUTH_PATHS = [
-  'signin',
-  'signup',
-  'reset-password'
-]; 
+export const AUTH_PATHS = ["/signin", "/signup", "/reset-password"];
+
+export interface SessionUser {
+  id: string;
+  name: string;
+  email: string;
+  role: "organization" | "volunteer";
+  image?: string;
+} 

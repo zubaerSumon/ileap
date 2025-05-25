@@ -10,7 +10,7 @@ import type { TRPCClientErrorLike } from "@trpc/client";
 import type { AppRouter } from "@/server";
 import { useRecruitmentStatus } from "@/hooks/useRecruitmentStatus";
 
-interface Applicant {
+export interface Applicant {
   id: string;
   name: string;
   profileImg: string;
@@ -26,10 +26,14 @@ export function ApplicantsCard({
   setIsModalOpen,
   hideRecruitButton = false,
   applicant,
+  setSelectedApplicantId,
+  onMessageClick,
 }: {
   setIsModalOpen: (isOpen: boolean) => void;
   hideRecruitButton?: boolean;
   applicant: Applicant;
+  setSelectedApplicantId: (id: string) => void;
+  onMessageClick: () => void;
 }) {
   const utils = trpc.useUtils();
   const { isRecruited, refetchRecruitmentStatus } = useRecruitmentStatus(
@@ -53,6 +57,11 @@ export function ApplicantsCard({
     recruitMutation.mutate({
       applicationId: applicant.applicationId,
     });
+  };
+
+  const handleViewProfile = () => {
+    setSelectedApplicantId(applicant.id);
+    setIsModalOpen(true);
   };
 
   return (
@@ -113,6 +122,7 @@ export function ApplicantsCard({
                   variant="ghost"
                   size="lg"
                   className="bg-gray-100 hover:bg-gray-200 rounded-[6px] px-3 min-w-[56px]"
+                  onClick={handleViewProfile}
                 >
                   <Star className="w-6 h-6 text-yellow-400" />
                 </Button>
@@ -147,6 +157,7 @@ export function ApplicantsCard({
               <Button
                 size="lg"
                 className="bg-[#246BFD] hover:bg-[#246BFD]/90 text-white px-6 rounded-[6px]"
+                onClick={onMessageClick}
               >
                 Send message
               </Button>

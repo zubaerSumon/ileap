@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { TRPCError } from "@trpc/server";
-import { sendMessageSchema, getMessagesSchema } from "./messages.validation";
+import { sendMessageSchema, getMessagesSchema } from "./message.validation";
 import Message from "../../db/models/message";
 import { Types } from "mongoose";
 import User from "../../db/models/user";
@@ -9,7 +9,7 @@ import { router } from "@/server/trpc";
 import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { z } from "zod";
 
-export const messagesRouter = router({
+export const messsageRouter = router({
   sendMessage: protectedProcedure
     .input(sendMessageSchema)
     .mutation(async ({ input, ctx }) => {

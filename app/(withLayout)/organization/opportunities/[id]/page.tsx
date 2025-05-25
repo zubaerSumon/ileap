@@ -14,12 +14,14 @@ import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { PostContent } from "@/components/layout/organization/opportunities/PostContent";
 import { Sidebar } from "@/components/layout/organization/opportunities/Sidebar";
-import { ApplicantsCard } from "@/components/layout/organization/opportunities/ApplicantsCard";
+import {
+  Applicant,
+  ApplicantsCard,
+} from "@/components/layout/organization/opportunities/ApplicantsCard";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
 import VolunteerModal from "@/components/layout/organization/opportunities/VolunteerModal";
 import { useState } from "react";
-import { type Applicant } from "@/components/layout/organization/opportunities/ApplicantsCard";
 import MessageApplicantModal from "@/components/layout/organization/opportunities/MessageApplicantModal";
 
 export default function OpportunityDetailsPage() {
@@ -27,8 +29,13 @@ export default function OpportunityDetailsPage() {
   const params = useParams();
   const opportunityId = params.id as string;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(
+    null
+  );
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
+    null
+  );
 
   const {
     data: opportunity,
@@ -38,27 +45,33 @@ export default function OpportunityDetailsPage() {
     enabled: !!opportunityId,
   });
 
-  const {
-    data: applicants,
-    isLoading: isLoadingApplicants,
-  } = trpc.applications.getOpportunityApplicants.useQuery(
-    { opportunityId },
-    { enabled: !!opportunityId }
-  );
+  const { data: applicants, isLoading: isLoadingApplicants } =
+    trpc.applications.getOpportunityApplicants.useQuery(
+      { opportunityId },
+      { enabled: !!opportunityId }
+    );
 
-  const {
-    data: recruitedApplicants,
-    isLoading: isLoadingRecruitedApplicants,
-  } = trpc.recruits.getRecruitedApplicants.useQuery(
-    { opportunityId },
-    { enabled: !!opportunityId }
-  );
+  const { data: recruitedApplicants, isLoading: isLoadingRecruitedApplicants } =
+    trpc.recruits.getRecruitedApplicants.useQuery(
+      { opportunityId },
+      { enabled: !!opportunityId }
+    );
+
+  const handleCloseMessageModal = () => {
+    setIsMessageModalOpen(false);
+    setSelectedApplicant(null);
+  };
+
+  const handleOpenMessageModal = (applicant: Applicant) => {
+    setSelectedApplicant(applicant);
+    setIsMessageModalOpen(true);
+  };
 
   if (isLoading || isLoadingApplicants || isLoadingRecruitedApplicants) {
     return (
       <ProtectedLayout>
         <div className="bg-[#F5F7FA] py-12">
-          <div className="w-[1048px] mx-auto bg-white rounded-xl min-h-screen p-8">
+          <div className="w-[1240px] mx-auto bg-white rounded-xl min-h-screen p-8">
             Loading...
           </div>
         </div>
@@ -70,7 +83,7 @@ export default function OpportunityDetailsPage() {
     return (
       <ProtectedLayout>
         <div className="bg-[#F5F7FA] py-12">
-          <div className="w-[1048px] mx-auto bg-white rounded-xl min-h-screen p-8">
+          <div className="w-[1240px] mx-auto bg-white rounded-xl min-h-screen p-8">
             Error loading opportunity
           </div>
         </div>
@@ -80,8 +93,8 @@ export default function OpportunityDetailsPage() {
 
   return (
     <ProtectedLayout>
-      <div className="bg-[#F5F7FA] py-12">
-        <div className="w-[1048px] mx-auto bg-white rounded-xl min-h-screen ">
+      <div className="bg-[#F5F7FA] border py-12">
+        <div className="w-[1240px] mx-auto bg-white rounded-xl min-h-screen ">
           <div className="p-8">
             <div className="mb-8">
               <Button
@@ -153,12 +166,13 @@ export default function OpportunityDetailsPage() {
                     <div className="w-full border-b border-[#F1F1F1]" />
                   </div>
                   {recruitedApplicants?.map((applicant) => (
-                    <ApplicantsCard 
-                      key={applicant.id} 
-                      setIsModalOpen={() => handleOpenVolunteerModal(applicant)}
-                      onMessageClick={() => handleOpenMessageModal(applicant)}
+                    <ApplicantsCard
+                      key={applicant.id}
+                      setIsModalOpen={setIsModalOpen}
                       hideRecruitButton={true}
                       applicant={applicant}
+                      setSelectedApplicantId={setSelectedApplicantId}
+                      onMessageClick={() => handleOpenMessageModal(applicant)}
                     />
                   ))}
                   {recruitedApplicants?.length === 0 && (
@@ -202,11 +216,12 @@ export default function OpportunityDetailsPage() {
                     </div>
                   </div>
                   {applicants?.map((applicant) => (
-                    <ApplicantsCard 
-                      key={applicant.id} 
-                      setIsModalOpen={() => handleOpenVolunteerModal(applicant)}
-                      onMessageClick={() => handleOpenMessageModal(applicant)}
+                    <ApplicantsCard
+                      key={applicant.id}
+                      setIsModalOpen={setIsModalOpen}
                       applicant={applicant}
+                      setSelectedApplicantId={setSelectedApplicantId}
+                      onMessageClick={() => handleOpenMessageModal(applicant)}
                     />
                   ))}
                 </div>
@@ -217,15 +232,10 @@ export default function OpportunityDetailsPage() {
       </div>
       <VolunteerModal
         isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        volunteer={selectedApplicant ? {
-          _id: selectedApplicant.id,
-          name: selectedApplicant.name,
-          avatar: selectedApplicant.profileImg,
-          status: 'pending',
-          appliedAt: new Date().toISOString(),
-          email: ''
-        } : null}
+        onClose={() => setIsModalOpen(false)}
+        volunteer={
+          applicants?.find((a) => a.id === selectedApplicantId) || null
+        }
       />
       <MessageApplicantModal
         isOpen={isMessageModalOpen}

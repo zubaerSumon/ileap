@@ -144,7 +144,7 @@ export default function OpportunitiesPage() {
   return (
     <ProtectedLayout>
       <div className="bg-[#F5F7FA] ">
-        <div className="max-w-[1048px] p-8 h-[900px] mx-auto overflow-auto">
+        <div className="max-w-[1240px] py-8 h-[900px] mx-auto overflow-auto">
           <div className="bg-white rounded-lg">
             <div className="px-4 pt-5">
               <h1 className="text-2xl font-semibold mb-1">Opportunities</h1>
