@@ -8,6 +8,7 @@ import VolunteerApplication from "@/server/db/models/volunteer-application";
 import connectDB from "@/server/config/mongoose";
 import { organisationRecruitmentValidation } from "./organisation-recruitment.validation";
 import { z } from "zod";
+import { sendRecruitmentConfirmationMail } from "@/utils/helpers/sendRecruitmentConfirmationMail";
 
 export const organisationRecruitmentRouter = router({
   getRecruitmentStatus: protectedProcedure
@@ -76,6 +77,9 @@ export const organisationRecruitmentRouter = router({
           application: input.applicationId,
           recruited_by: recruiter._id,
         });
+
+        // Send recruitment confirmation email
+        await sendRecruitmentConfirmationMail(input.applicationId);
 
         return organisationRecruitment;
       } catch (error) {
