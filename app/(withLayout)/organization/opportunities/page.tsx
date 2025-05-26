@@ -31,7 +31,7 @@ import { MoreHorizontal } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import type { Opportunity } from "@/types/opportunities";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
-import OpportunityTabs from "@/components/layout/organization/opportunities/OpportunityTabs";
+import OpportunityTabs from "@/components/layout/organisation/opportunities/OpportunityTabs";
 import { useRouter } from "next/navigation";
 
 export default function OpportunitiesPage() {

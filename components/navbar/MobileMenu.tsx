@@ -1,10 +1,17 @@
 import Image from "next/image";
-import { X, FileUser, MessageCircle, SettingsIcon, Layers2, LayoutDashboard } from "lucide-react";
+import {
+  X,
+  FileUser,
+  MessageCircle,
+  SettingsIcon,
+  Layers2,
+  LayoutDashboard,
+} from "lucide-react";
 import { Session } from "next-auth";
 import Logo from "../../public/AusLeap.png";
 import { PUBLIC_NAV_OPTIONS, STATIC_LINKS } from "@/utils/constants/navigation";
 import { NavLink } from "./NavLink";
- 
+
 interface MobileMenuProps {
   isMenuOpen: boolean;
   setIsMenuOpen: (isOpen: boolean) => void;
@@ -30,6 +37,9 @@ export function MobileMenu({
       className={`fixed top-0 left-0 h-full w-72 bg-[#1a1a1a] text-white transform transition-transform duration-300 ease-in-out z-50 ${
         isMenuOpen ? "translate-x-0" : "-translate-x-full"
       }`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mobile navigation menu"
     >
       <div className="p-6 h-full flex flex-col">
         <div className="flex justify-between items-center mb-8">
@@ -44,6 +54,7 @@ export function MobileMenu({
           <button
             onClick={handleCloseMenu}
             className="p-2 hover:bg-gray-800 rounded-full transition-colors duration-200"
+            aria-label="Close menu"
           >
             <X className="h-6 w-6" />
           </button>
@@ -60,7 +71,9 @@ export function MobileMenu({
                   </div>
                   <div>
                     <p className="font-medium">{session.user?.name}</p>
-                    <p className="text-sm text-gray-400">{session.user?.email}</p>
+                    <p className="text-sm text-gray-400">
+                      {session.user?.email}
+                    </p>
                   </div>
                 </div>
                 <div className="space-y-1">
@@ -108,7 +121,7 @@ export function MobileMenu({
                     onClick={handleCloseMenu}
                   />
                   <NavLink
-                    href="/organization/opportunity/create"
+                    href="/organization/opportunities/create"
                     label="Post an opportunity"
                     icon={FileUser}
                     className="bg-blue-600 hover:bg-blue-700"
@@ -118,7 +131,11 @@ export function MobileMenu({
               )}
               <div className="space-y-1">
                 <NavLink
-                  href={`/${session?.user?.role === "organization" ? "organisation" : session?.user?.role}/messages`}
+                  href={`/${
+                    session?.user?.role === "organization"
+                      ? "organisation"
+                      : session?.user?.role
+                  }/messages`}
                   label="Messages"
                   icon={MessageCircle}
                   showBadge
@@ -170,4 +187,4 @@ export function MobileMenu({
       </div>
     </div>
   );
-} 
+}

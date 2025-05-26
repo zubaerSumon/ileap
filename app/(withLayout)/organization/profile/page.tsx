@@ -1,4 +1,4 @@
-import OrganizationProfile from "../../../../components/layout/organization/OrganizationProfile";
+import OrganizationProfile from "../../../../components/layout/organisation/OrganizationProfile";
 
 
 export default function ProfilePage() {

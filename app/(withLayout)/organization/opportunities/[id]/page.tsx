@@ -13,17 +13,17 @@ import { useRouter, useParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { PostContent } from "@/components/layout/organization/opportunities/PostContent";
-import { Sidebar } from "@/components/layout/organization/opportunities/Sidebar";
+import { PostContent } from "@/components/layout/organisation/opportunities/PostContent";
+import { Sidebar } from "@/components/layout/organisation/opportunities/Sidebar";
 import {
   Applicant,
   ApplicantsCard,
-} from "@/components/layout/organization/opportunities/ApplicantsCard";
+} from "@/components/layout/organisation/opportunities/ApplicantsCard";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
-import VolunteerModal from "@/components/layout/organization/opportunities/VolunteerModal";
+import VolunteerModal from "@/components/layout/organisation/opportunities/VolunteerModal";
 import { useState } from "react";
-import MessageApplicantModal from "@/components/layout/organization/opportunities/MessageApplicantModal";
+import MessageApplicantModal from "@/components/layout/organisation/opportunities/MessageApplicantModal";
 import toast from "react-hot-toast";
 import {
   Dialog,
