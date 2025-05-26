@@ -16,15 +16,14 @@ import { TopBar } from "@/components/navbar/TopBar";
 
 export default function TopNavigationBar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [showNav, setShowNav] = useState(false);
+  const [showNav, setShowNav] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
   const { data: session } = useSession();
   const { isAuthenticated } = useAuthCheck();
 
   const isAuthPath = AUTH_PATHS.some((path) => pathname?.includes(path));
-  const isProtectedPath = PROTECTED_PATHS.some((path) =>
-    pathname?.includes(path)
-  );
+  const isProtectedPath = PROTECTED_PATHS.some((path) => pathname?.includes(path));
   const isResetPasswordPath = pathname?.endsWith("reset-password");
 
   // Fetch conversations to get total unread count
@@ -40,18 +39,22 @@ export default function TopNavigationBar() {
   );
 
   // Calculate total unread messages
-  const totalUnreadCount =
-    conversations?.reduce(
-      (total, conv) => total + (conv.unreadCount || 0),
-      0
-    ) || 0;
+  const totalUnreadCount = conversations?.reduce(
+    (total, conv) => total + (conv.unreadCount || 0),
+    0
+  ) || 0;
 
+  // Handle client-side mounting
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setShowNav(!isProtectedPath || (isProtectedPath && isAuthenticated));
-    }
+    setMounted(true);
+  }, []);
+
+  // Handle navigation visibility
+  useEffect(() => {
+    setShowNav(!isProtectedPath || (isProtectedPath && isAuthenticated));
   }, [isProtectedPath, isAuthenticated]);
 
+  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768 && isMenuOpen) {
@@ -63,7 +66,7 @@ export default function TopNavigationBar() {
     return () => window.removeEventListener("resize", handleResize);
   }, [isMenuOpen]);
 
-  // Close menu when clicking outside
+  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const mobileMenu = document.getElementById("mobile-menu");
@@ -83,8 +86,12 @@ export default function TopNavigationBar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
-    <div className="bg-white sticky top-0 z-50">
+    <div className="px-4 md:px-0">
       {!isAuthPath && !isProtectedPath && !isResetPasswordPath && (
         <div className="bg-blue-600 text-white py-1 px-4">
           <div className="container mx-auto flex justify-end space-x-4 text-sm">

@@ -1,16 +1,23 @@
 import { NavItem } from '@/types/navigation';
 
 export const PUBLIC_NAV_OPTIONS: NavItem[] = [
+ 
   {
+    label: "Volunteer sign up",
+    href: "/signup",
+    className: "hover:text-blue-500",
+  },
+  {
+    label: "Organization sign up",
+    href: "/signup?role=organization",
+    className: "hover:text-blue-500",
+  },
+   {
     label: "Sign in",
     href: "/signin",
     className: "hover:text-blue-500",
   },
-  {
-    label: "Sign up",
-    href: "/signup",
-    className: "hover:text-blue-500",
-  },
+  
 ];
 
 export const STATIC_LINKS: NavItem[] = [

@@ -37,6 +37,9 @@ export function MobileMenu({
       className={`fixed top-0 left-0 h-full w-72 bg-[#1a1a1a] text-white transform transition-transform duration-300 ease-in-out z-50 ${
         isMenuOpen ? "translate-x-0" : "-translate-x-full"
       }`}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Mobile navigation menu"
     >
       <div className="p-6 h-full flex flex-col">
         <div className="flex justify-between items-center mb-8">
@@ -51,6 +54,7 @@ export function MobileMenu({
           <button
             onClick={handleCloseMenu}
             className="p-2 hover:bg-gray-800 rounded-full transition-colors duration-200"
+            aria-label="Close menu"
           >
             <X className="h-6 w-6" />
           </button>

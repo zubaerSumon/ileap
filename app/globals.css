@@ -3,6 +3,7 @@
 
 @plugin "tailwindcss-animate";
  
+@import 'swiper/css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -125,9 +126,7 @@
   }
 }
 
- .swiper-pagination-bullets {
-  display: none !important;
-}
+ 
 .ProseMirror ul {
   list-style-type: disc;
   padding-left: 1.5rem;
