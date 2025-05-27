@@ -23,7 +23,9 @@ export default function TopNavigationBar() {
   const { isAuthenticated } = useAuthCheck();
 
   const isAuthPath = AUTH_PATHS.some((path) => pathname?.includes(path));
-  const isProtectedPath = PROTECTED_PATHS.some((path) => pathname?.includes(path));
+  const isProtectedPath = PROTECTED_PATHS.some((path) =>
+    pathname?.includes(path)
+  );
   const isResetPasswordPath = pathname?.endsWith("reset-password");
 
   // Fetch conversations to get total unread count
@@ -39,10 +41,11 @@ export default function TopNavigationBar() {
   );
 
   // Calculate total unread messages
-  const totalUnreadCount = conversations?.reduce(
-    (total, conv) => total + (conv.unreadCount || 0),
-    0
-  ) || 0;
+  const totalUnreadCount =
+    conversations?.reduce(
+      (total, conv) => total + (conv.unreadCount || 0),
+      0
+    ) || 0;
 
   // Handle client-side mounting
   useEffect(() => {
@@ -91,7 +94,7 @@ export default function TopNavigationBar() {
   }
 
   return (
-    <div className="px-4 md:px-0">
+    <div>
       {!isAuthPath && !isProtectedPath && !isResetPasswordPath && (
         <div className="bg-blue-600 text-white py-1 px-4">
           <div className="container mx-auto flex justify-end space-x-4 text-sm">

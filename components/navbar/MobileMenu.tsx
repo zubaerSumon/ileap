@@ -120,13 +120,6 @@ export function MobileMenu({
                     icon={Layers2}
                     onClick={handleCloseMenu}
                   />
-                  <NavLink
-                    href="/organization/opportunities/create"
-                    label="Post an opportunity"
-                    icon={FileUser}
-                    className="bg-blue-600 hover:bg-blue-700"
-                    onClick={handleCloseMenu}
-                  />
                 </div>
               )}
               <div className="space-y-1">
