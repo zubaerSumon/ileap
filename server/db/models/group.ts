@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose';
+import { IGroup } from '../interfaces/group';
 
-const groupSchema = new Schema(
+const groupSchema = new Schema<IGroup>(
   {
     name: {
       type: String,
@@ -8,12 +9,6 @@ const groupSchema = new Schema(
     },
     description: {
       type: String,
-      required: false,
-    },
-    createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: 'user',
-      required: true,
     },
     members: [{
       type: Schema.Types.ObjectId,
@@ -25,6 +20,15 @@ const groupSchema = new Schema(
       ref: 'user',
       required: true,
     }],
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
+    isOrganizationGroup: {
+      type: Boolean,
+      default: false,
+    },
     avatar: {
       type: String,
       required: false,
@@ -38,4 +42,4 @@ const groupSchema = new Schema(
 groupSchema.index({ members: 1 });
 groupSchema.index({ createdBy: 1 });
 
-export const Group = models.group || model('group', groupSchema); 
+export const Group = models.group || model<IGroup>('group', groupSchema); 

@@ -286,6 +286,7 @@ export const messsageRouter = router({
       name: z.string(),
       description: z.string().optional(),
       memberIds: z.array(z.string()),
+      isOrganizationGroup: z.boolean().optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       try {
@@ -313,12 +314,21 @@ export const messsageRouter = router({
           });
         }
 
+        // Check if user is an organization when creating an organization group
+        if (input.isOrganizationGroup && user.role !== "organization") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only organizations can create organization groups",
+          });
+        }
+
         const group = await Group.create({
           name: input.name,
           description: input.description,
           createdBy: user._id,
-          members: [...input.memberIds, user._id],
+          members: [...input.memberIds.map(id => new Types.ObjectId(id)), user._id],
           admins: [user._id],
+          isOrganizationGroup: input.isOrganizationGroup || false,
         });
 
         return group;
@@ -359,7 +369,7 @@ export const messsageRouter = router({
 
         // Get the last message and unread count for each group
         const groupsWithMessages = await Promise.all(
-          groups.map(async (group) => {
+          groups.map(async (group: any) => {
             const lastMessage = await Message.findOne({ group: group._id })
               .sort({ createdAt: -1 })
               .populate('sender', 'name avatar role')
