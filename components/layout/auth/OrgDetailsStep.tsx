@@ -42,6 +42,17 @@ export function OrgDetailsStep({ form }: OrgDetailsStepProps) {
           registerName="type"
           error={form.formState.errors.type?.message}
           options={organizationTypes}
+          value={form.watch("type")}
+          onChange={(value) => {
+            console.log("Type change handler called with value:", value);
+            // Validate the type before setting it
+            const isValidType = organizationTypes.some(opt => opt.value === value);
+            if (!isValidType) {
+              console.warn("Invalid organization type selected:", value);
+              return;
+            }
+            form.setValue("type", value);
+          }}
         />
 
         <MultiSelectField

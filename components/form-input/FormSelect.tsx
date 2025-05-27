@@ -46,6 +46,8 @@ interface SelectFieldProps<T extends FieldValues> {
   loading?: boolean;
   className?: string;
   description?: string;
+  value?: string;
+  onChange?: (value: string) => void;
 }
 
 export const FormSelect = <T extends FieldValues>({
@@ -61,6 +63,8 @@ export const FormSelect = <T extends FieldValues>({
   loading = false,
   className,
   description,
+  value,
+  onChange,
 }: SelectFieldProps<T>) => {
   const [open, setOpen] = useState(false);
 
@@ -113,6 +117,7 @@ export const FormSelect = <T extends FieldValues>({
                   value={option.value}
                   onSelect={() => {
                     field.onChange(option.value);
+                    onChange?.(option.value);
                     setOpen(false);
                   }}
                   disabled={option.disabled}
@@ -139,8 +144,11 @@ export const FormSelect = <T extends FieldValues>({
 
   const renderRegularSelect = (field: ControllerRenderProps<T, Path<T>>) => (
     <Select
-      value={field.value}
-      onValueChange={field.onChange}
+      value={value || field.value}
+      onValueChange={(newValue) => {
+        field.onChange(newValue);
+        onChange?.(newValue);
+      }}
       disabled={disabled || loading}
     >
       <SelectTrigger 

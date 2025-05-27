@@ -14,6 +14,7 @@ import { OrgProfileStep } from "./OrgProfileStep";
 import { OrgSignupStep } from "./OrgSignupStep";
 import { OrgDetailsStep } from "./OrgDetailsStep";
 import { Loader2 } from "lucide-react";
+import { organizationTypes } from "@/utils/constants/select-options";
 
 export default function OrganizationSignup() {
   const searchParams = useSearchParams();
@@ -63,7 +64,36 @@ export default function OrganizationSignup() {
   const form = useForm<OrgSignupFormData>({
     resolver: zodResolver(orgSignupSchema),
     mode: "onChange",
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+      confirm_password: "",
+      title: "",
+      contact_email: "",
+      bio: "",
+      phone_number: "",
+      state: "",
+      area: "",
+      abn: "",
+      type: "",
+      opportunity_types: [],
+      required_skills: [],
+      website: "",
+      profile_img: "",
+      cover_img: "",
+    }
   });
+
+  // Add debug logging for form state
+  useEffect(() => {
+    console.log("Form state:", {
+      values: form.getValues(),
+      errors: form.formState.errors,
+      isValid: form.formState.isValid,
+      isDirty: form.formState.isDirty
+    });
+  }, [form.formState]);
 
   const handleNext = async () => {
     let fieldsToValidate: Array<keyof OrgSignupFormData> = [];
@@ -91,6 +121,13 @@ export default function OrganizationSignup() {
         "abn",
       ];
     } else if (step === 3) {
+      // Add debug logging for type field
+      console.log("Type field before validation:", {
+        value: form.getValues("type"),
+        isValid: organizationTypes.some((opt: { value: string }) => opt.value === form.getValues("type")),
+        errors: form.formState.errors.type
+      });
+
       fieldsToValidate = [
         "type",
         "opportunity_types",
@@ -102,6 +139,11 @@ export default function OrganizationSignup() {
     }
 
     const isValid = await form.trigger(fieldsToValidate);
+    console.log("Form validation result:", {
+      isValid,
+      errors: form.formState.errors,
+      values: form.getValues()
+    });
 
     if (isValid) {
       if (step === 1) {
@@ -112,6 +154,7 @@ export default function OrganizationSignup() {
         try {
           setIsProfileLoading(true);
           const formData = form.getValues();
+          console.log("Submitting form data:", formData);
 
           await setupOrgProfile.mutate({
             title: formData.title,
