@@ -55,6 +55,7 @@
     "date-fns": "^4.1.0",
     "express-handlebars": "^8.0.1",
     "file-saver": "^2.0.5",
+    "framer-motion": "^12.14.0",
     "http-status": "^2.1.0",
     "install": "^0.13.0",
     "jsonwebtoken": "^9.0.2",
