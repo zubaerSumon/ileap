@@ -1,5 +1,5 @@
 import { Schema, model, models } from 'mongoose';
-import { IGroup } from '@/server/db/interfaces/group';
+import { IGroup } from '../interfaces/group';
 
 const groupSchema = new Schema<IGroup>(
   {
@@ -13,10 +13,12 @@ const groupSchema = new Schema<IGroup>(
     members: [{
       type: Schema.Types.ObjectId,
       ref: 'user',
+      required: true,
     }],
     admins: [{
       type: Schema.Types.ObjectId,
       ref: 'user',
+      required: true,
     }],
     createdBy: {
       type: Schema.Types.ObjectId,

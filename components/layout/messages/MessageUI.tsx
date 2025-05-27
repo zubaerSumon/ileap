@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
@@ -10,16 +10,24 @@ import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
 import MessageInput from './components/MessageInput';
 
-export const MessageUI: React.FC = () => {
+interface MessageUIProps {
+  initialUserId?: string | null;
+}
+
+export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   const { data: session } = useSession();
-  console.log("MessageUI - Full Session:", session);
-  console.log("MessageUI - User Role:", session?.user?.role);
-  console.log("MessageUI - User Email:", session?.user?.email);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [activeTab, setActiveTab] = useState("conversations");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const utils = trpc.useUtils();
+
+  useEffect(() => {
+    if (initialUserId) {
+      setSelectedUserId(initialUserId);
+      setActiveTab("applicants");
+    }
+  }, [initialUserId]);
 
   const { conversations, groups, isLoadingConversations, isLoadingGroups, markAsReadMutation } = useConversations();
   
@@ -46,11 +54,9 @@ export const MessageUI: React.FC = () => {
   const handleSelectUser = (userId: string) => {
     setSelectedUserId(userId);
     setShowMobileMenu(false);
-    // Mark messages as read when conversation is opened
     if (!isGroup) {
       markAsReadMutation.mutate({ conversationId: userId });
     } else {
-      // For groups, we'll use the getGroupMessages query which automatically marks messages as read
       utils.messages.getGroupMessages.invalidate({ groupId: userId });
     }
   };
@@ -77,9 +83,6 @@ export const MessageUI: React.FC = () => {
     }
   };
 
-  // Ensure we have the correct data before rendering
-  const currentConversation = isGroup ? selectedGroup : selectedConversation;
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 h-full bg-white rounded-lg border">
       <Sidebar
@@ -100,12 +103,12 @@ export const MessageUI: React.FC = () => {
       />
 
       <main className="col-span-1 md:col-span-3 flex flex-col h-full">
-        {selectedUserId && currentConversation ? (
+        {selectedUserId && selectedConversation ? (
           <>
             <ChatArea
               messages={flattenedMessages}
               isLoadingMessages={isLoadingMessages}
-              selectedConversation={currentConversation}
+              selectedConversation={selectedConversation}
               onMenuClick={() => setShowMobileMenu(true)}
               session={session}
               isGroup={isGroup}
