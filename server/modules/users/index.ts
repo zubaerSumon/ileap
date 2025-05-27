@@ -6,7 +6,7 @@ import { userValidation } from "./users.validation";
 import bcrypt from "bcryptjs";
 import { publicProcedure, router } from "@/server/trpc";
 import VolunteerProfile from "@/server/db/models/volunteer-profile";
- 
+import { TRPCError } from "@trpc/server";
 
 export const userRouter = router({
   getAvailableUsers: protectedProcedure.query(async ({ ctx }) => {
@@ -90,14 +90,31 @@ export const userRouter = router({
     if (!user) {
       throw new Error("User not found.");
     }
-    console.log({ user });
 
-    return {
+    // Add detailed logging of the organization profile
+    console.log("Organization Profile Details:", {
+      exists: !!user.organization_profile,
+      raw: user.organization_profile,
+      type: user.organization_profile?.type,
+      title: user.organization_profile?.title,
+      email: user.organization_profile?.contact_email
+    });
+
+    const response = {
       hasVolunteerProfile: !!user.volunteer_profile,
       hasOrganizationProfile: !!user.organization_profile,
       volunteerProfile: user.volunteer_profile,
       organizationProfile: user.organization_profile,
     };
+
+    // Log the response being sent
+    console.log("Profile Checkup Response:", {
+      hasOrgProfile: response.hasOrganizationProfile,
+      orgProfile: response.organizationProfile,
+      orgProfileType: response.organizationProfile?.type
+    });
+
+    return response;
   }),
 
   setupVolunteerProfile: protectedProcedure
@@ -122,20 +139,128 @@ export const userRouter = router({
   setupOrgProfile: protectedProcedure
     .input(userValidation.organizationProfileSchema)
     .mutation(async ({ ctx, input }) => {
-      const sessionUser = ctx.user as JwtPayload;
-      if (!sessionUser || !sessionUser?.id) {
-        throw new Error("You must be logged in to setup your profile.");
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser || !sessionUser?.id) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to setup your profile.",
+          });
+        }
+
+        console.log("Processing update for user:", sessionUser.email);
+        console.log("Input data:", input);
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found.",
+          });
+        }
+
+        // If user already has an organization profile, update it
+        if (user.organization_profile) {
+          console.log("Updating existing profile:", user.organization_profile);
+          
+          // Validate arrays before update
+          if (!input.opportunity_types?.length) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "At least one opportunity type is required",
+            });
+          }
+          if (!input.required_skills?.length) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "At least one required skill is required",
+            });
+          }
+
+          const updateData = {
+            ...input,
+            updatedAt: new Date()
+          };
+          
+          console.log("Update data:", updateData);
+
+          try {
+            const updatedProfile = await OrganizationProfile.findByIdAndUpdate(
+              user.organization_profile,
+              updateData,
+              { 
+                new: true,
+                runValidators: true,
+                context: 'query'
+              }
+            );
+
+            if (!updatedProfile) {
+              console.error("Failed to update profile for user:", sessionUser.email);
+              throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to update organization profile",
+              });
+            }
+
+            console.log("Profile updated successfully:", updatedProfile);
+            return updatedProfile;
+          } catch (error) {
+            console.error("Mongoose validation error:", error);
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: error instanceof Error ? error.message : "Validation failed",
+            });
+          }
+        }
+
+        // If user doesn't have an organization profile, create a new one
+        console.log("Creating new profile for user:", sessionUser.email);
+        
+        try {
+          const organizationProfile = await OrganizationProfile.create({
+            ...input,
+            createdAt: new Date(),
+            updatedAt: new Date()
+          });
+
+          if (!organizationProfile) {
+            console.error("Failed to create profile for user:", sessionUser.email);
+            throw new TRPCError({
+              code: "INTERNAL_SERVER_ERROR",
+              message: "Failed to create organization profile",
+            });
+          }
+
+          // Update user with the new organization profile reference
+          await User.findByIdAndUpdate(
+            user._id,
+            {
+              organization_profile: organizationProfile._id,
+            },
+            { new: true }
+          );
+
+          console.log("New profile created successfully:", organizationProfile);
+          return organizationProfile;
+        } catch (error) {
+          console.error("Mongoose creation error:", error);
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: error instanceof Error ? error.message : "Failed to create profile",
+          });
+        }
+      } catch (error) {
+        console.error("Error in setupOrgProfile:", error);
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error instanceof Error ? error.message : "Failed to process organization profile",
+          cause: error,
+        });
       }
-
-      const organizationProfile = await OrganizationProfile.create({
-        ...input,
-      });
-
-      if (!organizationProfile) {
-        throw new Error("Failed to create organization profile");
-      }
-
-      return organizationProfile;
     }),
 
   resetPassword: publicProcedure

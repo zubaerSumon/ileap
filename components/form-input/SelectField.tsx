@@ -1,6 +1,6 @@
 "use client";
 
-import { FieldValues, Path, UseFormRegister } from "react-hook-form";
+import { FieldValues, Path, UseFormRegister, UseFormSetValue, PathValue } from "react-hook-form";
 import { ChevronDown } from "lucide-react";
 
 interface Option {
@@ -16,16 +16,19 @@ interface SelectFieldProps<T extends FieldValues> {
   registerName: Path<T>;
   error?: string;
   options: Option[];
+  setValue: UseFormSetValue<T>;
+  value?: string;
 }
 
 export const SelectField = <T extends FieldValues>({
   label,
   id,
   placeholder,
-  register,
   registerName,
   error,
   options,
+  setValue,
+  value = "",
 }: SelectFieldProps<T>) => {
   return (
     <div className="space-y-1">
@@ -36,7 +39,10 @@ export const SelectField = <T extends FieldValues>({
         <div className="relative">
           <select
             id={id}
-            {...register(registerName)}
+            value={value}
+            onChange={(e) => {
+              setValue(registerName, e.target.value as PathValue<T, Path<T>>);
+            }}
             className="w-full h-6 px-2 py-0 focus:outline-none text-sm appearance-none pr-8"
           >
             <option value="">{placeholder || `Select ${label}`}</option>

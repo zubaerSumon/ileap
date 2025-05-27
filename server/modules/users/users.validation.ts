@@ -65,19 +65,31 @@ const volunteerProfileSchema = z.object({
 });
 
 const organizationProfileSchema = z.object({
-  title: z.string().nonempty("Title is required"),
-  contact_email: z.string().email("Invalid email address"),
-  phone_number: z.string().nonempty("Phone number is required"),
-  bio: z.string().nonempty("Motivation is required"),
-  type: z.string().nonempty("Type is required"),
-  opportunity_types: z
-    .array(z.string())
-    .nonempty("Please select at least one volunteer work"),
-  required_skills: z.array(z.string()).nonempty("Skills is required"),
-  state: z.string().nonempty("State is required"),
-  area: z.string().nonempty("Area/Suburb is required"),
-  abn: z.string().nonempty("ABN is required"),
-  website: z.string().optional(),
+  title: z.string().min(1, "Organization name is required"),
+  contact_email: z.string().email("Invalid email address").min(1, "Contact email is required"),
+  phone_number: z.string().min(1, "Phone number is required"),
+  bio: z.string().min(1, "Organization description is required"),
+  type: z.string().min(1, "Organization type is required")
+    .refine((val) => [
+      "ngo", "nonprofit", "community_group", "social_enterprise", "charity",
+      "educational_institution", "healthcare_provider", "religious_institution",
+      "environmental_group", "youth_organization", "arts_culture_group",
+      "disaster_relief_agency", "advocacy_group", "international_aid",
+      "sports_club", "animal_shelter"
+    ].includes(val), "Please select a valid organization type"),
+  opportunity_types: z.array(z.string())
+    .min(1, "Please select at least one opportunity type")
+    .refine((arr) => arr.every(item => item.length > 0), "All opportunity types must be valid"),
+  required_skills: z.array(z.string())
+    .min(1, "Please select at least one required skill")
+    .refine((arr) => arr.every(item => item.length > 0), "All required skills must be valid"),
+  state: z.string().min(1, "State is required"),
+  area: z.string().min(1, "Area/Suburb is required"),
+  abn: z.string().min(1, "ABN is required"),
+  website: z.string().optional().refine(
+    (val) => !val || val === "" || /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(val),
+    "Please enter a valid website URL or leave it empty"
+  ),
   profile_img: z.string().optional(),
   cover_img: z.string().optional(),
   user: z.string().optional(),
