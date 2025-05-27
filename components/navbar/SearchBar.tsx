@@ -81,7 +81,8 @@ export function SearchBar({ role }: SearchBarProps) {
 
   const handleSelect = (item: string) => {
     setQuery(item);
-    handleSearch();
+    router.push(`/search?type=${type}&q=${encodeURIComponent(item)}`);
+    setOverlay(false);
   };
 
   return (
@@ -144,29 +145,19 @@ export function SearchBar({ role }: SearchBarProps) {
       <div
         className="relative hidden md:flex h-[40px] items-center rounded-md border border-input bg-background w-[340px] overflow-visible group focus-within:ring-2 focus-within:ring-blue-500"
         style={{ boxShadow: "none" }}
+        onClick={() => setOverlay(true)}
       >
-        <form
-          onSubmit={handleSearch}
-          className="flex flex-1 items-center h-full"
-          autoComplete="off"
-        >
-          <span className="pl-3 flex items-center text-muted-foreground">
-            <Search className="h-4 w-4" />
-          </span>
-          <div 
-            className="flex-1 cursor-pointer"
-            onClick={() => setOverlay(true)}
-          >
-            <SearchInput
-              query={query}
-              placeholder={placeholder}
-              onInput={handleInput}
-              onSearch={handleSearch}
-              readOnly
-              className="border-none bg-transparent focus:ring-0 focus-visible:ring-0 px-2 text-sm flex-1 placeholder:text-muted-foreground cursor-pointer"
-            />
-          </div>
-        </form>
+        <span className="pl-3 flex items-center text-muted-foreground">
+          <Search className="h-4 w-4" />
+        </span>
+        <SearchInput
+          query={query}
+          placeholder={placeholder}
+          onInput={handleInput}
+          onSearch={handleSearch}
+          readOnly
+          className="border-none bg-transparent focus:ring-0 focus-visible:ring-0 px-2 text-sm flex-1 placeholder:text-muted-foreground cursor-pointer"
+        />
       </div>
     </>
   );
