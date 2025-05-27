@@ -36,6 +36,11 @@ export const userRouter = router({
         _id: { $ne: currentUser._id },
         role: "volunteer",
       };
+      console.log('Current user:', {
+        id: currentUser._id,
+        role: currentUser.role,
+        email: currentUser.email
+      });
       console.log('Query for volunteers:', query);
       const users = await User.find(query)
         .select("name avatar role")
