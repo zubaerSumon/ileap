@@ -226,5 +226,5 @@ export default function OrganizationHomepage() {
         </DialogContent>
       </Dialog>
     </section>
-  );
+  );
 }

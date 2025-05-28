@@ -1,0 +1,103 @@
+import { Card, CardContent } from "@/components/ui/card";
+import { MessageCircle } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+
+interface Volunteer {
+  _id: string;
+  name: string;
+  avatar?: string;
+  role: string;
+  volunteer_profile?: {
+    student_type?: "yes" | "no";
+    course?: string;
+    availability_date?: {
+      start_date?: string;
+      end_date?: string;
+    };
+    interested_on?: string[];
+    bio?: string;
+  };
+}
+
+interface VolunteerCardProps {
+  volunteer: Volunteer;
+  onConnect: (volunteer: Volunteer) => void;
+}
+
+export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardProps) {
+  return (
+    <Card className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 cursor-pointer relative bg-white">
+      <CardContent className="p-4">
+        <div className="flex flex-col">
+          <div className="flex justify-between items-center mb-4">
+            <div className="relative w-12 h-12">
+              <Image
+                src="/avatar.svg"
+                alt="Volunteer Avatar"
+                width={48}
+                height={48}
+                className="rounded-full bg-gray-100"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                ✓ Available
+              </span>
+            </div>
+          </div>
+
+          <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            {volunteer.name}
+          </h3>
+
+          <div className="flex items-center gap-3 mb-3 text-gray-600">
+            <div className="flex items-center gap-1">
+              <span className="text-gray-600 text-sm">📍</span>
+              <span className="text-sm">Sydney, Australia</span>
+            </div>
+            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+            <div className="flex items-center gap-1">
+              <span className="text-sm">🏆</span>
+              <span className="text-sm">10 projects</span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-1 mb-4">
+            {volunteer.volunteer_profile?.interested_on?.map((interest: string, index: number) => (
+              <span
+                key={index}
+                className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
+              >
+                {interest.replace(/_/g, " ")}
+              </span>
+            ))}
+          </div>
+
+          {volunteer.volunteer_profile?.bio && (
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+              {volunteer.volunteer_profile.bio}
+            </p>
+          )}
+
+          <div className="flex gap-2 mt-auto">
+            <Button
+              variant="outline"
+              className="flex-1 flex items-center justify-center gap-1 text-sm h-9 border-gray-200"
+            >
+              View Profile
+            </Button>
+            <Button
+              variant="default"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 text-sm h-9"
+              onClick={() => onConnect(volunteer)}
+            >
+              <MessageCircle className="h-4 w-4" />
+              Connect
+            </Button>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+} 
