@@ -6,6 +6,7 @@ import Image from "next/image";
 import { trpc } from "@/utils/trpc";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Dialog,
   DialogContent,
@@ -34,6 +35,7 @@ interface Volunteer {
 }
 
 export default function OrganizationHomepage() {
+  const router = useRouter();
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(
     null
   );
@@ -161,6 +163,7 @@ export default function OrganizationHomepage() {
                       <Button
                         variant="outline"
                         className="flex-1 flex items-center justify-center gap-1 text-sm h-9 border-gray-200"
+                        onClick={() => router.push(`/organization/volunteer/${volunteer._id}/profile`)}
                       >
                         View Profile
                       </Button>
