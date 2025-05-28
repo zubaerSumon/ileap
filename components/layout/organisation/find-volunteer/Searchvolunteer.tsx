@@ -19,9 +19,9 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 
-export default function FindVolunteer() {
+export default function SearchVolunteer() {
   return (
-    <div className="container py-8 space-y-6">
+    <div className="container max-w-[1240px] max-h-auto mx-auto py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div className="space-y-4">
           <div className="space-y-1">

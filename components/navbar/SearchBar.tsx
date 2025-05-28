@@ -17,20 +17,22 @@ export function SearchBar({ role }: SearchBarProps) {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const searchHistory = [
-    "medical illustrator",
-    "illustrator",
-    "go high level",
-    "youtube video editor",
+    "environmental cleanup",
+    "event volunteer",
+    "nonprofit marketing",
+    "youth mentor",
   ];
+  
   const allSuggestions = [
-    "medical illustrator",
-    "illustrator",
-    "go high level",
-    "youtube video editor",
-    "graphic designer",
-    "web developer",
-    "content writer",
+    "environmental cleanup",
+    "event volunteer",
+    "nonprofit marketing",
+    "youth mentor",
+    "fundraising assistant",
+    "community outreach",
+    "social media for NGOs",
   ];
+  
   const suggestions = query
     ? allSuggestions.filter((s) =>
         s.toLowerCase().includes(query.toLowerCase())

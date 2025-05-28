@@ -260,7 +260,10 @@ export const volunteerApplicationRouter = router({
           return [];
         }
 
-        return applications.map((application) => {
+        // Filter out applications with missing volunteer data
+        const validApplications = applications.filter(app => app.volunteer);
+
+        return validApplications.map((application) => {
           const app = application as unknown as {
             _id: { toString(): string };
             volunteer: {
