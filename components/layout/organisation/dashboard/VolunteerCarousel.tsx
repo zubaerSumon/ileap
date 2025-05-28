@@ -100,13 +100,32 @@ const VolunteerCarousel = ({
               key={`loading-${index}`}
               className="!flex !justify-center"
             >
-              <div className="w-full flex flex-col items-center p-6 bg-white border border-gray-200 rounded-xl">
-                <Skeleton className="h-16 w-16 rounded-full mb-4" />
-                <Skeleton className="h-6 w-32 mb-1" />
-                <Skeleton className="h-4 w-24 mb-2" />
-                <Skeleton className="h-4 w-40 mb-2" />
-                <Skeleton className="h-4 w-48 mb-3" />
-                <Skeleton className="h-8 w-full" />
+              <div className="w-full">
+                <div className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 cursor-pointer relative bg-white">
+                  <div className="p-4">
+                    <div className="flex flex-col">
+                      <div className="flex justify-between items-center mb-4">
+                        <Skeleton className="h-12 w-12 rounded-full" />
+                        <Skeleton className="h-6 w-24 rounded-full" />
+                      </div>
+                      <Skeleton className="h-6 w-32 mb-2" />
+                      <div className="flex items-center gap-3 mb-3">
+                        <Skeleton className="h-4 w-24" />
+                        <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                        <Skeleton className="h-4 w-20" />
+                      </div>
+                      <div className="flex gap-2 mb-4">
+                        <Skeleton className="h-6 w-20 rounded-full" />
+                        <Skeleton className="h-6 w-24 rounded-full" />
+                      </div>
+                      <Skeleton className="h-4 w-full mb-4" />
+                      <div className="flex gap-2 mt-auto">
+                        <Skeleton className="h-9 flex-1" />
+                        <Skeleton className="h-9 flex-1" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </SwiperSlide>
           ))
