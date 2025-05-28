@@ -36,19 +36,11 @@ export const userRouter = router({
         _id: { $ne: currentUser._id },
         role: "volunteer",
       };
-      console.log('Current user:', {
-        id: currentUser._id,
-        role: currentUser.role,
-        email: currentUser.email
+
+      const users = await User.find(query).select("name avatar role").populate({
+        path: "volunteer_profile",
+        select: "student_type course availability_date interested_on bio",
       });
-      console.log('Query for volunteers:', query);
-      const users = await User.find(query)
-        .select("name avatar role")
-        .populate({
-          path: "volunteer_profile",
-          select: "student_type course availability_date interested_on bio"
-        });
-      console.log('Found users:', JSON.stringify(users, null, 2));
       return users;
     }
 
@@ -102,7 +94,7 @@ export const userRouter = router({
       raw: user.organization_profile,
       type: user.organization_profile?.type,
       title: user.organization_profile?.title,
-      email: user.organization_profile?.contact_email
+      email: user.organization_profile?.contact_email,
     });
 
     const response = {
@@ -116,7 +108,7 @@ export const userRouter = router({
     console.log("Profile Checkup Response:", {
       hasOrgProfile: response.hasOrganizationProfile,
       orgProfile: response.organizationProfile,
-      orgProfileType: response.organizationProfile?.type
+      orgProfileType: response.organizationProfile?.type,
     });
 
     return response;
@@ -167,7 +159,7 @@ export const userRouter = router({
         // If user already has an organization profile, update it
         if (user.organization_profile) {
           console.log("Updating existing profile:", user.organization_profile);
-          
+
           // Validate arrays before update
           if (!input.opportunity_types?.length) {
             throw new TRPCError({
@@ -184,24 +176,27 @@ export const userRouter = router({
 
           const updateData = {
             ...input,
-            updatedAt: new Date()
+            updatedAt: new Date(),
           };
-          
+
           console.log("Update data:", updateData);
 
           try {
             const updatedProfile = await OrganizationProfile.findByIdAndUpdate(
               user.organization_profile,
               updateData,
-              { 
+              {
                 new: true,
                 runValidators: true,
-                context: 'query'
+                context: "query",
               }
             );
 
             if (!updatedProfile) {
-              console.error("Failed to update profile for user:", sessionUser.email);
+              console.error(
+                "Failed to update profile for user:",
+                sessionUser.email
+              );
               throw new TRPCError({
                 code: "INTERNAL_SERVER_ERROR",
                 message: "Failed to update organization profile",
@@ -214,23 +209,27 @@ export const userRouter = router({
             console.error("Mongoose validation error:", error);
             throw new TRPCError({
               code: "BAD_REQUEST",
-              message: error instanceof Error ? error.message : "Validation failed",
+              message:
+                error instanceof Error ? error.message : "Validation failed",
             });
           }
         }
 
         // If user doesn't have an organization profile, create a new one
         console.log("Creating new profile for user:", sessionUser.email);
-        
+
         try {
           const organizationProfile = await OrganizationProfile.create({
             ...input,
             createdAt: new Date(),
-            updatedAt: new Date()
+            updatedAt: new Date(),
           });
 
           if (!organizationProfile) {
-            console.error("Failed to create profile for user:", sessionUser.email);
+            console.error(
+              "Failed to create profile for user:",
+              sessionUser.email
+            );
             throw new TRPCError({
               code: "INTERNAL_SERVER_ERROR",
               message: "Failed to create organization profile",
@@ -252,7 +251,10 @@ export const userRouter = router({
           console.error("Mongoose creation error:", error);
           throw new TRPCError({
             code: "BAD_REQUEST",
-            message: error instanceof Error ? error.message : "Failed to create profile",
+            message:
+              error instanceof Error
+                ? error.message
+                : "Failed to create profile",
           });
         }
       } catch (error) {
@@ -262,7 +264,10 @@ export const userRouter = router({
         }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: error instanceof Error ? error.message : "Failed to process organization profile",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Failed to process organization profile",
           cause: error,
         });
       }
