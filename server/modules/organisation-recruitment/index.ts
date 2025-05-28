@@ -119,9 +119,9 @@ export const organisationRecruitmentRouter = router({
           })
           .lean();
 
-        // Filter out null applications (where opportunity didn't match)
+        // Filter out null applications (where opportunity didn't match) and applications with missing volunteer data
         const validRecruitedApplications = recruitedApplications.filter(
-          (recruitment) => recruitment.application
+          (recruitment) => recruitment.application && recruitment.application.volunteer
         );
 
         // Transform the data to match the expected format

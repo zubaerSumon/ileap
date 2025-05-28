@@ -132,11 +132,11 @@ const OrganisationDashboard = () => {
           Good afternoon, {session?.user?.name || "Org Name"}
         </h2>
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-0 rounded-lg transition-transform active:scale-95 flex items-center"
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-transform active:scale-95 flex items-center"
           size="lg"
           onClick={() => router.push("/organization/opportunities/create")}
         >
-          <PlusIcon size={48} className="mr-2" />
+          <PlusIcon className="mr-2 transform scale-170" />
           Post an opportunity
         </Button>
       </div>

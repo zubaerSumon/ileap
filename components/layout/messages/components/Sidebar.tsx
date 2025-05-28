@@ -44,7 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   console.log("Sidebar - User Role:", userRole);
   return (
     <aside className={cn(
-      "fixed inset-0 z-50 bg-white md:relative md:block md:col-span-1 border-r h-full",
+      "fixed inset-0 z-35 bg-white md:relative md:block md:col-span-1 border-r h-full",
       showMobileMenu ? "block" : "hidden"
     )}>
       <div className="flex flex-col h-full">

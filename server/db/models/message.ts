@@ -19,7 +19,6 @@ const messageSchema = new Schema<IMessage>(
       type: Schema.Types.ObjectId,
       ref: 'group',
       required: false,
-      index: true,
     },
     content: {
       type: String,
