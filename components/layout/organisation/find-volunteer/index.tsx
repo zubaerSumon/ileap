@@ -9,7 +9,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/utils/trpc";
-import { ApplicantsCard, type Applicant } from "@/components/layout/organisation/opportunities/ApplicantsCard";
+import {
+  ApplicantsCard,
+  type Applicant,
+} from "@/components/layout/organisation/opportunities/ApplicantsCard";
 import VolunteerModal from "@/components/layout/organisation/opportunities/VolunteerModal";
 import MessageApplicantModal from "@/components/layout/organisation/opportunities/MessageApplicantModal";
 
@@ -35,33 +38,36 @@ const FindVolunteer = () => {
   const [sortBy, setSortBy] = useState("recently-added");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
+    null
+  );
 
-  // Fetch available users
-  const { data: users, isLoading } = trpc.users.getAvailableUsers.useQuery<User[]>();
+  const { data: users, isLoading } =
+    trpc.users.getAvailableUsers.useQuery<User[]>();
 
-  // Filter users based on search query
-  const filteredUsers = users?.filter(user =>
+  const filteredUsers = users?.filter((user) =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Sort users based on selected option
   const sortedUsers = filteredUsers?.sort((a, b) => {
     switch (sortBy) {
       case "recently-active":
-        return new Date(b.volunteer_profile?.availability_date || 0).getTime() - 
-               new Date(a.volunteer_profile?.availability_date || 0).getTime();
+        return (
+          new Date(b.volunteer_profile?.availability_date || 0).getTime() -
+          new Date(a.volunteer_profile?.availability_date || 0).getTime()
+        );
       case "responsiveness":
-        // You might want to implement a different sorting logic here
         return 0;
-      default: // recently-added
-        return new Date(b.createdAt || 0).getTime() - 
-               new Date(a.createdAt || 0).getTime();
+      default:
+        return (
+          new Date(b.createdAt || 0).getTime() -
+          new Date(a.createdAt || 0).getTime()
+        );
     }
   });
 
   const handleSetSelectedApplicantId = (id: string) => {
-    const user = users?.find(u => u._id === id);
+    const user = users?.find((u) => u._id === id);
     if (user) {
       const applicant: Applicant = {
         id: user._id,
@@ -89,7 +95,7 @@ const FindVolunteer = () => {
       skills: user.volunteer_profile?.skills || [],
       completedProjects: user.volunteer_profile?.completed_projects || 0,
       availability: user.volunteer_profile?.availability_date || "",
-      applicationId: user._id, // Using user ID as application ID since this is a general search
+      applicationId: user._id,
     };
     setSelectedApplicant(applicant);
     setIsMessageModalOpen(true);
@@ -103,14 +109,16 @@ const FindVolunteer = () => {
             <div className="space-y-1">
               <h1 className="text-2xl font-semibold">Search Volunteers</h1>
               <p className="text-[11px] text-gray-500">
-                {isLoading ? "Loading..." : `${filteredUsers?.length || 0} volunteers found`}
+                {isLoading
+                  ? "Loading..."
+                  : `${filteredUsers?.length || 0} volunteers found`}
               </p>
             </div>
-            <div className="relative max-w-[333px]">
+            <div className="relative ">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-              <Input 
-                placeholder="Search volunteers" 
-                className="pl-10 bg-gray-50 border-0"
+              <Input
+                placeholder="Search volunteers"
+                className="pl-10 bg-gray-50 border-0 "
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -137,7 +145,9 @@ const FindVolunteer = () => {
         ) : !sortedUsers?.length ? (
           <div className="text-center py-12 bg-gray-50 rounded-lg">
             <p className="text-gray-600 text-lg">No volunteers found</p>
-            <p className="text-gray-500 text-sm mt-2">Try adjusting your search criteria</p>
+            <p className="text-gray-500 text-sm mt-2">
+              Try adjusting your search criteria
+            </p>
           </div>
         ) : (
           <div className="space-y-6">
@@ -149,9 +159,10 @@ const FindVolunteer = () => {
                 location: user.volunteer_profile?.location || "",
                 bio: user.volunteer_profile?.bio || "",
                 skills: user.volunteer_profile?.skills || [],
-                completedProjects: user.volunteer_profile?.completed_projects || 0,
+                completedProjects:
+                  user.volunteer_profile?.completed_projects || 0,
                 availability: user.volunteer_profile?.availability_date || "",
-                applicationId: user._id, // Using user ID as application ID since this is a general search
+                applicationId: user._id,
               };
 
               return (

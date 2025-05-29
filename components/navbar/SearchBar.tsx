@@ -98,6 +98,7 @@ export function SearchBar({ role }: SearchBarProps) {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
               className="fixed inset-0 bg-black/30 w-full z-40"
+              onClick={() => setOverlay(false)}
             />
             <motion.div
               initial={{ height: 160, opacity: 0 }}
