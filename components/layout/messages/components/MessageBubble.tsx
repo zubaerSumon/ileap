@@ -13,8 +13,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwnMess
   <div
     className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-4`}
   >
-    {!isOwnMessage && (
-      <Avatar name={message.sender.name} avatar={message.sender.avatar} size={32} />
+    {!isOwnMessage && message.sender && (
+      <Avatar name={message.sender.name || ''} avatar={message.sender.avatar} size={32} />
     )}
     <div
       className={cn(
@@ -30,8 +30,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwnMess
         {format(new Date(message.createdAt), "MMM d, h:mm a")}
       </p>
     </div>
-    {isOwnMessage && (
-      <Avatar name={message.sender.name} avatar={message.sender.avatar} size={32} />
+    {isOwnMessage && message.sender && (
+      <Avatar name={message.sender.name || ''} avatar={message.sender.avatar} size={32} />
     )}
   </div>
 );

@@ -41,7 +41,19 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   userRole,
   onGroupCreated
 }) => {
-  console.log("Sidebar - User Role:", userRole);
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const filteredConversations = conversations?.filter(conv => 
+    conv.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) || false
+  );
+
+  const filteredGroups = groups?.filter(group =>
+    group.name?.toLowerCase().includes(searchQuery.toLowerCase()) || false
+  );
+
+  const filteredUsers = availableUsers?.filter(user =>
+    user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || false
+  );
   return (
     <aside className={cn(
       "fixed inset-0 z-35 bg-white md:relative md:block md:col-span-1 border-r h-full",
@@ -61,7 +73,11 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
             </Button>
           </div>
           <div className="mt-4">
-            <Input placeholder="Search messages" />
+            <Input 
+              placeholder="Search messages" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
         </div>
 
@@ -78,8 +94,8 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
 
             <TabsContent value="conversations" className="mt-0 flex-1 min-h-0">
               <ConversationList 
-                conversations={conversations}
-                groups={groups}
+                conversations={filteredConversations}
+                groups={filteredGroups}
                 selectedUserId={selectedUserId}
                 onSelectUser={onSelectUser}
                 isLoading={isLoadingConversations}
@@ -92,7 +108,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
             {userRole !== "volunteer" && (
               <TabsContent value="applicants" className="mt-0 flex-1 min-h-0">
                 <UserList 
-                  users={availableUsers}
+                  users={filteredUsers}
                   onSelectUser={onSelectUser}
                   isLoading={isLoadingUsers}
                 />
@@ -107,4 +123,4 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
 
 Sidebar.displayName = 'Sidebar';
 
-export default Sidebar; 
+export default Sidebar;
