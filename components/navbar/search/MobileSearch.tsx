@@ -34,6 +34,7 @@ export const MobileSearch = ({ query, placeholder, onInput, onSearch, searchHist
           placeholder={placeholder}
           onInput={onInput}
           onSearch={onSearch}
+          autoFocus
           className="w-full pl-10 pr-2 py-2 border border-black text-base font-normal focus:border-black focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-400 bg-white outline-none shadow-none rounded-md"
         />
         <SearchSuggestions
