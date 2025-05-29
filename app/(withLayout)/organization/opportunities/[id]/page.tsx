@@ -50,6 +50,8 @@ export default function OpportunityDetailsPage() {
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
   const [groupMessage, setGroupMessage] = useState("");
   const [createdGroupId, setCreatedGroupId] = useState<string | null>(null);
+  const [applicantsSearchQuery, setApplicantsSearchQuery] = useState("");
+  const [recruitsSearchQuery, setRecruitsSearchQuery] = useState("");
 
   const {
     data: opportunity,
@@ -138,6 +140,20 @@ export default function OpportunityDetailsPage() {
     setIsMessageModalOpen(true);
   };
 
+  // Filter applicants based on search query
+  const filteredApplicants = applicants?.filter((applicant) =>
+    applicant.name.toLowerCase().includes(applicantsSearchQuery.toLowerCase()) ||
+    applicant.location.toLowerCase().includes(applicantsSearchQuery.toLowerCase()) ||
+    applicant.skills.some(skill => skill.toLowerCase().includes(applicantsSearchQuery.toLowerCase()))
+  );
+
+  // Filter recruited applicants based on search query
+  const filteredRecruitedApplicants = recruitedApplicants?.filter((applicant) =>
+    applicant.name.toLowerCase().includes(recruitsSearchQuery.toLowerCase()) ||
+    applicant.location.toLowerCase().includes(recruitsSearchQuery.toLowerCase()) ||
+    applicant.skills.some(skill => skill.toLowerCase().includes(recruitsSearchQuery.toLowerCase()))
+  );
+
   if (isLoading || isLoadingApplicants || isLoadingRecruitedApplicants) {
     return (
       <ProtectedLayout>
@@ -224,6 +240,8 @@ export default function OpportunityDetailsPage() {
                         <Input
                           placeholder="Search volunteers"
                           className="pl-10 bg-gray-50 border-0"
+                          value={recruitsSearchQuery}
+                          onChange={(e) => setRecruitsSearchQuery(e.target.value)}
                         />
                       </div>
                       <div className="flex gap-2">
@@ -247,7 +265,7 @@ export default function OpportunityDetailsPage() {
                     </div>
                     <div className="w-full border-b border-[#F1F1F1]" />
                   </div>
-                  {recruitedApplicants?.map((applicant) => (
+                  {filteredRecruitedApplicants?.map((applicant) => (
                     <ApplicantsCard
                       key={applicant.id}
                       setIsModalOpen={setIsModalOpen}
@@ -257,9 +275,9 @@ export default function OpportunityDetailsPage() {
                       onMessageClick={() => handleOpenMessageModal(applicant)}
                     />
                   ))}
-                  {recruitedApplicants?.length === 0 && (
+                  {filteredRecruitedApplicants?.length === 0 && (
                     <div className="text-center text-gray-500 py-8">
-                      No recruited volunteers yet
+                      {recruitsSearchQuery ? "No matching volunteers found" : "No recruited volunteers yet"}
                     </div>
                   )}
                 </div>
@@ -270,7 +288,7 @@ export default function OpportunityDetailsPage() {
                   <div className="space-y-2">
                     <div className="flex gap-8 text-sm">
                       <button className="text-[#246BFD] border-b-2 border-[#246BFD]">
-                        All (15)
+                        All ({filteredApplicants?.length || 0})
                       </button>
                       <button className="text-gray-500 hover:text-gray-700">
                         Saved (2)
@@ -286,6 +304,8 @@ export default function OpportunityDetailsPage() {
                         <Input
                           placeholder="Search volunteers"
                           className="pl-10 bg-gray-50 border-0"
+                          value={applicantsSearchQuery}
+                          onChange={(e) => setApplicantsSearchQuery(e.target.value)}
                         />
                       </div>
                       <Button
@@ -297,7 +317,7 @@ export default function OpportunityDetailsPage() {
                       </Button>
                     </div>
                   </div>
-                  {applicants?.map((applicant) => (
+                  {filteredApplicants?.map((applicant) => (
                     <ApplicantsCard
                       key={applicant.id}
                       setIsModalOpen={setIsModalOpen}
@@ -306,6 +326,11 @@ export default function OpportunityDetailsPage() {
                       onMessageClick={() => handleOpenMessageModal(applicant)}
                     />
                   ))}
+                  {filteredApplicants?.length === 0 && (
+                    <div className="text-center text-gray-500 py-8">
+                      {applicantsSearchQuery ? "No matching applicants found" : "No applicants yet"}
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>

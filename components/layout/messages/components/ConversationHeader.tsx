@@ -22,6 +22,8 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   isGroup,
   onDeleteGroup
 }) => {
+  if (!user) return null;
+  
   return (
     <div className="flex items-center justify-between p-4 border-b">
       <div className="flex items-center gap-3">
@@ -30,11 +32,11 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
             <Users className="h-5 w-5 text-blue-500" />
           </div>
         ) : (
-          <Avatar name={user.name} avatar={user.avatar} />
+          <Avatar name={user.name || ''} avatar={user.avatar} />
         )}
         <div>
-          <h2 className="font-semibold">{user.name}</h2>
-          {isGroup && (
+          <h2 className="font-semibold">{user.name || 'Unknown User'}</h2>
+          {isGroup && user.members !== undefined && (
             <p className="text-sm text-gray-500">{user.members} members</p>
           )}
         </div>

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 const getInitials = (name: string) => {
+  if (!name) return '';
   return name
     .split(' ')
     .map(word => word[0])
@@ -12,6 +13,7 @@ const getInitials = (name: string) => {
 };
 
 const getRandomColor = (name: string) => {
+  if (!name) return 'bg-blue-500';
   const colors = [
     'bg-blue-500',
     'bg-green-500',

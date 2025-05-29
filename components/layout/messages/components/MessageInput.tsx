@@ -23,14 +23,14 @@ export const MessageInput: React.FC<MessageInputProps> = React.memo(({
         <div className="flex-1 flex items-center gap-2">
           <Input
             ref={inputRef}
-            value={newMessage}
+            value={newMessage || ''}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
             className="h-10 flex-1"
           />
           <Button 
             type="submit" 
-            disabled={!newMessage.trim() || isSending}
+            disabled={!newMessage?.trim() || isSending}
             className="h-10"
           >
             {isSending ? (
