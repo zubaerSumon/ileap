@@ -22,6 +22,7 @@ export type Message = {
 };
 
 export type Conversation = {
+  name: string;
   _id: string;
   user: {
     name: string;
@@ -64,4 +65,4 @@ export type Group = {
   createdAt?: string;
   updatedAt?: string;
   isOrganizationGroup?: boolean;
-}; 
+};

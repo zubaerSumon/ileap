@@ -63,9 +63,12 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   }, [hasMore, isLoadingMore, onLoadMore]);
 
   const headerData = isGroup && selectedConversation ? {
-    name: (selectedConversation as Group).name,
+    name: (selectedConversation as Group).name || '',
     members: (selectedConversation as Group).members?.length
-  } : selectedConversation && 'user' in selectedConversation ? selectedConversation.user : undefined;
+  } : selectedConversation && 'user' in selectedConversation ? {
+    name: selectedConversation.user.name || '',
+    avatar: selectedConversation.user.avatar
+  } : undefined;
 
   return (
     <div className="flex flex-col h-full">
@@ -83,7 +86,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
           <div className="p-4">
             {isLoadingMessages ? (
               <div className="text-center text-gray-500">Loading messages...</div>
-            ) : messages?.length === 0 ? (
+            ) : !messages || messages.length === 0 ? (
               <div className="text-center text-gray-500">No messages yet</div>
             ) : (
               <div className="space-y-4">
@@ -101,11 +104,11 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
                     )}
                   </div>
                 )}
-                {messages?.map((message: Message) => (
+                {messages.map((message: Message) => (
                   <MessageBubble
                     key={message._id}
                     message={message}
-                    isOwnMessage={message.sender._id === session?.user?.id}
+                    isOwnMessage={message.sender?._id === session?.user?.id}
                   />
                 ))}
                 <div ref={messagesEndRef} data-messages-end />
