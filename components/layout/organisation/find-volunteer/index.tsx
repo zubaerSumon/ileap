@@ -34,7 +34,6 @@ const FindVolunteer = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState("recently-added");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedApplicantId, setSelectedApplicantId] = useState<string>("");
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
 
@@ -60,6 +59,25 @@ const FindVolunteer = () => {
                new Date(a.createdAt || 0).getTime();
     }
   });
+
+  const handleSetSelectedApplicantId = (id: string) => {
+    const user = users?.find(u => u._id === id);
+    if (user) {
+      const applicant: Applicant = {
+        id: user._id,
+        name: user.name,
+        profileImg: user.avatar || "/avatar.svg",
+        location: user.volunteer_profile?.location || "",
+        bio: user.volunteer_profile?.bio || "",
+        skills: user.volunteer_profile?.skills || [],
+        completedProjects: user.volunteer_profile?.completed_projects || 0,
+        availability: user.volunteer_profile?.availability_date || "",
+        applicationId: user._id,
+      };
+      setSelectedApplicant(applicant);
+      setIsModalOpen(true);
+    }
+  };
 
   const handleOpenMessageModal = (user: User) => {
     const applicant: Applicant = {
@@ -141,7 +159,7 @@ const FindVolunteer = () => {
                   key={user._id}
                   setIsModalOpen={setIsModalOpen}
                   applicant={applicant}
-                  setSelectedApplicantId={setSelectedApplicantId}
+                  setSelectedApplicantId={handleSetSelectedApplicantId}
                   onMessageClick={() => handleOpenMessageModal(user)}
                 />
               );
@@ -153,7 +171,7 @@ const FindVolunteer = () => {
       <VolunteerModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        applicantId={selectedApplicantId}
+        volunteer={selectedApplicant}
       />
 
       <MessageApplicantModal

@@ -45,6 +45,7 @@ export const DesktopSearch = ({ query, placeholder, onInput, onSearch, searchHis
             placeholder={placeholder}
             onInput={onInput}
             onSearch={onSearch}
+            autoFocus
             className="w-full text-black pl-10 pr-2 text-[20px] font-normal border-0 border-b-2 border-black bg-transparent placeholder:text-gray-400 focus:ring-0 focus:ring-offset-0 focus-visible:ring-0 focus-visible:ring-offset-0 outline-none shadow-none rounded-none"
             />
           <SearchSuggestions
