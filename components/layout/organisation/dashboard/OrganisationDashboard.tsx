@@ -10,6 +10,24 @@ import { useSession } from "next-auth/react";
 import OpenContent from "./OpenContent";
 import ActiveContent from "./ActiveContent";
 import DraftContent from "./DraftContent";
+import MessageDialog from "../MessageDialog";
+
+interface Volunteer {
+  _id: string;
+  name: string;
+  avatar?: string;
+  role: string;
+  volunteer_profile?: {
+    student_type?: "yes" | "no";
+    course?: string;
+    availability_date?: {
+      start_date?: string;
+      end_date?: string;
+    };
+    interested_on?: string[];
+    bio?: string;
+  };
+}
 
 const TABS = [
   { key: "open", label: "Open opportunity posts" },
@@ -20,6 +38,8 @@ const TABS = [
 const OrganisationDashboard = () => {
   const router = useRouter();
   const { data: session } = useSession();
+  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
 
   // Fetch opportunities
   const { data: opportunities, isLoading: isLoadingOpportunities } =
@@ -60,6 +80,11 @@ const OrganisationDashboard = () => {
     role: volunteer.role || "Volunteer",
     volunteer_profile: volunteer.volunteer_profile
   })) || [];
+
+  const handleSendMessage = (volunteer: Volunteer) => {
+    setSelectedVolunteer(volunteer);
+    setIsMessageDialogOpen(true);
+  };
 
   return (
     <div className="max-w-[1240px] mx-auto px-4 py-6 md:py-12">
@@ -153,9 +178,15 @@ const OrganisationDashboard = () => {
         <VolunteerCarousel 
           volunteers={previousVolunteers} 
           isLoading={isLoadingVolunteers}
-          onConnect={(volunteer) => router.push(`/organization/volunteers/${volunteer._id}`)}
+          onConnect={handleSendMessage}
         />
       </div>
+
+      <MessageDialog
+        isOpen={isMessageDialogOpen}
+        onOpenChange={setIsMessageDialogOpen}
+        volunteer={selectedVolunteer}
+      />
     </div>
   );
 };
