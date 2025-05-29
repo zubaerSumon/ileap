@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface Volunteer {
   _id: string;
@@ -26,8 +27,10 @@ interface VolunteerCardProps {
 }
 
 export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardProps) {
+  const router = useRouter();
+
   return (
-    <Card className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 cursor-pointer relative bg-white">
+    <Card className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 relative bg-white">
       <CardContent className="p-4">
         <div className="flex flex-col">
           <div className="flex justify-between items-center mb-4">
@@ -80,16 +83,17 @@ export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardPro
             </p>
           )}
 
-          <div className="flex gap-2 mt-auto">
+          <div onClick={(e) => e.stopPropagation()} className="flex gap-2 mt-auto ">
             <Button
               variant="outline"
-              className="flex-1 flex items-center justify-center gap-1 text-sm h-9 border-gray-200"
+              className="flex-1 flex items-center justify-center gap-1 text-sm h-9 border-gray-200 cursor-pointer"
+              onClick={() => router.push(`/organization/volunteer/${volunteer._id}/profile`)}
             >
               View Profile
             </Button>
             <Button
               variant="default"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 text-sm h-9"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 text-sm h-9 cursor-pointer"
               onClick={() => onConnect(volunteer)}
             >
               <MessageCircle className="h-4 w-4" />
