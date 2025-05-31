@@ -93,7 +93,7 @@ export default function OrganizationSignup() {
       isValid: form.formState.isValid,
       isDirty: form.formState.isDirty
     });
-  }, [form.formState]);
+  }, [form, form.formState]);
 
   const handleNext = async () => {
     let fieldsToValidate: Array<keyof OrgSignupFormData> = [];
