@@ -1,8 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import ActiveContractCard from "./ActiveContractCard";
 
+interface ActiveContract {
+  id?: string;
+  profileImg?: string;
+  jobTitle: string;
+  freelancerName: string;
+  startedAt: string;
+}
+
 interface ActiveContentProps {
-  activeContracts: any[];
+  activeContracts: ActiveContract[];
   isLoadingRecruited: boolean;
 }
 

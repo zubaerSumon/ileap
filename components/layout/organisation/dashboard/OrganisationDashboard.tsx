@@ -29,6 +29,14 @@ interface Volunteer {
   };
 }
 
+interface ActiveContract {
+  id?: string;
+  profileImg?: string;
+  jobTitle: string;
+  freelancerName: string;
+  startedAt: string;
+}
+
 const TABS = [
   { key: "open", label: "Open opportunity posts" },
   { key: "active", label: "Active contracts" },
@@ -58,9 +66,10 @@ const OrganisationDashboard = () => {
   const [tab, setTab] = useState("open");
 
   // Use only placeholder values for opportunity title and start date in active contracts
-  const activeContracts = (recruitedApplicants || []).map((c, i) => ({
-    ...c,
-    opportunityTitle: [
+  const activeContracts: ActiveContract[] = (recruitedApplicants || []).map((c, i) => ({
+    id: c.id,
+    profileImg: c.profileImg || "/avatar.svg",
+    jobTitle: [
       "User Experience Designer (UI/UX)",
       "Looking a React.js Developer for Stadion App",
     ][i % 2],
