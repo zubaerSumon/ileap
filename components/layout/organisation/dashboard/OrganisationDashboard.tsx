@@ -29,6 +29,34 @@ interface Volunteer {
   };
 }
 
+interface Opportunity {
+  _id: string;
+  title: string;
+  isDraft: boolean;
+  createdAt: string;
+}
+
+interface RecruitedApplicant {
+  readonly name: string;
+  readonly email: string;
+  readonly bio: string;
+  readonly id: string;
+  readonly location: string;
+  readonly applicationId: string;
+  readonly profileImg: string;
+  readonly skills: string[];
+  readonly completedProjects: number;
+  readonly availability: string;
+}
+
+interface ActiveContract {
+  id: string;
+  profileImg?: string;
+  jobTitle: string;
+  freelancerName: string;
+  startedAt: string;
+}
+
 const TABS = [
   { key: "open", label: "Open opportunity posts" },
   { key: "active", label: "Active contracts" },
@@ -43,32 +71,33 @@ const OrganisationDashboard = () => {
 
   // Fetch opportunities
   const { data: opportunities, isLoading: isLoadingOpportunities } =
-    trpc.opportunities.getOrganizationOpportunities.useQuery();
+    trpc.opportunities.getOrganizationOpportunities.useQuery<Opportunity[]>();
   // Fetch recruited applicants for 'active' tab
   const { data: recruitedApplicants, isLoading: isLoadingRecruited } =
-    trpc.recruits.getRecruitedApplicants.useQuery(
+    trpc.recruits.getRecruitedApplicants.useQuery<RecruitedApplicant[]>(
       { opportunityId: opportunities?.[0]?._id || "" },
       { enabled: !!opportunities?.[0]?._id }
     );
   // Fetch available volunteers
   const { data: availableVolunteers, isLoading: isLoadingVolunteers } =
-    trpc.users.getAvailableUsers.useQuery();
+    trpc.users.getAvailableUsers.useQuery<Volunteer[]>();
 
   // Tab state
   const [tab, setTab] = useState("open");
 
   // Use only placeholder values for opportunity title and start date in active contracts
-  const activeContracts = (recruitedApplicants || []).map((c, i) => ({
-    ...c,
-    opportunityTitle: [
+  const activeContracts: ActiveContract[] = (recruitedApplicants || []).map((c, i) => ({
+    id: c.id,
+    profileImg: c.profileImg,
+    jobTitle: [
       "User Experience Designer (UI/UX)",
       "Looking a React.js Developer for Stadion App",
     ][i % 2],
-    freelancerName: c.name || ["Oyewumi Olukunle", "Mayowa Dabiri"][i % 2],
+    freelancerName: c.name,
     startedAt: ["2023-11-05", "2023-04-01"][i % 2],
   }));
 
-  // Filtered data for tabs (replace with real logic as needed)
+  // Filtered data for tabs
   const openOpportunities = opportunities?.filter((opp) => !opp.isDraft) || [];
   const draftOpportunities = opportunities?.filter((opp) => opp.isDraft) || [];
 

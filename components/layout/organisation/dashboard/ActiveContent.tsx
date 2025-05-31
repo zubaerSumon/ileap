@@ -1,8 +1,16 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import ActiveContractCard from "./ActiveContractCard";
 
+interface ActiveContract {
+  id: string;
+  profileImg?: string;
+  jobTitle: string;
+  freelancerName: string;
+  startedAt: string;
+}
+
 interface ActiveContentProps {
-  activeContracts: any[];
+  activeContracts: ActiveContract[];
   isLoadingRecruited: boolean;
 }
 
@@ -13,9 +21,9 @@ const ActiveContent = ({ activeContracts, isLoadingRecruited }: ActiveContentPro
     ) : activeContracts.length === 0 ? (
       <div className="text-muted-foreground">No active volunteer contracts.</div>
     ) : (
-      activeContracts.map((contract, i) => (
+      activeContracts.map((contract) => (
         <ActiveContractCard
-          key={contract.id || i}
+          key={contract.id}
           avatar={contract.profileImg || "/avatar.svg"}
           jobTitle={contract.jobTitle}
           freelancerName={contract.freelancerName}

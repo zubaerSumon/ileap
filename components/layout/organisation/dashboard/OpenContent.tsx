@@ -3,8 +3,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
 
+interface Opportunity {
+  _id: string;
+  title: string;
+  createdAt: string;
+}
+
 interface OpenContentProps {
-  openOpportunities: any[];
+  openOpportunities: Opportunity[];
   isLoadingOpportunities: boolean;
   router: ReturnType<typeof useRouter>;
 }
