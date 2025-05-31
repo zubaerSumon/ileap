@@ -2,7 +2,7 @@
 import User from './user';
 import VolunteerProfile from './volunteer-profile';
 import OrganizationProfile from './organization-profile';
-import Message from './message';
+import { Message } from './message';
 import Opportunity from './opportunity';
 import VolunteerApplication from './volunteer-application';
 import FavoriteOpportunity from './favorite-opportunity';
