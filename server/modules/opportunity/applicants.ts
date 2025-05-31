@@ -1,48 +1,49 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
-import VolunteerApplication from "../../db/models/volunteer-application";
 
-interface Applicant {
-  volunteer: {
-    id: string;
-    name: string;
-    profile_img?: string;
-    location: string;
-    bio: string;
-    skills: string[];
-    completed_projects: number;
-    availability: string;
-  };
-  id: string;
-}
-
-export const applicantsRouter = router({
-  getApplicants: publicProcedure
+export const applicantsRouter = createTRPCRouter({
+  getApplicants: protectedProcedure
     .input(
       z.object({
         opportunityId: z.string(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const { opportunityId } = input;
 
-      const applicants = await VolunteerApplication.find({
-        opportunity: opportunityId,
-        status: "approved",
-      }).populate({
-        path: "volunteer",
-        select: "id name profile_img location bio skills completed_projects availability",
+      const applicants = await ctx.db.volunteerApplication.findMany({
+        where: {
+          opportunity_id: opportunityId,
+          status: "ACCEPTED", // Only get accepted applications
+        },
+        include: {
+          volunteer: {
+            select: {
+              id: true,
+              name: true,
+              profile_img: true,
+              location: true,
+              bio: true,
+              skills: true,
+              completed_projects: true,
+              availability: true,
+            },
+          },
+        },
+        orderBy: {
+          created_at: "desc",
+        },
       });
 
-      if (!applicants || applicants.length === 0) {
+      if (!applicants) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "No applicants found for this opportunity",
         });
       }
 
-      return applicants.map((applicant: Applicant) => ({
+      return applicants.map((applicant) => ({
         id: applicant.volunteer.id,
         name: applicant.volunteer.name,
         profileImg: applicant.volunteer.profile_img || "/avatar.svg",

@@ -2,10 +2,9 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
-import { Opportunity } from "@/types/opportunities";
 
 interface OpenContentProps {
-  openOpportunities: Opportunity[];
+  openOpportunities: any[];
   isLoadingOpportunities: boolean;
   router: ReturnType<typeof useRouter>;
 }
