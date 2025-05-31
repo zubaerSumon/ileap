@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { router, publicProcedure } from "../../trpc";
+import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import VolunteerApplication from "../../db/models/volunteer-application";
 import { IVolunteerApplication } from "../../db/interfaces/volunteer-application";
@@ -19,14 +19,14 @@ interface Applicant extends Document {
   id: string;
 }
 
-export const applicantsRouter = router({
-  getApplicants: publicProcedure
+export const applicantsRouter = createTRPCRouter({
+  getApplicants: protectedProcedure
     .input(
       z.object({
         opportunityId: z.string(),
       })
     )
-    .query(async ({ input }) => {
+    .query(async ({ ctx, input }) => {
       const { opportunityId } = input;
 
       const applicants = await VolunteerApplication.find({
@@ -37,7 +37,7 @@ export const applicantsRouter = router({
         select: "id name profile_img location bio skills completed_projects availability",
       }).sort({ createdAt: -1 });
 
-      if (!applicants || applicants.length === 0) {
+      if (!applicants) {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "No applicants found for this opportunity",

@@ -1,14 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useRouter } from "next/navigation";
-
-interface Opportunity {
-  _id: string;
-  title: string;
-}
+import { Opportunity } from "@/types/opportunities";
+import { Message } from './message';
 
 interface DraftContentProps {
-  draftOpportunities: Opportunity[];
+  draftOpportunities: any[];
   isLoadingOpportunities: boolean;
   router: ReturnType<typeof useRouter>;
 }

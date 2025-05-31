@@ -10,7 +10,7 @@ interface Opportunity {
 }
 
 interface OpenContentProps {
-  openOpportunities: Opportunity[];
+  openOpportunities: any[];
   isLoadingOpportunities: boolean;
   router: ReturnType<typeof useRouter>;
 }

@@ -11,6 +11,7 @@ import OpenContent from "./OpenContent";
 import ActiveContent from "./ActiveContent";
 import DraftContent from "./DraftContent";
 import MessageDialog from "../MessageDialog";
+import { Opportunity } from "@/types/opportunities";
 
 interface Volunteer {
   _id: string;
@@ -27,13 +28,6 @@ interface Volunteer {
     interested_on?: string[];
     bio?: string;
   };
-}
-
-interface Opportunity {
-  _id: string;
-  title: string;
-  isDraft: boolean;
-  createdAt: string;
 }
 
 interface RecruitedApplicant {
@@ -71,35 +65,45 @@ const OrganisationDashboard = () => {
 
   // Fetch opportunities
   const { data: opportunities, isLoading: isLoadingOpportunities } =
-    trpc.opportunities.getOrganizationOpportunities.useQuery<Opportunity[]>();
+    trpc.opportunities.getOrganizationOpportunities.useQuery(undefined, {
+      select: (data) => data as Opportunity[]
+    });
   // Fetch recruited applicants for 'active' tab
   const { data: recruitedApplicants, isLoading: isLoadingRecruited } =
-    trpc.recruits.getRecruitedApplicants.useQuery<RecruitedApplicant[]>(
+    trpc.recruits.getRecruitedApplicants.useQuery(
       { opportunityId: opportunities?.[0]?._id || "" },
-      { enabled: !!opportunities?.[0]?._id }
+      { 
+        enabled: !!opportunities?.[0]?._id,
+        select: (data) => data as RecruitedApplicant[]
+      }
     );
   // Fetch available volunteers
   const { data: availableVolunteers, isLoading: isLoadingVolunteers } =
-    trpc.users.getAvailableUsers.useQuery<Volunteer[]>();
+    trpc.users.getAvailableUsers.useQuery(undefined, {
+      select: (data) => data as Volunteer[]
+    });
 
   // Tab state
   const [tab, setTab] = useState("open");
 
-  // Use only placeholder values for opportunity title and start date in active contracts
-  const activeContracts: ActiveContract[] = (recruitedApplicants || []).map((c, i) => ({
+  // Map recruited applicants to active contracts
+  const activeContracts: ActiveContract[] = (recruitedApplicants || []).map((c) => ({
     id: c.id,
     profileImg: c.profileImg,
-    jobTitle: [
-      "User Experience Designer (UI/UX)",
-      "Looking a React.js Developer for Stadion App",
-    ][i % 2],
+    jobTitle: "Active Contract", // This should come from the opportunity data
     freelancerName: c.name,
-    startedAt: ["2023-11-05", "2023-04-01"][i % 2],
+    startedAt: new Date().toISOString().split('T')[0], // This should come from the contract data
   }));
 
   // Filtered data for tabs
-  const openOpportunities = opportunities?.filter((opp) => !opp.isDraft) || [];
-  const draftOpportunities = opportunities?.filter((opp) => opp.isDraft) || [];
+  const openOpportunities = opportunities?.filter((opp) => {
+    const startDate = new Date(opp.date.start_date);
+    return startDate > new Date();
+  }) || [];
+  const draftOpportunities = opportunities?.filter((opp) => {
+    const startDate = new Date(opp.date.start_date);
+    return startDate <= new Date();
+  }) || [];
 
   // Transform available volunteers data for the carousel
   const previousVolunteers = availableVolunteers?.map((volunteer) => ({
