@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "@/server/api/trpc";
+import { router, publicProcedure } from "../../trpc";
 import { TRPCError } from "@trpc/server";
 import VolunteerApplication from "../../db/models/volunteer-application";
 import { IVolunteerApplication } from "../../db/interfaces/volunteer-application";
@@ -19,14 +19,18 @@ interface Applicant extends Document {
   id: string;
 }
 
-export const applicantsRouter = createTRPCRouter({
-  getApplicants: protectedProcedure
+interface GetApplicantsInput {
+  opportunityId: string;
+}
+
+export const applicantsRouter = router({
+  getApplicants: publicProcedure
     .input(
       z.object({
         opportunityId: z.string(),
       })
     )
-    .query(async ({ ctx, input }) => {
+    .query(async ({ input }: { input: GetApplicantsInput }) => {
       const { opportunityId } = input;
 
       const applicants = await VolunteerApplication.find({

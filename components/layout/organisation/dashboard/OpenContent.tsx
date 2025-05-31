@@ -2,15 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import { useRouter } from "next/navigation";
-
-interface Opportunity {
-  _id: string;
-  title: string;
-  createdAt: string;
-}
+import { Opportunity } from "@/types/opportunities";
 
 interface OpenContentProps {
-  openOpportunities: any[];
+  openOpportunities: Opportunity[];
   isLoadingOpportunities: boolean;
   router: ReturnType<typeof useRouter>;
 }
@@ -32,7 +27,7 @@ const OpenContent = ({ openOpportunities, isLoadingOpportunities, router }: Open
               {opportunity.title}
             </div>
             <div className="text-xs text-muted-foreground">
-              Posted {formatDistanceToNow(new Date(opportunity.createdAt), { addSuffix: true })}
+              Posted {formatDistanceToNow(opportunity.createdAt, { addSuffix: true })}
             </div>
           </div>
           <div className="flex gap-2 ml-4 items-center">

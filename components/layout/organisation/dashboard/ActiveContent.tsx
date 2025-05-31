@@ -10,7 +10,7 @@ interface ActiveContract {
 }
 
 interface ActiveContentProps {
-  activeContracts: any[];
+  activeContracts: ActiveContract[];
   isLoadingRecruited: boolean;
 }
 
