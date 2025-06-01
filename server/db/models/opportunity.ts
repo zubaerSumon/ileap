@@ -28,7 +28,8 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
     email_contact: { type: String, required: true },
     phone_contact: { type: String },
     internal_reference: { type: String },
-   
+    is_archived: { type: Boolean, default: false },
+    deleted_at: { type: Date, default: null },
     is_recurring: { type: Boolean, default: false },
     recurrence: {
       type: { type: String },  
@@ -57,6 +58,15 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
   },
   { timestamps: true }
 );
+
+// Add a query middleware to exclude soft-deleted documents by default
+OpportunitySchema.pre('find', function() {
+  this.where({ deleted_at: null });
+});
+
+OpportunitySchema.pre('findOne', function() {
+  this.where({ deleted_at: null });
+});
 
 const Opportunity = mongoose.models.opportunity || mongoose.model<IOpportunity>("opportunity", OpportunitySchema);
 

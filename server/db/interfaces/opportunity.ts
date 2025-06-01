@@ -1,4 +1,4 @@
- import { Document, Types } from "mongoose";
+import { Document, Types } from "mongoose";
 
 export interface IOpportunity extends Document {
   title: string;
@@ -24,6 +24,8 @@ export interface IOpportunity extends Document {
   email_contact: string;
   phone_contact: string;
   internal_reference?: string;
+  is_archived: boolean;
+  deleted_at: Date | null;
   is_recurring: boolean;
   recurrence?: {
     type: string; // 'daily', 'weekly', 'monthly', 'yearly'
@@ -41,5 +43,4 @@ export interface IOpportunity extends Document {
   banner_img: string;
   organization_profile: Types.ObjectId;  
   created_by: Types.ObjectId;
-  
 }
