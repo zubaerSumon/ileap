@@ -173,4 +173,89 @@ export const opportunityRouter = router({
       });
     }
   }),
+
+  archiveOpportunity: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input: opportunityId }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to archive an opportunity",
+        });
+      }
+
+      try {
+        const opportunity = await Opportunity.findById(opportunityId);
+        if (!opportunity) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Opportunity not found",
+          });
+        }
+
+        // Check if the user owns this opportunity
+        if (opportunity.created_by.toString() !== sessionUser.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to archive this opportunity",
+          });
+        }
+
+        opportunity.is_archived = true;
+        await opportunity.save();
+
+        return opportunity;
+      } catch (error) {
+        console.error("Error archiving opportunity:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to archive opportunity",
+          cause: error,
+        });
+      }
+    }),
+
+  deleteOpportunity: protectedProcedure
+    .input(z.string())
+    .mutation(async ({ ctx, input: opportunityId }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to delete an opportunity",
+        });
+      }
+
+      try {
+        const opportunity = await Opportunity.findById(opportunityId);
+        if (!opportunity) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Opportunity not found",
+          });
+        }
+
+        // Check if the user owns this opportunity
+        if (opportunity.created_by.toString() !== sessionUser.id) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to delete this opportunity",
+          });
+        }
+
+        // Soft delete by setting deleted_at timestamp
+        opportunity.deleted_at = new Date();
+        await opportunity.save();
+
+        return { success: true };
+      } catch (error) {
+        console.error("Error deleting opportunity:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to delete opportunity",
+          cause: error,
+        });
+      }
+    }),
 });

@@ -4,6 +4,7 @@ import { trpc } from "@/utils/trpc";
 import { useState } from "react";
 import VolunteerCard from "@/components/layout/organisation/VolunteerCard";
 import MessageDialog from "@/components/layout/organisation/MessageDialog";
+import OrganizationOpportunities from "./OrganizationOpportunities";
 
 interface Volunteer {
   _id: string;
@@ -29,12 +30,8 @@ export default function OrganizationHomepage() {
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
 
   // Fetch all available volunteers
-  const { data: volunteers, isLoading } =
+  const { data: volunteers, isLoading: isLoadingVolunteers } =
     trpc.users.getAvailableUsers.useQuery();
-
-  // Debug logs
-  console.log("Volunteers data:", volunteers);
-  console.log("Is loading:", isLoading);
 
   const handleSendMessage = (volunteer: Volunteer) => {
     setSelectedVolunteer(volunteer);
@@ -43,12 +40,14 @@ export default function OrganizationHomepage() {
 
   return (
     <section className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-8 text-gray-800">
-        Available Volunteers
-      </h1>
+      {/* Organization Opportunities Section */}
+      <OrganizationOpportunities />
+
+      {/* Available Volunteers Section */}
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Available Volunteers</h2>
 
       <div className="flex flex-col gap-4">
-        {isLoading ? (
+        {isLoadingVolunteers ? (
           <div className="text-center py-12">
             <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
             <p className="text-gray-600">Loading volunteers...</p>
