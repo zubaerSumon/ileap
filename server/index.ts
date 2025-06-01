@@ -9,6 +9,7 @@ import { organizationProfileRouter } from "./modules/organization-profile";
 import { volunteerApplicationRouter } from "./modules/volunteer-application";
 import { organisationRecruitmentRouter } from "@/server/modules/organisation-recruitment";
 import { messsageRouter } from "./modules/message";
+import { organizationMentorRouter } from "./modules/organization-mentors";
 
 export const appRouter = router({
   users: userRouter,
@@ -20,6 +21,7 @@ export const appRouter = router({
   applications: volunteerApplicationRouter,
   recruits: organisationRecruitmentRouter,
   messages: messsageRouter,
+  mentors: organizationMentorRouter
 });
 
 export type AppRouter = typeof appRouter;

@@ -5,3 +5,4 @@ export const APPLICATION_CONFIRMATION_TEMPLATE: string =
   "application_confirmation";
 export const RECRUITMENT_CONFIRMATION_TEMPLATE: string =
   "recruitment_confirmation";
+export const MENTOR_INVITATION_TEMPLATE = "mentor_invitation";
