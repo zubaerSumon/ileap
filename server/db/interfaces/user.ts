@@ -5,6 +5,7 @@ export enum UserRole {
   ADMIN = "admin",
   VOLUNTEER = "volunteer",
   ORGANIZATION = "organization", 
+  MENTOR = "mentor"
 }
 
 export enum AuthProvider {

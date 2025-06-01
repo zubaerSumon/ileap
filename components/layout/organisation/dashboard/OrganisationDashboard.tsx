@@ -12,6 +12,7 @@ import ActiveContent from "./ActiveContent";
 import DraftContent from "./DraftContent";
 import MessageDialog from "../MessageDialog";
 import { Opportunity } from "@/types/opportunities";
+import InviteMentorDialog from "./InviteMentorDialog";
 
 interface Volunteer {
   _id: string;
@@ -62,6 +63,9 @@ const OrganisationDashboard = () => {
   const { data: session } = useSession();
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+
+  // Get organization profile ID
+  const { data: profileData } = trpc.users.profileCheckup.useQuery();
 
   // Fetch opportunities
   const { data: opportunities, isLoading: isLoadingOpportunities } =
@@ -125,14 +129,17 @@ const OrganisationDashboard = () => {
         <h2 className="text-lg md:text-xl font-bold tracking-tight">
           Good afternoon, {session?.user?.name || "Org Name"}
         </h2>
-        <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
-          size="lg"
-          onClick={() => router.push("/organization/opportunities/create")}
-        >
-          <PlusIcon className="mr-2 transform scale-170" />
-          Post an opportunity
-        </Button>
+        <div className="flex gap-2">
+          <InviteMentorDialog organizationId={profileData?.organizationProfile?._id || ""} />
+          <Button
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
+            size="lg"
+            onClick={() => router.push("/organization/opportunities/create")}
+          >
+            <PlusIcon className="mr-2 transform scale-170" />
+            Post an opportunity
+          </Button>
+        </div>
       </div>
       {/* Overview Section */}
       <h2 className="text-xl md:text-2xl font-semibold mb-4">Overview</h2>
