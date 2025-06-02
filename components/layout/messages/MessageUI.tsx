@@ -108,7 +108,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
             <ChatArea
               messages={flattenedMessages}
               isLoadingMessages={isLoadingMessages}
-              selectedConversation={selectedConversation || { _id: selectedUserId, user: { name: "New Conversation", avatar: "" } }}
+              selectedConversation={isGroup ? selectedGroup : selectedConversation || { _id: selectedUserId, user: { name: "New Conversation", avatar: "" } }}
               onMenuClick={() => setShowMobileMenu(true)}
               session={session}
               isGroup={isGroup}
