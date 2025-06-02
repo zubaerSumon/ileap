@@ -62,11 +62,11 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
     };
   }, [hasMore, isLoadingMore, onLoadMore]);
 
-  const headerData = isGroup && selectedConversation ? {
-    name: (selectedConversation as Group).name || '',
-    members: (selectedConversation as Group).members?.length
+  const headerData = isGroup ? {
+    name: (selectedConversation as Group)?.name,
+    members: (selectedConversation as Group)?.members?.length
   } : selectedConversation && 'user' in selectedConversation ? {
-    name: selectedConversation.user.name || '',
+    name: selectedConversation.user.name,
     avatar: selectedConversation.user.avatar
   } : undefined;
 
@@ -123,4 +123,4 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
 
 ChatArea.displayName = 'ChatArea';
 
-export default ChatArea; 
+export default ChatArea;
