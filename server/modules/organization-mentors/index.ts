@@ -8,7 +8,7 @@ import OrganizationProfile from "@/server/db/models/organization-profile";
 import { z } from "zod";
 import { sendMentorInvitationMail } from "@/utils/helpers/sendMentorInvitationMail";
 import crypto from "crypto";
-import { UserRole } from "@/server/db/interfaces/user";
+import { UserRole, AuthProvider } from "@/server/db/interfaces/user";
 
 const inviteMentorSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -18,6 +18,7 @@ const inviteMentorSchema = z.object({
 
 const acceptInvitationSchema = z.object({
   token: z.string().min(1, "Token is required"),
+  password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
 export const organizationMentorRouter = router({
@@ -54,12 +55,15 @@ export const organizationMentorRouter = router({
         // Check if user already exists
         let mentor = await User.findOne({ email: input.email });
         if (!mentor) {
-          // Create new user account for mentor
+          // Create new user account for mentor with temporary password
+          const tempPassword = crypto.randomBytes(16).toString("hex");
           mentor = await User.create({
             email: input.email,
             name: input.name,
             role: UserRole.MENTOR,
             is_verified: true,
+            provider: AuthProvider.CREDENTIALS,
+            password: tempPassword, // This will be changed when they accept the invitation
           });
         }
 
@@ -122,10 +126,11 @@ export const organizationMentorRouter = router({
         invitation.status = "accepted";
         await invitation.save();
 
-        // Update user's role if needed
+        // Update user's role and password
         const user = await User.findOne({ email: sessionUser.email });
-        if (user && user.role !== UserRole.MENTOR) {
+        if (user) {
           user.role = UserRole.MENTOR;
+          user.password = input.password; // The password will be hashed by the model's pre-save hook
           await user.save();
         }
 

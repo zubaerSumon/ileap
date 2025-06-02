@@ -17,6 +17,7 @@ export const sendMentorInvitationMail = async (
     }
 
     const organizationName = organization.title || "Organization";
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const emailTemplate = MENTOR_INVITATION_TEMPLATE;
     sendEmail(
@@ -27,6 +28,7 @@ export const sendMentorInvitationMail = async (
           userName: name,
           organizationName,
           token,
+          baseUrl,
         },
       },
       emailTemplate
