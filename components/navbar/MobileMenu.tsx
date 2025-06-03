@@ -72,7 +72,7 @@ export function MobileMenu({
                   <div>
                     <p className="font-medium">{session.user?.name}</p>
                     <p className="text-sm text-gray-400">
-                      {session.user?.email}
+                      {session.user?.role}
                     </p>
                   </div>
                 </div>

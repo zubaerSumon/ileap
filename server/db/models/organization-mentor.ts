@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
+import { IOrganizationMentor } from "../interfaces/organization-mentor";
 
-const OrganizationMentorSchema: Schema = new Schema(
+const OrganizationMentorSchema: Schema = new Schema<IOrganizationMentor>(
   {
     organization_profile: {
       type: Schema.Types.ObjectId,
@@ -10,7 +11,8 @@ const OrganizationMentorSchema: Schema = new Schema(
     mentor: {
       type: Schema.Types.ObjectId,
       ref: "user",
-      required: true
+      required: false,
+      sparse: true
     },
     invited_by: {
       type: Schema.Types.ObjectId,
@@ -29,17 +31,33 @@ const OrganizationMentorSchema: Schema = new Schema(
     invitation_expires: {
       type: Date,
       required: true
+    },
+    email: {
+      type: String,
+      required: true
+    },
+    name: {
+      type: String,
+      required: true
     }
   },
-  { timestamps: true }
+  { 
+    timestamps: true,
+    strict: true
+  }
 );
 
- OrganizationMentorSchema.index(
+// Only create unique index for accepted invitations
+OrganizationMentorSchema.index(
   { organization_profile: 1, mentor: 1 },
-  { unique: true }
+  { 
+    unique: true,
+    sparse: true,
+    partialFilterExpression: { status: "accepted" }
+  }
 );
 
 const OrganizationMentor = mongoose.models.organization_mentor || 
-  mongoose.model("organization_mentor", OrganizationMentorSchema);
+  mongoose.model<IOrganizationMentor>("organization_mentor", OrganizationMentorSchema);
 
 export default OrganizationMentor; 

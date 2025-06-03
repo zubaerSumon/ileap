@@ -31,7 +31,7 @@ export const userRouter = router({
         .populate("organization_profile");
       return users;
     }
-    if (currentUser.role === "organization") {
+    if (currentUser.role === "organization" || currentUser.role === "mentor") {
       const query = {
         _id: { $ne: currentUser._id },
         role: "volunteer",

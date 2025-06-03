@@ -21,8 +21,7 @@ interface UserMenuProps {
 export function UserMenu({ user }: UserMenuProps) {
   const userRole = user.role === "organization" ? "organisation" : user.role;
   const userName = user.name || "User";
-  const userEmail = user.email || "";
-
+ 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,10 +38,10 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none truncate max-w-[200px]" title={userName}>
-              {userName}
+              {userName.charAt(0).toUpperCase() + userName.slice(1)}
             </p>
-            <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={userEmail}>
-              {userEmail}
+            <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={userRole}>
+              {userRole}
             </p>
           </div>
         </DropdownMenuLabel>

@@ -52,7 +52,7 @@ export default function InviteMentorDialog({ organizationId }: InviteMentorDialo
       <DialogTrigger asChild>
         <Button
           variant="outline"
-          className="flex items-center gap-2 border-blue-600 text-blue-700 hover:bg-blue-50"
+          className="flex items-center gap-2 h-10 border-blue-600 text-blue-700 hover:bg-blue-50"
         >
           <UserPlus className="h-4 w-4" />
           Invite Mentor
