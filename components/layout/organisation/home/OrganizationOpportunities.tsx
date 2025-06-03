@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { PlusIcon, Trash2 } from "lucide-react";
+import { PlusIcon, Trash2, MapPin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { trpc } from "@/utils/trpc";
 import { Opportunity } from "@/types/opportunities";
@@ -15,6 +15,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 
 type TabType = "active" | "archived";
 
@@ -133,43 +135,80 @@ export default function OrganizationOpportunities() {
           {filteredOpportunities?.map((opportunity) => (
             <div
               key={opportunity._id}
-              className="bg-white border rounded-lg p-4 hover:border-blue-200 transition-colors"
+              className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
             >
-              <div className="flex justify-between items-start mb-2">
-                <h3 
-                  className="font-semibold text-lg cursor-pointer hover:text-blue-600"
-                  onClick={() => router.push(`/organization/opportunities/${opportunity._id}`)}
-                >
-                  {opportunity.title}
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8 text-gray-500 hover:text-red-600"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setOpportunityToDelete(opportunity);
-                    setIsDeleteDialogOpen(true);
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-              <div className="text-sm text-gray-600 mb-2">
-                {opportunity.location}
-              </div>
-              <div className="text-xs text-gray-500">
-                Posted {formatDistanceToNow(opportunity.createdAt, { addSuffix: true })}
-              </div>
-              <div className="mt-3 flex gap-2">
-                {opportunity.category.slice(0, 2).map((cat: string, index: number) => (
-                  <span
-                    key={index}
-                    className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-md"
+              <div className="p-4 h-full flex flex-col">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 mr-3">
+                      <Image
+                        src={opportunity?.organization_profile?.profile_img || "/default-org-logo.svg"}
+                        alt={opportunity?.organization_profile?.name || "Organization Logo"}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    </div>
+                    <h3 
+                      className="text-lg font-semibold cursor-pointer hover:text-blue-600"
+                      onClick={() => router.push(`/organization/opportunities/${opportunity._id}`)}
+                    >
+                      {opportunity.title}
+                    </h3>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-gray-500 hover:text-red-600"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setOpportunityToDelete(opportunity);
+                      setIsDeleteDialogOpen(true);
+                    }}
                   >
-                    {cat}
-                  </span>
-                ))}
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+
+                <div className="flex items-center text-sm text-gray-500 mb-3">
+                  <MapPin className="w-4 h-4 mr-1 text-blue-500" />
+                  <span>{opportunity.location}</span>
+                  <Badge variant="outline" className="ml-2 px-2 py-0.5 text-xs">
+                    {opportunity.commitment_type === 'oneoff' ? 'One-off' : 'Regular'}
+                  </Badge>
+                </div>
+
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {opportunity.category.map((cat: string, index: number) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="text-xs font-normal"
+                    >
+                      {cat}
+                    </Badge>
+                  ))}
+                </div>
+
+                <div className="flex-1">
+                  <div 
+                    className="text-sm text-gray-600 line-clamp-3"
+                    dangerouslySetInnerHTML={{
+                      __html: opportunity.description
+                    }}
+                  />
+                </div>
+
+                <div className="mt-auto pt-4">
+                  <div className="text-xs text-gray-500 mb-4">
+                    Posted {formatDistanceToNow(opportunity.createdAt, { addSuffix: true })}
+                  </div>
+
+                  <div className="flex justify-between items-center">
+                   
+                    
+                  </div>
+                </div>
               </div>
             </div>
           ))}

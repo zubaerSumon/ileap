@@ -32,6 +32,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 
 export default function OpportunityDetailsPage() {
   const utils = trpc.useUtils();
@@ -192,6 +193,14 @@ export default function OpportunityDetailsPage() {
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
+              <div className="w-full h-[200px] relative mb-6">
+                <Image
+                  src={opportunity.banner_img || "/default-banner.svg"}
+                  alt={`${opportunity.title} Banner`}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+              </div>
               <div className="flex items-center justify-between">
                 <h1 className="text-[20px] font-semibold">
                   {opportunity.title}
