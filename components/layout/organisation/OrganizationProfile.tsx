@@ -22,6 +22,7 @@ import { z } from "zod";
 import { TRPCClientErrorLike } from "@trpc/client";
 import { AppRouter } from "@/server";
 import { SelectField } from "@/components/form-input/SelectField";
+import { ProfilePhotoInput } from "@/components/form-input/ProfilePhotoInput";
 
 type OrganizationProfileData = Omit<z.infer<typeof userValidation.organizationProfileSchema>, 'opportunity_types' | 'required_skills'> & {
   opportunity_types: string[];
@@ -329,6 +330,13 @@ export default function OrganizationProfile() {
                 name="abn"
                 label="ABN"
                 placeholder="Enter your ABN"
+              />
+
+              <ProfilePhotoInput
+                label="Profile Image"
+                name="profile_img"
+                setValue={form.setValue}
+                defaultValue={form.watch("profile_img")}
               />
 
               <FormInput<OrganizationProfileData>

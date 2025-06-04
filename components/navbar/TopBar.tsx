@@ -79,7 +79,7 @@ export function TopBar({
               session
                 ? session.user?.role === "volunteer"
                   ? "/volunteer"
-                  : "/organization"
+                  : "/organization/dashboard"
                 : "/"
             }
             className="flex items-center"
