@@ -8,6 +8,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
+import UserManagementTable from "@/components/layout/organisation/dashboard/UserManagementTable";
 
 export default function OrganizationSettingsPage() {
   const [activeSection, setActiveSection] = useState("users");
@@ -66,7 +67,7 @@ export default function OrganizationSettingsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">User management features coming soon...</p>
+                  <UserManagementTable organizationId={profileData?.organizationProfile?._id || ""} />
                 </CardContent>
               </Card>
             )}

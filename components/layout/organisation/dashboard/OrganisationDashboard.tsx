@@ -4,14 +4,24 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/navigation";
-import { ChevronRight, PlusIcon } from "lucide-react";
+import { ChevronRight, PlusIcon, Trash2, MapPin } from "lucide-react";
 import VolunteerCarousel from "./VolunteerCarousel";
 import { useSession } from "next-auth/react";
-import OpenContent from "./OpenContent";
-import ActiveContent from "./ActiveContent";
-import DraftContent from "./DraftContent";
 import MessageDialog from "../MessageDialog";
 import { Opportunity } from "@/types/opportunities";
+import { formatDistanceToNow } from "date-fns";
+import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Volunteer {
   _id: string;
@@ -55,6 +65,7 @@ const TABS = [
   { key: "open", label: "Open opportunity posts" },
   { key: "active", label: "Active contracts" },
   { key: "draft", label: "Draft opportunity posts" },
+  { key: "archived", label: "Archived opportunity posts" },
 ];
 
 const OrganisationDashboard = () => {
@@ -62,6 +73,8 @@ const OrganisationDashboard = () => {
   const { data: session } = useSession();
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+  const [opportunityToDelete, setOpportunityToDelete] = useState<Opportunity | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   // Fetch opportunities
   const { data: opportunities, isLoading: isLoadingOpportunities } =
@@ -69,7 +82,7 @@ const OrganisationDashboard = () => {
       select: (data) => data as Opportunity[]
     });
   // Fetch recruited applicants for 'active' tab
-  const { data: recruitedApplicants, isLoading: isLoadingRecruited } =
+  const { data: recruitedApplicants } =
     trpc.recruits.getRecruitedApplicants.useQuery(
       { opportunityId: opportunities?.[0]?._id || "" },
       { 
@@ -98,12 +111,13 @@ const OrganisationDashboard = () => {
   // Filtered data for tabs
   const openOpportunities = opportunities?.filter((opp) => {
     const startDate = new Date(opp.date.start_date);
-    return startDate > new Date();
+    return startDate > new Date() && !opp.is_archived;
   }) || [];
   const draftOpportunities = opportunities?.filter((opp) => {
     const startDate = new Date(opp.date.start_date);
-    return startDate <= new Date();
+    return startDate <= new Date() && !opp.is_archived;
   }) || [];
+  const archivedOpportunities = opportunities?.filter((opp) => opp.is_archived) || [];
 
   // Transform available volunteers data for the carousel
   const previousVolunteers = availableVolunteers?.map((volunteer) => ({
@@ -113,6 +127,39 @@ const OrganisationDashboard = () => {
     role: volunteer.role || "Volunteer",
     volunteer_profile: volunteer.volunteer_profile
   })) || [];
+
+  const utils = trpc.useUtils();
+  const archiveMutation = trpc.opportunities.archiveOpportunity.useMutation({
+    onSuccess: () => {
+      utils.opportunities.getOrganizationOpportunities.invalidate();
+      setIsDeleteDialogOpen(false);
+      setOpportunityToDelete(null);
+    },
+  });
+
+  const deleteMutation = trpc.opportunities.deleteOpportunity.useMutation({
+    onSuccess: () => {
+      utils.opportunities.getOrganizationOpportunities.invalidate();
+      setIsDeleteDialogOpen(false);
+      setOpportunityToDelete(null);
+    },
+  });
+
+  const handleArchive = async (opportunity: Opportunity) => {
+    try {
+      await archiveMutation.mutateAsync(opportunity._id);
+    } catch (error) {
+      console.error("Failed to archive opportunity:", error);
+    }
+  };
+
+  const handleDelete = async (opportunity: Opportunity) => {
+    try {
+      await deleteMutation.mutateAsync(opportunity._id);
+    } catch (error) {
+      console.error("Failed to delete opportunity:", error);
+    }
+  };
 
   const handleSendMessage = (volunteer: Volunteer) => {
     setSelectedVolunteer(volunteer);
@@ -158,7 +205,9 @@ const OrganisationDashboard = () => {
                 ? openOpportunities.length
                 : t.key === "active"
                 ? activeContracts.length
-                : draftOpportunities.length}
+                : t.key === "draft"
+                ? draftOpportunities.length
+                : archivedOpportunities.length}
               )
             </button>
           ))}
@@ -171,29 +220,131 @@ const OrganisationDashboard = () => {
           <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
-      {/* Active Contracts List */}
+      {/* Tab Content */}
       <div className="transition-all duration-300 ease-in-out">
-        {tab === "active" && (
-          <ActiveContent
-            activeContracts={activeContracts}
-            isLoadingRecruited={isLoadingRecruited}
-          />
-        )}
-        {/* Open opportunity Posts List */}
-        {tab === "open" && (
-          <OpenContent
-            openOpportunities={openOpportunities}
-            isLoadingOpportunities={isLoadingOpportunities}
-            router={router}
-          />
-        )}
-        {/* Draft opportunity Posts List */}
-        {tab === "draft" && (
-          <DraftContent
-            draftOpportunities={draftOpportunities}
-            isLoadingOpportunities={isLoadingOpportunities}
-            router={router}
-          />
+        {isLoadingOpportunities ? (
+          <div className="text-center py-12">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading opportunities...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {tab === "active" ? (
+              activeContracts.map((contract) => (
+                <div
+                  key={contract.id}
+                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
+                >
+                  <div className="p-4 h-full flex flex-col">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 mr-3">
+                          <Image
+                            src={contract.profileImg || "/default-org-logo.svg"}
+                            alt={contract.freelancerName}
+                            width={40}
+                            height={40}
+                            className="rounded-full"
+                          />
+                        </div>
+                        <h3 className="text-lg font-semibold">
+                          {contract.jobTitle}
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center text-sm text-gray-500 mb-3">
+                      <span>{contract.freelancerName}</span>
+                    </div>
+
+                    <div className="mt-auto pt-4">
+                      <div className="text-xs text-gray-500 mb-4">
+                        Started {formatDistanceToNow(new Date(contract.startedAt), { addSuffix: true })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              (tab === "open" ? openOpportunities :
+               tab === "draft" ? draftOpportunities :
+               archivedOpportunities)?.map((opportunity) => (
+                <div
+                  key={opportunity._id}
+                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
+                >
+                  <div className="p-4 h-full flex flex-col">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-center">
+                        <div className="w-10 h-10 mr-3">
+                          <Image
+                            src={opportunity?.organization_profile?.profile_img || "/default-org-logo.svg"}
+                            alt={opportunity?.organization_profile?.title || "Organization Logo"}
+                            width={40}
+                            height={40}
+                            className="rounded-full"
+                          />
+                        </div>
+                        <h3 
+                          className="text-lg font-semibold cursor-pointer hover:text-blue-600"
+                          onClick={() => router.push(`/organization/opportunities/${opportunity._id}`)}
+                        >
+                          {opportunity.title}
+                        </h3>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-gray-500 hover:text-red-600"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setOpportunityToDelete(opportunity);
+                          setIsDeleteDialogOpen(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <div className="flex items-center text-sm text-gray-500 mb-3">
+                      <MapPin className="w-4 h-4 mr-1 text-blue-500" />
+                      <span>{opportunity.location}</span>
+                      <Badge variant="outline" className="ml-2 px-2 py-0.5 text-xs">
+                        {opportunity.commitment_type === 'oneoff' ? 'One-off' : 'Regular'}
+                      </Badge>
+                    </div>
+
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {opportunity.category.map((cat: string, index: number) => (
+                        <Badge
+                          key={index}
+                          variant="secondary"
+                          className="text-xs font-normal"
+                        >
+                          {cat}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <div className="flex-1">
+                      <div 
+                        className="text-sm text-gray-600 line-clamp-3"
+                        dangerouslySetInnerHTML={{
+                          __html: opportunity.description
+                        }}
+                      />
+                    </div>
+
+                    <div className="mt-auto pt-4">
+                      <div className="text-xs text-gray-500 mb-4">
+                        Posted {formatDistanceToNow(opportunity.createdAt, { addSuffix: true })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         )}
       </div>
       {/* Work together again section */}
@@ -222,6 +373,36 @@ const OrganisationDashboard = () => {
         onOpenChange={setIsMessageDialogOpen}
         volunteer={selectedVolunteer}
       />
+
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {tab === "archived"
+                ? "This action cannot be undone. This will permanently delete the opportunity."
+                : "This will move the opportunity to the archive. You can delete it permanently from there."}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (opportunityToDelete) {
+                  if (tab === "archived") {
+                    handleDelete(opportunityToDelete);
+                  } else {
+                    handleArchive(opportunityToDelete);
+                  }
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              {tab === "archived" ? "Delete" : "Archive"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

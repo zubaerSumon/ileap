@@ -36,7 +36,7 @@ export const organizationMentorRouter = router({
           });
         }
 
-        // Check if inviter is an organization admin
+        // Check if inviter is an admin or mentor
         const inviter = await User.findOne({ email: sessionUser.email });
         if (!inviter || (inviter.role !== UserRole.ADMIN && inviter.role !== UserRole.MENTOR)) {
           throw new TRPCError({

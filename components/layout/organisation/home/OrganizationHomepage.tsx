@@ -4,8 +4,7 @@ import { trpc } from "@/utils/trpc";
 import { useState } from "react";
 import VolunteerCard from "@/components/layout/organisation/VolunteerCard";
 import MessageDialog from "@/components/layout/organisation/MessageDialog";
-import OrganizationOpportunities from "./OrganizationOpportunities";
-
+ 
 interface Volunteer {
   _id: string;
   name: string;
@@ -40,11 +39,8 @@ export default function OrganizationHomepage() {
 
   return (
     <section className="container mx-auto px-4 py-8">
-      {/* Organization Opportunities Section */}
-      <OrganizationOpportunities />
-
-      {/* Available Volunteers Section */}
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Available Volunteers</h2>
+  
+       <h2 className="text-2xl font-bold text-gray-800 mb-6">Available Volunteers</h2>
 
       <div className="flex flex-col gap-4">
         {isLoadingVolunteers ? (
