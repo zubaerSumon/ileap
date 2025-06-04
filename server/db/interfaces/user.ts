@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 export enum UserRole {
   ADMIN = "admin",
   VOLUNTEER = "volunteer",
-  ORGANIZATION = "organization", 
   MENTOR = "mentor"
 }
 

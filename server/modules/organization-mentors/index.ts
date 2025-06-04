@@ -3,7 +3,6 @@ import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
 import { TRPCError } from "@trpc/server";
 import User from "@/server/db/models/user";
-import OrganizationMentor from "@/server/db/models/organization-mentor";
 import OrganizationProfile from "@/server/db/models/organization-profile";
 import MentorInvitation from "@/server/db/models/mentor-invitation";
 import { z } from "zod";
@@ -39,10 +38,10 @@ export const organizationMentorRouter = router({
 
         // Check if inviter is an organization admin
         const inviter = await User.findOne({ email: sessionUser.email });
-        if (!inviter || inviter.role !== UserRole.ORGANIZATION) {
+        if (!inviter || (inviter.role !== UserRole.ADMIN && inviter.role !== UserRole.MENTOR)) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only organization admins can invite mentors.",
+            message: "Only admins and mentors can invite mentors.",
           });
         }
 
@@ -115,27 +114,15 @@ export const organizationMentorRouter = router({
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(input.password, salt);
 
-        // Create new user account first
-        const user = await User.create({
+        // Create new user account
+        await User.create({
           email: invitation.email,
           name: input.name,
           role: UserRole.MENTOR,
           is_verified: true,
           provider: AuthProvider.CREDENTIALS,
           password: hashedPassword,
-          organization_profile: invitation.organization_profile // Link organization profile to user
-        });
-
-        // Now create the OrganizationMentor record
-        await OrganizationMentor.create({
-          organization_profile: invitation.organization_profile,
-          mentor: user._id,
-          invited_by: invitation.invited_by,
-          status: "accepted",
-          email: invitation.email,
-          name: invitation.name,
-          invitation_token: invitation.token,
-          invitation_expires: invitation.expires
+          organization_profile: invitation.organization_profile
         });
 
         // Delete the invitation after successful acceptance
@@ -160,18 +147,10 @@ export const organizationMentorRouter = router({
           });
         }
 
-        const mentors = await OrganizationMentor.find({
+        const mentors = await User.find({
           organization_profile: input.organizationId,
-          status: "accepted",
-        })
-          .populate({
-            path: "mentor",
-            select: "name email",
-          })
-          .populate({
-            path: "invited_by",
-            select: "name email",
-          });
+          role: UserRole.MENTOR
+        }).select('name email');
 
         return mentors;
       } catch (error) {

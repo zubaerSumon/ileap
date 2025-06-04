@@ -20,18 +20,20 @@ export const userRouter = router({
       throw new Error("Current user not found");
     }
 
-    // If user is a volunteer, show organizations
+    // If user is a volunteer, show admins and mentors
     if (currentUser.role === "volunteer") {
       const query = {
         _id: { $ne: currentUser._id },
-        role: "organization",
+        role: { $in: ["admin", "mentor"] },
       };
       const users = await User.find(query)
         .select("name avatar role")
         .populate("organization_profile");
       return users;
     }
-    if (currentUser.role === "organization" || currentUser.role === "mentor") {
+
+    // If user is an admin or mentor, show volunteers
+    if (currentUser.role === "admin" || currentUser.role === "mentor") {
       const query = {
         _id: { $ne: currentUser._id },
         role: "volunteer",
