@@ -314,11 +314,11 @@ export const messsageRouter = router({
           });
         }
 
-        // Check if user is an organization when creating an organization group
-        if (input.isOrganizationGroup && user.role !== "organization") {
+        // Check if user is an admin or mentor when creating an organization group
+        if (input.isOrganizationGroup && user.role !== "admin" && user.role !== "mentor") {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only organizations can create organization groups",
+            message: "Only admins and mentors can create organization groups",
           });
         }
 

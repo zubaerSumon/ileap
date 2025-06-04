@@ -40,7 +40,8 @@ export default function LoginPage() {
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated && session?.user?.role) {
-        router.replace(`/${session.user.role}`);
+        const role = session.user.role.toLowerCase();
+        router.replace(role === "admin" || role === "mentor" ? "/organization" : `/${role}`);
       } else if (!isAuthenticated && session?.user?.role && !hasProfile) {
         const timeoutId = setTimeout(() => {
           router.replace("/signup");

@@ -28,8 +28,8 @@ const withAuth = middleware(async ({ ctx, next, path }) => {
       throw new AuthError("Access denied. Volunteer access only.");
     }
     
-    if (path.includes('organization.') && userRole !== 'organization') {
-      throw new AuthError("Access denied. Organization access only.");
+    if (path.includes('organization.') && userRole !== 'admin' && userRole !== 'mentor') {
+      throw new AuthError("Access denied. Admin or Mentor access only.");
     }
 
     return next({

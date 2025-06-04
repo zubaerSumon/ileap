@@ -3,12 +3,13 @@ import { protectedProcedure } from "@/server/middlewares/with-auth";
 import { JwtPayload } from "jsonwebtoken";
 import { TRPCError } from "@trpc/server";
 import User from "@/server/db/models/user";
-import OrganizationMentor from "@/server/db/models/organization-mentor";
 import OrganizationProfile from "@/server/db/models/organization-profile";
+import MentorInvitation from "@/server/db/models/mentor-invitation";
 import { z } from "zod";
 import { sendMentorInvitationMail } from "@/utils/helpers/sendMentorInvitationMail";
 import crypto from "crypto";
 import { UserRole, AuthProvider } from "@/server/db/interfaces/user";
+import bcrypt from "bcryptjs";
 
 const inviteMentorSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -18,6 +19,7 @@ const inviteMentorSchema = z.object({
 
 const acceptInvitationSchema = z.object({
   token: z.string().min(1, "Token is required"),
+  name: z.string().min(1, "Name is required"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
 });
 
@@ -36,10 +38,10 @@ export const organizationMentorRouter = router({
 
         // Check if inviter is an organization admin
         const inviter = await User.findOne({ email: sessionUser.email });
-        if (!inviter || inviter.role !== UserRole.ORGANIZATION) {
+        if (!inviter || (inviter.role !== UserRole.ADMIN && inviter.role !== UserRole.MENTOR)) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only organization admins can invite mentors.",
+            message: "Only admins and mentors can invite mentors.",
           });
         }
 
@@ -53,32 +55,27 @@ export const organizationMentorRouter = router({
         }
 
         // Check if user already exists
-        let mentor = await User.findOne({ email: input.email });
-        if (!mentor) {
-          // Create new user account for mentor with temporary password
-          const tempPassword = crypto.randomBytes(16).toString("hex");
-          mentor = await User.create({
-            email: input.email,
-            name: input.name,
-            role: UserRole.MENTOR,
-            is_verified: true,
-            provider: AuthProvider.CREDENTIALS,
-            password: tempPassword, // This will be changed when they accept the invitation
+        const existingUser = await User.findOne({ email: input.email });
+        if (existingUser) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "A user with this email already exists.",
           });
         }
 
         // Generate invitation token
         const token = crypto.randomBytes(32).toString("hex");
         const expires = new Date();
-        expires.setHours(expires.getHours() + 24); // 24 hours expiry
+        expires.setHours(expires.getHours() + 24);
 
-        // Create mentor invitation
-        await OrganizationMentor.create({
+        // Store invitation details
+        await MentorInvitation.create({
           organization_profile: input.organizationId,
-          mentor: mentor._id,
           invited_by: inviter._id,
-          invitation_token: token,
-          invitation_expires: expires,
+          email: input.email,
+          name: input.name,
+          token,
+          expires
         });
 
         // Send invitation email
@@ -98,21 +95,12 @@ export const organizationMentorRouter = router({
 
   acceptInvitation: protectedProcedure
     .input(acceptInvitationSchema)
-    .mutation(async ({ ctx, input }) => {
+    .mutation(async ({ input }) => {
       try {
-        const sessionUser = ctx.user as JwtPayload;
-        if (!sessionUser?.email) {
-          throw new TRPCError({
-            code: "UNAUTHORIZED",
-            message: "You must be logged in to accept the invitation.",
-          });
-        }
-
         // Find the invitation
-        const invitation = await OrganizationMentor.findOne({
-          invitation_token: input.token,
-          status: "pending",
-          invitation_expires: { $gt: new Date() },
+        const invitation = await MentorInvitation.findOne({
+          token: input.token,
+          expires: { $gt: new Date() }
         });
 
         if (!invitation) {
@@ -122,17 +110,23 @@ export const organizationMentorRouter = router({
           });
         }
 
-        // Update invitation status
-        invitation.status = "accepted";
-        await invitation.save();
+        // Hash the password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(input.password, salt);
 
-        // Update user's role and password
-        const user = await User.findOne({ email: sessionUser.email });
-        if (user) {
-          user.role = UserRole.MENTOR;
-          user.password = input.password; // The password will be hashed by the model's pre-save hook
-          await user.save();
-        }
+        // Create new user account
+        await User.create({
+          email: invitation.email,
+          name: input.name,
+          role: UserRole.MENTOR,
+          is_verified: true,
+          provider: AuthProvider.CREDENTIALS,
+          password: hashedPassword,
+          organization_profile: invitation.organization_profile
+        });
+
+        // Delete the invitation after successful acceptance
+        await MentorInvitation.deleteOne({ _id: invitation._id });
 
         return { message: "Invitation accepted successfully" };
       } catch (error) {
@@ -153,18 +147,10 @@ export const organizationMentorRouter = router({
           });
         }
 
-        const mentors = await OrganizationMentor.find({
+        const mentors = await User.find({
           organization_profile: input.organizationId,
-          status: "accepted",
-        })
-          .populate({
-            path: "mentor",
-            select: "name email",
-          })
-          .populate({
-            path: "invited_by",
-            select: "name email",
-          });
+          role: UserRole.MENTOR
+        }).select('name email');
 
         return mentors;
       } catch (error) {
