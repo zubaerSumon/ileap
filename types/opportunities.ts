@@ -17,4 +17,5 @@ export type Opportunity = CreateOpportunityInput & {
   };
   applicantCount?: number;
   recruitCount?: number;
+  is_archived: boolean;
 };

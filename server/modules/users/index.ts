@@ -7,6 +7,7 @@ import bcrypt from "bcryptjs";
 import { publicProcedure, router } from "@/server/trpc";
 import VolunteerProfile from "@/server/db/models/volunteer-profile";
 import { TRPCError } from "@trpc/server";
+import { z } from "zod";
 
 export const userRouter = router({
   getAvailableUsers: protectedProcedure.query(async ({ ctx }) => {
@@ -301,5 +302,156 @@ export const userRouter = router({
         success: true,
         message: "Password has been successfully reset",
       };
+    }),
+
+  getOrganizationUsers: protectedProcedure
+    .input(z.object({ organizationId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.email) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to view users.",
+        });
+      }
+
+      const currentUser = await User.findOne({ email: sessionUser.email });
+      if (!currentUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Current user not found.",
+        });
+      }
+
+      // Only admins can view organization users
+      if (currentUser.role !== "admin" && currentUser.role !== "mentor") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can view organization users.",
+        });
+      }
+
+      const users = await User.find({
+        organization_profile: input.organizationId,
+      }).select("name email role avatar");
+
+      return users;
+    }),
+
+  updateUserRole: protectedProcedure
+    .input(z.object({
+      userId: z.string(),
+      role: z.enum(["admin", "mentor"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.email) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to update user roles.",
+        });
+      }
+
+      const currentUser = await User.findOne({ email: sessionUser.email });
+      if (!currentUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Current user not found.",
+        });
+      }
+
+      // Only admins can update user roles
+      if (currentUser.role !== "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can update user roles.",
+        });
+      }
+
+      const userToUpdate = await User.findById(input.userId);
+      if (!userToUpdate) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User to update not found.",
+        });
+      }
+
+      // Ensure user belongs to the same organization
+      if (userToUpdate.organization_profile?.toString() !== currentUser.organization_profile?.toString()) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Cannot update user from a different organization.",
+        });
+      }
+
+      userToUpdate.role = input.role;
+      await userToUpdate.save();
+
+      return userToUpdate;
+    }),
+
+  deleteUser: protectedProcedure
+    .input(z.object({
+      userId: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.email) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to delete users.",
+        });
+      }
+
+      const currentUser = await User.findOne({ email: sessionUser.email });
+      if (!currentUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Current user not found.",
+        });
+      }
+
+      // Only admins can delete users
+      if (currentUser.role !== "admin" && currentUser.role !== "mentor") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can delete users.",
+        });
+      }
+
+      const userToDelete = await User.findById(input.userId);
+      if (!userToDelete) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User to delete not found.",
+        });
+      }
+
+      // Ensure user belongs to the same organization
+      if (userToDelete.organization_profile?.toString() !== currentUser.organization_profile?.toString()) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Cannot delete user from a different organization.",
+        });
+      }
+
+      // Prevent deleting the last admin
+      if (userToDelete.role === "admin") {
+        const adminCount = await User.countDocuments({
+          organization_profile: currentUser.organization_profile,
+          role: "admin",
+        });
+
+        if (adminCount <= 1) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Cannot delete the last admin of the organization.",
+          });
+        }
+      }
+
+      await User.findByIdAndDelete(input.userId);
+
+      return { success: true };
     }),
 });

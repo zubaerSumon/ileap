@@ -186,7 +186,9 @@ export const opportunityRouter = router({
       }
 
       try {
-        const opportunity = await Opportunity.findById(opportunityId);
+        const opportunity = await Opportunity.findById(opportunityId)
+          .populate("organization_profile");
+        
         if (!opportunity) {
           throw new TRPCError({
             code: "NOT_FOUND",
@@ -194,20 +196,46 @@ export const opportunityRouter = router({
           });
         }
 
-        // Check if the user owns this opportunity
-        if (opportunity.created_by.toString() !== sessionUser.id) {
+        // Get the user to check their role
+        const user = await User.findById(sessionUser.id);
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        // Check if the user is either the creator or a mentor
+        const isCreator = opportunity.created_by.toString() === sessionUser.id;
+        const isMentor = user.role === "mentor";
+
+        if (!isCreator && !isMentor) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You don't have permission to archive this opportunity",
           });
         }
 
-        opportunity.is_archived = true;
-        await opportunity.save();
+        // Update the opportunity
+        const updatedOpportunity = await Opportunity.findByIdAndUpdate(
+          opportunityId,
+          { is_archived: true },
+          { new: true }
+        );
 
-        return opportunity;
+        if (!updatedOpportunity) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update opportunity",
+          });
+        }
+
+        return updatedOpportunity;
       } catch (error) {
         console.error("Error archiving opportunity:", error);
+        if (error instanceof TRPCError) {
+          throw error;
+        }
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to archive opportunity",
