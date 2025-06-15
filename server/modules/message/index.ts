@@ -331,7 +331,36 @@ export const messsageRouter = router({
           isOrganizationGroup: input.isOrganizationGroup || false,
         });
 
-        return group;
+        // Get the populated group data
+        const populatedGroup = await Group.findById(group._id)
+          .populate('members', 'name avatar role')
+          .populate('admins', 'name avatar role')
+          .lean();
+
+        if (!populatedGroup) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to create group",
+          });
+        }
+
+        // Convert to the expected format
+        const formattedGroup = {
+          _id: group._id.toString(),
+          name: group.name,
+          description: group.description,
+          members: (populatedGroup as any).members || [],
+          admins: (populatedGroup as any).admins || [],
+          createdBy: group.createdBy.toString(),
+          isOrganizationGroup: group.isOrganizationGroup,
+          avatar: group.avatar,
+          createdAt: group.createdAt,
+          updatedAt: group.updatedAt,
+          lastMessage: null,
+          unreadCount: 0
+        };
+
+        return formattedGroup;
       } catch (error: any) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

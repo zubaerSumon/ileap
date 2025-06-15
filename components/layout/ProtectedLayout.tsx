@@ -40,9 +40,13 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
 
   return (
     <Fragment>
-      <TopNavigationBar />
-      <div className="min-h-screen mx-auto ">{children}</div>
-      <UpdatedFooter />
+      <div className="flex flex-col min-h-screen overflow-hidden">
+        <TopNavigationBar />
+        <main className="flex-1 relative overflow-hidden">
+          {children}
+        </main>
+        <UpdatedFooter />
+      </div>
     </Fragment>
   );
 }
