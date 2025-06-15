@@ -17,21 +17,26 @@ export const MessageInput: React.FC<MessageInputProps> = React.memo(({
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSendMessage(e);
+  };
+
   return (
-    <form onSubmit={handleSendMessage} className="w-full">
-      <div className="flex items-center h-16 px-4 py-4 border-t">
+    <form onSubmit={onSubmit} className="w-full">
+      <div className="flex items-center h-14 px-4 py-2">
         <div className="flex-1 flex items-center gap-2">
           <Input
             ref={inputRef}
             value={newMessage || ''}
             onChange={(e) => setNewMessage(e.target.value)}
             placeholder="Type a message..."
-            className="h-10 flex-1"
+            className="h-9 flex-1 focus-visible:ring-0 focus-visible:ring-offset-0"
           />
           <Button 
             type="submit" 
             disabled={!newMessage?.trim() || isSending}
-            className="h-10"
+            className="h-9 bg-blue-500 hover:bg-blue-600 text-white focus-visible:ring-0 focus-visible:ring-offset-0"
           >
             {isSending ? (
               <span className="flex items-center gap-2">
@@ -50,4 +55,4 @@ export const MessageInput: React.FC<MessageInputProps> = React.memo(({
 
 MessageInput.displayName = 'MessageInput';
 
-export default MessageInput; 
+export default MessageInput;

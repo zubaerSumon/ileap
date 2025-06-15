@@ -15,11 +15,8 @@ interface OrgDetailsStepProps {
 }
 
 export function OrgDetailsStep({ form }: OrgDetailsStepProps) {
-  const handleSetValue = (
-    name: string,
-    value: string | { link: string; mimeType: string }
-  ) => {
-    form.setValue(name as keyof OrgSignupFormData, value as string);
+  const handleProfilePhotoSetValue = (name: string, value: string) => {
+    form.setValue(name as keyof OrgSignupFormData, value);
   };
 
   return (
@@ -91,14 +88,15 @@ export function OrgDetailsStep({ form }: OrgDetailsStepProps) {
         <ProfilePhotoInput
           label="Profile Image"
           name="profile_img"
-          setValue={handleSetValue}
+          setValue={handleProfilePhotoSetValue}
           defaultValue={form.watch("profile_img")}
         />
 
-        <FormImageInput
+        <FormImageInput<OrgSignupFormData>
           label="Cover Image"
           name="cover_img"
-          setValue={handleSetValue}
+          setValue={form.setValue}
+          control={form.control}
           defaultValue={form.watch("cover_img")}
         />
       </div>

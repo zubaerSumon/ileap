@@ -49,8 +49,7 @@ export default function OrganizationSignup() {
         // Redirect to organization dashboard
         const role = session?.user?.role?.toLowerCase();
         if (role) {
-          router.replace(`/${role}`);
-        }
+          router.replace(role === "admin" || role === "mentor" ? "/organization/dashboard" : `/${role}`);        }
       } catch (error) {
         console.error("Error updating user with profile:", error);
         toast.error("Failed to complete profile setup");
@@ -187,7 +186,7 @@ export default function OrganizationSignup() {
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated && session?.user?.role) {
-        router.replace(`/${session.user.role.toLowerCase()}`);
+         router.replace(session.user.role === "admin" || session.user.role === "mentor" ? "/organization/dashboard" : `/${session.user.role}`);
       } else if (session?.user && !isAuthenticated) {
         setStep(2);
         setIsLoggedIn(true);

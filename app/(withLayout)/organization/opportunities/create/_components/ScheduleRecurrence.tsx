@@ -114,64 +114,6 @@ export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceP
                   className="w-[382px]"
                 />
               </div>
-              {/* Select date & time */}
-              <div>
-                <h2 className="text-lg font-medium mb-1 flex items-center">
-                  Select date & time
-                  <span className="text-red-500 ml-1">*</span>
-                </h2>
-                <p className="text-sm text-gray-500 mb-4">
-                  To help avoid surprises, please be specific. e.g. a few hours
-                  every day. AusLEAP Australia recommends no more than 15 hours
-                  per week.
-                </p>
-                <div className="flex gap-4">
-                  <div>
-                    <label>Date</label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <FormInput
-                        name={"date.start_date" as Path<OpportunityFormValues>}
-                        label=""
-                        placeholder=""
-                        type="date"
-                        control={form.control}
-                        className="w-[150px]"
-                      />
-                      <span>-</span>
-                      <FormInput
-                        name={"date.end_date" as Path<OpportunityFormValues>}
-                        label=""
-                        placeholder=""
-                        type="date"
-                        control={form.control}
-                        className="w-[150px]"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <label>Time</label>
-                    <div className="flex items-center gap-2 mt-1">
-                      <FormInput
-                        name={"time.start_time" as Path<OpportunityFormValues>}
-                        label=""
-                        placeholder=""
-                        type="time"
-                        control={form.control}
-                        className="w-[120px]"
-                      />
-                      <span>-</span>
-                      <FormInput
-                        name={"time.end_time" as Path<OpportunityFormValues>}
-                        label=""
-                        placeholder=""
-                        type="time"
-                        control={form.control}
-                        className="w-[120px]"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
               {/* Add your email/contact */}
               <div>
                 <h2 className="text-lg font-medium mb-1 flex items-center">

@@ -53,13 +53,15 @@ export const {
     },
     async jwt({ token, user, trigger, session }) {
       if (trigger === 'signIn' || (trigger === 'update' && session)) {
-        const retrievedUser = await User.findOne({ email: user?.email || token.email });
+        const retrievedUser = await User.findOne({ email: user?.email || token.email })
+          .populate("organization_profile");
         
         if (retrievedUser) {
           token.id = retrievedUser.id;
           token.email = retrievedUser.email;
           token.name = retrievedUser.name || user?.name;
           token.role = retrievedUser.role || '';
+          token.organization_profile = retrievedUser.organization_profile;
         }
       }
       return token;
@@ -84,6 +86,7 @@ export const {
           email: token.email,
           name: token.name || user?.name,
           role: token.role || '',
+          organization_profile: token.organization_profile,
         },
       };
     },

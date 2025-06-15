@@ -9,6 +9,7 @@ import DeleteGroupModal from './DeleteGroupModal';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
 import MessageInput from './components/MessageInput';
+import { cn } from "@/lib/utils";
 
 interface MessageUIProps {
   initialUserId?: string | null;
@@ -65,6 +66,13 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
     utils.messages.getGroups.invalidate();
   };
 
+  // Add effect to handle group selection
+  useEffect(() => {
+    if (selectedUserId && isGroup) {
+      utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId });
+    }
+  }, [selectedUserId, isGroup, utils.messages.getGroupMessages]);
+
   const deleteGroupMutation = trpc.messages.deleteGroup.useMutation({
     onSuccess: () => {
       toast.success("Group deleted successfully");
@@ -84,76 +92,65 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 h-full bg-white rounded-lg border">
-      <Sidebar
-        showMobileMenu={showMobileMenu}
-        onClose={() => setShowMobileMenu(false)}
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        conversations={conversations}
-        groups={groups as Group[] | undefined}
-        selectedUserId={selectedUserId}
-        onSelectUser={handleSelectUser}
-        isLoadingConversations={isLoadingConversations}
-        isLoadingGroups={isLoadingGroups}
-        availableUsers={availableUsers}
-        isLoadingUsers={isLoadingUsers}
-        userRole={session?.user?.role}
-        onGroupCreated={handleGroupCreated}
-      />
+    <div className="grid grid-cols-1 md:grid-cols-4 h-full overflow-hidden">
+      <div className={cn(
+        "col-span-1 border-r bg-white overflow-hidden",
+        showMobileMenu ? "block" : "hidden md:block"
+      )}>
+        <Sidebar
+          showMobileMenu={showMobileMenu}
+          onClose={() => setShowMobileMenu(false)}
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          conversations={conversations}
+          groups={groups}
+          selectedUserId={selectedUserId}
+          onSelectUser={handleSelectUser}
+          isLoadingConversations={isLoadingConversations}
+          isLoadingGroups={isLoadingGroups}
+          availableUsers={availableUsers}
+          isLoadingUsers={isLoadingUsers}
+          userRole={session?.user?.role}
+          onGroupCreated={handleGroupCreated}
+        />
+      </div>
 
-      <main className="col-span-1 md:col-span-3 flex flex-col h-full">
+      <main className="col-span-1 md:col-span-3 flex flex-col h-full border-l">
         {selectedUserId ? (
-          <>
-            <ChatArea
-              messages={flattenedMessages}
-              isLoadingMessages={isLoadingMessages}
-              selectedConversation={isGroup ? selectedGroup : selectedConversation || { _id: selectedUserId, user: { name: "New Conversation", avatar: "" } }}
-              onMenuClick={() => setShowMobileMenu(true)}
-              session={session}
-              isGroup={isGroup}
-              onDeleteGroup={isGroup && session?.user?.role !== "volunteer" ? () => setShowDeleteModal(true) : undefined}
-              onLoadMore={handleLoadMore}
-              hasMore={hasMore}
-              isLoadingMore={isLoadingMore}
-            />
-            <MessageInput
-              newMessage={newMessage}
-              setNewMessage={setNewMessage}
-              handleSendMessage={handleSendMessage}
-              isSending={isSending}
-            />
-          </>
+          <div className="flex flex-col h-full">
+            <div className="flex-1 min-h-0 relative">
+              <ChatArea
+                messages={flattenedMessages}
+                isLoadingMessages={isLoadingMessages}
+                selectedConversation={isGroup ? selectedGroup : selectedConversation || { _id: selectedUserId, user: { name: "New Conversation", avatar: "" } }}
+                onMenuClick={() => setShowMobileMenu(true)}
+                session={session}
+                isGroup={isGroup}
+                onDeleteGroup={isGroup && session?.user?.role !== "volunteer" ? () => setShowDeleteModal(true) : undefined}
+                onLoadMore={handleLoadMore}
+                hasMore={hasMore}
+                isLoadingMore={isLoadingMore}
+                currentUserId={session?.user?.id || ""} isSending={false} selectedConversationId={null}              />
+            </div>
+            <div className="flex-shrink-0 border-t bg-white sticky bottom-0 p-4">
+              <MessageInput
+                newMessage={newMessage}
+                setNewMessage={setNewMessage}
+                handleSendMessage={handleSendMessage}
+                isSending={isSending}
+              />
+            </div>
+          </div>
         ) : (
           <div className="md:flex-1 md:flex md:items-center md:justify-center md:text-gray-500 md:p-4">
-            <div className="md:text-center md:mb-4">
-              <p className="md:mb-2 hidden md:block">Select a conversation to start messaging</p>
-              <div className="md:hidden">
-                <Sidebar
-                  showMobileMenu={true}
-                  onClose={() => {}}
-                  activeTab={activeTab}
-                  setActiveTab={setActiveTab}
-                  conversations={conversations}
-                  groups={groups as Group[] | undefined}
-                  selectedUserId={selectedUserId}
-                  onSelectUser={handleSelectUser}
-                  isLoadingConversations={isLoadingConversations}
-                  isLoadingGroups={isLoadingGroups}
-                  availableUsers={availableUsers}
-                  isLoadingUsers={isLoadingUsers}
-                  userRole={session?.user?.role}
-                  onGroupCreated={handleGroupCreated}
-                />
-              </div>
-            </div>
+            Select a conversation to start messaging
           </div>
         )}
       </main>
 
-      {showDeleteModal && selectedGroup && session?.user?.role !== "volunteer" && (
+      {showDeleteModal && selectedGroup && (
         <DeleteGroupModal
-          groupName={(selectedGroup as Group).name}
+          groupName={selectedGroup.name}
           onClose={() => setShowDeleteModal(false)}
           onDelete={handleDeleteGroup}
         />

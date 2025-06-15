@@ -6,29 +6,34 @@ import { trpc } from '../../utils/trpc';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import SharedTooltip from '../SharedTooltip';
+import { Control, useController, Path, UseFormSetValue, PathValue } from 'react-hook-form';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
-type FormImageInputProps = {
-  name: string;
-  customClassName?: string;
-  setValue: (
-    name: string,
-    value: string | { link: string; mimeType: string }
-  ) => void;
+type FormImageInputProps<T extends Record<string, unknown>> = {
+  name: Path<T>;
+  className?: string;
+  setValue: UseFormSetValue<T>;
   defaultValue?: string;
   includeMimeType?: boolean;
   label?: string;
+  control: Control<T>;
 };
 
-export function FormImageInput({
+export function FormImageInput<T extends Record<string, unknown>>({
   name,
-  customClassName,
+  className,
   setValue,
   defaultValue,
   includeMimeType = false,
   label,
-}: FormImageInputProps) {
+  control,
+}: FormImageInputProps<T>) {
+  const { field } = useController({
+    name,
+    control,
+  });
+
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedLink, setUploadedLink] = useState<string | null>(null);
   const [fileName, setFileName] = useState<string>('');
@@ -40,8 +45,9 @@ export function FormImageInput({
   useEffect(() => {
     if (defaultValue) {
       setUploadedLink(defaultValue);
+      field.onChange(defaultValue);
     }
-  }, [defaultValue]);
+  }, [defaultValue, field]);
 
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -54,9 +60,22 @@ export function FormImageInput({
 
   const handleFileUpload = useCallback(
     async (file: File) => {
+      if (!file) return;
+      
       setError('');
       setIsUploading(true);
+      
       try {
+        // Validate file size
+        if (file.size > MAX_FILE_SIZE) {
+          throw new Error(`File size exceeds 5MB limit (${(file.size / (1024 * 1024)).toFixed(1)}MB)`);
+        }
+
+        // Validate file type
+        if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+          throw new Error('Only images and PDF files are allowed');
+        }
+
         const base64File = await convertFileToBase64(file);
         const result = await uploadMutation.mutateAsync({
           base64File,
@@ -65,47 +84,51 @@ export function FormImageInput({
           folder: 'files',
         });
 
-        if (result?.data?.link) {
-          if (includeMimeType) {
-            setValue(name, {
-              link: result.data.link,
-              mimeType: file.type,
-            });
-          } else {
-            setValue(name, result.data.link);
-          }
-          setUploadedLink(result.data.link);
-          setFileName(file.name);
-          setFileType(file.type);
+        if (!result?.data?.link) {
+          throw new Error('Failed to get upload link');
         }
+
+        const value = includeMimeType 
+          ? { link: result.data.link, mimeType: file.type }
+          : result.data.link;
+
+        setValue(name, value as PathValue<T, Path<T>>);
+        field.onChange(value);
+        
+        setUploadedLink(result.data.link);
+        setFileName(file.name);
+        setFileType(file.type);
       } catch (error) {
         console.error('Upload error:', error);
-        setError('Failed to upload file');
+        setError(error instanceof Error ? error.message : 'Failed to upload file');
+        setUploadedLink(defaultValue || null);
+        setFileName('');
+        setFileType('');
+        field.onChange(defaultValue || '');
       } finally {
         setIsUploading(false);
       }
     },
-    [uploadMutation, name, setValue, includeMimeType]
+    [uploadMutation, name, setValue, includeMimeType, defaultValue, field]
   );
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({
-    onDrop: (_acceptedFiles, rejectedFiles) => {
+    onDrop: async (acceptedFiles, rejectedFiles) => {
       if (rejectedFiles.length > 0) {
         const fileSize = rejectedFiles[0].file.size;
-        if (fileSize > MAX_FILE_SIZE) {
-          setError(
-            `File size exceeds 5MB limit (${(fileSize / (1024 * 1024)).toFixed(1)}MB)`
-          );
-        }
+        setError(
+          `File size exceeds 5MB limit (${(fileSize / (1024 * 1024)).toFixed(1)}MB)`
+        );
         setUploadedLink(defaultValue || null);
         setFileName('');
         setFileType('');
+        field.onChange(defaultValue || '');
         return;
       }
 
-      const file = _acceptedFiles[0];
+      const file = acceptedFiles[0];
       if (file) {
-        handleFileUpload(file);
+        await handleFileUpload(file);
       }
     },
     accept: {
@@ -124,33 +147,38 @@ export function FormImageInput({
     if (!imageSrc) return null;
 
     return (
-      <SharedTooltip
-        visibleContent={
-          <Link
-            href={imageSrc}
-            className="underline text-xs font-medium text-blue-500"
-          >
-            {fileName || 'Uploaded File'}
-          </Link>
-        }
-      >
-        {fileType.startsWith('image/') ? (
-          <Image
-            alt="image"
-            src={imageSrc}
-            width={100}
-            height={100}
-            className="h-full w-full object-cover"
-          />
-        ) : (
-          <div className="flex items-center space-x-2 p-2 bg-gray-100 rounded">
-            <FileText className="text-gray-600" size={24} />
-            <span className="text-sm text-gray-600">
+      <div className="mt-4">
+        <SharedTooltip
+          visibleContent={
+            <Link
+              href={imageSrc}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline text-xs font-medium text-blue-500"
+            >
               {fileName || 'Uploaded File'}
-            </span>
-          </div>
-        )}
-      </SharedTooltip>
+            </Link>
+          }
+        >
+          {fileType.startsWith('image/') ? (
+            <div className="relative w-24 h-24">
+              <Image
+                alt="Uploaded image"
+                src={imageSrc}
+                fill
+                className="object-cover rounded"
+              />
+            </div>
+          ) : (
+            <div className="flex items-center space-x-2 p-2 bg-gray-100 rounded">
+              <FileText className="text-gray-600" size={24} />
+              <span className="text-sm text-gray-600">
+                {fileName || 'Uploaded File'}
+              </span>
+            </div>
+          )}
+        </SharedTooltip>
+      </div>
     );
   };
 
@@ -164,9 +192,9 @@ export function FormImageInput({
       <div
         {...getRootProps()}
         className={cn(
-          'rounded-lg  bg-[#F0EFFE] border-[#9C9CAA] p-5 border-dashed border-2',
-          error && 'border-red-500 ',
-          customClassName
+          'rounded-lg bg-[#F0EFFE] border-[#9C9CAA] p-5 border-dashed border-2',
+          error && 'border-red-500',
+          className
         )}
       >
         <input {...getInputProps()} hidden accept="image/*,.pdf" />
@@ -174,7 +202,7 @@ export function FormImageInput({
           <p className="text-[#71717A] p-6">Drop the file here ...</p>
         ) : (
           <div
-            className="h-full w-full flex items-center justify-center flex-col space-y-2"
+            className="h-full w-full flex items-center justify-center flex-col space-y-2 cursor-pointer"
             onClick={open}
           >
             {isUploading ? (
@@ -200,7 +228,7 @@ export function FormImageInput({
           <span className="text-sm">{error}</span>
         </div>
       )}
-         {renderPreview()}
-     </div>
+      {renderPreview()}
+    </div>
   );
 }

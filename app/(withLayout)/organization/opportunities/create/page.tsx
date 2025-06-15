@@ -1,20 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import toast from "react-hot-toast";
 import BasicInformation, {
   OpportunityFormValues,
 } from "./_components/BasicInformation";
-import ScheduleRecurrence from "./_components/ScheduleRecurrence";
 import CreateFooter from "./_components/CreateFooter";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/navigation";
 
 export default function CreateOpportunityPage() {
-  const [currentStep, setCurrentStep] = useState(1);
   const router = useRouter();
   const utils = trpc.useUtils();
 
@@ -35,18 +32,9 @@ export default function CreateOpportunityPage() {
       description: "",
       category: [],
       required_skills: [],
-      extra_conditions: [],
-      commitment_type: "regular",
+      commitment_type: "workbased",
       location: "",
       number_of_volunteers: 1,
-      date: {
-        start_date: "",
-        end_date: "",
-      },
-      time: {
-        start_time: "",
-        end_time: "",
-      },
       email_contact: "",
       phone_contact: "",
       is_recurring: false,
@@ -61,12 +49,6 @@ export default function CreateOpportunityPage() {
     },
   });
 
-  const handleNext = () => {
-    if (currentStep === 1) {
-      setCurrentStep(2);
-    }
-  };
-
   const handleSaveDraft = () => {
     toast.success("Draft saved! (API integration coming soon)");
   };
@@ -80,25 +62,14 @@ export default function CreateOpportunityPage() {
       number_of_volunteers: Number(formData.number_of_volunteers),
     });
   };
-  const description = form.watch("description");
-  console.log({description});
   
   return (
     <ProtectedLayout>
       <div className="bg-[#F5F7FA] ">
         <Form {...form}>
-          <div className="max-w-[1240px]  pb-16 mx-auto">
-            {currentStep === 1 ? (
-              <BasicInformation form={form} />
-            ) : (
-              <ScheduleRecurrence
-                form={form}
-                onBack={() => setCurrentStep(1)}
-              />
-            )}
+          <div className="max-w-[1240px] pb-16 mx-auto">
+            <BasicInformation form={form} />
             <CreateFooter
-              step={currentStep}
-              onNext={handleNext}
               onSaveDraft={handleSaveDraft}
               onCreate={handleCreateOpportunity}
               isLoading={createOpportunity.isPending}

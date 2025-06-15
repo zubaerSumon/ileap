@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import Avatar from "./Avatar";
+import type { Group } from "../types";
 
 interface CreateGroupDialogProps {
   onGroupCreated: () => void;
@@ -20,6 +21,7 @@ export const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({ onGroupCre
   const [name, setName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const utils = trpc.useUtils();
   const { data: availableUsers } = trpc.users.getAvailableUsers.useQuery(undefined, {
     enabled: open,
   });
@@ -33,11 +35,15 @@ export const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({ onGroupCre
   ) || [];
 
   const createGroupMutation = trpc.messages.createGroup.useMutation({
-    onSuccess: () => {
+    onSuccess: (newGroup) => {
       setOpen(false);
       setName("");
       setSearchQuery("");
       setSelectedUsers([]);
+      utils.messages.getGroups.setData(undefined, (oldGroups: Group[] | undefined) => {
+        if (!oldGroups) return [newGroup];
+        return [newGroup, ...oldGroups];
+      });
       onGroupCreated();
     },
     onError: (error) => {

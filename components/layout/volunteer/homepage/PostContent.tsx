@@ -17,14 +17,6 @@ type Opportunity = {
   commitment_type: string;
   location: string;
   number_of_volunteers: number;
-  date: {
-    start_date: Date;
-    end_date?: Date;
-  };
-  time: {
-    start_time: string;
-    end_time: string;
-  };
   organization_profile: {
     _id: string;
     title: string;
@@ -73,8 +65,6 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
       title: opportunity.organization_profile.title,
       id: opportunity.organization_profile._id,
     },
-    date: new Date(opportunity.date.start_date).toLocaleDateString("en-GB"),
-    time: `${opportunity.time.start_time} - ${opportunity.time.end_time}`,
     location: opportunity.location,
   };
 

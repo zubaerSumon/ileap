@@ -13,6 +13,7 @@ import fileIcon from "../../../../public/icons/file-icon.svg";
 import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { format } from "date-fns";
 
 export type OpportunityDetails = {
   id: string;
@@ -21,8 +22,6 @@ export type OpportunityDetails = {
     title: string;
     id: string;
   };
-  date: string;
-  time: string;
   location: string;
 };
 
@@ -49,9 +48,16 @@ export default function Categories() {
     
     const spotsAvailable = Math.max(0, opportunity.number_of_volunteers - appliedCount);
     
+    // Format dates if they exist
+    const formattedDates = opportunity.recurrence?.date_range ? {
+      start_date: format(new Date(opportunity.recurrence.date_range.start_date), 'MMM d'),
+      end_date: opportunity.recurrence.date_range.end_date ? format(new Date(opportunity.recurrence.date_range.end_date), 'MMM d') : undefined
+    } : undefined;
+    
     return {
       ...opportunity,
       spotsAvailable,
+      formattedDates
     };
   }) || [];
 
@@ -64,8 +70,7 @@ export default function Categories() {
   return (
     <section className="w-full md:w-[57%] relative">
       <h1 className="text-[#101010] font-inter text-xxl font-bold text-center mt-8 mb-5">
-        Volunteering Opportunities during National Volunteer Week 2025 (19 - 25
-        May)
+        Volunteering Opportunities
       </h1>
 
       <Tabs defaultValue="all" className="w-full mb-6">
@@ -149,16 +154,20 @@ export default function Categories() {
                       className="mr-1"
                       alt="File icon"
                     />
-                    <span className="">
-                      {opportunity.commitment_type === "oneoff"
-                        ? "One off"
-                        : "Regular"}
-                      ;{" "}
-                      {new Date(opportunity.date.start_date).toLocaleDateString(
-                        "en-GB"
-                      )}
-                    </span>
+                    <p className="text-sm text-gray-500">
+                      {opportunity.commitment_type === "workbased"
+                        ? "Work based"
+                        : "Event based"}
+                    </p>
                   </div>
+                  {opportunity.formattedDates && (
+                    <div className="flex items-center text-xs text-gray-500">
+                      <span className="text-sm text-gray-500">
+                        {opportunity.formattedDates.start_date}
+                        {opportunity.formattedDates.end_date ? ` - ${opportunity.formattedDates.end_date}` : ''}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap gap-1">
@@ -187,9 +196,9 @@ export default function Categories() {
 
                 <div className="space-y-1">
                   <div
-                    className="text-sm text-gray-600 line-clamp-3"
+                    className="text-sm text-gray-600 line-clamp-3 overflow-hidden"
                     dangerouslySetInnerHTML={{
-                      __html: opportunity.description,
+                      __html: opportunity.description.replace(/<[^>]*>/g, ''),
                     }}
                   />
                 </div>
@@ -208,10 +217,6 @@ export default function Categories() {
                         title: opportunity.organization_profile?.title || "",
                         id: opportunity.organization_profile?._id || "",
                       },
-                      date: new Date(
-                        opportunity.date.start_date
-                      ).toLocaleDateString("en-GB"),
-                      time: `${opportunity.time.start_time} - ${opportunity.time.end_time}`,
                       location: opportunity.location,
                     }}
                   />

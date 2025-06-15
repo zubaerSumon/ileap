@@ -9,8 +9,8 @@ import { FaLinkedin } from "react-icons/fa";
 
 export default function UpdatedFooter() {
   const path = usePathname();
-  const hiddenPaths = ["/opportunity/create", "/organisation/opportunities", "messaging"];
-  const isHidden = hiddenPaths.some(hiddenPath => path.includes(hiddenPath));
+  const hiddenPaths = ["/opportunity/create", "/organisation/opportunities", "/messaging", "/messages"];
+  const isHidden = hiddenPaths.some(hiddenPath => path?.includes(hiddenPath));
   return (
     <footer className={cn("bg-[#F5F7FA] border-t py-12", isHidden && "hidden")}>
       <div className="container mx-auto px-4">

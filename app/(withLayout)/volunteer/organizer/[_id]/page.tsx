@@ -55,6 +55,12 @@ export default function OrganizerDetailPage() {
 
   const { organizationProfile, user } = data;
 
+  console.log("Organization Profile Data:", {
+    profile_img: organizationProfile.profile_img,
+    title: organizationProfile.title,
+    cover_img: organizationProfile.cover_img
+  });
+
   return (
     <ProtectedLayout>
       <div className="max-w-[1240px] mx-auto">

@@ -56,29 +56,29 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   );
   return (
     <aside className={cn(
-      "fixed inset-0 z-35 bg-white md:relative md:block md:col-span-1 border-r h-full",
-      showMobileMenu ? "block" : "hidden"
+      "fixed inset-y-0 left-0 z-50 w-full md:w-80 bg-white border-r md:relative md:translate-x-0 transition-transform duration-200 ease-in-out",
+      showMobileMenu ? "translate-x-0" : "-translate-x-full"
     )}>
       <div className="flex flex-col h-full">
-        <div className="p-4 border-b flex-shrink-0">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold">Messages</h2>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="md:hidden"
-              onClick={onClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-          <div className="mt-4">
-            <Input 
-              placeholder="Search messages" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
+        <div className="p-4 border-b flex items-center justify-between">
+          <h2 className="text-lg font-semibold">Messages</h2>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="md:hidden"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+
+        <div className="p-4 border-b">
+          <Input
+            placeholder="Search conversations..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
+          />
         </div>
 
         <div className="flex-1 min-h-0">

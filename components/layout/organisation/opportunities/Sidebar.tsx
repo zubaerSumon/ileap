@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { MapPin, Calendar, Clock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import Image from "next/image";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
 
@@ -24,14 +24,6 @@ export function Sidebar({ opportunity }: SidebarProps) {
         <div className="flex items-center text-sm">
           <MapPin className="w-4 h-4 mr-2 text-gray-500" />
           <span>{opportunity.location}</span>
-        </div>
-        <div className="flex items-center text-sm">
-          <Calendar className="w-4 h-4 mr-2 text-gray-500" />
-          <span>{new Date(opportunity.date.start_date).toLocaleDateString()}</span>
-        </div>
-        <div className="flex items-center text-sm">
-          <Clock className="w-4 h-4 mr-2 text-gray-500" />
-          <span>{opportunity.time.start_time} - {opportunity.time.end_time}</span>
         </div>
       </div>
 

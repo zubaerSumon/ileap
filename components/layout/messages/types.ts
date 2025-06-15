@@ -25,6 +25,7 @@ export type Conversation = {
   name: string;
   _id: string;
   user: {
+    _id: string;
     name: string;
     avatar: string;
     role: string;

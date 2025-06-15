@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Loader2 } from "lucide-react";
 
 interface InviteMentorDialogProps {
   organizationId: string;
@@ -98,7 +98,14 @@ export default function InviteMentorDialog({ organizationId }: InviteMentorDialo
               className="bg-blue-600 hover:bg-blue-700"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Sending..." : "Send Invitation"}
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                "Send Invitation"
+              )}
             </Button>
           </div>
         </form>

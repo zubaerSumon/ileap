@@ -5,22 +5,9 @@ export interface IOpportunity extends Document {
   description: string;
   category: string[];
   required_skills: string[];
-  extra_conditions: {
-    question: string;
-    answer_type: string;  
-    options?: string[];
-  }[];
   commitment_type: string; 
   location: string;
   number_of_volunteers: number;
-  date: {
-    start_date: Date;
-    end_date?: Date;
-  };
-  time: {
-    start_time: string;
-    end_time: string;
-  };
   email_contact: string;
   phone_contact: string;
   internal_reference?: string;
@@ -43,4 +30,6 @@ export interface IOpportunity extends Document {
   banner_img: string;
   organization_profile: Types.ObjectId;  
   created_by: Types.ObjectId;
+  createdAt: Date;
+  updatedAt: Date;
 }

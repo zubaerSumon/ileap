@@ -79,7 +79,7 @@ export function TopBar({
               session
                 ? session.user?.role === "volunteer"
                   ? "/volunteer"
-                  : "/organization"
+                  : "/organization/dashboard"
                 : "/"
             }
             className="flex items-center"
@@ -106,6 +106,12 @@ export function TopBar({
                 className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
               >
                 <FileUser className="h-4 w-4" /> Opportunities
+              </Link>
+              <Link
+                href="/organization/browse-volunteer"
+                className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
+              >
+                <FileUser className="h-4 w-4" />Browse-volunteer
               </Link>
             </>
           )}
