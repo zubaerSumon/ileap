@@ -64,7 +64,6 @@ interface ActiveContract {
 const TABS = [
   { key: "open", label: "Open opportunity posts" },
   { key: "active", label: "Active contracts" },
-  { key: "draft", label: "Draft opportunity posts" },
   { key: "archived", label: "Archived opportunity posts" },
 ];
 
@@ -109,14 +108,8 @@ const OrganisationDashboard = () => {
   }));
 
   // Filtered data for tabs
-  const openOpportunities = opportunities?.filter((opp) => {
-    const startDate = new Date(opp.date.start_date);
-    return startDate > new Date() && !opp.is_archived;
-  }) || [];
-  const draftOpportunities = opportunities?.filter((opp) => {
-    const startDate = new Date(opp.date.start_date);
-    return startDate <= new Date() && !opp.is_archived;
-  }) || [];
+  const openOpportunities = opportunities?.filter((opp) => !opp.is_archived) || [];
+  const draftOpportunities: Opportunity[] = []; // Since we don't have draft status anymore
   const archivedOpportunities = opportunities?.filter((opp) => opp.is_archived) || [];
 
   // Transform available volunteers data for the carousel
@@ -233,7 +226,7 @@ const OrganisationDashboard = () => {
               activeContracts.map((contract) => (
                 <div
                   key={contract.id}
-                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
+                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[240px]"
                 >
                   <div className="p-4 h-full flex flex-col">
                     <div className="flex justify-between items-start mb-3">
@@ -271,7 +264,7 @@ const OrganisationDashboard = () => {
                archivedOpportunities)?.map((opportunity) => (
                 <div
                   key={opportunity._id}
-                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
+                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[240px]"
                 >
                   <div className="p-4 h-full flex flex-col">
                     <div className="flex justify-between items-start mb-3">
@@ -310,7 +303,7 @@ const OrganisationDashboard = () => {
                       <MapPin className="w-4 h-4 mr-1 text-blue-500" />
                       <span>{opportunity.location}</span>
                       <Badge variant="outline" className="ml-2 px-2 py-0.5 text-xs">
-                        {opportunity.commitment_type === 'oneoff' ? 'One-off' : 'Regular'}
+                        {opportunity.commitment_type === 'workbased' ? 'Work based' : 'Event based'}
                       </Badge>
                     </div>
 

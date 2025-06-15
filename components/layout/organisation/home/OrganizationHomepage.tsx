@@ -1,12 +1,13 @@
 "use client";
 
 import { trpc } from "@/utils/trpc";
-import { useState } from "react";
-import VolunteerCard from "@/components/layout/organisation/VolunteerCard";
-import MessageDialog from "@/components/layout/organisation/MessageDialog";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
- 
+import { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import FilterSidebar, { VolunteerFilters } from "./FilterSidebar";
+import VolunteerCard from "@/components/layout/organisation/VolunteerCard";
+
 interface Volunteer {
   _id: string;
   name: string;
@@ -24,20 +25,47 @@ interface Volunteer {
   };
 }
 
+// Custom hook for debouncing
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+}
+
 export default function OrganizationHomepage() {
-  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(
-    null
-  );
-  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState<VolunteerFilters>({
+    categories: [],
+    studentType: "all",
+    availability: {
+      startDate: null,
+      endDate: null,
+    },
+  });
 
-  // Fetch all available volunteers
-  const { data: volunteers, isLoading: isLoadingVolunteers } =
-    trpc.users.getAvailableUsers.useQuery();
+  // Debounce the search query with a 300ms delay
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-  // Filter volunteers based on search query (name or interests)
+  const { data: volunteers, isLoading } = trpc.users.getAvailableUsers.useQuery();
+
+  const handleConnect = (volunteer: Volunteer) => {
+    // Handle connect action
+    console.log("Connect with:", volunteer);
+  };
+
+  // Filter volunteers based on search query and filters
   const filteredVolunteers = volunteers?.filter((volunteer) => {
-    const searchLower = searchQuery.toLowerCase();
+    const searchLower = debouncedSearchQuery.toLowerCase();
     
     // Check if name matches
     const nameMatches = volunteer.name.toLowerCase().includes(searchLower);
@@ -46,68 +74,90 @@ export default function OrganizationHomepage() {
     const interestsMatch = volunteer.volunteer_profile?.interested_on?.some(
       (interest: string) => interest.toLowerCase().includes(searchLower)
     );
+
+    // Check category filters
+    const categoryMatch = filters.categories.length === 0 || 
+      filters.categories.some(category => 
+        volunteer.volunteer_profile?.interested_on?.includes(category)
+      );
+
+    // Check student type filter
+    const studentTypeMatch = filters.studentType === "all" || 
+      volunteer.volunteer_profile?.student_type === filters.studentType;
+
+    // Check availability filter
+    const availabilityMatch = !filters.availability.startDate || !filters.availability.endDate || 
+      (volunteer.volunteer_profile?.availability_date?.start_date && 
+       volunteer.volunteer_profile?.availability_date?.end_date &&
+       new Date(volunteer.volunteer_profile.availability_date.start_date) <= new Date(filters.availability.endDate) &&
+       new Date(volunteer.volunteer_profile.availability_date.end_date) >= new Date(filters.availability.startDate));
     
-    // Return true if either name or interests match
-    return nameMatches || interestsMatch;
+    // Return true if all conditions match
+    return (nameMatches || interestsMatch) && categoryMatch && studentTypeMatch && availabilityMatch;
   });
 
-  const handleSendMessage = (volunteer: Volunteer) => {
-    setSelectedVolunteer(volunteer);
-    setIsMessageModalOpen(true);
-  };
-
   return (
-    <section className="container mx-auto px-4 py-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Available Volunteers</h2>
-        
-        <div className="relative w-full md:w-64 mt-4 md:mt-0">
-          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Search className="h-4 w-4 text-gray-400" />
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Filter Sidebar */}
+        <div className="hidden md:block sticky top-4">
+          <FilterSidebar onFilterChange={setFilters} />
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 min-w-0">
+          {/* Search Bar */}
+          <div className="relative mb-6">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Search volunteers..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-          <Input
-            type="text"
-            placeholder="Search by name or interests..."
-            className="pl-10 w-full"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+
+          {/* Volunteer Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {isLoading
+              ? Array.from({ length: 6 }).map((_, index) => (
+                  <div key={index} className="w-full max-w-[382px]">
+                    <div className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 cursor-pointer relative bg-white">
+                      <div className="p-4">
+                        <div className="flex flex-col">
+                          <div className="flex justify-between items-center mb-4">
+                            <Skeleton className="h-12 w-12 rounded-full" />
+                            <Skeleton className="h-6 w-24 rounded-full" />
+                          </div>
+                          <Skeleton className="h-6 w-32 mb-2" />
+                          <div className="flex items-center gap-3 mb-3">
+                            <Skeleton className="h-4 w-24" />
+                            <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                            <Skeleton className="h-4 w-20" />
+                          </div>
+                          <div className="flex gap-2 mb-4">
+                            <Skeleton className="h-6 w-20 rounded-full" />
+                            <Skeleton className="h-6 w-24 rounded-full" />
+                          </div>
+                          <Skeleton className="h-4 w-full mb-4" />
+                          <div className="flex gap-2 mt-auto">
+                            <Skeleton className="h-9 flex-1" />
+                            <Skeleton className="h-9 flex-1" />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              : filteredVolunteers?.map((volunteer: Volunteer) => (
+                  <div key={volunteer._id} className="w-full max-w-[382px]">
+                    <VolunteerCard volunteer={volunteer} onConnect={handleConnect} />
+                  </div>
+                ))}
+          </div>
         </div>
       </div>
-
-      <div className="flex flex-col gap-4">
-        {isLoadingVolunteers ? (
-          <div className="text-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading volunteers...</p>
-          </div>
-        ) : filteredVolunteers?.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <p className="text-gray-600 text-lg">
-              {searchQuery ? "No volunteers match your search." : "No volunteers available at the moment."}
-            </p>
-            <p className="text-gray-500 text-sm mt-2">
-              {searchQuery ? "Try a different search term." : "Please check back later."}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {filteredVolunteers?.map((volunteer) => (
-              <VolunteerCard
-                key={volunteer._id}
-                volunteer={volunteer}
-                onConnect={handleSendMessage}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      <MessageDialog
-        isOpen={isMessageModalOpen}
-        onOpenChange={setIsMessageModalOpen}
-        volunteer={selectedVolunteer}
-      />
-    </section>
+    </div>
   );
 }

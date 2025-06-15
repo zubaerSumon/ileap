@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { MapPin, Calendar, Clock } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -92,21 +92,6 @@ export function ConfirmationModal({
             </p>
 
             <div className="space-y-3 w-full px-4 sm:px-0">
-              <div className="flex items-center gap-2 text-gray-600">
-                <Calendar className="w-5 h-5 text-blue-500" />
-                <div>
-                  <strong className="block text-gray-900 text-sm">Date</strong>
-                  <span className="text-sm">{opportunityDetails.date}</span>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-gray-600">
-                <Clock className="w-5 h-5 text-blue-500" />
-                <div>
-                  <strong className="block text-gray-900 text-sm">Time</strong>
-                  <span className="text-sm">{opportunityDetails.time}</span>
-                </div>
-              </div>
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="w-5 h-5 text-blue-500" />
                 <div>

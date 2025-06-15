@@ -69,6 +69,7 @@ export const MultiSelectField = <T extends FieldValues>({
             border: '1px solid #CBCBCB',
             borderRadius: '8px',
             padding: '4px 8px',
+            width: '100%',
             '&:hover': {
               borderColor: '#CBCBCB',
             },

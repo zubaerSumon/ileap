@@ -5,22 +5,9 @@ const createOpportunitySchema = z.object({
   description: z.string().min(1, "Description is required"),
   category: z.array(z.string()).min(1, "At least one category is required"),
   required_skills: z.array(z.string()).min(1, "At least one skill is required"),
-  extra_conditions: z.array(z.object({
-    question: z.string(),
-    answer_type: z.string(),
-    options: z.array(z.string()).optional()
-  })).optional(),
   commitment_type: z.string().min(1, "Commitment type is required"),
   location: z.string().min(1, "Location is required"),
   number_of_volunteers: z.number().min(1, "Number of volunteers must be at least 1"),
-  date: z.object({
-    start_date: z.string().min(1, "Start date is required"),
-    end_date: z.string().optional()
-  }),
-  time: z.object({
-    start_time: z.string().min(1, "Start time is required"),
-    end_time: z.string().min(1, "End time is required")
-  }),
   email_contact: z.string().email("Invalid email address"),
   phone_contact: z.string().optional(),
   internal_reference: z.string().optional(),

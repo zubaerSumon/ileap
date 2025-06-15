@@ -205,7 +205,7 @@ export default function OrganizationSignup() {
         email: data.email,
         password: data.password,
         name: data.name,
-        role: UserRole.ADMIN,
+        role: UserRole.ORGANIZATION,
         referred_by: referral || undefined,
         action: "signup",
         redirect: false,

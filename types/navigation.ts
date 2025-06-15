@@ -11,6 +11,22 @@ export type SessionUser = {
   email?: string | null;
   image?: string | null;
   role?: UserRole;
+  organization_profile?: {
+    _id: string;
+    title: string;
+    type: string;
+    contact_email: string;
+    phone_number: string;
+    bio: string;
+    state: string;
+    area: string;
+    abn: string;
+    website?: string;
+    profile_img?: string;
+    cover_img?: string;
+    opportunity_types: string[];
+    required_skills: string[];
+  };
 };
 
 export type Session = {

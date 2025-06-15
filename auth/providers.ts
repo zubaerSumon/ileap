@@ -16,7 +16,7 @@ export const CredentialsProvider = Credentials({
       }
 
       await connectDB();
-      const user = await User.findOne({ email: credentials.email });
+      const user = await User.findOne({ email: credentials.email }).populate("organization_profile");
 
       if (credentials?.action === "signin") {
         if (!user) {

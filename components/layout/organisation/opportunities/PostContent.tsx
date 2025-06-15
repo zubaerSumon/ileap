@@ -38,7 +38,7 @@ export function PostContent({ opportunity }: PostContentProps) {
   return (
     <div className="flex-1 space-y-6">
       <div className="flex items-center justify-between ">
-        <p className="text-sm text-gray-500">Posted {new Date(opportunity.date.start_date).toLocaleDateString()}</p>
+        <p className="text-sm text-gray-500">Posted {new Date(opportunity.createdAt).toLocaleDateString()}</p>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" className="flex gap-2">
             <Edit className="h-4 w-4" />

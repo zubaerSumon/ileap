@@ -83,7 +83,7 @@ export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardPro
             </p>
           )}
 
-          <div onClick={(e) => e.stopPropagation()} className="flex gap-2 mt-auto ">
+          <div onClick={(e) => e.stopPropagation()} className="flex gap-1 mt-auto ">
             <Button
               variant="outline"
               className="flex-1 flex items-center justify-center gap-1 text-sm h-9 border-gray-200 cursor-pointer"
@@ -93,11 +93,11 @@ export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardPro
             </Button>
             <Button
               variant="default"
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 text-sm h-9 cursor-pointer"
+              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center gap-1 text-[12px] h-9 cursor-pointer"
               onClick={() => onConnect(volunteer)}
             >
               <MessageCircle className="h-4 w-4" />
-              Connect
+              Send Message
             </Button>
           </div>
         </div>

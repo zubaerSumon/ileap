@@ -19,7 +19,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user }: UserMenuProps) {
-  const userRole = user.role === "organization" ? "organisation" : user.role;
+  const userRole = user.role === "organization" ? (user.name || "Organization") : user.role;
   const userName = user.name || "User";
  
   return (
@@ -40,9 +40,16 @@ export function UserMenu({ user }: UserMenuProps) {
             <p className="text-sm font-medium leading-none truncate max-w-[200px]" title={userName}>
               {userName.charAt(0).toUpperCase() + userName.slice(1)}
             </p>
-            <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={userRole}>
-              {userRole}
-            </p>
+            {user.organization_profile?.title && (
+              <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={user.organization_profile.title}>
+                {user.organization_profile.title}
+              </p>
+            )}
+            {user.role === "volunteer" && (
+              <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={user.role}>
+                {user.role}
+              </p>
+            )}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

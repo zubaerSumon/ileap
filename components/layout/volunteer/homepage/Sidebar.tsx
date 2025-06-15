@@ -12,14 +12,6 @@ type Opportunity = {
   commitment_type: string;
   location: string;
   number_of_volunteers: number;
-  date: {
-    start_date: Date;
-    end_date?: Date;
-  };
-  time: {
-    start_time: string;
-    end_time: string;
-  };
   organization_profile: {
     _id: string;
     name: string;
@@ -47,8 +39,8 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
           </div>
           <div>
             <h3 className="font-semibold">{opportunity.organization_profile.name}</h3>
-            <p className="text-sm text-gray-600">
-              {opportunity.commitment_type === 'oneoff' ? 'One-off' : 'Regular'} Opportunity
+            <p className="text-sm text-gray-500">
+              {opportunity.commitment_type === 'workbased' ? 'Work based' : 'Event based'} Opportunity
             </p>
           </div>
         </div>
@@ -57,21 +49,6 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
           <div>
             <h4 className="text-sm font-medium mb-1">Location</h4>
             <p className="text-sm text-gray-600">{opportunity.location}</p>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-medium mb-1">Date</h4>
-            <p className="text-sm text-gray-600">
-              {new Date(opportunity.date.start_date).toLocaleDateString('en-GB')}
-              {opportunity.date.end_date && ` - ${new Date(opportunity.date.end_date).toLocaleDateString('en-GB')}`}
-            </p>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-medium mb-1">Time</h4>
-            <p className="text-sm text-gray-600">
-              {opportunity.time.start_time} - {opportunity.time.end_time}
-            </p>
           </div>
 
           <div>

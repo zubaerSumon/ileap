@@ -335,7 +335,9 @@ export default function OrganizationProfile() {
               <ProfilePhotoInput
                 label="Profile Image"
                 name="profile_img"
-                setValue={form.setValue}
+                setValue={(name: string, value: string) => {
+                  form.setValue(name as keyof OrganizationProfileData, value);
+                }}
                 defaultValue={form.watch("profile_img")}
               />
 

@@ -77,6 +77,7 @@ export function TiptapEditor<T extends FieldValues>({
 
   return (
     <div className="bg-white border border-gray-300 rounded-md overflow-hidden">
+      <TiptapToolbar editor={editor} />
       <div className="p-3 relative z-0" style={{ overflow: 'visible' }}>
         <div className="h-[200px] overflow-y-auto">
           <EditorContent
@@ -133,7 +134,6 @@ export function TiptapEditor<T extends FieldValues>({
           }
         `}</style>
       </div>
-      <TiptapToolbar editor={editor} />
     </div>
   );
 } 

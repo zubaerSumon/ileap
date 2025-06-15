@@ -7,8 +7,8 @@ export const OPPORTUNITY_CATEGORIES = [
 ] as const;
 
 export const COMMITMENT_TYPES = [
-  { value: "oneoff", label: "One off" },
-  { value: "regular", label: "Regular" },
+  { value: "workbased", label: "Work based" },
+  { value: "eventbased", label: "Event based" },
 ] as const;
 
 export const RECURRENCE_TYPES = [
