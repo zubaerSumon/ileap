@@ -5,11 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { signIn, useSession } from "next-auth/react";
 import { OrgSignupFormData, orgSignupSchema } from "@/types/auth";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 import toast from "react-hot-toast";
-import { UserRole } from "@/server/db/interfaces/user";
 import { OrgProfileStep } from "./OrgProfileStep";
 import { OrgSignupStep } from "./OrgSignupStep";
 import { OrgDetailsStep } from "./OrgDetailsStep";
@@ -17,7 +16,6 @@ import { Loader2 } from "lucide-react";
 import { organizationTypes } from "@/utils/constants/select-options";
 
 export default function OrganizationSignup() {
-  const searchParams = useSearchParams();
   const router = useRouter();
   const utils = trpc.useUtils();
   const { data: session } = useSession();
@@ -198,36 +196,26 @@ export default function OrganizationSignup() {
     if (form.formState.isSubmitting) return;
 
     try {
-      setError(null);
       setIsSignupLoading(true);
-      const referral = searchParams?.get("referral");
-      const signInResult = await signIn("credentials", {
+      const response = await signIn("credentials", {
+        name: data.name,
         email: data.email,
         password: data.password,
-        name: data.name,
-        role: UserRole.ORGANIZATION,
-        referred_by: referral || undefined,
+        role: "admin", // Set role to admin for organizations
         action: "signup",
         redirect: false,
       });
 
-      if (signInResult?.error) {
-        if (signInResult.error) {
-          toast.error(
-            "Account with this email already exists. Please provide the correct password."
-          );
-        }
-        setIsSignupLoading(false);
+      if (response?.error) {
+        setError(response.error);
         return;
       }
 
       setIsLoggedIn(true);
       setStep(2);
-    } catch (err: unknown) {
-      console.error("Error during signup:", err);
-      setError(
-        err instanceof Error ? err.message : "An error occurred during signup"
-      );
+    } catch (err) {
+      console.error("Signup error:", err);
+      setError("An error occurred during signup");
     } finally {
       setIsSignupLoading(false);
     }

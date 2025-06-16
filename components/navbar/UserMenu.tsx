@@ -21,6 +21,7 @@ interface UserMenuProps {
 export function UserMenu({ user }: UserMenuProps) {
   const userRole = user.role === "organization" ? (user.name || "Organization") : user.role;
   const userName = user.name || "User";
+  const isOrgUser = user.role === "organization" || user.role === "admin" || user.role === "mentor";
  
   return (
     <DropdownMenu>
@@ -40,7 +41,7 @@ export function UserMenu({ user }: UserMenuProps) {
             <p className="text-sm font-medium leading-none truncate max-w-[200px]" title={userName}>
               {userName.charAt(0).toUpperCase() + userName.slice(1)}
             </p>
-            {user.organization_profile?.title && (
+            {isOrgUser && user.organization_profile?.title && (
               <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={user.organization_profile.title}>
                 {user.organization_profile.title}
               </p>
