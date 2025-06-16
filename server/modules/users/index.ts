@@ -12,11 +12,15 @@ import { z } from "zod";
 export const userRouter = router({
   getAvailableUsers: protectedProcedure.query(async ({ ctx }) => {
     const sessionUser = ctx.user as JwtPayload;
+    console.log("Session User:", sessionUser);
+    
     if (!sessionUser || !sessionUser?.id) {
       throw new Error("You must be logged in to view available users.");
     }
 
     const currentUser = await User.findById(sessionUser.id);
+    console.log("Current User:", currentUser);
+    
     if (!currentUser) {
       throw new Error("Current user not found");
     }
@@ -27,9 +31,11 @@ export const userRouter = router({
         _id: { $ne: currentUser._id },
         role: { $in: ["admin", "mentor"] },
       };
+      console.log("Volunteer Query:", query);
       const users = await User.find(query)
         .select("name avatar role")
         .populate("organization_profile");
+      console.log("Found Users for Volunteer:", users);
       return users;
     }
 
@@ -39,14 +45,19 @@ export const userRouter = router({
         _id: { $ne: currentUser._id },
         role: "volunteer",
       };
+      console.log("Admin/Mentor Query:", query);
 
-      const users = await User.find(query).select("name avatar role").populate({
-        path: "volunteer_profile",
-        select: "student_type course availability_date interested_on bio",
-      });
+      const users = await User.find(query)
+        .select("name avatar role")
+        .populate({
+          path: "volunteer_profile",
+          select: "student_type course availability_date interested_on bio",
+        });
+      console.log("Found Users for Admin/Mentor:", users);
       return users;
     }
 
+    console.log("No matching role found, returning empty array");
     return [];
   }),
   updateUser: protectedProcedure

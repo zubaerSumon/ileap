@@ -4,7 +4,7 @@ export type NavItem = {
   className?: string;
 };
 
-export type UserRole = 'organization' | 'volunteer';
+export type UserRole = 'organization' | 'volunteer' | 'admin' | 'mentor';
 
 export type SessionUser = {
   name?: string | null;
