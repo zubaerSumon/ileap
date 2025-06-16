@@ -19,7 +19,7 @@ export default function CreateOpportunityPage() {
     onSuccess: () => {
       toast.success("Opportunity created successfully!");
       utils.opportunities.getOrganizationOpportunities.invalidate();
-      router.push("/organization");
+      router.push("/organization/dashboard");
     },
     onError: (error) => {
       toast.error(error.message || "Failed to create opportunity");

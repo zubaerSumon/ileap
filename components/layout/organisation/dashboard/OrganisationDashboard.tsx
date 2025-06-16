@@ -207,7 +207,7 @@ const OrganisationDashboard = () => {
         </div>
         <button
           className="flex items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
-          onClick={() => router.push("/organization/contracts")}
+          onClick={() => router.push("/organization/opportunities")}
         >
           View all contracts{" "}
           <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
@@ -348,7 +348,7 @@ const OrganisationDashboard = () => {
           </h3>
           <button
             className="flex items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
-            onClick={() => router.push("/organization/hires")}
+            onClick={() => router.push("/organization/browse-volunteer")}
           >
             View recent volunteers{" "}
             <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
