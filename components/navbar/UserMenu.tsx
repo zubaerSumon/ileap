@@ -22,6 +22,7 @@ export function UserMenu({ user }: UserMenuProps) {
   const userRole = user.role === "organization" ? (user.name || "Organization") : user.role;
   const userName = user.name || "User";
   const isOrgUser = user.role === "organization" || user.role === "admin" || user.role === "mentor";
+  const organizationName = user.organization_profile?.title || "Organization";
  
   return (
     <DropdownMenu>
@@ -41,14 +42,9 @@ export function UserMenu({ user }: UserMenuProps) {
             <p className="text-sm font-medium leading-none truncate max-w-[200px]" title={userName}>
               {userName.charAt(0).toUpperCase() + userName.slice(1)}
             </p>
-            {isOrgUser && user.organization_profile?.title && (
-              <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={user.organization_profile.title}>
-                {user.organization_profile.title}
-              </p>
-            )}
-            {user.role === "volunteer" && (
-              <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={user.role}>
-                {user.role}
+            {isOrgUser && (
+              <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={organizationName}>
+                {organizationName}
               </p>
             )}
           </div>
