@@ -3,13 +3,14 @@ import React, { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
-import type { Group } from "./types";
-import { useMessages, useConversations } from "./hooks";
-import DeleteGroupModal from './DeleteGroupModal';
+  import DeleteGroupModal from './DeleteGroupModal';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
 import MessageInput from './components/MessageInput';
 import { cn } from "@/lib/utils";
+import { useConversations } from "@/hooks/useConversations";
+import { useMessages } from "@/hooks/useMessages";
+import { Group } from "@/types/message";
 
 interface MessageUIProps {
   initialUserId?: string | null;

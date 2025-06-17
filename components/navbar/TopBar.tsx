@@ -139,7 +139,7 @@ export function TopBar({
               )}
               <Link
                 href={`/${
-                  session?.user?.role === "organization"
+                  session?.user?.role === "mentor" || session?.user?.role === "admin"
                     ? "organisation"
                     : session?.user?.role
                 }/messages`}

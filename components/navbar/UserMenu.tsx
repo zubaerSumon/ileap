@@ -19,11 +19,17 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user }: UserMenuProps) {
-  const userRole = user.role === "organization" ? (user.name || "Organization") : user.role;
+  const userRole =
+    user.role === "admin" || user.role === "mentor"
+      ?  "organisation"
+      : user.role;
   const userName = user.name || "User";
-  const isOrgUser = user.role === "organization" || user.role === "admin" || user.role === "mentor";
+  const isOrgUser =
+    user.role === "organization" ||
+    user.role === "admin" ||
+    user.role === "mentor";
   const organizationName = user.organization_profile?.title || "Organization";
- 
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -39,11 +45,17 @@ export function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none truncate max-w-[200px]" title={userName}>
+            <p
+              className="text-sm font-medium leading-none truncate max-w-[200px]"
+              title={userName}
+            >
               {userName.charAt(0).toUpperCase() + userName.slice(1)}
             </p>
             {isOrgUser && (
-              <p className="text-xs leading-none text-muted-foreground truncate max-w-[200px]" title={organizationName}>
+              <p
+                className="text-xs leading-none text-muted-foreground truncate max-w-[200px]"
+                title={organizationName}
+              >
                 {organizationName}
               </p>
             )}

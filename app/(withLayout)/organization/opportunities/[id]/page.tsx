@@ -92,7 +92,7 @@ export default function OpportunityDetailsPage() {
       setGroupMessage("");
       utils.messages.getGroups.invalidate();
       // Redirect to messages page
-      router.push("/organization/messages");
+      router.push("/organisation/messages");
     },
     onError: (error) => {
       toast.error(error.message || "Failed to send message");
