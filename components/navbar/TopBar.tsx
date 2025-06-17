@@ -6,7 +6,7 @@ import { SessionUser } from "@/types/navigation";
 import Logo from "../../public/AusLeap.png";
 import { STATIC_LINKS } from "@/utils/constants/navigation";
 import { UserMenu } from "./UserMenu";
-import { SearchBar } from "./SearchBar";
+// import { SearchBar } from "./SearchBar";
 
 interface TopBarProps {
   isMenuOpen: boolean;
@@ -133,9 +133,9 @@ export function TopBar({
         ) : isProtectedPath ? (
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
-              {(session?.user?.role === "organization" || session?.user?.role === "volunteer") && (
+              {/* {(session?.user?.role === "organization" || session?.user?.role === "volunteer") && (
                 <SearchBar role={session.user.role} />
-              )}
+              )} */}
               <Link
                 href={`/${
                   session?.user?.role === "organization"
