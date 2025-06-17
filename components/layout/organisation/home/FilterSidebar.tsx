@@ -98,7 +98,7 @@ export default function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
                     checked={filters.studentType === "no"}
                     onCheckedChange={() => handleStudentTypeChange("no")}
                   />
-                  <Label htmlFor="student-no">Non-Student</Label>
+                  <Label htmlFor="student-no">Non-Academic</Label>
                 </div>
               </div>
             </div>
