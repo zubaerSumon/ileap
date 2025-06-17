@@ -124,8 +124,8 @@ export function MobileMenu({
               )}
               <div className="space-y-1">
                 <NavLink
-                  href={`/${
-                    session?.user?.role === "organization"
+                    href={`/${
+                      session?.user?.role === "mentor" || session?.user?.role === "admin"
                       ? "organisation"
                       : session?.user?.role
                   }/messages`}

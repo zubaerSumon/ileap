@@ -197,10 +197,27 @@ export const messsageRouter = router({
             as: "user",
             pipeline: [
               {
+                $lookup: {
+                  from: "organization_profiles",
+                  localField: "organization_profile",
+                  foreignField: "_id",
+                  as: "organization_profile"
+                }
+              },
+              {
+                $unwind: {
+                  path: "$organization_profile",
+                  preserveNullAndEmptyArrays: true
+                }
+              },
+              {
                 $project: {
                   name: 1,
                   avatar: 1,
                   role: 1,
+                  organization_profile: {
+                    title: 1
+                  }
                 },
               },
             ],
