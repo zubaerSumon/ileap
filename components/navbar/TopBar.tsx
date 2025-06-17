@@ -107,12 +107,7 @@ export function TopBar({
               >
                 <FileUser className="h-4 w-4" /> Opportunities
               </Link>
-              <Link
-                href="/organization/browse-volunteer"
-                className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
-              >
-                <FileUser className="h-4 w-4" />Browse-volunteer
-              </Link>
+              
             </>
           )}
         </div>
@@ -133,8 +128,8 @@ export function TopBar({
         ) : isProtectedPath ? (
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
-              {(session?.user?.role === "organization" || session?.user?.role === "volunteer" ||session?.user?.role === "admin") && (
-                <SearchBar role={session.user.role} />
+              { session?.user?.role && (
+                <SearchBar role={session.user.role as "volunteer" | "organization" | "admin"} />
               )}
               <Link
                 href={`/${

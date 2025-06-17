@@ -56,7 +56,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   );
   return (
     <aside className={cn(
-      "fixed inset-y-0 left-0 z-50 w-full md:w-80 bg-white border-r md:relative md:translate-x-0 transition-transform duration-200 ease-in-out",
+      "fixed inset-y-0 left-0 z-39 w-full md:w-80 bg-white border-r md:relative md:translate-x-0 transition-transform duration-200 ease-in-out",
       showMobileMenu ? "translate-x-0" : "-translate-x-full"
     )}>
       <div className="flex flex-col h-full">
