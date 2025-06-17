@@ -22,7 +22,17 @@ export default function CreateOpportunityPage() {
       router.push("/organization/dashboard");
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to create opportunity");
+      // Handle validation errors
+      if (error.data?.zodError?.fieldErrors) {
+        const fieldErrors = error.data.zodError.fieldErrors;
+        Object.entries(fieldErrors).forEach(([field, errors]) => {
+          if (errors?.[0]) {
+            toast.error(errors[0]);
+          }
+        });
+      } else {
+        toast.error(error.message || "Failed to create opportunity");
+      }
     },
   });
 
@@ -49,28 +59,56 @@ export default function CreateOpportunityPage() {
     },
   });
 
-  const handleSaveDraft = () => {
-    toast.success("Draft saved! (API integration coming soon)");
-  };
-
   const handleCreateOpportunity = async () => {
-    const formData = form.getValues();
-    console.log({formData});
-    
-    await createOpportunity.mutateAsync({
-      ...formData,
-      number_of_volunteers: Number(formData.number_of_volunteers),
-    });
+    try {
+      const formData = form.getValues();
+      
+      // Basic validation
+      if (!formData.title.trim()) {
+        toast.error("Please enter a title for the opportunity");
+        return;
+      }
+      if (!formData.description.trim()) {
+        toast.error("Please provide a description");
+        return;
+      }
+      if (formData.category.length === 0) {
+        toast.error("Please select at least one category");
+        return;
+      }
+      if (formData.required_skills.length === 0) {
+        toast.error("Please select at least one required skill");
+        return;
+      }
+      if (!formData.location.trim()) {
+        toast.error("Please enter a location");
+        return;
+      }
+      if (!formData.email_contact.trim()) {
+        toast.error("Please enter a contact email");
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email_contact)) {
+        toast.error("Please enter a valid email address");
+        return;
+      }
+      
+      await createOpportunity.mutateAsync({
+        ...formData,
+        number_of_volunteers: Number(formData.number_of_volunteers),
+      });
+    } catch (error) {
+      console.error("Error creating opportunity:", error);
+    }
   };
   
   return (
     <ProtectedLayout>
-      <div className="bg-[#F5F7FA] ">
+      <div className="bg-[#F5F7FA] min-h-screen">
         <Form {...form}>
-          <div className="max-w-[1240px] pb-16 mx-auto">
+          <div className="max-w-[1240px] mx-auto px-4 py-8">
             <BasicInformation form={form} />
             <CreateFooter
-              onSaveDraft={handleSaveDraft}
               onCreate={handleCreateOpportunity}
               isLoading={createOpportunity.isPending}
             />
