@@ -209,7 +209,7 @@ const OrganisationDashboard = () => {
           className="flex items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
           onClick={() => router.push("/organization/opportunities")}
         >
-          View all contracts{" "}
+          View all opportunities{" "}
           <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
@@ -226,7 +226,7 @@ const OrganisationDashboard = () => {
               activeContracts.map((contract) => (
                 <div
                   key={contract.id}
-                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[240px]"
+                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
                 >
                   <div className="p-4 h-full flex flex-col">
                     <div className="flex justify-between items-start mb-3">
@@ -264,7 +264,7 @@ const OrganisationDashboard = () => {
                archivedOpportunities)?.map((opportunity) => (
                 <div
                   key={opportunity._id}
-                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[240px]"
+                  className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[300px]"
                 >
                   <div className="p-4 h-full flex flex-col">
                     <div className="flex justify-between items-start mb-3">
@@ -350,7 +350,7 @@ const OrganisationDashboard = () => {
             className="flex items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
             onClick={() => router.push("/organization/browse-volunteer")}
           >
-            View recent volunteers{" "}
+            View All volunteers{" "}
             <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>

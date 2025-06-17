@@ -14,7 +14,8 @@ import { OrgSignupStep } from "./OrgSignupStep";
 import { OrgDetailsStep } from "./OrgDetailsStep";
 import { Loader2 } from "lucide-react";
 import { organizationTypes } from "@/utils/constants/select-options";
-
+import { UserRole } from "@/server/db/interfaces/user";
+ 
 export default function OrganizationSignup() {
   const router = useRouter();
   const utils = trpc.useUtils();
@@ -201,7 +202,7 @@ export default function OrganizationSignup() {
         name: data.name,
         email: data.email,
         password: data.password,
-        role: "admin", // Set role to admin for organizations
+        role: UserRole.ADMIN, // Set role to admin for organizations
         action: "signup",
         redirect: false,
       });

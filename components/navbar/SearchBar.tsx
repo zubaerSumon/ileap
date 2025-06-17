@@ -5,14 +5,16 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { SearchInput, MobileSearch, DesktopSearch } from "./search";
+import { useSearch } from "@/contexts/SearchContext";
 
 interface SearchBarProps {
-  role: "organization" | "volunteer";
+  role: "organization" | "volunteer" | "admin";
+  disableOverlay?: boolean;
 }
 
-export function SearchBar({ role }: SearchBarProps) {
+export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const { searchQuery, setSearchQuery } = useSearch();
   const [overlay, setOverlay] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -33,9 +35,9 @@ export function SearchBar({ role }: SearchBarProps) {
     "social media for NGOs",
   ];
   
-  const suggestions = query
+  const suggestions = searchQuery
     ? allSuggestions.filter((s) =>
-        s.toLowerCase().includes(query.toLowerCase())
+        s.toLowerCase().includes(searchQuery.toLowerCase())
       )
     : [];
 
@@ -62,27 +64,27 @@ export function SearchBar({ role }: SearchBarProps) {
   }, [overlay]);
 
   const placeholder =
-    role === "organization"
+    role === "organization" || role === "admin"
       ? "Search for volunteers"
       : "Search for opportunities";
-  const type = role === "organization" ? "volunteer" : "opportunity";
+  const type = role === "organization" || role === "admin" ? "volunteer" : "opportunity";
 
   const PANEL_HEIGHT = 380;
 
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (query.trim()) {
-      router.push(`/search?type=${type}&q=${encodeURIComponent(query)}`);
+    if (searchQuery.trim()) {
+      router.push(`/search?type=${type}&q=${encodeURIComponent(searchQuery)}`);
       setOverlay(false);
     }
   };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
+    setSearchQuery(e.target.value);
   };
 
   const handleSelect = (item: string) => {
-    setQuery(item);
+    setSearchQuery(item);
     router.push(`/search?type=${type}&q=${encodeURIComponent(item)}`);
     setOverlay(false);
   };
@@ -90,7 +92,7 @@ export function SearchBar({ role }: SearchBarProps) {
   return (
     <>
       <AnimatePresence>
-        {overlay && (
+        {overlay && !disableOverlay && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
@@ -109,7 +111,7 @@ export function SearchBar({ role }: SearchBarProps) {
             >
               <div className="w-full h-full flex flex-col overflow-hidden">
                 <MobileSearch
-                  query={query}
+                  query={searchQuery}
                   placeholder={placeholder}
                   onInput={handleInput}
                   onSearch={handleSearch}
@@ -120,7 +122,7 @@ export function SearchBar({ role }: SearchBarProps) {
                   onClose={() => setOverlay(false)}
                 />
                 <DesktopSearch
-                  query={query}
+                  query={searchQuery}
                   placeholder={placeholder}
                   onInput={handleInput}
                   onSearch={handleSearch}
@@ -136,29 +138,31 @@ export function SearchBar({ role }: SearchBarProps) {
         )}
       </AnimatePresence>
 
-      <button
-        type="button"
-        className="flex md:hidden items-center justify-center cursor-pointer h-10 w-10"
-        onClick={() => setOverlay(true)}
-        aria-label="Open search"
-      >
-        <Search className="h-6 w-6" />
-      </button>
+      {!disableOverlay && (
+        <button
+          type="button"
+          className="flex md:hidden items-center justify-center cursor-pointer h-10 w-10"
+          onClick={() => setOverlay(true)}
+          aria-label="Open search"
+        >
+          <Search className="h-6 w-6" />
+        </button>
+      )}
 
       <div
-        className="relative hidden md:flex h-[40px] items-center rounded-md border border-input bg-background w-[340px] overflow-visible group focus-within:ring-2 focus-within:ring-blue-500"
+        className={`relative ${disableOverlay ? 'flex w-full' : 'hidden md:flex w-[340px]'} h-[40px] items-center rounded-md border border-input bg-background overflow-visible group focus-within:ring-2 focus-within:ring-blue-500`}
         style={{ boxShadow: "none" }}
-        onClick={() => setOverlay(true)}
+        onClick={() => !disableOverlay && setOverlay(true)}
       >
         <span className="pl-3 flex items-center text-muted-foreground">
           <Search className="h-4 w-4" />
         </span>
         <SearchInput
-          query={query}
+          query={searchQuery}
           placeholder={placeholder}
           onInput={handleInput}
           onSearch={handleSearch}
-          readOnly
+          readOnly={!disableOverlay}
           className="border-none bg-transparent focus:ring-0 focus-visible:ring-0 px-2 text-sm flex-1 placeholder:text-muted-foreground cursor-pointer"
         />
       </div>

@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import { useSearchParams } from "next/navigation";
-import FindVolunteer from "@/components/layout/organisation/find-volunteer";
 import FindOpportunity from "@/components/layout/volunteer/find-opportunity";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
+import OrganizationHomepage from "@/components/layout/organisation/home/OrganizationHomepage";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
@@ -14,8 +14,8 @@ const SearchPage = () => {
   console.log("Search Query:", query);
 
   return (
-    <ProtectedLayout>
-      {type === "volunteer" && <FindVolunteer />}
+    <ProtectedLayout> 
+      {type === "volunteer" && < OrganizationHomepage />}
       {type === "opportunity" && <FindOpportunity />}
       {!type && (
         <div>Please specify a search type (volunteer or opportunity)</div>

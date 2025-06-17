@@ -1,13 +1,13 @@
 "use client";
 
 import { trpc } from "@/utils/trpc";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import FilterSidebar, { VolunteerFilters } from "./FilterSidebar";
 import VolunteerCard from "@/components/layout/organisation/VolunteerCard";
 import MessageDialog from "../MessageDialog";
+import { SearchBar } from "@/components/navbar/SearchBar";
+import { useSearch } from "@/contexts/SearchContext";
 
 interface Volunteer {
   _id: string;
@@ -26,25 +26,7 @@ interface Volunteer {
   };
 }
 
-// Custom hook for debouncing
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-
 export default function OrganizationHomepage() {
-  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<VolunteerFilters>({
     categories: [],
     studentType: "all",
@@ -55,9 +37,7 @@ export default function OrganizationHomepage() {
   });
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
-
-  // Debounce the search query with a 300ms delay
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const { searchQuery } = useSearch();
 
   const { data: volunteers, isLoading } = trpc.users.getAvailableUsers.useQuery();
 
@@ -66,17 +46,16 @@ export default function OrganizationHomepage() {
     setIsMessageDialogOpen(true);
   };
 
-  // Filter volunteers based on search query and filters
+  // Filter volunteers based on filters and search query
   const filteredVolunteers = volunteers?.filter((volunteer) => {
-    const searchLower = debouncedSearchQuery.toLowerCase();
-    
-    // Check if name matches
-    const nameMatches = volunteer.name.toLowerCase().includes(searchLower);
-    
-    // Check if any interests match
-    const interestsMatch = volunteer.volunteer_profile?.interested_on?.some(
-      (interest: string) => interest.toLowerCase().includes(searchLower)
-    );
+    // Check search query
+    const searchMatch = !searchQuery || 
+      volunteer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      volunteer.volunteer_profile?.course?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      volunteer.volunteer_profile?.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      volunteer.volunteer_profile?.interested_on?.some((category: string) => 
+        category.toLowerCase().includes(searchQuery.toLowerCase())
+      );
 
     // Check category filters
     const categoryMatch = filters.categories.length === 0 || 
@@ -96,7 +75,7 @@ export default function OrganizationHomepage() {
        new Date(volunteer.volunteer_profile.availability_date.end_date) >= new Date(filters.availability.startDate));
     
     // Return true if all conditions match
-    return (nameMatches || interestsMatch) && categoryMatch && studentTypeMatch && availabilityMatch;
+    return searchMatch && categoryMatch && studentTypeMatch && availabilityMatch;
   });
 
   return (
@@ -110,15 +89,8 @@ export default function OrganizationHomepage() {
         {/* Main Content */}
         <div className="flex-1 min-w-0">
           {/* Search Bar */}
-          <div className="relative mb-6">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-            <Input
-              type="text"
-              placeholder="Search volunteers..."
-              className="pl-10"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+          <div className="mb-6 w-full">
+            <SearchBar role="organization" disableOverlay />
           </div>
 
           {/* Volunteer Cards */}

@@ -1,8 +1,8 @@
-import { Button } from "@/components/ui/button";
+// import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Edit, Share } from "lucide-react";
+// import { Edit, Share } from "lucide-react";
 import Underline from "@tiptap/extension-underline";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
 
@@ -40,14 +40,14 @@ export function PostContent({ opportunity }: PostContentProps) {
       <div className="flex items-center justify-between ">
         <p className="text-sm text-gray-500">Posted {new Date(opportunity.createdAt).toLocaleDateString()}</p>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="flex gap-2">
+          {/* <Button variant="outline" size="sm" className="flex gap-2">
             <Edit className="h-4 w-4" />
             Edit post
           </Button>
           <Button variant="outline" size="sm" className="flex gap-2">
             <Share className="h-4 w-4" />
             Share
-          </Button>
+          </Button> */}
         </div>
       </div>
       <Separator />
