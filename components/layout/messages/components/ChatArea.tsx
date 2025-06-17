@@ -1,11 +1,11 @@
 import React, { useRef, useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import type { Message, Conversation, Group } from "../types";
 import MessageBubble from "./MessageBubble";
 import ConversationHeader from "./ConversationHeader";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
+import { Message, Conversation, Group } from "@/types/message";
 
 interface ChatAreaProps {
   messages: Message[] | undefined;
@@ -88,16 +88,24 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
 
   // Scroll to bottom when new messages arrive or when sending
   useEffect(() => {
-    if (shouldScrollRef.current && (isSending || (messages?.length ?? 0) > 0)) {
+    const scrollToBottom = () => {
       const scrollArea = scrollAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]');
       if (scrollArea) {
-        // Force immediate scroll
         scrollArea.scrollTop = scrollArea.scrollHeight;
-        // Reset shouldScroll after scrolling
-        shouldScrollRef.current = false;
       }
+    };
+
+    // Scroll on initial load
+    if (messages && messages.length > 0 && !isLoadingMessages) {
+      scrollToBottom();
     }
-  }, [messages, isSending, selectedConversationId]);
+
+    // Scroll when new messages arrive or when sending
+    if (shouldScrollRef.current && (isSending || (messages?.length ?? 0) > 0)) {
+      scrollToBottom();
+      shouldScrollRef.current = false;
+    }
+  }, [messages, isSending, selectedConversationId, isLoadingMessages]);
 
   const headerData = isGroup ? {
     name: (selectedConversation as Group)?.name,
@@ -107,6 +115,15 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
     name: selectedConversation.user.name,
     avatar: selectedConversation.user.avatar
   } : undefined;
+
+  // Sort messages by creation time in ascending order and remove duplicates
+  const sortedMessages = React.useMemo(() => {
+    if (!messages) return [];
+    const uniqueMessages = Array.from(new Map(messages.map(msg => [msg._id, msg])).values());
+    return uniqueMessages.sort((a, b) => 
+      new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+  }, [messages]);
 
   if (isLoadingMessages) {
     return (
@@ -118,7 +135,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
 
   if (!messages || messages.length === 0) {
     return (
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col border">
         <div className="flex-1 flex flex-col items-center justify-center py-4">
           {isGroup ? (
             <div className="text-center">
@@ -136,11 +153,6 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
       </div>
     );
   }
-
-  // Sort messages by creation time in ascending order
-  const sortedMessages = [...messages].sort((a, b) => 
-    new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-  );
 
   return (
     <div className="flex flex-col h-full">
