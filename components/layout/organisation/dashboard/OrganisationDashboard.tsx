@@ -302,12 +302,13 @@ const OrganisationDashboard = () => {
                     <div className="flex items-center text-sm text-gray-500 mb-3">
                       <MapPin className="w-4 h-4 mr-1 text-blue-500" />
                       <span>{opportunity.location}</span>
-                      <Badge variant="outline" className="ml-2 px-2 py-0.5 text-xs">
-                        {opportunity.commitment_type === 'workbased' ? 'Work based' : 'Event based'}
-                      </Badge>
+                     
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-3">
+                    <Badge variant="outline" className="ml-2 px-2 py-0.5 text-xs">
+                        {opportunity.commitment_type === 'workbased' ? 'Work based' : 'Event based'}
+                      </Badge>
                       {opportunity.category.map((cat: string, index: number) => (
                         <Badge
                           key={index}
