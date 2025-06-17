@@ -35,7 +35,9 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
           <Avatar name={user.name || ''} avatar={user.avatar} />
         )}
         <div>
-          <h2 className="font-semibold">{user.name}</h2>
+          <h2 className="font-semibold">
+            {user.name}
+          </h2>
           {isGroup && user.members !== undefined && (
             <p className="text-sm text-gray-500">{user.members} members</p>
           )}

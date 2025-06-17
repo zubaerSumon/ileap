@@ -22,7 +22,17 @@ export default function CreateOpportunityPage() {
       router.push("/organization/dashboard");
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to create opportunity");
+      // Handle validation errors
+      if (error.data && 'zodError' in error.data) {
+        const fieldErrors = (error.data as { zodError: { fieldErrors: Record<string, string[]> } }).zodError.fieldErrors;
+        Object.entries(fieldErrors).forEach(([, errors]) => {
+          if (errors?.[0]) {
+            toast.error(errors[0]);
+          }
+        });
+      } else {
+        toast.error(error.message || "Failed to create opportunity");
+      }
     },
   });
 
@@ -47,34 +57,31 @@ export default function CreateOpportunityPage() {
       },
       banner_img: "",
     },
+    mode: "onChange",
   });
 
-  const handleSaveDraft = () => {
-    toast.success("Draft saved! (API integration coming soon)");
-  };
-
-  const handleCreateOpportunity = async () => {
-    const formData = form.getValues();
-    console.log({formData});
-    
-    await createOpportunity.mutateAsync({
-      ...formData,
-      number_of_volunteers: Number(formData.number_of_volunteers),
-    });
+  const onSubmit = async (data: OpportunityFormValues) => {
+    try {
+      await createOpportunity.mutateAsync({
+        ...data,
+        number_of_volunteers: Number(data.number_of_volunteers),
+      });
+    } catch (error) {
+      console.error("Error creating opportunity:", error);
+    }
   };
   
   return (
     <ProtectedLayout>
-      <div className="bg-[#F5F7FA] ">
+      <div className="bg-[#F5F7FA] min-h-screen">
         <Form {...form}>
-          <div className="max-w-[1240px] pb-16 mx-auto">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[1240px] mx-auto px-4 py-8">
             <BasicInformation form={form} />
             <CreateFooter
-              onSaveDraft={handleSaveDraft}
-              onCreate={handleCreateOpportunity}
+              onCreate={form.handleSubmit(onSubmit)}
               isLoading={createOpportunity.isPending}
             />
-          </div>
+          </form>
         </Form>
       </div>
     </ProtectedLayout>

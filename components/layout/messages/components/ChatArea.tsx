@@ -142,7 +142,11 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
               <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-blue-500" />
               </div>
-              <h2 className="text-xl font-semibold mb-2">{(selectedConversation as Group)?.name}</h2>
+              <h2 className="text-xl font-semibold mb-2">
+                {(selectedConversation as Group)?.name.length > 15 
+                  ? `${(selectedConversation as Group)?.name.substring(0, 15)}...` 
+                  : (selectedConversation as Group)?.name}
+              </h2>
               <p className="text-sm text-gray-500 mb-4">{(selectedConversation as Group)?.members?.length} members</p>
               <p className="text-sm text-gray-500">Start the conversation by sending a message</p>
             </div>

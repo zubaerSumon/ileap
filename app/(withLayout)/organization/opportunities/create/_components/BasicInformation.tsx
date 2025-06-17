@@ -162,8 +162,8 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 <label htmlFor="workbased" className="text-sm font-medium">
                   <span>Work based</span>
                 </label>
-              </div>
-              <div className="flex items-center space-x-2">
+              
+              
                 <input
                   type="radio"
                   id="eventbased"

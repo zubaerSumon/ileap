@@ -1,13 +1,24 @@
 import React from "react";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import { cn } from "@/lib/utils";
-import type { Message } from "../types";
+import type { Message } from "@/types/message";
 import Avatar from "./Avatar";
 
 interface MessageBubbleProps {
   message: Message;
   isOwnMessage: boolean;
 }
+
+const formatMessageDate = (date: Date): string => {
+  const now = new Date();
+  const diffDays = differenceInDays(now, date);
+
+  if (diffDays === 0) {
+    return format(date, "h:mm a");
+  } else {
+    return `${diffDays} days ago`;
+  }
+};
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwnMessage }) => (
   <div
@@ -27,7 +38,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwnMess
         "text-xs mt-1",
         isOwnMessage ? "text-blue-100" : "text-gray-500"
       )}>
-        {format(new Date(message.createdAt), "MMM d, h:mm a")}
+        {formatMessageDate(new Date(message.createdAt))}
       </p>
     </div>
     {isOwnMessage && message.sender && (

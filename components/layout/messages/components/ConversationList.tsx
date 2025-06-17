@@ -94,8 +94,8 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
                           </div>
                           <div className="flex-1 min-w-0 text-left">
                             <div className="flex justify-between items-start">
-                              <h3 className="font-medium truncate">
-                                {group.name}
+                              <h3 className="font-medium truncate max-w-[150px]">
+                                {group.name.length > 15 ? `${group.name.substring(0, 15)}...` : group.name}
                               </h3>
                               {group.unreadCount > 0 && (
                                 <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
