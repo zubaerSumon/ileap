@@ -74,7 +74,7 @@ export default function FilterSidebar({ onFilterChange }: FilterSidebarProps) {
 
             {/* Student Type */}
             <div>
-              <h4 className="font-medium mb-3">Student Type</h4>
+              <h4 className="font-medium mb-3">Studentship status</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox

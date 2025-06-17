@@ -92,7 +92,7 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
           )}
 
           {/* Availability */}
-          {volunteer.availability_date && (
+          {/* {volunteer.availability_date && (
             <div>
               <h3 className="text-sm font-medium text-gray-500 mb-2">Availability</h3>
               <div className="flex items-center gap-2 text-gray-700">
@@ -101,7 +101,7 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
                 <span>To: {new Date(volunteer.availability_date.end_date || '').toLocaleDateString()}</span>
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Additional Info */}
