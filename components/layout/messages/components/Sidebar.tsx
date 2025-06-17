@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
-import type { Conversation, Group } from "../types";
+import type { Conversation, Group } from "@/types/message";
 import ConversationList from "./ConversationList";
 import UserList from "./UserList";
 

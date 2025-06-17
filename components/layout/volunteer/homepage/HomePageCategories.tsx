@@ -14,6 +14,7 @@ import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
+import { useSession } from "next-auth/react";
 
 export type OpportunityDetails = {
   id: string;
@@ -28,12 +29,17 @@ export type OpportunityDetails = {
 export default function Categories() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
+  const { data: session } = useSession();
+  const volunteerId = session?.user?.id;
 
   // Fetch all opportunities
   const { data: opportunities } = trpc.opportunities.getAllOpportunities.useQuery();
   
   // Fetch all applications to calculate available spots
-  const { data: applications } = trpc.applications.getVolunteerApplications.useQuery();
+  const { data: applications } = trpc.applications.getVolunteerApplications.useQuery(
+    volunteerId!,
+    { enabled: !!volunteerId }
+  );
 
   // Fetch user's favorite opportunities
   const { data: favoriteOpportunities } = trpc.volunteers.getFavoriteOpportunities.useQuery();

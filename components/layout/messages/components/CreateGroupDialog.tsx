@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import Avatar from "./Avatar";
-import type { Group } from "../types";
+import type { Group } from "@/types/message";
 
 interface CreateGroupDialogProps {
   onGroupCreated: () => void;
