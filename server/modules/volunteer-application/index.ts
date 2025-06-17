@@ -9,6 +9,7 @@ import FavoriteOpportunity from "@/server/db/models/favorite-opportunity";
 import connectDB from "@/server/config/mongoose";
 import { sendApplicationConfirmationMail } from "@/utils/helpers/sendApplicationConfirmationMail";
 import { volunteerApplicationValidation } from "./volunteer-application.validation";
+import { z } from "zod";
 
 export const volunteerApplicationRouter = router({
   getApplicationStatus: protectedProcedure
@@ -37,17 +38,26 @@ export const volunteerApplicationRouter = router({
       }
     }),
 
-  getVolunteerApplications: publicProcedure.query(async () => {
-    try {
-      const applications = await VolunteerApplication.find()
-        .select("opportunity status")
-        .lean();
-      return applications;
-    } catch (error) {
-      console.error("Error fetching volunteer applications:", error);
-      return [];
-    }
-  }),
+  getVolunteerApplications: publicProcedure
+    .input(z.string())
+    .query(async ({ input: volunteerId }) => {
+      try {
+        const applications = await VolunteerApplication.find({
+          volunteer: volunteerId,
+        })
+          .populate({
+            path: "opportunity",
+            select: "title description category location commitment_type",
+          })
+          .sort({ createdAt: -1 })
+          .lean();
+
+        return applications;
+      } catch (error) {
+        console.error("Error fetching volunteer applications:", error);
+        return [];
+      }
+    }),
 
   applyToOpportunity: protectedProcedure
     .input(volunteerApplicationValidation.applyToOpportunitySchema)
@@ -185,6 +195,7 @@ export const volunteerApplicationRouter = router({
         throw error;
       }
     }),
+
   getVolunteersByOpportunity: protectedProcedure
     .input(volunteerApplicationValidation.getApplicationStatusSchema)
     .query(async ({ ctx, input }) => {
@@ -230,6 +241,7 @@ export const volunteerApplicationRouter = router({
         });
       }
     }),
+
   getOpportunityApplicants: protectedProcedure
     .input(volunteerApplicationValidation.getOpportunityApplicantsSchema)
     .query(async ({ ctx, input }) => {
