@@ -23,9 +23,9 @@ export default function CreateOpportunityPage() {
     },
     onError: (error) => {
       // Handle validation errors
-      if (error.data?.zodError?.fieldErrors) {
-        const fieldErrors = error.data.zodError.fieldErrors;
-        Object.entries(fieldErrors).forEach(([field, errors]) => {
+      if (error.data && 'zodError' in error.data) {
+        const fieldErrors = (error.data as { zodError: { fieldErrors: Record<string, string[]> } }).zodError.fieldErrors;
+        Object.entries(fieldErrors).forEach(([, errors]) => {
           if (errors?.[0]) {
             toast.error(errors[0]);
           }
@@ -57,45 +57,14 @@ export default function CreateOpportunityPage() {
       },
       banner_img: "",
     },
+    mode: "onChange",
   });
 
-  const handleCreateOpportunity = async () => {
+  const onSubmit = async (data: OpportunityFormValues) => {
     try {
-      const formData = form.getValues();
-      
-      // Basic validation
-      if (!formData.title.trim()) {
-        toast.error("Please enter a title for the opportunity");
-        return;
-      }
-      if (!formData.description.trim()) {
-        toast.error("Please provide a description");
-        return;
-      }
-      if (formData.category.length === 0) {
-        toast.error("Please select at least one category");
-        return;
-      }
-      if (formData.required_skills.length === 0) {
-        toast.error("Please select at least one required skill");
-        return;
-      }
-      if (!formData.location.trim()) {
-        toast.error("Please enter a location");
-        return;
-      }
-      if (!formData.email_contact.trim()) {
-        toast.error("Please enter a contact email");
-        return;
-      }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email_contact)) {
-        toast.error("Please enter a valid email address");
-        return;
-      }
-      
       await createOpportunity.mutateAsync({
-        ...formData,
-        number_of_volunteers: Number(formData.number_of_volunteers),
+        ...data,
+        number_of_volunteers: Number(data.number_of_volunteers),
       });
     } catch (error) {
       console.error("Error creating opportunity:", error);
@@ -106,13 +75,13 @@ export default function CreateOpportunityPage() {
     <ProtectedLayout>
       <div className="bg-[#F5F7FA] min-h-screen">
         <Form {...form}>
-          <div className="max-w-[1240px] mx-auto px-4 py-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[1240px] mx-auto px-4 py-8">
             <BasicInformation form={form} />
             <CreateFooter
-              onCreate={handleCreateOpportunity}
+              onCreate={form.handleSubmit(onSubmit)}
               isLoading={createOpportunity.isPending}
             />
-          </div>
+          </form>
         </Form>
       </div>
     </ProtectedLayout>
