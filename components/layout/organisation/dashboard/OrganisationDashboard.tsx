@@ -302,12 +302,13 @@ const OrganisationDashboard = () => {
                     <div className="flex items-center text-sm text-gray-500 mb-3">
                       <MapPin className="w-4 h-4 mr-1 text-blue-500" />
                       <span>{opportunity.location}</span>
-                      <Badge variant="outline" className="ml-2 px-2 py-0.5 text-xs">
-                        {opportunity.commitment_type === 'workbased' ? 'Work based' : 'Event based'}
-                      </Badge>
+                     
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-3">
+                    <Badge variant="outline" className="ml-2 px-2 py-0.5 text-xs">
+                        {opportunity.commitment_type === 'workbased' ? 'Work based' : 'Event based'}
+                      </Badge>
                       {opportunity.category.map((cat: string, index: number) => (
                         <Badge
                           key={index}
@@ -348,7 +349,7 @@ const OrganisationDashboard = () => {
           </h3>
           <button
             className="flex items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
-            onClick={() => router.push("/organization/browse-volunteer")}
+            onClick={() => router.push("/search?type=volunteer")}
           >
             View All volunteers{" "}
             <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
