@@ -348,7 +348,7 @@ const OrganisationDashboard = () => {
           </h3>
           <button
             className="flex items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
-            onClick={() => router.push("/organization/browse-volunteer")}
+            onClick={() => router.push("/search?type=volunteer")}
           >
             View All volunteers{" "}
             <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
