@@ -128,16 +128,22 @@ export const opportunityRouter = router({
       const opportunitiesWithCounts = await Promise.all(
         opportunities.map(async (opportunity) => {
           const [applicantCount, recruitCount] = await Promise.all([
-            VolunteerApplication.countDocuments({ opportunity: opportunity._id }),
+            VolunteerApplication.countDocuments({
+              opportunity: opportunity._id,
+            }),
             OrganisationRecruitment.countDocuments({
-              application: { $in: await VolunteerApplication.find({ opportunity: opportunity._id }).select('_id') }
-            })
+              application: {
+                $in: await VolunteerApplication.find({
+                  opportunity: opportunity._id,
+                }).select("_id"),
+              },
+            }),
           ]);
 
           return {
             ...opportunity.toObject(),
             applicantCount,
-            recruitCount
+            recruitCount,
           };
         })
       );
@@ -182,9 +188,10 @@ export const opportunityRouter = router({
       }
 
       try {
-        const opportunity = await Opportunity.findById(opportunityId)
-          .populate("organization_profile");
-        
+        const opportunity = await Opportunity.findById(opportunityId).populate(
+          "organization_profile"
+        );
+
         if (!opportunity) {
           throw new TRPCError({
             code: "NOT_FOUND",
@@ -203,15 +210,16 @@ export const opportunityRouter = router({
 
         // Check if the user is either the creator or a mentor
         const isCreator = opportunity.created_by.toString() === sessionUser.id;
+        const isAdmin = user.role === "admin";
+        const isOrganization = user.role === "organization";
         const isMentor = user.role === "mentor";
 
-        if (!isCreator && !isMentor) {
+        if (!isCreator && !isAdmin && !isOrganization && !isMentor) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You don't have permission to archive this opportunity",
           });
         }
-
         // Update the opportunity
         const updatedOpportunity = await Opportunity.findByIdAndUpdate(
           opportunityId,
@@ -260,8 +268,22 @@ export const opportunityRouter = router({
           });
         }
 
-        // Check if the user owns this opportunity
-        if (opportunity.created_by.toString() !== sessionUser.id) {
+        // Get the user to check their role
+        const user = await User.findById(sessionUser.id);
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        // Check if the user is either the creator, admin, organization, or mentor
+        const isCreator = opportunity.created_by.toString() === sessionUser.id;
+        const isAdmin = user.role === "admin";
+        const isOrganization = user.role === "organization";
+        const isMentor = user.role === "mentor";
+
+        if (!isCreator && !isAdmin && !isOrganization && !isMentor) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You don't have permission to delete this opportunity",

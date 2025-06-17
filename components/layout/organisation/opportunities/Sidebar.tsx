@@ -4,22 +4,31 @@ import { Separator } from "@/components/ui/separator";
 import { MapPin } from "lucide-react";
 import Image from "next/image";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
+import { IOrgnizationPofile } from "@/server/db/interfaces/organization-profile";
 
 interface SidebarProps {
-  opportunity: IOpportunity;
+  opportunity: IOpportunity & {
+    organization_profile: IOrgnizationPofile;
+  };
 }
 
 export function Sidebar({ opportunity }: SidebarProps) {
   return (
     <div className="w-[300px]">
       <div className="py-4 rounded-lg mb-4 space-y-4">
-        <Image
-          src="/Easy.svg"
-          alt="Easy Care"
-          width={48}
-          height={48}
-          className="rounded-full"
-        />
+        <div className="flex items-center space-x-3">
+          <Image
+            src={opportunity.organization_profile.profile_img || "/avatar.svg"}
+            alt={opportunity.organization_profile.title}
+            width={48}
+            height={48}
+            className="rounded-full"
+          />
+          <div>
+            <h3 className="font-semibold">{opportunity.organization_profile.title}</h3>
+            
+          </div>
+        </div>
 
         <div className="flex items-center text-sm">
           <MapPin className="w-4 h-4 mr-2 text-gray-500" />
