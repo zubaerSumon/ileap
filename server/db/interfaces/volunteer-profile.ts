@@ -26,4 +26,5 @@ export interface IVolunteerProfile extends Document {
     start_time?: string;
     end_time?: string;
   };
+  is_available?: boolean;
 }

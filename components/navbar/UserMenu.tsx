@@ -3,6 +3,7 @@ import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { SessionUser } from "@/types/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+import { Switch } from "../ui/switch";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,12 +14,17 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { useState, useEffect, useRef } from "react";
+import { trpc } from "@/utils/trpc";
 
 interface UserMenuProps {
   user: SessionUser;
 }
 
 export function UserMenu({ user }: UserMenuProps) {
+  const utils = trpc.useUtils();
+  const [isAvailable, setIsAvailable] = useState(true);
+  const hasInitialized = useRef(false);
   const userRole =
     user.role === "admin" || user.role === "mentor"
       ?  "organisation"
@@ -28,7 +34,42 @@ export function UserMenu({ user }: UserMenuProps) {
     user.role === "organization" ||
     user.role === "admin" ||
     user.role === "mentor";
+  const isVolunteer = user.role === "volunteer";
   const organizationName = user.organization_profile?.title || "Organization";
+
+  // Fetch current availability status
+  const { data: volunteerProfile } = trpc.volunteers.getVolunteerProfile.useQuery(
+    undefined,
+    {
+      enabled: isVolunteer,
+    }
+  );
+
+  // Update availability mutation
+  const updateVolunteerProfile = trpc.volunteers.updateVolunteerProfile.useMutation({
+    onSuccess: (data) => {
+      setIsAvailable(data.is_available || true);
+      utils.volunteers.getVolunteerProfile.invalidate();
+    },
+    onError: (error) => {
+      // Revert the switch if update fails
+      setIsAvailable(!isAvailable);
+      console.error("Failed to update availability:", error.message);
+    },
+  });
+
+  // Update local state when profile data changes (only on initial load)
+  useEffect(() => {
+    if (volunteerProfile && volunteerProfile.is_available !== undefined && !hasInitialized.current) {
+      setIsAvailable(volunteerProfile.is_available);
+      hasInitialized.current = true;
+    }
+  }, [volunteerProfile]);
+
+  const handleAvailabilityChange = (checked: boolean) => {
+    setIsAvailable(checked);
+    updateVolunteerProfile.mutate({ is_available: checked });
+  };
 
   return (
     <DropdownMenu>
@@ -59,7 +100,19 @@ export function UserMenu({ user }: UserMenuProps) {
                 {organizationName}
               </p>
             )}
-          </div>
+            {isVolunteer && (
+              <div className="flex items-center justify-between pt-1">
+                <span className="text-xs text-muted-foreground">
+                  Available to serve
+                </span>
+                <Switch
+                  checked={isAvailable}
+                  onCheckedChange={handleAvailabilityChange}
+                  className="scale-75 data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-blue-200"
+                />
+              </div>
+            )}
+           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
