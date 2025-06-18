@@ -18,6 +18,7 @@ interface Volunteer {
     };
     interested_on?: string[];
     bio?: string;
+    is_available?: boolean;
   };
 }
 
@@ -47,9 +48,15 @@ export default function VolunteerCard({
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-medium">
-                ✓ Available
-              </span>
+              {volunteer.volunteer_profile?.is_available ? (
+                <span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full text-xs font-medium">
+                  ✓ Available
+                </span>
+              ) : (
+                <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs font-medium">
+                  ⏸️ Unavailable
+                </span>
+              )}
             </div>
           </div>
 
@@ -90,7 +97,7 @@ export default function VolunteerCard({
 
           <div
             onClick={(e) => e.stopPropagation()}
-            className="flex gap-1 mt-auto "
+            className="flex gap-2 mt-auto "
           >
             <Button
               variant="outline"
