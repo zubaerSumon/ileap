@@ -12,11 +12,9 @@ import type { Group } from "@/types/message";
 
 interface CreateGroupDialogProps {
   onGroupCreated: () => void;
-  userRole?: string;
 }
 
-export const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({ onGroupCreated, userRole }) => {
-  console.log("CreateGroupDialog - User Role:", userRole);
+export const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({ onGroupCreated }) => {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [searchQuery, setSearchQuery] = useState("");

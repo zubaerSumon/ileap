@@ -15,7 +15,7 @@ export const TrpcProvider = ({ children }: { children: React.ReactNode }) => {
         }),
       ],
     });
-  });
+  }, );
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>

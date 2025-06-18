@@ -15,6 +15,7 @@ interface ChatAreaProps {
   session: { user?: { id?: string } } | null;
   isGroup?: boolean;
   onDeleteGroup?: () => void;
+  onDeleteConversation?: () => void;
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
@@ -31,11 +32,12 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   session,
   isGroup,
   onDeleteGroup,
+  onDeleteConversation,
   onLoadMore,
   hasMore,
   isLoadingMore,
   isSending,
-  selectedConversationId
+  selectedConversationId,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -44,7 +46,8 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   const lastMessageRef = useRef<HTMLDivElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [hasReachedTop, setHasReachedTop] = useState(false);
-  const shouldScrollRef = useRef(false);
+  const previousMessageCountRef = useRef<number>(0);
+  const isInitialLoadRef = useRef(true);
 
   useEffect(() => {
     if (!topRef.current) return;
@@ -79,12 +82,8 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   // Reset hasReachedTop when conversation changes
   useEffect(() => {
     setHasReachedTop(false);
+    isInitialLoadRef.current = true;
   }, [selectedConversation?._id]);
-
-  // Set shouldScroll to true when a conversation is selected
-  useEffect(() => {
-    shouldScrollRef.current = true;
-  }, [selectedConversationId]);
 
   // Scroll to bottom when new messages arrive or when sending
   useEffect(() => {
@@ -95,17 +94,29 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
       }
     };
 
+    const currentMessageCount = messages?.length || 0;
+    const previousMessageCount = previousMessageCountRef.current;
+
     // Scroll on initial load
-    if (messages && messages.length > 0 && !isLoadingMessages) {
+    if (isInitialLoadRef.current && messages && messages.length > 0 && !isLoadingMessages) {
+      scrollToBottom();
+      isInitialLoadRef.current = false;
+    }
+
+    // Scroll when user is sending a message
+    if (isSending) {
       scrollToBottom();
     }
 
-    // Scroll when new messages arrive or when sending
-    if (shouldScrollRef.current && (isSending || (messages?.length ?? 0) > 0)) {
+    // Scroll when new messages arrive (but not when loading older messages)
+    // New messages = message count increased AND we're not currently loading older messages
+    if (currentMessageCount > previousMessageCount && !isLoadingMore && !isLoading) {
       scrollToBottom();
-      shouldScrollRef.current = false;
     }
-  }, [messages, isSending, selectedConversationId, isLoadingMessages]);
+
+    // Update the previous message count
+    previousMessageCountRef.current = currentMessageCount;
+  }, [messages, isSending, selectedConversationId, isLoadingMessages, isLoadingMore, isLoading]);
 
   const headerData = isGroup ? {
     name: (selectedConversation as Group)?.name,
@@ -166,6 +177,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
           onMenuClick={onMenuClick}
           isGroup={isGroup}
           onDeleteGroup={onDeleteGroup}
+          onDeleteConversation={onDeleteConversation}
         />
       )}
 

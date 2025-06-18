@@ -29,9 +29,6 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
     onCreateGroup,
     userRole,
   }) => {
-    console.log("ConversationList - Conversations:", conversations);
-
-    console.log("ConversationList - User Role:", userRole);
     // Sort conversations by last message time
     const sortedConversations = conversations?.sort((a, b) => {
       const timeA = new Date(a.lastMessage?.createdAt || 0).getTime();
@@ -61,7 +58,6 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
             <h3 className="text-sm font-medium text-gray-500">Groups</h3>
             <CreateGroupDialog
               onGroupCreated={onCreateGroup}
-              userRole={userRole}
             />
           </div>
         )}
