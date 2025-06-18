@@ -1,13 +1,14 @@
 "use client";
 
 import { trpc } from "@/utils/trpc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import FilterSidebar, { VolunteerFilters } from "./FilterSidebar";
 import VolunteerCard from "@/components/layout/organisation/VolunteerCard";
 import MessageDialog from "../MessageDialog";
 import { SearchBar } from "@/components/navbar/SearchBar";
 import { useSearch } from "@/contexts/SearchContext";
+import { PaginationWrapper } from "@/components/PaginationWrapper";
 
 interface Volunteer {
   _id: string;
@@ -26,7 +27,7 @@ interface Volunteer {
   };
 }
 
-export default function OrganizationHomepage() {
+export default function BrowseVolunteer() {
   const [filters, setFilters] = useState<VolunteerFilters>({
     categories: [],
     studentType: "all",
@@ -35,68 +36,62 @@ export default function OrganizationHomepage() {
       endDate: null,
     },
   });
+  const [currentPage, setCurrentPage] = useState(1);
   const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
-  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(null);
+  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(
+    null
+  );
   const { searchQuery } = useSearch();
 
-  const { data: volunteers, isLoading } = trpc.users.getAvailableUsers.useQuery();
+   useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, searchQuery]);
+
+  const { data: volunteersData, isLoading } = trpc.users.getAvailableUsers.useQuery({
+    page: currentPage,
+    limit: 6,
+    search: searchQuery || undefined,
+    categories: filters.categories.length > 0 ? filters.categories : undefined,
+    studentType: filters.studentType,
+    availability: filters.availability.startDate && filters.availability.endDate ? {
+      startDate: filters.availability.startDate,
+      endDate: filters.availability.endDate,
+    } : undefined,
+  });
 
   const handleConnect = (volunteer: Volunteer) => {
     setSelectedVolunteer(volunteer);
     setIsMessageDialogOpen(true);
   };
 
-  // Filter volunteers based on filters and search query
-  const filteredVolunteers = volunteers?.filter((volunteer) => {
-    // Check search query
-    const searchMatch = !searchQuery || 
-      volunteer.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      volunteer.volunteer_profile?.course?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      volunteer.volunteer_profile?.bio?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      volunteer.volunteer_profile?.interested_on?.some((category: string) => 
-        category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-    // Check category filters
-    const categoryMatch = filters.categories.length === 0 || 
-      filters.categories.some(category => 
-        volunteer.volunteer_profile?.interested_on?.includes(category)
-      );
-
-    // Check student type filter
-    const studentTypeMatch = filters.studentType === "all" || 
-      volunteer.volunteer_profile?.student_type === filters.studentType;
-
-    // Check availability filter
-    const availabilityMatch = !filters.availability.startDate || !filters.availability.endDate || 
-      (volunteer.volunteer_profile?.availability_date?.start_date && 
-       volunteer.volunteer_profile?.availability_date?.end_date &&
-       new Date(volunteer.volunteer_profile.availability_date.start_date) <= new Date(filters.availability.endDate) &&
-       new Date(volunteer.volunteer_profile.availability_date.end_date) >= new Date(filters.availability.startDate));
-    
-    // Return true if all conditions match
-    return searchMatch && categoryMatch && studentTypeMatch && availabilityMatch;
-  });
+  const volunteers = volunteersData?.users || [];
+  const totalItems = volunteersData?.total || 0;
+  const totalPages = volunteersData?.totalPages || 0;
+  const startIndex = (currentPage - 1) * 6;
+  const endIndex = Math.min(startIndex + 6, totalItems);
 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Filter Sidebar */}
         <div className="hidden md:block sticky top-4">
           <FilterSidebar onFilterChange={setFilters} />
         </div>
 
-        {/* Main Content */}
         <div className="flex-1 min-w-0">
-          {/* Search Bar */}
           <div className="mb-6 w-full">
             <SearchBar role="organization" disableOverlay />
           </div>
 
-          {/* Volunteer Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {!isLoading &&
+            volunteers.length > 0 && (
+              <div className="mb-4 text-sm text-gray-600">
+                Showing {startIndex + 1} to {endIndex} of {totalItems}{" "}
+                volunteers
+              </div>
+            )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[620px]">
             {isLoading ? (
-              // Loading skeletons
               Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="w-full max-w-[382px]">
                   <div className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 cursor-pointer relative bg-white">
@@ -126,7 +121,7 @@ export default function OrganizationHomepage() {
                   </div>
                 </div>
               ))
-            ) : filteredVolunteers?.length === 0 ? (
+            ) : volunteers.length === 0 ? (
               <div className="col-span-full text-center py-12">
                 <p className="text-gray-600 text-lg">No volunteers found</p>
                 <p className="text-gray-500 text-sm mt-2">
@@ -134,13 +129,28 @@ export default function OrganizationHomepage() {
                 </p>
               </div>
             ) : (
-              filteredVolunteers?.map((volunteer: Volunteer) => (
-                <div key={volunteer._id} className="w-full max-w-[382px]">
-                  <VolunteerCard volunteer={volunteer} onConnect={handleConnect} />
+              volunteers.map((volunteer: Record<string, unknown>) => (
+                <div key={volunteer._id as string} className="w-full max-w-[382px]">
+                  <VolunteerCard
+                    volunteer={volunteer as unknown as Volunteer}
+                    onConnect={handleConnect}
+                  />
                 </div>
               ))
             )}
           </div>
+
+          {!isLoading &&
+            volunteers.length > 0 && (
+              <div className="mt-8 flex justify-center">
+                <PaginationWrapper
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  maxVisiblePages={5}
+                />
+              </div>
+            )}
         </div>
       </div>
 

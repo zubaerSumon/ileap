@@ -22,13 +22,18 @@ export const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({ onGroupCre
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const utils = trpc.useUtils();
-  const { data: availableUsers } = trpc.users.getAvailableUsers.useQuery(undefined, {
+  const { data: availableUsersData } = trpc.users.getAvailableUsers.useQuery({
+    page: 1,
+    limit: 50, // Get more users for group creation
+    search: searchQuery || undefined,
+  }, {
     enabled: open,
   });
 
-  const filteredUsers = availableUsers?.filter(user =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const availableUsers = availableUsersData?.users || [];
+
+  // Remove client-side filtering since it's now handled server-side
+  const filteredUsers = availableUsers;
 
   const selectedUsersList = availableUsers?.filter(user =>
     selectedUsers.includes(user._id)

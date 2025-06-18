@@ -90,10 +90,15 @@ const OrganisationDashboard = () => {
       }
     );
   // Fetch available volunteers
-  const { data: availableVolunteers, isLoading: isLoadingVolunteers } =
-    trpc.users.getAvailableUsers.useQuery(undefined, {
-      select: (data) => data as Volunteer[]
+  const { data: availableVolunteersData, isLoading: isLoadingVolunteers } =
+    trpc.users.getAvailableUsers.useQuery({
+      page: 1,
+      limit: 10, // Get fewer volunteers for dashboard
+    }, {
+      select: (data) => data.users as Volunteer[]
     });
+
+  const availableVolunteers = availableVolunteersData || [];
 
   // Tab state
   const [tab, setTab] = useState("open");

@@ -49,9 +49,14 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
     isSending
   } = useMessages(selectedUserId, isGroup);
 
-  const { data: availableUsers, isLoading: isLoadingUsers } = trpc.users.getAvailableUsers.useQuery(undefined, {
+  const { data: availableUsersData, isLoading: isLoadingUsers } = trpc.users.getAvailableUsers.useQuery({
+    page: 1,
+    limit: 50,  
+  }, {
     enabled: !!session && session.user?.role !== "volunteer"
   });
+
+  const availableUsers = availableUsersData?.users || [];
 
   const handleSelectUser = (userId: string) => {
     setSelectedUserId(userId);
