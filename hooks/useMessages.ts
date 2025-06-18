@@ -1,12 +1,16 @@
- import { Message } from "@/types/message";
+import { Message } from "@/types/message";
 import { trpc } from "@/utils/trpc";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
+import { useRealtimeMessages } from "./useRealtimeMessages";
  
 export const useMessages = (selectedUserId: string | null, isGroup: boolean) => {
     const utils = trpc.useUtils();
     const [newMessage, setNewMessage] = useState("");
     const { data: session } = useSession();
+  
+    // Enable real-time messaging
+    useRealtimeMessages(selectedUserId, isGroup);
   
     const { data: messages, isLoading: isLoadingMessages, fetchNextPage, hasNextPage, isFetchingNextPage } = trpc.messages.getMessages.useInfiniteQuery(
       { 
@@ -42,12 +46,15 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
   
     const sendMessageMutation = trpc.messages.sendMessage.useMutation({
       onMutate: async (newMessage) => {
+        console.log('🚀 Starting optimistic update for message:', newMessage.content);
+        
         // Cancel any outgoing refetches
         await utils.messages.getMessages.cancel({ userId: selectedUserId || "" });
-  
+
         // Get the current messages
-        const previousMessages = utils.messages.getMessages.getData({ userId: selectedUserId || "" });
-  
+        const previousMessages = utils.messages.getMessages.getInfiniteData({ userId: selectedUserId || "", limit: 20 });
+        console.log('📝 Previous messages data:', previousMessages);
+
         // Optimistically update the messages
         if (previousMessages) {
           const optimisticMessage = {
@@ -68,46 +75,69 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
             },
             __v: 0
           };
-  
-          utils.messages.getMessages.setData(
-            { userId: selectedUserId || "" },
-            (old) => {
-              if (!old) return old;
+
+          console.log('📝 Adding optimistic message:', optimisticMessage);
+
+          utils.messages.getMessages.setInfiniteData(
+            { userId: selectedUserId || "", limit: 20 },
+            (oldData) => {
+              if (!oldData) {
+                console.log('❌ No old data for optimistic update');
+                return oldData;
+              }
+              
+              console.log('📝 Optimistic update - old pages count:', oldData.pages.length);
+              const newPages = [...oldData.pages];
+              if (newPages.length > 0) {
+                // Add the optimistic message to the end of the first page
+                // The ChatArea component will sort messages by creation time
+                newPages[0] = {
+                  ...newPages[0],
+                  messages: [...newPages[0].messages, optimisticMessage],
+                };
+              }
+              
+              console.log('📝 Optimistic update - new first page messages count:', newPages[0]?.messages?.length || 0);
               return {
-                messages: [optimisticMessage, ...old.messages],
-                nextCursor: old.nextCursor
+                ...oldData,
+                pages: newPages,
               };
             }
           );
+        } else {
+          console.log('❌ No previous messages found for optimistic update');
         }
-  
+
         return { previousMessages };
       },
       onError: (err, newMessage, context) => {
         // Rollback on error
         if (context?.previousMessages) {
-          utils.messages.getMessages.setData(
-            { userId: selectedUserId || "" },
+          utils.messages.getMessages.setInfiniteData(
+            { userId: selectedUserId || "", limit: 20 },
             context.previousMessages
           );
         }
       },
-      onSuccess: () => {
-        // Invalidate both conversations and messages
+      onSuccess: (data) => {
+        console.log('✅ Message sent successfully:', data);
+        // Invalidate conversations to update the list
         utils.messages.getConversations.invalidate();
-        utils.messages.getMessages.invalidate({ userId: selectedUserId || "" });
         setNewMessage("");
       },
     });
   
     const sendGroupMessageMutation = trpc.messages.sendGroupMessage.useMutation({
       onMutate: async (newMessage) => {
+        console.log('🚀 Starting optimistic update for group message:', newMessage.content);
+        
         // Cancel any outgoing refetches
         await utils.messages.getGroupMessages.cancel({ groupId: selectedUserId || "" });
-  
+
         // Get the current messages
-        const previousMessages = utils.messages.getGroupMessages.getData({ groupId: selectedUserId || "" });
-  
+        const previousMessages = utils.messages.getGroupMessages.getInfiniteData({ groupId: selectedUserId || "", limit: 20 });
+        console.log('📝 Previous group messages data:', previousMessages);
+
         // Optimistically update the messages
         if (previousMessages) {
           const optimisticMessage = {
@@ -127,34 +157,53 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
             },
             __v: 0
           };
-  
-          utils.messages.getGroupMessages.setData(
-            { groupId: selectedUserId || "" },
-            (old) => {
-              if (!old) return old;
+
+          console.log('📝 Adding optimistic group message:', optimisticMessage);
+
+          utils.messages.getGroupMessages.setInfiniteData(
+            { groupId: selectedUserId || "", limit: 20 },
+            (oldData) => {
+              if (!oldData) {
+                console.log('❌ No old data for optimistic group update');
+                return oldData;
+              }
+              
+              console.log('📝 Optimistic group update - old pages count:', oldData.pages.length);
+              const newPages = [...oldData.pages];
+              if (newPages.length > 0) {
+                // Add the optimistic message to the end of the first page
+                // The ChatArea component will sort messages by creation time
+                newPages[0] = {
+                  ...newPages[0],
+                  messages: [...newPages[0].messages, optimisticMessage],
+                };
+              }
+              
+              console.log('📝 Optimistic group update - new first page messages count:', newPages[0]?.messages?.length || 0);
               return {
-                messages: [optimisticMessage, ...old.messages],
-                nextCursor: old.nextCursor
+                ...oldData,
+                pages: newPages,
               };
             }
           );
+        } else {
+          console.log('❌ No previous group messages found for optimistic update');
         }
-  
+
         return { previousMessages };
       },
       onError: (err, newMessage, context) => {
         // Rollback on error
         if (context?.previousMessages) {
-          utils.messages.getGroupMessages.setData(
-            { groupId: selectedUserId || "" },
+          utils.messages.getGroupMessages.setInfiniteData(
+            { groupId: selectedUserId || "", limit: 20 },
             context.previousMessages
           );
         }
       },
       onSuccess: () => {
-        // Invalidate both groups and messages
-        utils.messages.getGroups.invalidate();
-        utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId || "" });
+        // Invalidate conversations to update the list
+        utils.messages.getConversations.invalidate();
         setNewMessage("");
       },
     });
