@@ -1,5 +1,5 @@
 import { trpc } from "@/utils/trpc";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 export const useVolunteerApplication = (opportunityId: string) => {
   const [isApplied, setIsApplied] = useState(false);
@@ -9,15 +9,24 @@ export const useVolunteerApplication = (opportunityId: string) => {
   const { data: applicationStatus, isPending: isStatusPending } = trpc.applications.getApplicationStatus.useQuery(
     { opportunityId }
   );
-  console.log({applicationStatus});
+
+  // Memoize the application state to prevent unnecessary re-renders
+  const applicationState = useMemo(() => {
+    if (isStatusPending) {
+      return { isApplied: false, isLoading: true };
+    }
+    
+    const status = applicationStatus?.status;
+    return {
+      isApplied: status === "pending" || status === "approved",
+      isLoading: false,
+    };
+  }, [applicationStatus, isStatusPending]);
 
   useEffect(() => {
-    if (!isStatusPending) {
-      const status = applicationStatus?.status;
-      setIsApplied(status === "pending" || status === "approved");
-      setIsLoading(false);
-    }
-  }, [applicationStatus, isStatusPending]);
+    setIsApplied(applicationState.isApplied);
+    setIsLoading(applicationState.isLoading);
+  }, [applicationState]);
 
   // Mutation to apply for opportunity
   const applyMutation = trpc.applications.applyToOpportunity.useMutation({

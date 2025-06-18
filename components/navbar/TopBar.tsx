@@ -42,6 +42,7 @@ export function TopBar({
               width={80}
               height={32}
               className="h-8 w-auto"
+              style={{ width: 'auto', height: '32px' }}
               priority
             />
           </Link>
@@ -90,6 +91,7 @@ export function TopBar({
               width={80}
               height={32}
               className="h-8 w-auto"
+              style={{ width: 'auto', height: '32px' }}
               priority
             />
           </Link>

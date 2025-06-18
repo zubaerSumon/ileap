@@ -7,10 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "build:server": "tsc --project server/tsconfig.json",
-    "start:ws": "node scripts/start-ws-server.js",
-    "dev:ws": "npm run build:server && npm run start:ws",
-    "dev:all": "concurrently \"npm run dev\" \"npm run dev:ws\""
+    "build:server": "tsc --project server/tsconfig.json"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.8.0",
@@ -52,7 +49,6 @@
     "@trpc/react-query": "^11.0.0",
     "@trpc/server": "^11.0.0",
     "@types/axios": "^0.14.4",
-    "@types/ws": "^8.18.1",
     "axios": "^1.9.0",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
@@ -90,7 +86,6 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7",
     "tiptap": "^1.32.2",
-    "ws": "^8.18.2",
     "xlsx": "^0.18.5",
     "zod": "^3.24.2"
   },

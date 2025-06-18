@@ -35,7 +35,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   hasMore,
   isLoadingMore,
   isSending,
-  selectedConversationId
+  selectedConversationId,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);

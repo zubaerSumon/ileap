@@ -43,6 +43,7 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
           )}
         </div>
       </div>
+      
       <div className="flex items-center gap-2">
         {isGroup && onDeleteGroup && (
           <Button

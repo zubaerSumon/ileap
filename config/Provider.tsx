@@ -1,46 +1,37 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { httpBatchLink, wsLink, splitLink } from "@trpc/client";
-import React, { useState } from "react";
-import { getBaseUrl, trpc } from "./client";
-import { createWSClient } from "@trpc/client";
+import { httpBatchLink } from "@trpc/client";
+import React, { useState, useMemo } from "react";
+import { trpc } from "./client";
 
 export const TrpcProvider = ({ children }: { children: React.ReactNode }) => {
-  const [queryClient] = useState(() => new QueryClient());
-  const [trpcClient] = useState(() => {
-    if (typeof window === 'undefined') {
-      // Server-side: only use HTTP
-      return trpc.createClient({
-        links: [
-          httpBatchLink({
-            url: `${getBaseUrl()}/api/trpc`,
-          }),
-        ],
-      });
-    }
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: 1, // Only retry once
+        retryDelay: 1000, // Wait 1 second between retries
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes
+      },
+    },
+  }));
 
-    // Client-side: use WebSocket for subscriptions, HTTP for queries/mutations
-    const wsClient = createWSClient({
-      url: process.env.NEXT_PUBLIC_WS_URL || 'ws://localhost:3001',
-    });
-
+  const trpcClient = useMemo(() => {
     return trpc.createClient({
       links: [
-        splitLink({
-          condition: (op) => {
-            return op.type === 'subscription';
+        httpBatchLink({
+          url: '/api/trpc',
+          fetch: (url, options) => {
+            return fetch(url, {
+              ...options,
+              signal: AbortSignal.timeout(10000), // 10 second timeout
+            });
           },
-          true: wsLink({
-            client: wsClient,
-          }),
-          false: httpBatchLink({
-            url: '/api/trpc',
-          }),
         }),
       ],
     });
-  });
+  }, []);
 
   return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>

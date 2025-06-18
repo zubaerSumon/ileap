@@ -5,77 +5,13 @@ import { Message } from "../../db/models/message";
 import { Types } from "mongoose";
 import User from "../../db/models/user";
 import { JwtPayload } from "jsonwebtoken";
-import { router, subscriptionProcedure, ee } from "../../trpc";
+import { router } from "../../trpc";
 import { z } from "zod";
 import { Group } from "../../db/models/group";
 import { IMessage } from "../../db/interfaces/message";
 import { protectedProcedure } from "../../middlewares/with-auth";
-import { observable } from "@trpc/server/observable";
 
 export const messsageRouter = router({
-  // New subscription procedures for real-time messaging
-  onMessage: subscriptionProcedure
-    .input(z.object({
-      userId: z.string(),
-    }))
-    .subscription(({ input }) => {
-      console.log('🔔 Setting up message subscription for user:', input.userId);
-      
-      return observable<{ message: IMessage; type: 'new' | 'read' }>((emit) => {
-        const onMessage = (data: { message: IMessage; type: 'new' | 'read'; targetUserId: string; senderId: string }) => {
-          console.log('📨 Message event received:', {
-            targetUserId: data.targetUserId,
-            senderId: data.senderId,
-            currentUserId: input.userId,
-            messageId: data.message._id
-          });
-          
-          // Listen for messages where current user is either sender or receiver
-          if (data.targetUserId === input.userId || data.senderId === input.userId) {
-            console.log('✅ Emitting message to client for user:', input.userId);
-            emit.next({ message: data.message, type: data.type });
-          } else {
-            console.log('❌ Message not for current user');
-          }
-        };
-
-        const onGroupMessage = (data: { message: IMessage; type: 'new' | 'read'; groupId: string }) => {
-          // For group messages, we'll need to check if the user is a member
-          // This is a simplified version - you might want to add group membership check
-          emit.next({ message: data.message, type: data.type });
-        };
-
-        ee.on('message', onMessage);
-        ee.on('groupMessage', onGroupMessage);
-
-        return () => {
-          console.log('🔔 Cleaning up message subscription for user:', input.userId);
-          ee.off('message', onMessage);
-          ee.off('groupMessage', onGroupMessage);
-        };
-      });
-    }),
-
-  onConversationUpdate: subscriptionProcedure
-    .input(z.object({
-      userId: z.string(),
-    }))
-    .subscription(({ input }) => {
-      return observable<{ type: 'new' | 'read' | 'delete'; conversationId: string }>((emit) => {
-        const onConversationUpdate = (data: { type: 'new' | 'read' | 'delete'; conversationId: string; targetUserId: string }) => {
-          if (data.targetUserId === input.userId) {
-            emit.next({ type: data.type, conversationId: data.conversationId });
-          }
-        };
-
-        ee.on('conversationUpdate', onConversationUpdate);
-
-        return () => {
-          ee.off('conversationUpdate', onConversationUpdate);
-        };
-      });
-    }),
-
   sendMessage: protectedProcedure
     .input(sendMessageSchema)
     .mutation(async ({ input, ctx }) => {
@@ -105,36 +41,12 @@ export const messsageRouter = router({
           content,
         });
 
-        // Populate the sender information for the emitted message
+        // Populate the sender information for the response
         const populatedMessage = await Message.findById(message._id)
           .populate('sender', 'name avatar role')
           .lean();
 
-        // Emit the new message event for real-time updates
-        console.log('📤 Emitting message event:', {
-          messageId: message._id,
-          type: 'new',
-          targetUserId: receiverId,
-          senderId: senderId.toString(),
-        });
-        
-        // Emit to receiver
-        ee.emit('message', {
-          message: populatedMessage,
-          type: 'new',
-          targetUserId: receiverId,
-          senderId: senderId.toString(),
-        });
-
-        // Also emit to sender so they see their own message immediately
-        ee.emit('message', {
-          message: populatedMessage,
-          type: 'new',
-          targetUserId: senderId.toString(),
-          senderId: senderId.toString(),
-        });
-
-        return message;
+        return populatedMessage;
       } catch (error: any) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
@@ -379,13 +291,6 @@ export const messsageRouter = router({
 
         // Only invalidate if we actually updated something
         if (result.modifiedCount > 0) {
-          // Emit conversation update event
-          ee.emit('conversationUpdate', {
-            type: 'read',
-            conversationId,
-            targetUserId: conversationId,
-          });
-
           return { success: true, updatedCount: result.modifiedCount };
         }
 
@@ -589,19 +494,12 @@ export const messsageRouter = router({
           readBy: [{ user: user._id }],
         });
 
-        // Populate the sender information for the emitted message
+        // Populate the sender information for the response
         const populatedMessage = await Message.findById(message._id)
           .populate('sender', 'name avatar role')
           .lean();
 
-        // Emit the new group message event for real-time updates
-        ee.emit('groupMessage', {
-          message: populatedMessage,
-          type: 'new',
-          groupId: input.groupId,
-        });
-
-        return message;
+        return populatedMessage;
       } catch (error: any) {
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

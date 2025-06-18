@@ -2,15 +2,11 @@ import { Message } from "@/types/message";
 import { trpc } from "@/utils/trpc";
 import { useSession } from "next-auth/react";
 import { useState } from "react";
-import { useRealtimeMessages } from "./useRealtimeMessages";
- 
+
 export const useMessages = (selectedUserId: string | null, isGroup: boolean) => {
     const utils = trpc.useUtils();
     const [newMessage, setNewMessage] = useState("");
     const { data: session } = useSession();
-  
-    // Enable real-time messaging
-    useRealtimeMessages(selectedUserId, isGroup);
   
     const { data: messages, isLoading: isLoadingMessages, fetchNextPage, hasNextPage, isFetchingNextPage } = trpc.messages.getMessages.useInfiniteQuery(
       { 
@@ -20,15 +16,13 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       { 
         enabled: !!selectedUserId && !isGroup,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        staleTime: 0, // Always consider data stale
-        gcTime: 10 * 60 * 1000,
-        refetchInterval: false,
+        refetchInterval: 3000, // Poll every 3 seconds
         refetchOnWindowFocus: true,
         refetchOnMount: true,
       }
     );
   
-    const { data: groupMessages, isLoading: isLoadingGroupMessages, fetchNextPage: fetchNextGroupPage, hasNextPage: hasNextGroupPage, isFetchingNextPage: isFetchingNextGroupPage } = trpc.messages.getGroupMessages.useInfiniteQuery(
+    const { data: groupMessages, isLoading: isLoadingGroupMessages, fetchNextPage: fetchNextGroupPage, hasNextPage: hasNextGroupPage, isFetchingNextPage: isFetchingNextGroupNextPage } = trpc.messages.getGroupMessages.useInfiniteQuery(
       { 
         groupId: selectedUserId || "",
         limit: 20
@@ -36,9 +30,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       { 
         enabled: !!selectedUserId && isGroup,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        staleTime: 0, // Always consider data stale
-        gcTime: 10 * 60 * 1000,
-        refetchInterval: false,
+        refetchInterval: 3000, // Poll every 3 seconds
         refetchOnWindowFocus: true,
         refetchOnMount: true,
       }
@@ -249,7 +241,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       flattenedMessages,
       isLoadingMessages: isGroup ? isLoadingGroupMessages : isLoadingMessages,
       hasMore: isGroup ? hasNextGroupPage : hasNextPage,
-      isLoadingMore: isGroup ? isFetchingNextGroupPage : isFetchingNextPage,
+      isLoadingMore: isGroup ? isFetchingNextGroupNextPage : isFetchingNextPage,
       isSending: isGroup ? sendGroupMessageMutation.isPending : sendMessageMutation.isPending,
     };
   };
