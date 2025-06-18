@@ -45,6 +45,8 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   const [isLoading, setIsLoading] = useState(false);
   const [hasReachedTop, setHasReachedTop] = useState(false);
   const shouldScrollRef = useRef(false);
+  const previousMessageCountRef = useRef<number>(0);
+  const isInitialLoadRef = useRef(true);
 
   useEffect(() => {
     if (!topRef.current) return;
@@ -79,6 +81,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   // Reset hasReachedTop when conversation changes
   useEffect(() => {
     setHasReachedTop(false);
+    isInitialLoadRef.current = true;
   }, [selectedConversation?._id]);
 
   // Set shouldScroll to true when a conversation is selected
@@ -95,17 +98,30 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
       }
     };
 
+    const currentMessageCount = messages?.length || 0;
+    const previousMessageCount = previousMessageCountRef.current;
+
     // Scroll on initial load
-    if (messages && messages.length > 0 && !isLoadingMessages) {
+    if (isInitialLoadRef.current && messages && messages.length > 0 && !isLoadingMessages) {
       scrollToBottom();
+      isInitialLoadRef.current = false;
     }
 
-    // Scroll when new messages arrive or when sending
-    if (shouldScrollRef.current && (isSending || (messages?.length ?? 0) > 0)) {
+    // Only scroll to bottom if:
+    // 1. We're sending a new message, OR
+    // 2. New messages were added to the end (not older messages loaded at top)
+    const hasNewMessagesAtEnd = currentMessageCount > previousMessageCount && 
+      shouldScrollRef.current && 
+      !isLoadingMore;
+
+    if (isSending || hasNewMessagesAtEnd) {
       scrollToBottom();
       shouldScrollRef.current = false;
     }
-  }, [messages, isSending, selectedConversationId, isLoadingMessages]);
+
+    // Update the previous message count
+    previousMessageCountRef.current = currentMessageCount;
+  }, [messages, isSending, selectedConversationId, isLoadingMessages, isLoadingMore]);
 
   const headerData = isGroup ? {
     name: (selectedConversation as Group)?.name,
