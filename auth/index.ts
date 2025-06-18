@@ -66,7 +66,7 @@ export const {
       }
       return token;
     },
-    async session({ session, token, user }) {
+    async session({ session, token }) {
       if (!token) {
         return {
           ...session,
@@ -82,10 +82,10 @@ export const {
       return {
         ...session,
         user: {
-          id: token.id,
-          email: token.email,
-          name: token.name || user?.name,
-          role: token.role || '',
+          id: typeof token.id === 'string' ? token.id : '',
+          email: typeof token.email === 'string' ? token.email : '',
+          name: typeof token.name === 'string' ? token.name : '',
+          role: typeof token.role === 'string' ? token.role : '',
           organization_profile: token.organization_profile,
         },
       };
