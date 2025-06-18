@@ -42,12 +42,17 @@ const FindVolunteer = () => {
     null
   );
 
-  const { data: users, isLoading } =
-    trpc.users.getAvailableUsers.useQuery<User[]>();
+  const { data: usersData, isLoading } =
+    trpc.users.getAvailableUsers.useQuery({
+      page: 1,
+      limit: 50, // Get more users for this view
+      search: searchQuery || undefined,
+    });
 
-  const filteredUsers = users?.filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const users = usersData?.users || [];
+
+  // Remove client-side filtering since it's now handled server-side
+  const filteredUsers = users;
 
   const sortedUsers = filteredUsers?.sort((a, b) => {
     switch (sortBy) {
@@ -151,27 +156,27 @@ const FindVolunteer = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {sortedUsers.map((user) => {
+            {sortedUsers.map((user: Record<string, unknown>) => {
               const applicant: Applicant = {
-                id: user._id,
-                name: user.name,
-                profileImg: user.avatar || "/avatar.svg",
-                location: user.volunteer_profile?.location || "",
-                bio: user.volunteer_profile?.bio || "",
-                skills: user.volunteer_profile?.skills || [],
+                id: user._id as string,
+                name: user.name as string,
+                profileImg: (user.avatar as string) || "/avatar.svg",
+                location: (user.volunteer_profile as VolunteerProfile)?.location || "",
+                bio: (user.volunteer_profile as VolunteerProfile)?.bio || "",
+                skills: (user.volunteer_profile as VolunteerProfile)?.skills || [],
                 completedProjects:
-                  user.volunteer_profile?.completed_projects || 0,
-                availability: user.volunteer_profile?.availability_date || "",
-                applicationId: user._id,
+                  (user.volunteer_profile as VolunteerProfile)?.completed_projects || 0,
+                availability: (user.volunteer_profile as VolunteerProfile)?.availability_date || "",
+                applicationId: user._id as string,
               };
 
               return (
                 <ApplicantsCard
-                  key={user._id}
+                  key={user._id as string}
                   setIsModalOpen={setIsModalOpen}
                   applicant={applicant}
                   setSelectedApplicantId={handleSetSelectedApplicantId}
-                  onMessageClick={() => handleOpenMessageModal(user)}
+                  onMessageClick={() => handleOpenMessageModal(user as unknown as User)}
                 />
               );
             })}

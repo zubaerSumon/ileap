@@ -26,13 +26,16 @@ interface VolunteerCardProps {
   onConnect: (volunteer: Volunteer) => void;
 }
 
-export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardProps) {
+export default function VolunteerCard({
+  volunteer,
+  onConnect,
+}: VolunteerCardProps) {
   const router = useRouter();
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 relative bg-white">
-      <CardContent className="p-4">
-        <div className="flex flex-col">
+    <Card className="hover:shadow-lg transition-all  duration-300 rounded-lg overflow-hidden w-full py-0 relative bg-white">
+      <CardContent className="p-4 ">
+        <div className="flex flex-col min-h-[280px] max-h-[280px]">
           <div className="flex justify-between items-center mb-4">
             <div className="relative w-12 h-12">
               <Image
@@ -67,14 +70,16 @@ export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardPro
           </div>
 
           <div className="flex flex-wrap gap-1 mb-4">
-            {volunteer.volunteer_profile?.interested_on?.map((interest: string, index: number) => (
-              <span
-                key={index}
-                className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
-              >
-                {interest.replace(/_/g, " ")}
-              </span>
-            ))}
+            {volunteer.volunteer_profile?.interested_on?.map(
+              (interest: string, index: number) => (
+                <span
+                  key={index}
+                  className="bg-gray-100 text-gray-700 px-2 py-1 rounded-full text-xs"
+                >
+                  {interest.replace(/_/g, " ")}
+                </span>
+              )
+            )}
           </div>
 
           {volunteer.volunteer_profile?.bio && (
@@ -83,11 +88,16 @@ export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardPro
             </p>
           )}
 
-          <div onClick={(e) => e.stopPropagation()} className="flex gap-1 mt-auto ">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex gap-1 mt-auto "
+          >
             <Button
               variant="outline"
               className="flex-1 flex items-center justify-center gap-1 text-sm h-9 border-gray-200 cursor-pointer"
-              onClick={() => router.push(`/organization/volunteer/${volunteer._id}/profile`)}
+              onClick={() =>
+                router.push(`/organization/volunteer/${volunteer._id}/profile`)
+              }
             >
               View Profile
             </Button>
@@ -104,4 +114,4 @@ export default function VolunteerCard({ volunteer, onConnect }: VolunteerCardPro
       </CardContent>
     </Card>
   );
-} 
+}

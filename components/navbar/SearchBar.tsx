@@ -74,7 +74,9 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
   const handleSearch = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?type=${type}&q=${encodeURIComponent(searchQuery)}`);
+      if (!disableOverlay) {
+        router.push(`/search?type=${type}&q=${encodeURIComponent(searchQuery)}`);
+      }
       setOverlay(false);
     }
   };
@@ -152,7 +154,7 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
       <div
         className={`relative ${disableOverlay ? 'flex w-full' : 'hidden md:flex w-[340px]'} h-[40px] items-center rounded-md border border-input bg-background overflow-visible group focus-within:ring-2 focus-within:ring-blue-500`}
         style={{ boxShadow: "none" }}
-        onClick={() => !disableOverlay && setOverlay(true)}
+        onClick={disableOverlay ? undefined : () => setOverlay(true)}
       >
         <span className="pl-3 flex items-center text-muted-foreground">
           <Search className="h-4 w-4" />
@@ -163,7 +165,7 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
           onInput={handleInput}
           onSearch={handleSearch}
           readOnly={!disableOverlay}
-          className="border-none bg-transparent focus:ring-0 focus-visible:ring-0 px-2 text-sm flex-1 placeholder:text-muted-foreground cursor-pointer"
+          className={`border-none bg-transparent focus:ring-0 focus-visible:ring-0 px-2 text-sm flex-1 placeholder:text-muted-foreground ${!disableOverlay ? 'cursor-pointer' : ''}`}
         />
       </div>
     </>

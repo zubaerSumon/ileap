@@ -10,56 +10,252 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 
 export const userRouter = router({
-  getAvailableUsers: protectedProcedure.query(async ({ ctx }) => {
-    const sessionUser = ctx.user as JwtPayload;
-    console.log("Session User:", sessionUser);
-    
-    if (!sessionUser || !sessionUser?.id) {
-      throw new Error("You must be logged in to view available users.");
-    }
+  getAvailableUsers: protectedProcedure
+    .input(userValidation.getAvailableUsersSchema)
+    .query(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      console.log("Session User:", sessionUser);
+      
+      if (!sessionUser || !sessionUser?.id) {
+        throw new Error("You must be logged in to view available users.");
+      }
 
-    const currentUser = await User.findById(sessionUser.id);
-    console.log("Current User:", currentUser);
-    
-    if (!currentUser) {
-      throw new Error("Current user not found");
-    }
+      const currentUser = await User.findById(sessionUser.id);
+      console.log("Current User:", currentUser);
+      
+      if (!currentUser) {
+        throw new Error("Current user not found");
+      }
 
-    // If user is a volunteer, show admins and mentors
-    if (currentUser.role === "volunteer") {
-      const query = {
+      const { page, limit, search, categories, studentType, availability } = input;
+      const skip = (page - 1) * limit;
+
+      // Build base query
+      const baseQuery: Record<string, unknown> = {
         _id: { $ne: currentUser._id },
-        role: { $in: ["admin", "mentor"] },
       };
-      console.log("Volunteer Query:", query);
-      const users = await User.find(query)
-        .select("name avatar role")
-        .populate("organization_profile");
-      console.log("Found Users for Volunteer:", users);
-      return users;
-    }
 
-    // If user is an admin or mentor, show volunteers
-    if (currentUser.role === "admin" || currentUser.role === "mentor") {
-      const query = {
-        _id: { $ne: currentUser._id },
-        role: "volunteer",
+      // If user is a volunteer, show admins and mentors
+      if (currentUser.role === "volunteer") {
+        baseQuery.role = { $in: ["admin", "mentor"] };
+      }
+      // If user is an admin, mentor, or organization, show volunteers
+      else if (currentUser.role === "admin" || currentUser.role === "mentor" || currentUser.role === "organization") {
+        baseQuery.role = "volunteer";
+      } else {
+        return { users: [], total: 0, totalPages: 0 };
+      }
+
+      // Add search filter
+      if (search) {
+        const searchRegex = new RegExp(search, 'i');
+        if (currentUser.role === "volunteer") {
+          // When volunteer is searching for admins/mentors, search in organization fields
+          baseQuery.$or = [
+            { name: searchRegex },
+            { 'organization_profile.title': searchRegex },
+            { 'organization_profile.bio': searchRegex },
+          ];
+        } else {
+          // When admin/mentor/organization is searching for volunteers, search in volunteer fields
+          baseQuery.$or = [
+            { name: searchRegex },
+            { 'volunteer_profile.course': searchRegex },
+            { 'volunteer_profile.bio': searchRegex },
+            { 'volunteer_profile.interested_on': searchRegex },
+          ];
+        }
+      }
+
+      // Add category filter (only for volunteers)
+      if (categories && categories.length > 0 && (currentUser.role === "admin" || currentUser.role === "mentor" || currentUser.role === "organization")) {
+        baseQuery['volunteer_profile.interested_on'] = { $in: categories };
+      }
+
+      // Add student type filter (only for volunteers)
+      if (studentType !== "all" && (currentUser.role === "admin" || currentUser.role === "mentor" || currentUser.role === "organization")) {
+        baseQuery['volunteer_profile.student_type'] = studentType;
+      }
+
+      // Add availability filter (only for volunteers)
+      if (availability?.startDate && availability?.endDate && (currentUser.role === "admin" || currentUser.role === "mentor" || currentUser.role === "organization")) {
+        // Match the frontend logic: start_date <= endDate AND end_date >= startDate
+        baseQuery['volunteer_profile.availability_date.start_date'] = { 
+          $exists: true, 
+          $ne: null,
+          $lte: availability.endDate 
+        };
+        baseQuery['volunteer_profile.availability_date.end_date'] = { 
+          $exists: true, 
+          $ne: null,
+          $gte: availability.startDate 
+        };
+      }
+
+      console.log("Final Query:", JSON.stringify(baseQuery, null, 2));
+
+      // Get total count for pagination
+      let total, totalPages;
+      
+      if (currentUser.role === "volunteer") {
+        total = await User.countDocuments(baseQuery);
+        totalPages = Math.ceil(total / limit);
+      } else {
+        // Use aggregation for accurate counting when filters are applied
+        const countPipeline = [
+          { $match: { _id: { $ne: currentUser._id }, role: "volunteer" } },
+          {
+            $lookup: {
+              from: "volunteer_profiles",
+              localField: "volunteer_profile",
+              foreignField: "_id",
+              as: "volunteer_profile"
+            }
+          },
+          { $unwind: "$volunteer_profile" },
+          {
+            $match: {
+              $and: [
+                // Search filter
+                search ? {
+                  $or: [
+                    { name: new RegExp(search, 'i') },
+                    { 'volunteer_profile.course': new RegExp(search, 'i') },
+                    { 'volunteer_profile.bio': new RegExp(search, 'i') },
+                    { 'volunteer_profile.interested_on': new RegExp(search, 'i') }
+                  ]
+                } : {},
+                // Category filter
+                categories && categories.length > 0 ? {
+                  'volunteer_profile.interested_on': { $in: categories }
+                } : {},
+                // Student type filter - include both "yes" and "no" when "all" is selected
+                studentType !== "all" ? {
+                  'volunteer_profile.student_type': studentType
+                } : {
+                  'volunteer_profile.student_type': { $in: ["yes", "no"] }
+                },
+                // Availability filter
+                availability?.startDate && availability?.endDate ? {
+                  'volunteer_profile.availability_date.start_date': { 
+                    $exists: true, 
+                    $ne: null,
+                    $lte: availability.endDate 
+                  },
+                  'volunteer_profile.availability_date.end_date': { 
+                    $exists: true, 
+                    $ne: null,
+                    $gte: availability.startDate 
+                  }
+                } : {}
+              ].filter(condition => Object.keys(condition).length > 0)
+            }
+          },
+          { $count: "total" }
+        ];
+
+        const countResult = await User.aggregate(countPipeline);
+        total = countResult.length > 0 ? countResult[0].total : 0;
+        totalPages = Math.ceil(total / limit);
+      }
+
+      console.log("Total documents found:", total);
+      console.log("Total pages:", totalPages);
+      console.log("Skip:", skip);
+      console.log("Limit:", limit);
+
+      // Execute query with pagination using aggregation for proper filtering
+      let users;
+      if (currentUser.role === "volunteer") {
+        users = await User.find(baseQuery)
+          .select("name avatar role")
+          .populate("organization_profile")
+          .skip(skip)
+          .limit(limit)
+          .lean();
+      } else {
+        // Use aggregation to properly filter on populated volunteer_profile fields
+        const pipeline = [
+          { $match: { _id: { $ne: currentUser._id }, role: "volunteer" } },
+          {
+            $lookup: {
+              from: "volunteer_profiles",
+              localField: "volunteer_profile",
+              foreignField: "_id",
+              as: "volunteer_profile"
+            }
+          },
+          { $unwind: "$volunteer_profile" },
+          {
+            $match: {
+              $and: [
+                // Search filter
+                search ? {
+                  $or: [
+                    { name: new RegExp(search, 'i') },
+                    { 'volunteer_profile.course': new RegExp(search, 'i') },
+                    { 'volunteer_profile.bio': new RegExp(search, 'i') },
+                    { 'volunteer_profile.interested_on': new RegExp(search, 'i') }
+                  ]
+                } : {},
+                // Category filter
+                categories && categories.length > 0 ? {
+                  'volunteer_profile.interested_on': { $in: categories }
+                } : {},
+                // Student type filter - include both "yes" and "no" when "all" is selected
+                studentType !== "all" ? {
+                  'volunteer_profile.student_type': studentType
+                } : {
+                  'volunteer_profile.student_type': { $in: ["yes", "no"] }
+                },
+                // Availability filter
+                availability?.startDate && availability?.endDate ? {
+                  'volunteer_profile.availability_date.start_date': { 
+                    $exists: true, 
+                    $ne: null,
+                    $lte: availability.endDate 
+                  },
+                  'volunteer_profile.availability_date.end_date': { 
+                    $exists: true, 
+                    $ne: null,
+                    $gte: availability.startDate 
+                  }
+                } : {}
+              ].filter(condition => Object.keys(condition).length > 0)
+            }
+          },
+          {
+            $project: {
+              name: 1,
+              avatar: 1,
+              role: 1,
+              volunteer_profile: {
+                student_type: 1,
+                course: 1,
+                availability_date: 1,
+                interested_on: 1,
+                bio: 1
+              }
+            }
+          },
+          { $skip: skip },
+          { $limit: limit }
+        ];
+
+        users = await User.aggregate(pipeline);
+      }
+
+      console.log(`Found ${users.length} users out of ${total} total`);
+
+      return {
+        users,
+        total,
+        totalPages,
+        currentPage: page,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
       };
-      console.log("Admin/Mentor Query:", query);
-
-      const users = await User.find(query)
-        .select("name avatar role")
-        .populate({
-          path: "volunteer_profile",
-          select: "student_type course availability_date interested_on bio",
-        });
-      console.log("Found Users for Admin/Mentor:", users);
-      return users;
-    }
-
-    console.log("No matching role found, returning empty array");
-    return [];
-  }),
+    }),
   updateUser: protectedProcedure
     .input(userValidation.updateUserSchema)
     .mutation(async ({ ctx, input }) => {

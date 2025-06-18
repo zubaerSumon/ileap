@@ -6,14 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
-import {
   useReactTable,
   getCoreRowModel,
   flexRender,
@@ -32,22 +24,28 @@ import { trpc } from "@/utils/trpc";
 import type { Opportunity } from "@/types/opportunities";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import OpportunityTabs from "@/components/layout/organisation/opportunities/OpportunityTabs";
+import { PaginationWrapper } from "@/components/PaginationWrapper";
+import { usePagination } from "@/hooks/usePagination";
 import { useRouter } from "next/navigation";
 
 export default function OpportunitiesPage() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("open");
-  const [pageIndex, setPageIndex] = useState(0);
-  const pageSize = 4;
 
   const { data: opportunities, isLoading } =
     trpc.opportunities.getOrganizationOpportunities.useQuery();
 
-  // Pagination logic
-  const paginatedData = (opportunities || []).slice(
-    pageIndex * pageSize,
-    pageIndex * pageSize + pageSize
-  );
+  // Use the pagination hook
+  const {
+    currentPage,
+    totalPages,
+    paginatedData,
+    setCurrentPage,
+    totalItems,
+  } = usePagination(opportunities || [], {
+    pageSize: 4,
+    initialPage: 1,
+  });
 
   const columnHelper = createColumnHelper<Opportunity>();
 
@@ -135,11 +133,9 @@ export default function OpportunitiesPage() {
     columns,
     getCoreRowModel: getCoreRowModel(),
     manualPagination: true,
-    pageCount: Math.ceil((opportunities?.length || 0) / pageSize),
-    state: { pagination: { pageIndex, pageSize } },
+    pageCount: totalPages,
+    state: { pagination: { pageIndex: currentPage - 1, pageSize: 4 } },
   });
-
-  const totalPages = Math.ceil((opportunities?.length || 0) / pageSize);
 
   return (
     <ProtectedLayout>
@@ -152,7 +148,7 @@ export default function OpportunitiesPage() {
               <OpportunityTabs
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
-                openCount={opportunities?.length || 0}
+                openCount={totalItems}
               />
             </div>
 
@@ -230,52 +226,12 @@ export default function OpportunitiesPage() {
             </div>
 
             <div className="p-4 flex items-center justify-center">
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setPageIndex((prev) => Math.max(prev - 1, 0));
-                      }}
-                      className={
-                        pageIndex === 0 ? "pointer-events-none opacity-50" : ""
-                      }
-                    />
-                  </PaginationItem>
-                  {[...Array(totalPages)].map((_, i) => (
-                    <PaginationItem key={i}>
-                      <PaginationLink
-                        href="#"
-                        isActive={i === pageIndex}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setPageIndex(i);
-                        }}
-                      >
-                        {i + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ))}
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setPageIndex((prev) =>
-                          Math.min(prev + 1, totalPages - 1)
-                        );
-                      }}
-                      className={
-                        pageIndex === totalPages - 1
-                          ? "pointer-events-none opacity-50"
-                          : ""
-                      }
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+              <PaginationWrapper
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                maxVisiblePages={5}
+              />
             </div>
           </div>
         </div>

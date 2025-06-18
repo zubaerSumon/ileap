@@ -12,7 +12,7 @@ const userSchema = z.object({
     .min(6, "Password must be at least 6 characters long")
     .nonempty("Password is required"),
   provider: z.enum([AuthProvider.CREDENTIALS, AuthProvider.GOOGLE]),
-  role: z.enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION]),
+  role: z.enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.MENTOR, UserRole.ORGANIZATION]),
   reffered_by: z.string().optional(),
   is_verified: z.boolean(),
 });
@@ -23,7 +23,7 @@ const updateUserSchema = z.object({
   password: z.string().optional(),
   provider: z.enum([AuthProvider.CREDENTIALS, AuthProvider.GOOGLE]).optional(),
   role: z
-    .enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.ORGANIZATION])
+    .enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.MENTOR, UserRole.ORGANIZATION])
     .optional(),
   reffered_by: z.string().optional(),
   is_verified: z.boolean().optional(),
@@ -99,6 +99,18 @@ const applyToEventSchema = z.object({
   eventId: z.string(),
 });
 
+const getAvailableUsersSchema = z.object({
+  page: z.number().min(1).default(1),
+  limit: z.number().min(1).max(50).default(6),
+  search: z.string().optional(),
+  categories: z.array(z.string()).optional(),
+  studentType: z.enum(["all", "yes", "no"]).default("all"),
+  availability: z.object({
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+  }).optional(),
+});
+
 export const userValidation = {
   userSchema,
   updateUserSchema,
@@ -106,4 +118,5 @@ export const userValidation = {
   organizationProfileSchema,
   resetPasswordSchema,
   applyToEventSchema,
+  getAvailableUsersSchema,
 };
