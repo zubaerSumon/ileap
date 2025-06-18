@@ -16,9 +16,9 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       { 
         enabled: !!selectedUserId && !isGroup,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        refetchInterval: 3000, // Poll every 3 seconds
         refetchOnWindowFocus: true,
         refetchOnMount: true,
+        staleTime: 30000, // 30 seconds
       }
     );
   
@@ -30,9 +30,9 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       { 
         enabled: !!selectedUserId && isGroup,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        refetchInterval: 3000, // Poll every 3 seconds
         refetchOnWindowFocus: true,
         refetchOnMount: true,
+        staleTime: 30000, // 30 seconds
       }
     );
   

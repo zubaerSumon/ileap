@@ -11,7 +11,7 @@ import MessageInput from './components/MessageInput';
 import { cn } from "@/lib/utils";
 import { useConversations } from "@/hooks/useConversations";
 import { useMessages } from "@/hooks/useMessages";
-import { useMessageRefresh } from "@/hooks/useMessageRefresh";
+import { useMessageSubscription } from "@/hooks/useMessageSubscription";
 import { Group } from "@/types/message";
 
 interface MessageUIProps {
@@ -40,7 +40,9 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   const selectedGroup = (groups as Group[] | undefined)?.find((g) => g._id === selectedUserId);
   const isGroup = selectedGroup !== undefined;
 
-  const { totalUnreadCount, cleanup } = useMessageRefresh(selectedUserId, isGroup);
+  // Add tRPC subscription for real-time messaging
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { isConnected: isSubscriptionConnected } = useMessageSubscription(selectedUserId, isGroup);
 
   const { 
     newMessage, 
@@ -53,13 +55,6 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
     isLoadingMore,
     isSending
   } = useMessages(selectedUserId, isGroup);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      cleanup();
-    };
-  }, [cleanup]);
 
   const { data: availableUsersData, isLoading: isLoadingUsers } = trpc.users.getAvailableUsers.useQuery({
     page: 1,
@@ -157,12 +152,6 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
       <main className="col-span-1 md:col-span-3 flex flex-col h-full border-l">
         {selectedUserId ? (
           <div className="flex flex-col h-full">
-            {/* Debug indicator - can be removed later */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="bg-blue-50 p-2 text-xs text-blue-600 border-b">
-                🔄 Unread: {totalUnreadCount}
-              </div>
-            )}
             <div className="flex-1 min-h-0 relative">
               <ChatArea
                 messages={flattenedMessages}

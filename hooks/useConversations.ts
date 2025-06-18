@@ -7,22 +7,18 @@ export const useConversations = () => {
 
   const { data: conversations, isLoading: isLoadingConversations } =
     trpc.messages.getConversations.useQuery(undefined, {
-      enabled: !!session,
+      enabled: !!session?.user?.id,
       staleTime: 30000,
-      gcTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchInterval: 5000,
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
     });
 
   const { data: groups, isLoading: isLoadingGroups } =
     trpc.messages.getGroups.useQuery(undefined, {
-      enabled: !!session,
+      enabled: !!session?.user?.id,
       staleTime: 30000,
-      gcTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
-      refetchInterval: 5000,
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
     });
 
   const markAsReadMutation = trpc.messages.markAsRead.useMutation({

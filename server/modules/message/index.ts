@@ -5,11 +5,12 @@ import { Message } from "../../db/models/message";
 import { Types } from "mongoose";
 import User from "../../db/models/user";
 import { JwtPayload } from "jsonwebtoken";
-import { router } from "../../trpc";
+import { router, observable } from "../../trpc";
 import { z } from "zod";
 import { Group } from "../../db/models/group";
 import { IMessage } from "../../db/interfaces/message";
 import { protectedProcedure } from "../../middlewares/with-auth";
+import { messagePubSub } from "./subscriptions";
 
 export const messsageRouter = router({
   sendMessage: protectedProcedure
@@ -45,6 +46,20 @@ export const messsageRouter = router({
         const populatedMessage = await Message.findById(message._id)
           .populate('sender', 'name avatar role')
           .lean();
+
+        // Publish the new message to both sender and receiver channels
+        if (populatedMessage) {
+          console.log('📤 Publishing message via tRPC:', {
+            senderId: senderId.toString(),
+            receiverId: receiverId.toString(),
+            messageId: (populatedMessage as any)._id
+          });
+          
+          // Publish to receiver's channel
+          messagePubSub.publishNewMessage(receiverId, populatedMessage as Record<string, unknown>);
+          // Also publish to sender's channel so their UI updates immediately
+          messagePubSub.publishNewMessage(senderId, populatedMessage as Record<string, unknown>);
+        }
 
         return populatedMessage;
       } catch (error: any) {
@@ -717,4 +732,50 @@ export const messsageRouter = router({
         });
       }
     }),
+
+  // Subscription for real-time messages
+  onMessage: protectedProcedure.subscription(({ ctx }) => {
+    const sessionUser = ctx.user as JwtPayload;
+    if (!sessionUser?.email) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You must be logged in to subscribe to messages",
+      });
+    }
+
+    return observable<{ type: string; data: Record<string, unknown> }>((emit) => {
+      // Get user ID from session
+      const getUser = async () => {
+        const user = await User.findOne({ email: sessionUser.email });
+        return user?._id?.toString();
+      };
+
+      getUser().then((userId) => {
+        if (userId) {
+          console.log('📡 User subscribing to messages:', userId);
+          return messagePubSub.subscribeToMessages(userId);
+        }
+      }).then((subscription) => {
+        if (subscription) {
+          subscription.subscribe({
+            next: (data) => {
+              console.log('📨 Subscription received:', data);
+              emit.next(data);
+            },
+            error: (error) => {
+              console.error('❌ Subscription error:', error);
+              emit.error(error);
+            },
+          });
+        }
+      }).catch((error) => {
+        console.error('❌ Failed to setup subscription:', error);
+        emit.error(error);
+      });
+
+      return () => {
+        console.log('📡 User unsubscribing from messages');
+      };
+    });
+  }),
 });
