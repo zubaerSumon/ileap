@@ -22,7 +22,6 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ user }: UserMenuProps) {
-  const utils = trpc.useUtils();
   const [isAvailable, setIsAvailable] = useState(true);
   const hasInitialized = useRef(false);
   const userRole =
@@ -47,9 +46,9 @@ export function UserMenu({ user }: UserMenuProps) {
 
   // Update availability mutation
   const updateVolunteerProfile = trpc.volunteers.updateVolunteerProfile.useMutation({
-    onSuccess: (data) => {
-      setIsAvailable(data.is_available || true);
-      utils.volunteers.getVolunteerProfile.invalidate();
+    onSuccess: () => {
+      // Don't update local state here, let the user's choice persist
+      // The server update was successful, so we trust the local state
     },
     onError: (error) => {
       // Revert the switch if update fails
@@ -108,7 +107,7 @@ export function UserMenu({ user }: UserMenuProps) {
                 <Switch
                   checked={isAvailable}
                   onCheckedChange={handleAvailabilityChange}
-                  className="scale-75 data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-blue-200"
+                  className="scale-75 cursor-pointer data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-blue-200"
                 />
               </div>
             )}

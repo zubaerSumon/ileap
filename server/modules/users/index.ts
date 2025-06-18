@@ -234,7 +234,8 @@ export const userRouter = router({
                 course: 1,
                 availability_date: 1,
                 interested_on: 1,
-                bio: 1
+                bio: 1,
+                is_available: 1
               }
             }
           },
