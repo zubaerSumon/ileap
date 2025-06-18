@@ -9,11 +9,13 @@ import {
 } from "@/components/ui/dialog";
 
 interface DeleteConversationModalProps {
+  userName: string;
   onClose: () => void;
   onDelete: () => void;
 }
 
 export const DeleteConversationModal: React.FC<DeleteConversationModalProps> = ({
+  userName,
   onClose,
   onDelete,
 }) => {
@@ -25,14 +27,16 @@ export const DeleteConversationModal: React.FC<DeleteConversationModalProps> = (
         </DialogHeader>
         
         <div className="space-y-4">
-          <p className="text-gray-600">Are you sure you want to delete this conversation?</p>
+          <p className="text-gray-600">
+            Are you sure you want to delete the conversation with &quot;{userName}&quot;? This action cannot be undone and all messages will be permanently removed.
+          </p>
           
           <div className="flex justify-end gap-3">
             <Button
-              variant="default"
+              variant="destructive"
               onClick={onDelete}
             >
-              Delete
+              Delete Conversation
             </Button>
             <Button
               variant="outline"

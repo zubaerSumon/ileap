@@ -624,19 +624,27 @@ export const messsageRouter = router({
           });
         }
 
-        const group = await Group.findOne({ 
-          _id: input.groupId,
-          admins: user._id 
-        });
-
+        // Find the group
+        const group = await Group.findById(input.groupId);
         if (!group) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Group not found or you don't have permission to delete it",
+            message: "Group not found",
           });
         }
 
-        // Delete all messages in the group
+        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
+        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organization";
+        const isGroupAdmin = group.admins.includes(user._id);
+        
+        if (!isAdminOrMentor && !isGroupAdmin) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to delete this group",
+          });
+        }
+
+        // Delete all messages in the group (this will work even if no messages exist)
         await Message.deleteMany({ group: group._id });
 
         // Delete the group
@@ -647,6 +655,65 @@ export const messsageRouter = router({
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: error?.message || "Failed to delete group",
+        });
+      }
+    }),
+
+  deleteConversation: protectedProcedure
+    .input(z.object({
+      conversationId: z.string()
+    }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to delete a conversation",
+          });
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        // Check if user is a volunteer
+        if (user.role === "volunteer") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Volunteers cannot delete conversations",
+          });
+        }
+
+        // Only allow admin, mentor, or organization users to delete conversations
+        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organization";
+        if (!isAdminOrMentor) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to delete conversations",
+          });
+        }
+
+        // Find the conversation (messages between the user and the target user)
+        const conversationId = input.conversationId;
+        
+        // Delete all messages in the conversation
+        await Message.deleteMany({
+          $or: [
+            { sender: user._id, receiver: conversationId },
+            { sender: conversationId, receiver: user._id }
+          ]
+        });
+
+        return { success: true };
+      } catch (error: any) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error?.message || "Failed to delete conversation",
         });
       }
     }),

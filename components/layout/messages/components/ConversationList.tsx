@@ -58,7 +58,6 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
             <h3 className="text-sm font-medium text-gray-500">Groups</h3>
             <CreateGroupDialog
               onGroupCreated={onCreateGroup}
-              userRole={userRole}
             />
           </div>
         )}

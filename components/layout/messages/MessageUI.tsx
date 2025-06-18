@@ -4,6 +4,7 @@ import { useSession } from "next-auth/react";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import DeleteGroupModal from './DeleteGroupModal';
+import DeleteConversationModal from './DeleteConversationModal';
 import Sidebar from './components/Sidebar';
 import ChatArea from './components/ChatArea';
 import MessageInput from './components/MessageInput';
@@ -23,6 +24,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [activeTab, setActiveTab] = useState("conversations");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteConversationModal, setShowDeleteConversationModal] = useState(false);
   const utils = trpc.useUtils();
 
   useEffect(() => {
@@ -100,10 +102,32 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
     },
   });
 
+  const deleteConversationMutation = trpc.messages.deleteConversation.useMutation({
+    onSuccess: () => {
+      toast.success("Conversation deleted successfully");
+      setSelectedUserId(null);
+      utils.messages.getConversations.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete conversation");
+    },
+  });
+
   const handleDeleteGroup = () => {
     if (selectedUserId) {
       deleteGroupMutation.mutate({ groupId: selectedUserId });
     }
+  };
+
+  const handleDeleteConversation = () => {
+    setShowDeleteConversationModal(true);
+  };
+
+  const handleConfirmDeleteConversation = () => {
+    if (selectedUserId) {
+      deleteConversationMutation.mutate({ conversationId: selectedUserId });
+    }
+    setShowDeleteConversationModal(false);
   };
 
   return (
@@ -154,6 +178,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
                 currentUserId={session?.user?.id || ""} 
                 isSending={false} 
                 selectedConversationId={null}
+                onDeleteConversation={!isGroup && (session?.user?.role === "admin" || session?.user?.role === "mentor" || session?.user?.role === "organization") ? handleDeleteConversation : undefined}
               />
             </div>
             <div className="flex-shrink-0 border-t bg-white sticky bottom-0 p-4">
@@ -177,6 +202,14 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
           groupName={selectedGroup.name}
           onClose={() => setShowDeleteModal(false)}
           onDelete={handleDeleteGroup}
+        />
+      )}
+
+      {showDeleteConversationModal && selectedConversation && (
+        <DeleteConversationModal
+          userName={selectedConversation.user?.name || "Unknown User"}
+          onClose={() => setShowDeleteConversationModal(false)}
+          onDelete={handleConfirmDeleteConversation}
         />
       )}
     </div>

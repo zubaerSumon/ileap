@@ -14,13 +14,15 @@ interface ConversationHeaderProps {
   onMenuClick: () => void;
   isGroup?: boolean;
   onDeleteGroup?: () => void;
+  onDeleteConversation?: () => void;
 }
 
 export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   user,
   onMenuClick,
   isGroup,
-  onDeleteGroup
+  onDeleteGroup,
+  onDeleteConversation
 }) => {
   if (!user) return null;
   
@@ -53,6 +55,16 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
             className="text-red-500 hover:text-red-600 hover:bg-red-50"
           >
             Delete Group
+          </Button>
+        )}
+        {!isGroup && onDeleteConversation && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDeleteConversation}
+            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+          >
+            Delete Conversation
           </Button>
         )}
         <Button
