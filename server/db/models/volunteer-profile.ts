@@ -61,6 +61,10 @@ const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
       start_time: { type: String },
       end_time: { type: String }
     },
+    is_available: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
