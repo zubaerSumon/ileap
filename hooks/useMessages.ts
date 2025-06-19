@@ -22,10 +22,10 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       { 
         enabled: !!selectedUserId && !isGroup,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false, // Disable refetch on window focus
         refetchOnMount: true,
-        staleTime: 0, // No stale time to ensure immediate real-time updates
-        refetchInterval: 3000, // Refetch every 3 seconds as backup for real-time updates
+        staleTime: 5 * 60 * 1000, // 5 minutes stale time
+        refetchInterval: false, // Disable polling - rely on SSE for real-time updates
       }
     );
   
@@ -37,10 +37,10 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       { 
         enabled: !!selectedUserId && isGroup,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false, // Disable refetch on window focus
         refetchOnMount: true,
-        staleTime: 0, // No stale time to ensure immediate real-time updates for group messages
-        refetchInterval: 2000, // Refetch every 2 seconds as backup for real-time updates
+        staleTime: 5 * 60 * 1000, // 5 minutes stale time
+        refetchInterval: false, // Disable polling - rely on SSE for real-time updates
       }
     );
 

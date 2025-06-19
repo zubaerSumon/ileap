@@ -33,10 +33,10 @@ export default function TopNavigationBar() {
     undefined,
     {
       enabled: isAuthenticated,
-      staleTime: 0, // No stale time to ensure real-time updates
-      refetchOnWindowFocus: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes stale time
+      refetchOnWindowFocus: false, // Disable refetch on window focus
       refetchOnMount: true,
-      refetchInterval: 5000, // Refetch every 5 seconds as backup
+      refetchInterval: false, // Disable polling - rely on SSE for real-time updates
     }
   );
 
@@ -45,10 +45,10 @@ export default function TopNavigationBar() {
     undefined,
     {
       enabled: isAuthenticated,
-      staleTime: 0, // No stale time to ensure real-time updates
-      refetchOnWindowFocus: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes stale time
+      refetchOnWindowFocus: false, // Disable refetch on window focus
       refetchOnMount: true,
-      refetchInterval: 5000, // Refetch every 5 seconds as backup
+      refetchInterval: false, // Disable polling - rely on SSE for real-time updates
     }
   );
 

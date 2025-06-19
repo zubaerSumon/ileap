@@ -8,19 +8,19 @@ export const useConversations = () => {
   const { data: conversations, isLoading: isLoadingConversations } =
     trpc.messages.getConversations.useQuery(undefined, {
       enabled: !!session?.user?.id,
-      staleTime: 0,
-      refetchOnWindowFocus: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes stale time
+      refetchOnWindowFocus: false, // Disable refetch on window focus
       refetchOnMount: true,
-      refetchInterval: 5000,
+      refetchInterval: false, // Disable polling - rely on SSE for real-time updates
     });
 
   const { data: groups, isLoading: isLoadingGroups } =
     trpc.messages.getGroups.useQuery(undefined, {
       enabled: !!session?.user?.id,
-      staleTime: 0,
-      refetchOnWindowFocus: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes stale time
+      refetchOnWindowFocus: false, // Disable refetch on window focus
       refetchOnMount: true,
-      refetchInterval: 5000,
+      refetchInterval: false, // Disable polling - rely on SSE for real-time updates
     });
 
   console.log('🔍 useConversations hook state:', {
