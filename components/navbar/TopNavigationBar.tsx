@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
@@ -22,6 +22,7 @@ export default function TopNavigationBar() {
   const { data: session } = useSession();
   const { isAuthenticated } = useAuthCheck();
   const utils = trpc.useUtils();
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   const isAuthPath = AUTH_PATHS.some((path) => pathname?.includes(path));
   const isProtectedPath = PROTECTED_PATHS.some((path) =>
@@ -37,7 +38,7 @@ export default function TopNavigationBar() {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: false, // Disable polling - use SSE instead
+      refetchInterval: false, // No polling
     }
   );
 
@@ -49,29 +50,50 @@ export default function TopNavigationBar() {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: false, // Disable polling - use SSE instead
+      refetchInterval: false, // No polling
     }
   );
 
-  // SSE subscription for real-time unread count updates
-  const subscription = trpc.messages.subscribeToConversations.useSubscription(
-    undefined,
-    {
-      enabled: isAuthenticated,
-      onData: (data) => {
-        console.log('📡 TopNavigationBar: Received conversation update:', data);
+  // Real-time updates using EventSource
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    console.log('📡 Connecting to EventSource for TopNavigationBar');
+
+    // Create EventSource connection
+    const eventSource = new EventSource('/api/messages/stream');
+    eventSourceRef.current = eventSource;
+
+    eventSource.onopen = () => {
+      console.log('✅ EventSource connection opened for TopNavigationBar');
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('📨 TopNavigationBar: Received EventSource update:', data);
         
-        if (data.type === 'conversation_update' || data.type === 'group_update') {
+        if (data.type === 'new_message' || data.type === 'message_read') {
+          console.log('🔄 TopNavigationBar: Updating unread counts');
           // Invalidate conversations and groups to update unread counts
           utils.messages.getConversations.invalidate();
           utils.messages.getGroups.invalidate();
         }
-      },
-      onError: (error) => {
-        console.error('📡 TopNavigationBar: Subscription error:', error);
-      },
-    }
-  );
+      } catch (error) {
+        console.error('Error parsing EventSource message:', error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('EventSource connection error:', error);
+    };
+
+    return () => {
+      console.log('📡 Closing EventSource connection for TopNavigationBar');
+      eventSource.close();
+      eventSourceRef.current = null;
+    };
+  }, [isAuthenticated, utils]);
 
   // Calculate total unread messages from both conversations and groups
   const conversationsUnreadCount = conversations?.reduce(
@@ -91,8 +113,7 @@ export default function TopNavigationBar() {
     groupsUnreadCount,
     totalUnreadCount,
     conversationsCount: conversations?.length || 0,
-    groupsCount: groups?.length || 0,
-    subscriptionStatus: subscription.status
+    groupsCount: groups?.length || 0
   });
 
   // Handle client-side mounting
