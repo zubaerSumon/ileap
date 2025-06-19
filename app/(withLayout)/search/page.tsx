@@ -8,10 +8,8 @@ import BrowseVolunteer from "@/components/layout/organisation/search/BrowseVolun
 const SearchPage = () => {
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
-  const query = searchParams.get("q");
-
-  console.log("Search Type:", type);
-  console.log("Search Query:", query);
+ 
+ 
 
   return (
     <ProtectedLayout> 

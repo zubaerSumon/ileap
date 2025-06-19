@@ -512,7 +512,24 @@ export const messsageRouter = router({
         // Populate the sender information for the response
         const populatedMessage = await Message.findById(message._id)
           .populate('sender', 'name avatar role')
+          .populate('group', 'name')
           .lean();
+
+        // Publish the new message to all group members
+        if (populatedMessage) {
+          console.log('📤 Publishing group message via tRPC:', {
+            groupId: input.groupId,
+            senderId: user._id.toString(),
+            messageId: (populatedMessage as any)._id,
+            groupMembers: group.members.map((member: Types.ObjectId) => member.toString())
+          });
+          
+          // Publish to all group members
+          messagePubSub.publishGroupMessage(
+            group.members.map((member: Types.ObjectId) => member.toString()),
+            populatedMessage as Record<string, unknown>
+          );
+        }
 
         return populatedMessage;
       } catch (error: any) {

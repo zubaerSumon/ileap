@@ -8,6 +8,12 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
     const [newMessage, setNewMessage] = useState("");
     const { data: session } = useSession();
   
+    console.log('🔍 useMessages hook state:', {
+      selectedUserId,
+      isGroup,
+      sessionUserId: session?.user?.id
+    });
+
     const { data: messages, isLoading: isLoadingMessages, fetchNextPage, hasNextPage, isFetchingNextPage } = trpc.messages.getMessages.useInfiniteQuery(
       { 
         userId: selectedUserId || "",
@@ -18,7 +24,8 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         getNextPageParam: (lastPage) => lastPage.nextCursor,
         refetchOnWindowFocus: true,
         refetchOnMount: true,
-        staleTime: 30000, // 30 seconds
+        staleTime: 0, // No stale time to ensure immediate real-time updates
+        refetchInterval: 3000, // Refetch every 3 seconds as backup for real-time updates
       }
     );
   
@@ -32,9 +39,25 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         getNextPageParam: (lastPage) => lastPage.nextCursor,
         refetchOnWindowFocus: true,
         refetchOnMount: true,
-        staleTime: 30000, // 30 seconds
+        staleTime: 0, // No stale time to ensure immediate real-time updates for group messages
+        refetchInterval: 2000, // Refetch every 2 seconds as backup for real-time updates
       }
     );
+
+    console.log('🔍 useMessages query results:', {
+      isGroup,
+      messagesCount: messages?.pages?.length || 0,
+      groupMessagesCount: groupMessages?.pages?.length || 0,
+      isLoadingMessages,
+      isLoadingGroupMessages,
+      selectedUserId,
+      groupMessagesEnabled: !!selectedUserId && isGroup,
+      directMessagesEnabled: !!selectedUserId && !isGroup,
+      groupMessagesData: groupMessages?.pages?.[0]?.messages?.length || 0,
+      directMessagesData: messages?.pages?.[0]?.messages?.length || 0,
+      groupMessagesQueryKey: { groupId: selectedUserId || "", limit: 20 },
+      directMessagesQueryKey: { userId: selectedUserId || "", limit: 20 }
+    });
   
     const sendMessageMutation = trpc.messages.sendMessage.useMutation({
       onMutate: async (newMessage) => {
@@ -196,6 +219,8 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       onSuccess: () => {
         // Invalidate conversations to update the list
         utils.messages.getConversations.invalidate();
+        // Also invalidate group messages to ensure chat area updates
+        utils.messages.getGroupMessages.invalidate();
         setNewMessage("");
       },
     });

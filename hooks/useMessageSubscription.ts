@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { trpc } from '@/utils/trpc';
+import toast from 'react-hot-toast';
 
 export const useMessageSubscription = (selectedUserId: string | null, isGroup: boolean) => {
   const { data: session } = useSession();
@@ -38,9 +39,19 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
           const currentUserId = session?.user?.id;
           const messageSender = (messageData.sender as Record<string, unknown>)?._id;
           const messageReceiver = (messageData.receiver as Record<string, unknown>)?._id;
+          const messageGroup = (messageData.group as Record<string, unknown>)?._id;
+          
+          console.log('📨 Raw message data:', messageData);
+          console.log('📨 Message fields:', {
+            messageSender,
+            messageReceiver,
+            messageGroup,
+            hasGroup: !!messageData.group,
+            groupData: messageData.group
+          });
           
           const isForCurrentConversation = isGroup 
-            ? (messageData.group as Record<string, unknown>)?._id === selectedUserId
+            ? messageGroup === selectedUserId
             : (messageSender === selectedUserId || messageReceiver === selectedUserId);
           
           console.log('📨 Message check:', {
@@ -49,26 +60,106 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
             selectedUserId,
             messageSender,
             messageReceiver,
-            messageGroup: (messageData.group as Record<string, unknown>)?._id,
-            isForCurrentConversation
+            messageGroup,
+            isForCurrentConversation,
+            messageContent: (messageData.content as string)?.substring(0, 50)
           });
+          
+          // Show toast notification if message is not from current user and not for current conversation
+          const isFromCurrentUser = messageSender === currentUserId;
+          const shouldShowToast = !isFromCurrentUser && !isForCurrentConversation;
+          
+          console.log('🔔 Toast notification check:', {
+            isFromCurrentUser,
+            isForCurrentConversation,
+            shouldShowToast,
+            messageSender,
+            currentUserId
+          });
+          
+          if (shouldShowToast) {
+            const senderName = (messageData.sender as Record<string, unknown>)?.name || 'Someone';
+            const groupName = (messageData.group as Record<string, unknown>)?.name;
+            const messageContent = (messageData.content as string) || '';
+            
+            if (messageData.group) {
+              // Group message
+              console.log('🔔 Showing group message toast:', `${senderName} sent a message in ${groupName}`);
+              toast.success(`${senderName} sent a message in ${groupName}: ${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}`, {
+                duration: 4000,
+                position: 'top-right',
+              });
+            } else {
+              // Direct message
+              console.log('🔔 Showing direct message toast:', `${senderName} sent you a message`);
+              toast.success(`${senderName} sent you a message: ${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}`, {
+                duration: 4000,
+                position: 'top-right',
+              });
+            }
+          }
           
           if (isForCurrentConversation && selectedUserId) {
             console.log('🔄 Updating current conversation with new message');
             
-            // Force refetch the messages immediately
+            // Force complete cache invalidation and refetch
             if (isGroup) {
-              utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId });
-              utils.messages.getGroupMessages.refetch({ groupId: selectedUserId });
+              console.log('🔄 Force invalidating group messages for groupId:', selectedUserId);
+              // Invalidate all group message queries
+              utils.messages.getGroupMessages.invalidate();
+              // Force a refetch after a short delay
+              setTimeout(() => {
+                console.log('🔄 Force refetching group messages');
+                utils.messages.getGroupMessages.refetch();
+              }, 200);
             } else {
-              utils.messages.getMessages.invalidate({ userId: selectedUserId });
-              utils.messages.getMessages.refetch({ userId: selectedUserId });
+              console.log('🔄 Force invalidating direct messages for userId:', selectedUserId);
+              // Invalidate all direct message queries
+              utils.messages.getMessages.invalidate();
+              // Force a refetch after a short delay
+              setTimeout(() => {
+                console.log('🔄 Force refetching direct messages');
+                utils.messages.getMessages.refetch();
+              }, 200);
             }
           }
           
-          // Always invalidate conversations to update the list
+          // Always invalidate conversations and groups to update the sidebar
+          console.log('🔄 Invalidating conversations and groups lists');
+          
+          // Invalidate all conversations and groups queries
           utils.messages.getConversations.invalidate();
+          utils.messages.getGroups.invalidate();
+          
+          // Force immediate refetch
+          console.log('🔄 Force refetching conversations and groups');
           utils.messages.getConversations.refetch();
+          utils.messages.getGroups.refetch();
+          
+          // Force another refetch after a delay to ensure updates
+          setTimeout(() => {
+            console.log('🔄 Delayed refetch of conversations and groups');
+            utils.messages.getConversations.refetch();
+            utils.messages.getGroups.refetch();
+          }, 500);
+          
+          // Also try to invalidate all message-related queries
+          setTimeout(() => {
+            console.log('🔄 Invalidating all message queries');
+            utils.messages.getConversations.invalidate();
+            utils.messages.getGroups.invalidate();
+            utils.messages.getMessages.invalidate();
+            utils.messages.getGroupMessages.invalidate();
+          }, 1000);
+          
+          // Final attempt with longer delay
+          setTimeout(() => {
+            console.log('🔄 Final attempt to update sidebar');
+            utils.messages.getConversations.invalidate();
+            utils.messages.getGroups.invalidate();
+            utils.messages.getConversations.refetch();
+            utils.messages.getGroups.refetch();
+          }, 2000);
         }
         
         if (data.type === 'message_read' && selectedUserId) {
@@ -77,11 +168,9 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
           utils.messages.getConversations.invalidate();
           utils.messages.getConversations.refetch();
           if (isGroup) {
-            utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId });
-            utils.messages.getGroupMessages.refetch({ groupId: selectedUserId });
+            utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId, limit: 20 });
           } else {
-            utils.messages.getMessages.invalidate({ userId: selectedUserId });
-            utils.messages.getMessages.refetch({ userId: selectedUserId });
+            utils.messages.getMessages.invalidate({ userId: selectedUserId, limit: 20 });
           }
         }
       } catch (error) {
