@@ -5,7 +5,7 @@ import { Message } from "../../db/models/message";
 import { Types } from "mongoose";
 import User from "../../db/models/user";
 import { JwtPayload } from "jsonwebtoken";
-import { router, observable } from "../../trpc";
+import { router } from "../../trpc";
 import { z } from "zod";
 import { Group } from "../../db/models/group";
 import { IMessage } from "../../db/interfaces/message";
@@ -66,9 +66,9 @@ export const messsageRouter = router({
           });
           
           // Publish to receiver's channel
-          messagePubSub.publishNewMessage(receiverId, populatedMessage as Record<string, unknown>);
+          await messagePubSub.publishNewMessage(receiverId, populatedMessage as Record<string, unknown>);
           // Also publish to sender's channel so their UI updates immediately
-          messagePubSub.publishNewMessage(senderId, populatedMessage as Record<string, unknown>);
+          await messagePubSub.publishNewMessage(senderId, populatedMessage as Record<string, unknown>);
         }
 
         return populatedMessage;
@@ -854,172 +854,5 @@ export const messsageRouter = router({
           message: error?.message || "Failed to delete conversation",
         });
       }
-    }),
-
-  // Subscription for real-time messages
-  onMessage: protectedProcedure.subscription(({ ctx }) => {
-    const sessionUser = ctx.user as JwtPayload;
-    if (!sessionUser?.email) {
-      throw new TRPCError({
-        code: "UNAUTHORIZED",
-        message: "You must be logged in to subscribe to messages",
-      });
-    }
-
-    return observable<{ type: string; data: Record<string, unknown> }>((emit) => {
-      // Get user ID from session
-      const getUser = async () => {
-        const user = await User.findOne({ email: sessionUser.email });
-        return user?._id?.toString();
-      };
-
-      getUser().then((userId) => {
-        if (userId) {
-          console.log('📡 User subscribing to messages:', userId);
-          return messagePubSub.subscribeToMessages(userId);
-        }
-      }).then((subscription) => {
-        if (subscription) {
-          subscription.subscribe({
-            next: (data) => {
-              console.log('📨 Subscription received:', data);
-              emit.next(data);
-            },
-            error: (error) => {
-              console.error('❌ Subscription error:', error);
-              emit.error(error);
-            },
-          });
-        }
-      }).catch((error) => {
-        console.error('❌ Failed to setup subscription:', error);
-        emit.error(error);
-      });
-
-      return () => {
-        console.log('📡 User unsubscribing from messages');
-      };
-    });
-  }),
-
-  // SSE subscription for messages
-  subscribeToMessages: protectedProcedure
-    .input(z.object({
-      userId: z.string().optional(),
-      isGroup: z.boolean().default(false),
-    }))
-    .subscription(async ({ ctx }) => {
-      const sessionUser = ctx.user as JwtPayload;
-      if (!sessionUser?.email) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You must be logged in to subscribe to messages",
-        });
-      }
-
-      const user = await User.findOne({ email: sessionUser.email });
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found",
-        });
-      }
-
-      const currentUserId = user._id.toString();
-
-      return observable<{
-        type: 'new_message' | 'message_read' | 'conversation_update' | 'connected';
-        data: any;
-      }>((emit) => {
-        const messageHandler = (event: any) => {
-          console.log('📡 SSE: Emitting message event:', event);
-          emit.next(event);
-        };
-
-        const conversationHandler = (event: any) => {
-          console.log('📡 SSE: Emitting conversation event:', event);
-          emit.next({
-            type: 'conversation_update',
-            data: event
-          });
-        };
-
-        // Subscribe to user-specific messages
-        messagePubSub.on(`message:${currentUserId}`, messageHandler);
-        
-        // Subscribe to conversation updates
-        messagePubSub.on(`conversation:${currentUserId}`, conversationHandler);
-
-        // Send initial connection message
-        emit.next({
-          type: 'connected',
-          data: { userId: currentUserId, timestamp: new Date().toISOString() }
-        });
-
-        return () => {
-          console.log('📡 SSE: Cleaning up subscription for user:', currentUserId);
-          messagePubSub.off(`message:${currentUserId}`, messageHandler);
-          messagePubSub.off(`conversation:${currentUserId}`, conversationHandler);
-        };
-      });
-    }),
-
-  // SSE subscription for conversations
-  subscribeToConversations: protectedProcedure
-    .subscription(async ({ ctx }) => {
-      const sessionUser = ctx.user as JwtPayload;
-      if (!sessionUser?.email) {
-        throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You must be logged in to subscribe to conversations",
-        });
-      }
-
-      const user = await User.findOne({ email: sessionUser.email });
-      if (!user) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found",
-        });
-      }
-
-      const currentUserId = user._id.toString();
-
-      return observable<{
-        type: 'conversation_update' | 'group_update' | 'connected';
-        data: any;
-      }>((emit) => {
-        const conversationHandler = (event: any) => {
-          console.log('📡 SSE: Emitting conversation update:', event);
-          emit.next({
-            type: 'conversation_update',
-            data: event
-          });
-        };
-
-        const groupHandler = (event: any) => {
-          console.log('📡 SSE: Emitting group update:', event);
-          emit.next({
-            type: 'group_update',
-            data: event
-          });
-        };
-
-        // Subscribe to conversation updates
-        messagePubSub.on(`conversation:${currentUserId}`, conversationHandler);
-        messagePubSub.on(`group:${currentUserId}`, groupHandler);
-
-        // Send initial connection message
-        emit.next({
-          type: 'connected',
-          data: { userId: currentUserId, timestamp: new Date().toISOString() }
-        });
-
-        return () => {
-          console.log('📡 SSE: Cleaning up conversation subscription for user:', currentUserId);
-          messagePubSub.off(`conversation:${currentUserId}`, conversationHandler);
-          messagePubSub.off(`group:${currentUserId}`, groupHandler);
-        };
-      });
     }),
 });

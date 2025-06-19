@@ -11,7 +11,7 @@ import MessageInput from './components/MessageInput';
 import { cn } from "@/lib/utils";
 import { useConversations } from "@/hooks/useConversations";
 import { useMessages } from "@/hooks/useMessages";
-import { useMessageSubscription } from "@/hooks/useMessageSubscription";
+import { usePusherSubscription } from "@/hooks/usePusherSubscription";
 import { Group } from "@/types/message";
 
 interface MessageUIProps {
@@ -41,7 +41,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   const isGroup = selectedGroup !== undefined;
 
    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { isConnected: isSubscriptionConnected } = useMessageSubscription(selectedUserId, isGroup);
+  const { isConnected: isSubscriptionConnected } = usePusherSubscription(selectedUserId, isGroup);
 
   const { 
     newMessage, 

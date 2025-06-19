@@ -1,5 +1,5 @@
 import { observable } from '../../trpc';
-import { EventEmitter } from 'events';
+import { pusher } from '../../../lib/pusher';
 
 // Message event types
 interface MessageEvent {
@@ -21,8 +21,8 @@ interface ConversationEvent {
   };
 }
 
-// Simple in-memory pub/sub system
-class MessagePubSub extends EventEmitter {
+// Pusher-based pub/sub system
+class MessagePubSub {
   private static instance: MessagePubSub;
 
   static getInstance(): MessagePubSub {
@@ -32,77 +32,96 @@ class MessagePubSub extends EventEmitter {
     return MessagePubSub.instance;
   }
 
-  publishNewMessage(userId: string, message: Record<string, unknown>) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    console.log('📤 Publishing new message to user:', userId, 'message ID:', (message as any)._id);
-    this.emit(`message:${userId}`, {
-      type: 'new_message',
-      data: { message }
-    });
-    console.log('📤 Message published successfully to user:', userId);
-  }
-
-  publishGroupMessage(groupMembers: string[], message: Record<string, unknown>) {
-    // Publish to all group members
-    groupMembers.forEach(memberId => {
-      this.emit(`message:${memberId}`, {
+  async publishNewMessage(userId: string, message: Record<string, unknown>) {
+    console.log('📤 Publishing new message to user via Pusher:', userId, 'message ID:', (message as Record<string, unknown>)._id);
+    
+    try {
+      await pusher.trigger(`user-${userId}`, 'new_message', {
         type: 'new_message',
         data: { message }
       });
-    });
+      console.log('📤 Message published successfully to user via Pusher:', userId);
+    } catch (error) {
+      console.error('❌ Error publishing message via Pusher:', error);
+    }
   }
 
-  publishMessageRead(userId: string, conversationId: string) {
-    this.emit(`message:${userId}`, {
-      type: 'message_read',
-      data: { conversationId }
-    });
+  async publishGroupMessage(groupMembers: string[], message: Record<string, unknown>) {
+    console.log('📤 Publishing group message via Pusher to members:', groupMembers);
+    
+    try {
+      // Publish to all group members
+      for (const memberId of groupMembers) {
+        await pusher.trigger(`user-${memberId}`, 'new_message', {
+          type: 'new_message',
+          data: { message }
+        });
+      }
+      console.log('📤 Group message published successfully via Pusher');
+    } catch (error) {
+      console.error('❌ Error publishing group message via Pusher:', error);
+    }
   }
 
-  publishConversationUpdate(userId: string, conversations: Record<string, unknown>[]) {
-    this.emit(`conversation:${userId}`, {
-      type: 'conversation_update',
-      data: { conversations, userId }
-    });
+  async publishMessageRead(userId: string, conversationId: string) {
+    console.log('📤 Publishing message read via Pusher:', userId, conversationId);
+    
+    try {
+      await pusher.trigger(`user-${userId}`, 'message_read', {
+        type: 'message_read',
+        data: { conversationId }
+      });
+    } catch (error) {
+      console.error('❌ Error publishing message read via Pusher:', error);
+    }
   }
 
-  publishGroupUpdate(userId: string, groups: Record<string, unknown>[]) {
-    this.emit(`group:${userId}`, {
-      type: 'group_update',
-      data: { groups, userId }
-    });
+  async publishConversationUpdate(userId: string, conversations: Record<string, unknown>[]) {
+    console.log('📤 Publishing conversation update via Pusher:', userId);
+    
+    try {
+      await pusher.trigger(`user-${userId}`, 'conversation_update', {
+        type: 'conversation_update',
+        data: { conversations, userId }
+      });
+    } catch (error) {
+      console.error('❌ Error publishing conversation update via Pusher:', error);
+    }
   }
 
-  subscribeToMessages(userId: string) {
-    return observable<MessageEvent>((emit) => {
-      const handler = (data: MessageEvent) => {
-        emit.next(data);
-      };
+  async publishGroupUpdate(userId: string, groups: Record<string, unknown>[]) {
+    console.log('📤 Publishing group update via Pusher:', userId);
+    
+    try {
+      await pusher.trigger(`user-${userId}`, 'group_update', {
+        type: 'group_update',
+        data: { groups, userId }
+      });
+    } catch (error) {
+      console.error('❌ Error publishing group update via Pusher:', error);
+    }
+  }
 
-      this.on(`message:${userId}`, handler);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  subscribeToMessages(_userId: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return observable<MessageEvent>((_emit) => {
+      // This is now handled by the client-side Pusher subscription
+      // The observable is kept for compatibility but won't be used
       return () => {
-        this.off(`message:${userId}`, handler);
+        // Cleanup if needed
       };
     });
   }
 
-  subscribeToConversations(userId: string) {
-    return observable<ConversationEvent>((emit) => {
-      const conversationHandler = (data: ConversationEvent) => {
-        emit.next(data);
-      };
-
-      const groupHandler = (data: ConversationEvent) => {
-        emit.next(data);
-      };
-
-      this.on(`conversation:${userId}`, conversationHandler);
-      this.on(`group:${userId}`, groupHandler);
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  subscribeToConversations(_userId: string) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    return observable<ConversationEvent>((_emit) => {
+      // This is now handled by the client-side Pusher subscription
+      // The observable is kept for compatibility but won't be used
       return () => {
-        this.off(`conversation:${userId}`, conversationHandler);
-        this.off(`group:${userId}`, groupHandler);
+        // Cleanup if needed
       };
     });
   }
