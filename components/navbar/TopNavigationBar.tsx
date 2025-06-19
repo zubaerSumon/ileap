@@ -33,19 +33,45 @@ export default function TopNavigationBar() {
     undefined,
     {
       enabled: isAuthenticated,
-      staleTime: 30000,
-      gcTime: 5 * 60 * 1000,
-      refetchOnWindowFocus: false,
-      refetchOnMount: false,
+      staleTime: 0, // No stale time to ensure real-time updates
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchInterval: 5000, // Refetch every 5 seconds as backup
     }
   );
 
-  // Calculate total unread messages
-  const totalUnreadCount =
-    conversations?.reduce(
-      (total, conv) => total + (conv.unreadCount || 0),
-      0
-    ) || 0;
+  // Fetch groups to get total unread count
+  const { data: groups } = trpc.messages.getGroups.useQuery(
+    undefined,
+    {
+      enabled: isAuthenticated,
+      staleTime: 0, // No stale time to ensure real-time updates
+      refetchOnWindowFocus: true,
+      refetchOnMount: true,
+      refetchInterval: 5000, // Refetch every 5 seconds as backup
+    }
+  );
+
+  // Calculate total unread messages from both conversations and groups
+  const conversationsUnreadCount = conversations?.reduce(
+    (total, conv) => total + (conv.unreadCount || 0),
+    0
+  ) || 0;
+
+  const groupsUnreadCount = groups?.reduce(
+    (total, group) => total + (group.unreadCount || 0),
+    0
+  ) || 0;
+
+  const totalUnreadCount = conversationsUnreadCount + groupsUnreadCount;
+
+  console.log('🔍 TopNavigationBar unread counts:', {
+    conversationsUnreadCount,
+    groupsUnreadCount,
+    totalUnreadCount,
+    conversationsCount: conversations?.length || 0,
+    groupsCount: groups?.length || 0
+  });
 
   // Handle client-side mounting
   useEffect(() => {
