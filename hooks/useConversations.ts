@@ -8,7 +8,7 @@ export const useConversations = () => {
   const { data: conversations, isLoading: isLoadingConversations } =
     trpc.messages.getConversations.useQuery(undefined, {
       enabled: !!session?.user?.id,
-      staleTime: 5 * 60 * 1000, // 5 minutes stale time
+      staleTime: 0, // No stale time to allow immediate updates via SSE
       refetchOnWindowFocus: false, // Disable refetch on window focus
       refetchOnMount: true,
       refetchInterval: false, // Disable polling - rely on SSE for real-time updates
@@ -17,7 +17,7 @@ export const useConversations = () => {
   const { data: groups, isLoading: isLoadingGroups } =
     trpc.messages.getGroups.useQuery(undefined, {
       enabled: !!session?.user?.id,
-      staleTime: 5 * 60 * 1000, // 5 minutes stale time
+      staleTime: 0, // No stale time to allow immediate updates via SSE
       refetchOnWindowFocus: false, // Disable refetch on window focus
       refetchOnMount: true,
       refetchInterval: false, // Disable polling - rely on SSE for real-time updates

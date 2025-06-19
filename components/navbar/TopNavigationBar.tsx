@@ -33,7 +33,7 @@ export default function TopNavigationBar() {
     undefined,
     {
       enabled: isAuthenticated,
-      staleTime: 5 * 60 * 1000, // 5 minutes stale time
+      staleTime: 0, // No stale time to allow immediate updates via SSE
       refetchOnWindowFocus: false, // Disable refetch on window focus
       refetchOnMount: true,
       refetchInterval: false, // Disable polling - rely on SSE for real-time updates
@@ -45,7 +45,7 @@ export default function TopNavigationBar() {
     undefined,
     {
       enabled: isAuthenticated,
-      staleTime: 5 * 60 * 1000, // 5 minutes stale time
+      staleTime: 0, // No stale time to allow immediate updates via SSE
       refetchOnWindowFocus: false, // Disable refetch on window focus
       refetchOnMount: true,
       refetchInterval: false, // Disable polling - rely on SSE for real-time updates

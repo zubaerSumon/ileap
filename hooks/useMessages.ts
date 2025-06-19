@@ -24,7 +24,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         getNextPageParam: (lastPage) => lastPage.nextCursor,
         refetchOnWindowFocus: false, // Disable refetch on window focus
         refetchOnMount: true,
-        staleTime: 5 * 60 * 1000, // 5 minutes stale time
+        staleTime: 0, // No stale time to allow immediate updates via SSE
         refetchInterval: false, // Disable polling - rely on SSE for real-time updates
       }
     );
@@ -39,7 +39,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         getNextPageParam: (lastPage) => lastPage.nextCursor,
         refetchOnWindowFocus: false, // Disable refetch on window focus
         refetchOnMount: true,
-        staleTime: 5 * 60 * 1000, // 5 minutes stale time
+        staleTime: 0, // No stale time to allow immediate updates via SSE
         refetchInterval: false, // Disable polling - rely on SSE for real-time updates
       }
     );

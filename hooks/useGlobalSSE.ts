@@ -181,14 +181,26 @@ export const useGlobalSSE = () => {
         }
       }
       
-      // Always update conversations and groups lists for sidebar
+      // Update conversations and groups lists for sidebar
       utils.messages.getConversations.invalidate();
       utils.messages.getGroups.invalidate();
+      
+      // Also invalidate all message queries to ensure UI updates
+      // This ensures that any open conversation will show the new message
+      if (messageData.group) {
+        // For group messages, invalidate group messages query
+        utils.messages.getGroupMessages.invalidate();
+      } else {
+        // For direct messages, invalidate direct messages query
+        utils.messages.getMessages.invalidate();
+      }
     }
     
     if (data.type === 'message_read') {
       // Update read status
       utils.messages.getConversations.invalidate();
+      utils.messages.getMessages.invalidate();
+      utils.messages.getGroupMessages.invalidate();
     }
   }, [session?.user?.id, utils]);
 
