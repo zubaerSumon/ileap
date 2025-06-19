@@ -4,6 +4,7 @@ import { ClientProviders } from "@/config/ClientProviders";
 import { auth } from "@/auth";
 import { Toaster } from "react-hot-toast";
 import { SearchProvider } from "@/contexts/SearchContext";
+import { GlobalSSEProvider } from "@/components/GlobalSSEProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,8 +25,10 @@ export default async function RootLayout({
       <body className={`${inter.className} `}>
         <ClientProviders session={session}>
           <SearchProvider>
-            {children}
-            <Toaster position="top-center" />
+            <GlobalSSEProvider>
+              {children}
+              <Toaster position="top-center" />
+            </GlobalSSEProvider>
           </SearchProvider>
         </ClientProviders>
       </body>
