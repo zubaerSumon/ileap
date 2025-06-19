@@ -7,6 +7,7 @@ interface MessageEvent {
   data: {
     message?: Record<string, unknown>;
     conversationId?: string;
+    groupId?: string;
   };
 }
 
@@ -25,6 +26,16 @@ class MessagePubSub extends EventEmitter {
     this.emit(`message:${userId}`, {
       type: 'new_message',
       data: { message }
+    });
+  }
+
+  publishGroupMessage(groupMembers: string[], message: Record<string, unknown>) {
+    // Publish to all group members
+    groupMembers.forEach(memberId => {
+      this.emit(`message:${memberId}`, {
+        type: 'new_message',
+        data: { message }
+      });
     });
   }
 

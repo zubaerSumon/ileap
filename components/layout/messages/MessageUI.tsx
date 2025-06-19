@@ -40,8 +40,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   const selectedGroup = (groups as Group[] | undefined)?.find((g) => g._id === selectedUserId);
   const isGroup = selectedGroup !== undefined;
 
-  // Add tRPC subscription for real-time messaging
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isConnected: isSubscriptionConnected } = useMessageSubscription(selectedUserId, isGroup);
 
   const { 
@@ -71,7 +70,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
     if (!isGroup) {
       markAsReadMutation.mutate({ conversationId: userId });
     } else {
-      utils.messages.getGroupMessages.invalidate({ groupId: userId });
+      utils.messages.getGroupMessages.invalidate();
     }
   };
 
@@ -81,7 +80,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
 
   useEffect(() => {
     if (selectedUserId && isGroup) {
-      utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId });
+      utils.messages.getGroupMessages.invalidate();
     }
   }, [selectedUserId, isGroup, utils.messages.getGroupMessages]);
 
