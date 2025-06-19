@@ -11,6 +11,16 @@ interface MessageEvent {
   };
 }
 
+// Conversation event types
+interface ConversationEvent {
+  type: 'conversation_update' | 'group_update';
+  data: {
+    conversations?: Record<string, unknown>[];
+    groups?: Record<string, unknown>[];
+    userId?: string;
+  };
+}
+
 // Simple in-memory pub/sub system
 class MessagePubSub extends EventEmitter {
   private static instance: MessagePubSub;
@@ -46,6 +56,20 @@ class MessagePubSub extends EventEmitter {
     });
   }
 
+  publishConversationUpdate(userId: string, conversations: Record<string, unknown>[]) {
+    this.emit(`conversation:${userId}`, {
+      type: 'conversation_update',
+      data: { conversations, userId }
+    });
+  }
+
+  publishGroupUpdate(userId: string, groups: Record<string, unknown>[]) {
+    this.emit(`group:${userId}`, {
+      type: 'group_update',
+      data: { groups, userId }
+    });
+  }
+
   subscribeToMessages(userId: string) {
     return observable<MessageEvent>((emit) => {
       const handler = (data: MessageEvent) => {
@@ -56,6 +80,26 @@ class MessagePubSub extends EventEmitter {
 
       return () => {
         this.off(`message:${userId}`, handler);
+      };
+    });
+  }
+
+  subscribeToConversations(userId: string) {
+    return observable<ConversationEvent>((emit) => {
+      const conversationHandler = (data: ConversationEvent) => {
+        emit.next(data);
+      };
+
+      const groupHandler = (data: ConversationEvent) => {
+        emit.next(data);
+      };
+
+      this.on(`conversation:${userId}`, conversationHandler);
+      this.on(`group:${userId}`, groupHandler);
+
+      return () => {
+        this.off(`conversation:${userId}`, conversationHandler);
+        this.off(`group:${userId}`, groupHandler);
       };
     });
   }

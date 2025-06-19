@@ -99,78 +99,26 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
             }
           }
           
-          if (isForCurrentConversation && selectedUserId) {
-            console.log('🔄 Updating current conversation with new message');
-            
-            // Force complete cache invalidation and refetch
-            if (isGroup) {
-              console.log('🔄 Force invalidating group messages for groupId:', selectedUserId);
-              // Invalidate all group message queries
-              utils.messages.getGroupMessages.invalidate();
-              // Force a refetch after a short delay
-              setTimeout(() => {
-                console.log('🔄 Force refetching group messages');
-                utils.messages.getGroupMessages.refetch();
-              }, 200);
-            } else {
-              console.log('🔄 Force invalidating direct messages for userId:', selectedUserId);
-              // Invalidate all direct message queries
-              utils.messages.getMessages.invalidate();
-              // Force a refetch after a short delay
-              setTimeout(() => {
-                console.log('🔄 Force refetching direct messages');
-                utils.messages.getMessages.refetch();
-              }, 200);
-            }
+          // For current conversation, let long polling handle the updates
+          // Only invalidate if it's not for the current conversation to update sidebar
+          if (!isForCurrentConversation) {
+            console.log('🔄 Invalidating conversations and groups for sidebar update');
+            utils.messages.getConversations.invalidate();
+            utils.messages.getGroups.invalidate();
           }
-          
-          // Always invalidate conversations and groups to update the sidebar
-          console.log('🔄 Invalidating conversations and groups lists');
-          
-          // Invalidate all conversations and groups queries
-          utils.messages.getConversations.invalidate();
-          utils.messages.getGroups.invalidate();
-          
-          // Force immediate refetch
-          console.log('🔄 Force refetching conversations and groups');
-          utils.messages.getConversations.refetch();
-          utils.messages.getGroups.refetch();
-          
-          // Force another refetch after a delay to ensure updates
-          setTimeout(() => {
-            console.log('🔄 Delayed refetch of conversations and groups');
-            utils.messages.getConversations.refetch();
-            utils.messages.getGroups.refetch();
-          }, 500);
-          
-          // Also try to invalidate all message-related queries
-          setTimeout(() => {
-            console.log('🔄 Invalidating all message queries');
-            utils.messages.getConversations.invalidate();
-            utils.messages.getGroups.invalidate();
-            utils.messages.getMessages.invalidate();
-            utils.messages.getGroupMessages.invalidate();
-          }, 1000);
-          
-          // Final attempt with longer delay
-          setTimeout(() => {
-            console.log('🔄 Final attempt to update sidebar');
-            utils.messages.getConversations.invalidate();
-            utils.messages.getGroups.invalidate();
-            utils.messages.getConversations.refetch();
-            utils.messages.getGroups.refetch();
-          }, 2000);
         }
         
         if (data.type === 'message_read' && selectedUserId) {
           console.log('📖 Message read event received');
-          // Update read status
-          utils.messages.getConversations.invalidate();
-          utils.messages.getConversations.refetch();
-          if (isGroup) {
-            utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId, limit: 20 });
-          } else {
-            utils.messages.getMessages.invalidate({ userId: selectedUserId, limit: 20 });
+          // Update read status - let long polling handle this
+          // Only invalidate if it's not for the current conversation
+          if (!isGroup) {
+            const messageSender = (data.data.message as Record<string, unknown>)?.sender as Record<string, unknown>;
+            const isForCurrentConversation = messageSender?._id === selectedUserId;
+            
+            if (!isForCurrentConversation) {
+              utils.messages.getConversations.invalidate();
+            }
           }
         }
       } catch (error) {
@@ -198,10 +146,7 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
     };
   }, []);
 
-  // Expose connection status
-  const isConnected = eventSourceRef.current?.readyState === EventSource.OPEN;
-
   return {
-    isConnected,
+    isConnected: !!eventSourceRef.current,
   };
 }; 

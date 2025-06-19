@@ -14,6 +14,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       sessionUserId: session?.user?.id
     });
 
+    // Initial load of messages
     const { data: messages, isLoading: isLoadingMessages, fetchNextPage, hasNextPage, isFetchingNextPage } = trpc.messages.getMessages.useInfiniteQuery(
       { 
         userId: selectedUserId || "",
@@ -22,10 +23,10 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       { 
         enabled: !!selectedUserId && !isGroup,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false,
         refetchOnMount: true,
-        staleTime: 0, // No stale time to ensure immediate real-time updates
-        refetchInterval: 3000, // Refetch every 3 seconds as backup for real-time updates
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        refetchInterval: false, // Disable automatic refetching
       }
     );
   
@@ -37,10 +38,65 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       { 
         enabled: !!selectedUserId && isGroup,
         getNextPageParam: (lastPage) => lastPage.nextCursor,
-        refetchOnWindowFocus: true,
+        refetchOnWindowFocus: false,
         refetchOnMount: true,
-        staleTime: 0, // No stale time to ensure immediate real-time updates for group messages
-        refetchInterval: 2000, // Refetch every 2 seconds as backup for real-time updates
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        refetchInterval: false, // Disable automatic refetching
+      }
+    );
+
+    // SSE subscription for real-time message updates
+    const subscription = trpc.messages.subscribeToMessages.useSubscription(
+      { userId: selectedUserId || undefined, isGroup },
+      {
+        enabled: !!session?.user?.id,
+        onData: (data) => {
+          console.log('📡 SSE: Received message update:', data);
+          
+          if (data.type === 'new_message') {
+            const messageData = data.data.message as Record<string, unknown>;
+            const messageSender = (messageData.sender as Record<string, unknown>)?._id;
+            const messageReceiver = (messageData.receiver as Record<string, unknown>)?._id;
+            const messageGroup = (messageData.group as Record<string, unknown>)?._id;
+            
+            // Check if this message is for the current conversation
+            const isForCurrentConversation = isGroup 
+              ? messageGroup === selectedUserId
+              : (messageSender === selectedUserId || messageReceiver === selectedUserId);
+            
+            if (isForCurrentConversation && selectedUserId) {
+              console.log('🔄 SSE: Updating current conversation with new message');
+              // Invalidate and refetch messages
+              utils.messages.getMessages.invalidate({ userId: selectedUserId, limit: 20 });
+              utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId, limit: 20 });
+            }
+            
+            // Always invalidate conversations to update sidebar
+            utils.messages.getConversations.invalidate();
+            utils.messages.getGroups.invalidate();
+          }
+          
+          if (data.type === 'message_read') {
+            console.log('📖 SSE: Message read event received');
+            // Update read status
+            utils.messages.getConversations.invalidate();
+            if (isGroup && selectedUserId) {
+              utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId, limit: 20 });
+            } else if (selectedUserId) {
+              utils.messages.getMessages.invalidate({ userId: selectedUserId, limit: 20 });
+            }
+          }
+          
+          if (data.type === 'conversation_update') {
+            console.log('🔄 SSE: Conversation update received');
+            // Update conversations
+            utils.messages.getConversations.invalidate();
+            utils.messages.getGroups.invalidate();
+          }
+        },
+        onError: (error) => {
+          console.error('📡 SSE: Subscription error:', error);
+        },
       }
     );
 
@@ -56,7 +112,8 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       groupMessagesData: groupMessages?.pages?.[0]?.messages?.length || 0,
       directMessagesData: messages?.pages?.[0]?.messages?.length || 0,
       groupMessagesQueryKey: { groupId: selectedUserId || "", limit: 20 },
-      directMessagesQueryKey: { userId: selectedUserId || "", limit: 20 }
+      directMessagesQueryKey: { userId: selectedUserId || "", limit: 20 },
+      subscriptionStatus: subscription.status
     });
   
     const sendMessageMutation = trpc.messages.sendMessage.useMutation({
@@ -202,7 +259,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
             }
           );
         } else {
-          console.log('❌ No previous group messages found for optimistic update');
+          console.log('❌ No previous messages found for optimistic group update');
         }
 
         return { previousMessages };
@@ -216,11 +273,10 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
           );
         }
       },
-      onSuccess: () => {
-        // Invalidate conversations to update the list
-        utils.messages.getConversations.invalidate();
-        // Also invalidate group messages to ensure chat area updates
-        utils.messages.getGroupMessages.invalidate();
+      onSuccess: (data) => {
+        console.log('✅ Group message sent successfully:', data);
+        // Invalidate groups to update the list
+        utils.messages.getGroups.invalidate();
         setNewMessage("");
       },
     });
