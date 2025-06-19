@@ -83,7 +83,7 @@ export function TiptapToolbar({ editor }: TiptapToolbarProps) {
   };
 
   return (
-    <div className="relative z-50 flex items-center justify-center mx-2 mb-2 flex-nowrap space-x-0.5 bg-[#F0F1F2] overflow-visible">
+    <div className="relative z-50 flex items-center w-full  px-2 bg-[#F0F1F2]  mb-2 flex-nowrap space-x-0.5 overflow-visible">
       {/* Font Size Selector */}
       <div className="relative mr-1">
         <button
