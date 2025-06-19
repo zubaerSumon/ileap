@@ -4,7 +4,7 @@ import React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Filter } from "lucide-react";
+import { Filter, PlusIcon } from "lucide-react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -36,16 +36,11 @@ export default function OpportunitiesPage() {
     trpc.opportunities.getOrganizationOpportunities.useQuery();
 
   // Use the pagination hook
-  const {
-    currentPage,
-    totalPages,
-    paginatedData,
-    setCurrentPage,
-    totalItems,
-  } = usePagination(opportunities || [], {
-    pageSize: 4,
-    initialPage: 1,
-  });
+  const { currentPage, totalPages, paginatedData, setCurrentPage, totalItems } =
+    usePagination(opportunities || [], {
+      pageSize: 4,
+      initialPage: 1,
+    });
 
   const columnHelper = createColumnHelper<Opportunity>();
 
@@ -143,8 +138,22 @@ export default function OpportunitiesPage() {
         <div className="max-w-[1240px] py-8 h-[900px] mx-auto overflow-auto">
           <div className="bg-white rounded-lg">
             <div className="px-4 pt-5">
-              <h1 className="text-2xl font-semibold mb-1">Opportunities</h1>
-              <p className="text-sm text-gray-500 mb-6">Posted tasks</p>
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <h1 className="text-2xl font-semibold mb-1">Opportunities</h1>
+                  <p className="text-sm text-gray-500">Posted tasks</p>
+                </div>
+                <Button
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
+                  size="lg"
+                  onClick={() =>
+                    router.push("/organization/opportunities/create")
+                  }
+                >
+                  <PlusIcon className="mr-2 transform scale-170" />
+                  Post an opportunity
+                </Button>
+              </div>
               <OpportunityTabs
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
