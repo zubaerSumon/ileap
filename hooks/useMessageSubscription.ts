@@ -47,7 +47,9 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
             messageReceiver,
             messageGroup,
             hasGroup: !!messageData.group,
-            groupData: messageData.group
+            groupData: messageData.group,
+            senderRole: (messageData.sender as Record<string, unknown>)?.role,
+            receiverRole: (messageData.receiver as Record<string, unknown>)?.role
           });
           
           // Convert IDs to strings for comparison
@@ -72,7 +74,9 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
             receiverIdStr,
             groupIdStr,
             isForCurrentConversation,
-            messageContent: (messageData.content as string)?.substring(0, 50)
+            messageContent: (messageData.content as string)?.substring(0, 50),
+            senderRole: (messageData.sender as Record<string, unknown>)?.role,
+            receiverRole: (messageData.receiver as Record<string, unknown>)?.role
           });
           
           // Show toast notification if message is not from current user and not for current conversation

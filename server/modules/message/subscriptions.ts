@@ -33,6 +33,7 @@ class MessagePubSub extends EventEmitter {
   }
 
   publishNewMessage(userId: string, message: Record<string, unknown>) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     console.log('📤 Publishing new message to user:', userId, 'message ID:', (message as any)._id);
     this.emit(`message:${userId}`, {
       type: 'new_message',

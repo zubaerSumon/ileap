@@ -316,6 +316,13 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
     const handleSendMessage = (e: React.FormEvent) => {
       e.preventDefault();
       if (!newMessage.trim() || !selectedUserId) return;
+
+      console.log('📤 Client sending message:', {
+        selectedUserId,
+        isGroup,
+        messageContent: newMessage.substring(0, 50) + (newMessage.length > 50 ? '...' : ''),
+        sessionUser: session?.user
+      });
   
       if (isGroup) {
         sendGroupMessageMutation.mutate({

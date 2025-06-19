@@ -36,6 +36,14 @@ export const messsageRouter = router({
 
         const senderId = user._id;
 
+        console.log('📤 Sending message:', {
+          senderEmail: sessionUser.email,
+          senderId: senderId.toString(),
+          senderRole: user.role,
+          receiverId,
+          content: content.substring(0, 50) + (content.length > 50 ? '...' : ''),
+        });
+
         const message = await Message.create({
           sender: new Types.ObjectId(senderId),
           receiver: new Types.ObjectId(receiverId),
@@ -52,7 +60,9 @@ export const messsageRouter = router({
           console.log('📤 Publishing message via tRPC:', {
             senderId: senderId.toString(),
             receiverId: receiverId.toString(),
-            messageId: (populatedMessage as any)._id
+            messageId: (populatedMessage as any)._id,
+            senderRole: user.role,
+            receiverRole: (populatedMessage as any).sender?.role || 'unknown'
           });
           
           // Publish to receiver's channel
