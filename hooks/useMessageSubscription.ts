@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { trpc } from '@/utils/trpc';
 import toast from 'react-hot-toast';
@@ -6,31 +5,14 @@ import toast from 'react-hot-toast';
 export const useMessageSubscription = (selectedUserId: string | null, isGroup: boolean) => {
   const { data: session } = useSession();
   const utils = trpc.useUtils();
-  const eventSourceRef = useRef<EventSource | null>(null);
 
-  // Subscribe to real-time updates via Server-Sent Events
-  useEffect(() => {
-    if (!session?.user?.id) return;
-
-    console.log('📡 Connecting to SSE for user:', session.user.id);
-
-    // Create EventSource connection
-    const eventSource = new EventSource('/api/messages/stream');
-    eventSourceRef.current = eventSource;
-
-    eventSource.onopen = () => {
-      console.log('✅ SSE connection opened for user:', session.user.id);
-    };
-
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log('📨 Received SSE event:', data);
-        
-        // Skip heartbeat and connection messages
-        if (data.type === 'heartbeat' || data.type === 'connected') {
-          return;
-        }
+  // SSE subscription for real-time message updates
+  const subscription = trpc.messages.subscribeToMessages.useSubscription(
+    { userId: selectedUserId || undefined, isGroup },
+    {
+      enabled: !!session?.user?.id,
+      onData: (data) => {
+        console.log('📡 useMessageSubscription: Received message update:', data);
         
         if (data.type === 'new_message') {
           const messageData = data.data.message as Record<string, unknown>;
@@ -99,7 +81,7 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
             }
           }
           
-          // For current conversation, let long polling handle the updates
+          // For current conversation, let the main message hooks handle the updates
           // Only invalidate if it's not for the current conversation to update sidebar
           if (!isForCurrentConversation) {
             console.log('🔄 Invalidating conversations and groups for sidebar update');
@@ -110,7 +92,7 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
         
         if (data.type === 'message_read' && selectedUserId) {
           console.log('📖 Message read event received');
-          // Update read status - let long polling handle this
+          // Update read status - let the main message hooks handle this
           // Only invalidate if it's not for the current conversation
           if (!isGroup) {
             const messageSender = (data.data.message as Record<string, unknown>)?.sender as Record<string, unknown>;
@@ -121,32 +103,21 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
             }
           }
         }
-      } catch (error) {
-        console.error('Error parsing SSE message:', error);
-      }
-    };
-
-    eventSource.onerror = (error) => {
-      console.error('SSE connection error:', error);
-    };
-
-    return () => {
-      console.log('📡 Closing SSE connection for user:', session.user.id);
-      eventSource.close();
-      eventSourceRef.current = null;
-    };
-  }, [session?.user?.id, selectedUserId, isGroup, utils]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (eventSourceRef.current) {
-        eventSourceRef.current.close();
-      }
-    };
-  }, []);
+        
+        if (data.type === 'conversation_update') {
+          console.log('🔄 Conversation update received');
+          // Update conversations
+          utils.messages.getConversations.invalidate();
+          utils.messages.getGroups.invalidate();
+        }
+      },
+      onError: (error) => {
+        console.error('📡 useMessageSubscription: Subscription error:', error);
+      },
+    }
+  );
 
   return {
-    isConnected: !!eventSourceRef.current,
+    isConnected: subscription.status !== 'error',
   };
 }; 
