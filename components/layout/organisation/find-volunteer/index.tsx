@@ -1,202 +1,164 @@
-import React, { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+"use client";
+
 import { trpc } from "@/utils/trpc";
-import {
-  ApplicantsCard,
-  type Applicant,
-} from "@/components/layout/organisation/opportunities/ApplicantsCard";
-import VolunteerModal from "@/components/layout/organisation/opportunities/VolunteerModal";
-import MessageApplicantModal from "@/components/layout/organisation/opportunities/MessageApplicantModal";
+import { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+import FilterSidebar, { VolunteerFilters } from "./FilterSidebar";
+import VolunteerCard from "@/components/layout/organisation/VolunteerCard";
+import MessageDialog from "../MessageDialog";
+import { SearchBar } from "@/components/navbar/SearchBar";
+import { useSearch } from "@/contexts/SearchContext";
+import { PaginationWrapper } from "@/components/PaginationWrapper";
 
-interface VolunteerProfile {
-  location?: string;
-  bio?: string;
-  skills?: string[];
-  availability_date?: string;
-  completed_projects?: number;
-}
-
-interface User {
+interface Volunteer {
   _id: string;
   name: string;
   avatar?: string;
-  is_verified?: boolean;
-  createdAt?: string;
-  volunteer_profile?: VolunteerProfile;
+  role: string;
+  volunteer_profile?: {
+    student_type?: "yes" | "no";
+    course?: string;
+    availability_date?: {
+      start_date?: string;
+      end_date?: string;
+    };
+    interested_on?: string[];
+    bio?: string;
+  };
 }
 
-const FindVolunteer = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortBy, setSortBy] = useState("recently-added");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
+export default function BrowseVolunteer() {
+  const [filters, setFilters] = useState<VolunteerFilters>({
+    categories: [],
+    studentType: "all",
+    availability: {
+      startDate: null,
+      endDate: null,
+    },
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isMessageDialogOpen, setIsMessageDialogOpen] = useState(false);
+  const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(
     null
   );
+  const { searchQuery } = useSearch();
 
-  const { data: usersData, isLoading } =
-    trpc.users.getAvailableUsers.useQuery({
-      page: 1,
-      limit: 50, // Get more users for this view
-      search: searchQuery || undefined,
-    });
+   useEffect(() => {
+    setCurrentPage(1);
+  }, [filters, searchQuery]);
 
-  const users = usersData?.users || [];
-
-  // Remove client-side filtering since it's now handled server-side
-  const filteredUsers = users;
-
-  const sortedUsers = filteredUsers?.sort((a, b) => {
-    switch (sortBy) {
-      case "recently-active":
-        return (
-          new Date(b.volunteer_profile?.availability_date || 0).getTime() -
-          new Date(a.volunteer_profile?.availability_date || 0).getTime()
-        );
-      case "responsiveness":
-        return 0;
-      default:
-        return (
-          new Date(b.createdAt || 0).getTime() -
-          new Date(a.createdAt || 0).getTime()
-        );
-    }
+  const { data: volunteersData, isLoading } = trpc.users.getAvailableUsers.useQuery({
+    page: currentPage,
+    limit: 6,
+    search: searchQuery || undefined,
+    categories: filters.categories.length > 0 ? filters.categories : undefined,
+    studentType: filters.studentType,
+    availability: filters.availability.startDate && filters.availability.endDate ? {
+      startDate: filters.availability.startDate,
+      endDate: filters.availability.endDate,
+    } : undefined,
   });
 
-  const handleSetSelectedApplicantId = (id: string) => {
-    const user = users?.find((u) => u._id === id);
-    if (user) {
-      const applicant: Applicant = {
-        id: user._id,
-        name: user.name,
-        profileImg: user.avatar || "/avatar.svg",
-        location: user.volunteer_profile?.location || "",
-        bio: user.volunteer_profile?.bio || "",
-        skills: user.volunteer_profile?.skills || [],
-        completedProjects: user.volunteer_profile?.completed_projects || 0,
-        availability: user.volunteer_profile?.availability_date || "",
-        applicationId: user._id,
-      };
-      setSelectedApplicant(applicant);
-      setIsModalOpen(true);
-    }
+  const handleConnect = (volunteer: Volunteer) => {
+    setSelectedVolunteer(volunteer);
+    setIsMessageDialogOpen(true);
   };
 
-  const handleOpenMessageModal = (user: User) => {
-    const applicant: Applicant = {
-      id: user._id,
-      name: user.name,
-      profileImg: user.avatar || "/avatar.svg",
-      location: user.volunteer_profile?.location || "",
-      bio: user.volunteer_profile?.bio || "",
-      skills: user.volunteer_profile?.skills || [],
-      completedProjects: user.volunteer_profile?.completed_projects || 0,
-      availability: user.volunteer_profile?.availability_date || "",
-      applicationId: user._id,
-    };
-    setSelectedApplicant(applicant);
-    setIsMessageModalOpen(true);
-  };
+  const volunteers = volunteersData?.users || [];
+  const totalItems = volunteersData?.total || 0;
+  const totalPages = volunteersData?.totalPages || 0;
+  const startIndex = (currentPage - 1) * 6;
+  const endIndex = Math.min(startIndex + 6, totalItems);
 
   return (
-    <div className="w-full bg-white">
-      <div className="container max-w-[1240px] max-h-auto mx-auto py-8 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="space-y-4">
-            <div className="space-y-1">
-              <h1 className="text-2xl font-semibold">Search Volunteers</h1>
-              <p className="text-[11px] text-gray-500">
-                {isLoading
-                  ? "Loading..."
-                  : `${filteredUsers?.length || 0} volunteers found`}
-              </p>
-            </div>
-            <div className="relative ">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-              <Input
-                placeholder="Search volunteers"
-                className="pl-10 bg-gray-50 border-0 "
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-          </div>
-          <div className="mt-8">
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Sort by" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="recently-added">Recently added</SelectItem>
-                <SelectItem value="recently-active">Recently active</SelectItem>
-                <SelectItem value="responsiveness">Responsiveness</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row gap-6">
+        <div className="hidden md:block sticky top-4">
+          <FilterSidebar onFilterChange={setFilters} />
         </div>
 
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+        <div className="flex-1 min-w-0">
+          <div className="mb-6 w-full">
+            <SearchBar role="organization" disableOverlay />
           </div>
-        ) : !sortedUsers?.length ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <p className="text-gray-600 text-lg">No volunteers found</p>
-            <p className="text-gray-500 text-sm mt-2">
-              Try adjusting your search criteria
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {sortedUsers.map((user: Record<string, unknown>) => {
-              const applicant: Applicant = {
-                id: user._id as string,
-                name: user.name as string,
-                profileImg: (user.avatar as string) || "/avatar.svg",
-                location: (user.volunteer_profile as VolunteerProfile)?.location || "",
-                bio: (user.volunteer_profile as VolunteerProfile)?.bio || "",
-                skills: (user.volunteer_profile as VolunteerProfile)?.skills || [],
-                completedProjects:
-                  (user.volunteer_profile as VolunteerProfile)?.completed_projects || 0,
-                availability: (user.volunteer_profile as VolunteerProfile)?.availability_date || "",
-                applicationId: user._id as string,
-              };
 
-              return (
-                <ApplicantsCard
-                  key={user._id as string}
-                  setIsModalOpen={setIsModalOpen}
-                  applicant={applicant}
-                  setSelectedApplicantId={handleSetSelectedApplicantId}
-                  onMessageClick={() => handleOpenMessageModal(user as unknown as User)}
-                />
-              );
-            })}
+          {!isLoading &&
+            volunteers.length > 0 && (
+              <div className="mb-4 text-sm text-gray-600">
+                Showing {startIndex + 1} to {endIndex} of {totalItems}{" "}
+                volunteers
+              </div>
+            )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[620px]">
+            {isLoading ? (
+              Array.from({ length: 6 }).map((_, index) => (
+                <div key={index} className="w-full max-w-[382px]">
+                  <div className="hover:shadow-lg transition-all duration-300 rounded-lg overflow-hidden w-full py-0 cursor-pointer relative bg-white">
+                    <div className="p-4">
+                      <div className="flex flex-col">
+                        <div className="flex justify-between items-center mb-4">
+                          <Skeleton className="h-12 w-12 rounded-full" />
+                          <Skeleton className="h-6 w-24 rounded-full" />
+                        </div>
+                        <Skeleton className="h-6 w-32 mb-2" />
+                        <div className="flex items-center gap-3 mb-3">
+                          <Skeleton className="h-4 w-24" />
+                          <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
+                          <Skeleton className="h-4 w-20" />
+                        </div>
+                        <div className="flex gap-2 mb-4">
+                          <Skeleton className="h-6 w-20 rounded-full" />
+                          <Skeleton className="h-6 w-24 rounded-full" />
+                        </div>
+                        <Skeleton className="h-4 w-full mb-4" />
+                        <div className="flex gap-2 mt-auto">
+                          <Skeleton className="h-9 flex-1" />
+                          <Skeleton className="h-9 flex-1" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : volunteers.length === 0 ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-gray-600 text-lg">No volunteers found</p>
+                <p className="text-gray-500 text-sm mt-2">
+                  Try adjusting your search criteria
+                </p>
+              </div>
+            ) : (
+              volunteers.map((volunteer: Record<string, unknown>) => (
+                <div key={volunteer._id as string} className="w-full max-w-[382px]">
+                  <VolunteerCard
+                    volunteer={volunteer as unknown as Volunteer}
+                    onConnect={handleConnect}
+                  />
+                </div>
+              ))
+            )}
           </div>
-        )}
+
+          {!isLoading &&
+            volunteers.length > 0 && (
+              <div className="mt-8 flex justify-center">
+                <PaginationWrapper
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  maxVisiblePages={5}
+                />
+              </div>
+            )}
+        </div>
       </div>
 
-      <VolunteerModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        volunteer={selectedApplicant}
-      />
-
-      <MessageApplicantModal
-        isOpen={isMessageModalOpen}
-        onClose={() => setIsMessageModalOpen(false)}
-        applicant={selectedApplicant}
+      <MessageDialog
+        isOpen={isMessageDialogOpen}
+        onOpenChange={setIsMessageDialogOpen}
+        volunteer={selectedVolunteer}
       />
     </div>
   );
-};
-
-export default FindVolunteer;
+}

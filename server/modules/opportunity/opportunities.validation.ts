@@ -30,6 +30,20 @@ const createOpportunitySchema = z.object({
   banner_img: z.string().optional()
 });
 
+const getAllOpportunitiesSchema = z.object({
+  page: z.number().min(1).default(1),
+  limit: z.number().min(1).max(50).default(6),
+  search: z.string().optional(),
+  categories: z.array(z.string()).optional(),
+  commitmentType: z.enum(["all", "workbased", "eventbased"]).default("all"),
+  location: z.string().optional(),
+  availability: z.object({
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+  }).optional(),
+});
+
 export const opportunityValidation = {
-  createOpportunitySchema
+  createOpportunitySchema,
+  getAllOpportunitiesSchema
 }; 
