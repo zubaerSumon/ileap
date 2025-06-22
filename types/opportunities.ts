@@ -19,3 +19,19 @@ export type Opportunity = CreateOpportunityInput & {
   recruitCount?: number;
   is_archived: boolean;
 };
+export interface TabConfig {
+  value: string;
+  label: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  component: React.ComponentType;
+}
+
+export type OpportunityDetails = {
+  id: string;
+  title: string;
+  organization: {
+    title: string;
+    id: string;
+  };
+  location: string;
+}; 
