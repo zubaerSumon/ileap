@@ -120,20 +120,20 @@ export default function FindOpportunity() {
                 <div className="lg:col-span-2 flex flex-row lg:flex-col space-x-4 lg:space-x-0 lg:space-y-2">
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="in-person"
+                      id="work-based"
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-500"
                     />
-                    <label htmlFor="in-person" className="font-medium">
-                      In-Person
+                    <label htmlFor="work-based" className="font-medium text-white">
+                      Work Based
                     </label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <Checkbox
-                      id="virtual"
+                      id="event-based"
                       className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-500"
                     />
-                    <label htmlFor="virtual" className="font-medium">
-                      Virtual
+                    <label htmlFor="event-based" className="font-medium text-white">
+                      Event Based
                     </label>
                   </div>
                 </div>

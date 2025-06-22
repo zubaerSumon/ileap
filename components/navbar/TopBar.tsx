@@ -14,6 +14,8 @@ import Logo from "../../public/AusLeap.png";
 import { STATIC_LINKS } from "@/utils/constants/navigation";
 import { UserMenu } from "./UserMenu";
 import { SearchBar } from "./SearchBar";
+import { GiBinoculars } from "react-icons/gi";
+
 
 interface TopBarProps {
   isMenuOpen: boolean;
@@ -131,7 +133,7 @@ export function TopBar({
             session?.user?.role === "mentor" ? (
               <Users className="h-4 w-4" />
             ) : (
-              <FileUser className="h-4 w-4" />
+              <GiBinoculars className="h-4 w-4" />
             )}{" "}
             {session?.user?.role === "admin" || session?.user?.role === "mentor"
               ? "Browse Volunteers"
