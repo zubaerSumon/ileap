@@ -5,7 +5,7 @@ import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
+import Categories from "@/components/layout/volunteer/home-page/HomePageCategories";
 import { trpc } from "@/utils/trpc";
 import { Loader2 } from "lucide-react";
 

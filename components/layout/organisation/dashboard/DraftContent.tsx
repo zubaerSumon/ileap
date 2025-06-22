@@ -32,7 +32,7 @@ const DraftContent = ({ draftOpportunities, isLoadingOpportunities, router }: Dr
               variant="outline"
               size="sm"
               className="border-blue-600 text-blue-700 hover:bg-blue-50 transition-colors"
-              onClick={() => router.push(`/organization/opportunities/${opportunity._id}/edit`)}
+              onClick={() => router.push(`/organisation/opportunities/${opportunity._id}/edit`)}
             >
               Edit Draft Opportunity
             </Button>

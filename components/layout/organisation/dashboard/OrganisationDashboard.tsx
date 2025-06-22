@@ -184,7 +184,7 @@ const OrganisationDashboard = () => {
         <Button
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
           size="lg"
-          onClick={() => router.push("/organization/opportunities/create")}
+          onClick={() => router.push("/organisation/opportunities/create")}
         >
           <PlusIcon className="mr-2 transform scale-170" />
           Post an opportunity
@@ -221,7 +221,7 @@ const OrganisationDashboard = () => {
         </div>
         <button
           className="flex items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
-          onClick={() => router.push("/organization/opportunities")}
+          onClick={() => router.push("/organisation/opportunities")}
         >
           View all opportunities{" "}
           <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
@@ -309,7 +309,7 @@ const OrganisationDashboard = () => {
                             className="text-lg font-semibold cursor-pointer hover:text-blue-600"
                             onClick={() =>
                               router.push(
-                                `/organization/opportunities/${opportunity._id}`
+                                `/organisation/opportunities/${opportunity._id}`
                               )
                             }
                           >

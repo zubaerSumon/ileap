@@ -1,13 +1,12 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { ChevronLeft } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { FormInput } from "@/components/form-input/FormInput";
 import { UseFormReturn, Path } from "react-hook-form";
 import { MultiSelectField } from "@/components/form-input/MultiSelectField";
 import { FormRichTextEditor } from "@/components/form-input/FormRichTextEditor";
 import { FormImageInput } from "@/components/form-input/FormImageInput";
+import BackButton from "@/components/buttons/BackButton";
 
 // Define the form type to match the useForm defaultValues in page.tsx
 export type OpportunityFormValues = {
@@ -38,25 +37,24 @@ export type OpportunityFormValues = {
   banner_img?: string;
 };
 
-export default function BasicInformation({ form }: { form: UseFormReturn<OpportunityFormValues> }) {
-  const router = useRouter();
-
+export default function BasicInformation({
+  form,
+}: {
+  form: UseFormReturn<OpportunityFormValues>;
+}) {
   return (
     <div className="max-w-[1240px] mx-auto">
-      <div className="flex items-center gap-2 mb-6">
-        <button
-          onClick={() => router.back()}
-          className="text-sm text-blue-600 font-medium flex items-center pt-4"
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Back
-        </button>
-      </div>
-
-      <Card className="bg-white rounded-lg shadow-none border-0 relative" role="dialog" aria-labelledby="basic-info-title">
+      <BackButton />
+      <Card
+        className="bg-white rounded-lg shadow-none border-0 relative"
+        role="dialog"
+        aria-labelledby="basic-info-title"
+      >
         <div className="pt-16 px-6 pb-6">
-          <h2 id="basic-info-title" className="sr-only">Basic Information Form</h2>
-          
+          <h2 id="basic-info-title" className="sr-only">
+            Basic Information Form
+          </h2>
+
           <div className="space-y-8">
             {/* Title & Description */}
             <div>
@@ -93,7 +91,9 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 <span className="text-red-500 ml-1">*</span>
               </h2>
               <p className="text-sm text-gray-500 mb-4">
-                Which categories best represent this opportunity? Volunteers use this to help find opportunities they are interested in supporting.
+                Which categories best represent this opportunity? Volunteers use
+                this to help find opportunities they are interested in
+                supporting.
               </p>
               <div className="space-y-4">
                 <MultiSelectField
@@ -104,14 +104,35 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                   registerName="category"
                   error={form.formState.errors.category?.message}
                   options={[
-                    { value: "Community & Social Services", label: "Community & Social Services" },
-                    { value: "Education & Mentorship", label: "Education & Mentorship" },
-                    { value: "Healthcare & Medical Volunteering", label: "Healthcare & Medical Volunteering" },
-                    { value: "Corporate & Skilled Volunteering", label: "Corporate & Skilled Volunteering" },
-                    { value: "Technology & Digital Volunteering", label: "Technology & Digital Volunteering" },
+                    {
+                      value: "Community & Social Services",
+                      label: "Community & Social Services",
+                    },
+                    {
+                      value: "Education & Mentorship",
+                      label: "Education & Mentorship",
+                    },
+                    {
+                      value: "Healthcare & Medical Volunteering",
+                      label: "Healthcare & Medical Volunteering",
+                    },
+                    {
+                      value: "Corporate & Skilled Volunteering",
+                      label: "Corporate & Skilled Volunteering",
+                    },
+                    {
+                      value: "Technology & Digital Volunteering",
+                      label: "Technology & Digital Volunteering",
+                    },
                     { value: "Animal Welfare", label: "Animal Welfare" },
-                    { value: "Arts, Culture & Heritage", label: "Arts, Culture & Heritage" },
-                    { value: "Environmental & Conservation", label: "Environmental & Conservation" },
+                    {
+                      value: "Arts, Culture & Heritage",
+                      label: "Arts, Culture & Heritage",
+                    },
+                    {
+                      value: "Environmental & Conservation",
+                      label: "Environmental & Conservation",
+                    },
                   ]}
                   setValue={form.setValue}
                   value={form.watch("category")}
@@ -148,7 +169,8 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 <span className="text-red-500 ml-1">*</span>
               </h2>
               <p className="text-sm text-gray-500 mb-4">
-                How much time does the volunteer need to commit to? Volunteers use this to help find suitable opportunities.
+                How much time does the volunteer need to commit to? Volunteers
+                use this to help find suitable opportunities.
               </p>
               <div className="flex items-center space-x-2">
                 <input
@@ -162,8 +184,7 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 <label htmlFor="workbased" className="text-sm font-medium">
                   <span>Work based</span>
                 </label>
-              
-              
+
                 <input
                   type="radio"
                   id="eventbased"
@@ -185,7 +206,9 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                 <span className="text-red-500 ml-1">*</span>
               </h2>
               <p className="text-sm text-gray-500 mb-4">
-                Where does the volunteer need to work from? Be specific, but flexible if you can. Does the work need to be done in person (at a physical location) or could it be done online or remotely?
+                Where does the volunteer need to work from? Be specific, but
+                flexible if you can. Does the work need to be done in person (at
+                a physical location) or could it be done online or remotely?
               </p>
               <FormInput
                 name={"location" as Path<OpportunityFormValues>}

@@ -80,7 +80,7 @@ export function TopBar({
               session
                 ? session.user?.role === "volunteer"
                   ? "/volunteer"
-                  : "/organization/dashboard"
+                  : "/organisation/dashboard"
                 : "/"
             }
             className="flex items-center"
@@ -98,13 +98,13 @@ export function TopBar({
           {session?.user?.role !== "volunteer" && isProtectedPath && (
             <>
               <Link
-                href="/organization/dashboard"
+                href="/organisation/dashboard"
                 className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
               >
                 <LayoutDashboard className="h-4 w-4" /> Dashboard
               </Link>
               <Link
-                href="/organization/opportunities"
+                href="/organisation/opportunities"
                 className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
               >
                 <FileUser className="h-4 w-4" /> Opportunities

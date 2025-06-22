@@ -35,7 +35,7 @@ export const STATIC_LINKS: NavItem[] = [
   },
 ];
 
-export const PROTECTED_PATHS = ["/organization", "/volunteer", "/profile", "/settings", "/messages", "/search"];
+export const PROTECTED_PATHS = ["/organisation", "/volunteer", "/profile", "/settings", "/messages", "/search"];
 
 export const AUTH_PATHS = ["/signin", "/signup", "/reset-password"];
 

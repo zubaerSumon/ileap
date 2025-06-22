@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
 
-import MiniGallery from "@/components/layout/volunteer/homepage/MiniGallery";
+import MiniGallery from "@/components/layout/volunteer/home-page/MiniGallery";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
-import Categories from "@/components/layout/volunteer/homepage/HomePageCategories";
+import Categories from "@/components/layout/volunteer/home-page/HomePageCategories";
 
-const VolunteerPage = () => {
+const VolunteerHomepageOld = () => {
   return (
     <ProtectedLayout>
       <div className="px-4 flex flex-col items-center pb-40 max-w-[1240px] mx-auto">
@@ -27,4 +27,4 @@ const VolunteerPage = () => {
   );
 };
 
-export default VolunteerPage;
+export default VolunteerHomepageOld;

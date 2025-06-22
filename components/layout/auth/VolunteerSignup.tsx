@@ -52,7 +52,7 @@ export default function VolunteerSignup() {
          setTimeout(() => {
           const role = session?.user?.role?.toLowerCase();
           if (role) {
-            router.replace(role === "admin" || role === "mentor" ? "/organization/dashboard" : `/${role}`);          }
+            router.replace(role === "admin" || role === "mentor" ? "/organisation/dashboard" : `/${role}`);          }
         }, 1000);
       } catch (error) {
         console.error("Error updating user with profile:", error);
