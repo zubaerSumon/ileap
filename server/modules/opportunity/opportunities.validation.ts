@@ -11,8 +11,8 @@ const createOpportunitySchema = z.object({
   email_contact: z.string().email("Please enter a valid email address"),
   phone_contact: z.string().optional(),
   internal_reference: z.string().optional(),
-  start_date: z.string().min(1, "Please select a start date"),
-  start_time: z.string().min(1, "Please select a start time"),
+  start_date: z.string().optional(),
+  start_time: z.string().optional(),
   is_recurring: z.boolean().default(false),
   recurrence: z.object({
     type: z.string(),

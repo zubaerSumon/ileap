@@ -22,6 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { toast } from "react-hot-toast";
 
 interface Volunteer {
   _id: string;
@@ -149,6 +150,13 @@ const OrganisationDashboard = () => {
   const deleteMutation = trpc.opportunities.deleteOpportunity.useMutation({
     onSuccess: () => {
       utils.opportunities.getOrganizationOpportunities.invalidate();
+      setIsDeleteDialogOpen(false);
+      setOpportunityToDelete(null);
+      toast.success("Opportunity deleted successfully");
+    },
+    onError: (error) => {
+      console.error("Failed to delete opportunity:", error);
+      toast.error(error.message || "Failed to delete opportunity");
       setIsDeleteDialogOpen(false);
       setOpportunityToDelete(null);
     },

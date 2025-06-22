@@ -5,6 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 // import { Edit, Share } from "lucide-react";
 import Underline from "@tiptap/extension-underline";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
+import { MapPin } from "lucide-react";
 
 interface PostContentProps {
   opportunity: IOpportunity;
@@ -73,6 +74,17 @@ export function PostContent({ opportunity }: PostContentProps) {
           </div>
         </div>
       )}
+
+      {/* Opportunity Location */}
+      <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+        <h3 className="text-sm font-medium text-gray-900 mb-2">Opportunity Location</h3>
+        <div className="text-sm text-gray-800">
+          <p className="flex items-center">
+            <MapPin className="w-4 h-4 mr-2 text-gray-500" />
+            <span>{opportunity.location}</span>
+          </p>
+        </div>
+      </div>
       
       <div>
         <h2 className="text-lg font-medium mb-4">{opportunity.title}</h2>
@@ -111,6 +123,25 @@ export function PostContent({ opportunity }: PostContentProps) {
                 </span>
               ))}
             </div>
+          </div>
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Opportunity Details Section */}
+      <div>
+        <h3 className="text-lg font-medium mb-4">Opportunity Details</h3>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-gray-600">Commitment Type:</span>
+            <span className="font-medium">
+              {opportunity.commitment_type === "workbased" ? "Work based" : "Event based"}
+            </span>
+          </div>
+          <div className="flex justify-between items-center py-2 border-b border-gray-100">
+            <span className="text-gray-600">Volunteers Needed:</span>
+            <span className="font-medium">{opportunity.number_of_volunteers}</span>
           </div>
         </div>
       </div>
