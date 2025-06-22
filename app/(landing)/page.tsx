@@ -9,7 +9,7 @@ import ProgramBenefits from "@/components/layout/landing/ausleap/about/ProgramBe
 import WhatIsAusLEAP from "@/components/layout/landing/ausleap/about/WhatIsAusLEAP";
 import RegistrationBanner from "@/components/RegistrationBanner";
 
-export default function Home() {
+export default function HomePage() {
   return (
     <main className="min-h-screen">
       {/* <Hero />
