@@ -27,7 +27,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         staleTime: 5 * 60 * 1000, // 5 minutes
-        refetchInterval: false, // No polling
+        refetchInterval: 5000, // Poll every 5 seconds for new messages
       }
     );
   
@@ -42,7 +42,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         staleTime: 5 * 60 * 1000, // 5 minutes
-        refetchInterval: false, // No polling
+        refetchInterval: 5000, // Poll every 5 seconds for new messages
       }
     );
 
