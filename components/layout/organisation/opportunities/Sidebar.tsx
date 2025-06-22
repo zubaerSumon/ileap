@@ -49,7 +49,7 @@ export function Sidebar({ opportunity }: SidebarProps) {
             </div>
             <div className="flex items-center text-sm">
               <span className="font-medium">Start Time:</span>
-              <span className="ml-2">{opportunity.start_time}</span>
+              <span className="ml-2">{formatTimeToAMPM(opportunity.start_time)}</span>
             </div>
           </div>
         )}

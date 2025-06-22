@@ -1,12 +1,13 @@
-import { Star, ChevronLeft } from "lucide-react";
+import { Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ApplyButton } from "@/components/buttons/ApplyButton";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
+import BackButton from "@/components/buttons/BackButton";
+import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 
 type Opportunity = {
   _id: string;
@@ -34,7 +35,6 @@ type Opportunity = {
 export function PostContent({ opportunity }: { opportunity: Opportunity }) {
   const { data: session } = useSession();
   const isOrganization = session?.user?.role === "organization";
-  const router = useRouter();
 
   const editor = useEditor({
     extensions: [
@@ -72,13 +72,7 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
 
   return (
     <div className="flex-1 max-w-3xl">
-      <button
-        onClick={() => router.back()}
-        className="flex items-center text-sm text-gray-600 hover:text-gray-900 mb-4"
-      >
-        <ChevronLeft className="h-4 w-4 mr-1" />
-        Back
-      </button>
+      <BackButton />
 
       <div className="w-full h-[200px] relative mb-6">
         <Image
@@ -118,7 +112,7 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
           </p>
           <p>
             <span className="font-medium">Time:</span>{" "}
-            {opportunity.start_time}
+            {formatTimeToAMPM(opportunity.start_time)}
           </p>
         </div>
       </div>

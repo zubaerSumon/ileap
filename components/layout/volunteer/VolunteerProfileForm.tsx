@@ -1,7 +1,5 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
-import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
@@ -18,6 +16,7 @@ import { trpc } from "@/utils/trpc";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 import { VolunteerProfileFormData } from "@/types/volunteers";
+import BackButton from "@/components/buttons/BackButton";
 
 const volunteerTypes = [
   { value: "animal_welfare", label: "Animal welfare" },
@@ -95,13 +94,7 @@ export function VolunteerProfileForm() {
         {/* Mobile navigation */}
         <div className="md:hidden bg-white rounded-lg p-4 mb-4">
           <div className="flex items-center space-x-4 mb-4">
-            <Link
-              href="/volunteer"
-              className="flex items-center text-sm text-gray-600 hover:text-gray-900"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Back
-            </Link>
+            <BackButton />
             <h2 className="text-lg font-semibold">Edit profile</h2>
           </div>
          
@@ -110,13 +103,7 @@ export function VolunteerProfileForm() {
         {/* Desktop sidebar */}
         <div className="hidden md:block w-64 shrink-0 bg-white rounded-lg p-6 h-fit">
           <div className="mb-6">
-            <Link
-              href="/volunteer"
-              className="flex items-center text-sm text-gray-600 hover:text-gray-900"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Back
-            </Link>
+            <BackButton />
           </div>
 
           <h2 className="text-xl font-semibold mb-4 ">Edit profile</h2>

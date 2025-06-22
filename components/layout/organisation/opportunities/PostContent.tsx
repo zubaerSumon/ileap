@@ -6,6 +6,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
 import { MapPin } from "lucide-react";
+import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 
 interface PostContentProps {
   opportunity: IOpportunity;
@@ -69,7 +70,7 @@ export function PostContent({ opportunity }: PostContentProps) {
             </p>
             <p>
               <span className="font-medium">Time:</span>{" "}
-              {opportunity.start_time}
+              {opportunity.start_time ? formatTimeToAMPM(opportunity.start_time) : 'Not set'}
             </p>
           </div>
         </div>

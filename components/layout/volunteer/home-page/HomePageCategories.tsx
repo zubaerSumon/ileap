@@ -15,6 +15,7 @@ import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
+import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 
 export type OpportunityDetails = {
   id: string;
@@ -26,6 +27,40 @@ export type OpportunityDetails = {
   location: string;
 };
 
+interface OpportunityData {
+  _id: string;
+  title: string;
+  description: string;
+  category: string[];
+  required_skills: string[];
+  commitment_type: string;
+  location: string;
+  number_of_volunteers: number;
+  start_date?: Date;
+  start_time?: string;
+  organization_profile: {
+    _id: string;
+    title: string;
+    profile_img?: string;
+  };
+  created_by?: {
+    _id: string;
+    name: string;
+  };
+  recurrence?: {
+    date_range: {
+      start_date: Date;
+      end_date?: Date;
+    };
+  };
+  spotsAvailable?: number;
+  formattedDates?: {
+    start_date: string;
+    end_date?: string;
+  };
+  [key: string]: unknown; // Allow additional properties from tRPC response
+}
+
 export default function Categories() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
@@ -33,7 +68,10 @@ export default function Categories() {
   const volunteerId = session?.user?.id;
 
   // Fetch all opportunities
-  const { data: opportunities } = trpc.opportunities.getAllOpportunities.useQuery();
+  const { data: opportunitiesData } = trpc.opportunities.getAllOpportunities.useQuery({
+    page: 1,
+    limit: 50,
+  });
   
   // Fetch all applications to calculate available spots
   const { data: applications } = trpc.applications.getVolunteerApplications.useQuery(
@@ -45,30 +83,31 @@ export default function Categories() {
   const { data: favoriteOpportunities } = trpc.volunteers.getFavoriteOpportunities.useQuery();
 
   // Calculate available spots for each opportunity
-  const opportunitiesWithSpots = opportunities?.map((opportunity) => {
+  const opportunitiesWithSpots = opportunitiesData?.opportunities?.map((opportunity) => {
+    const opp = opportunity as unknown as OpportunityData;
     const appliedCount = (applications as Array<{ opportunity: string; status: string }> | undefined)?.filter(
       (app) => 
-        app.opportunity === opportunity._id.toString() && 
+        app.opportunity === opp._id.toString() && 
         (app.status === 'pending' || app.status === 'approved')
     ).length || 0;
     
-    const spotsAvailable = Math.max(0, opportunity.number_of_volunteers - appliedCount);
+    const spotsAvailable = Math.max(0, opp.number_of_volunteers - appliedCount);
     
     // Format dates if they exist
-    const formattedDates = opportunity.recurrence?.date_range ? {
-      start_date: format(new Date(opportunity.recurrence.date_range.start_date), 'MMM d'),
-      end_date: opportunity.recurrence.date_range.end_date ? format(new Date(opportunity.recurrence.date_range.end_date), 'MMM d') : undefined
+    const formattedDates = opp.recurrence?.date_range ? {
+      start_date: format(new Date(opp.recurrence.date_range.start_date), 'MMM d'),
+      end_date: opp.recurrence.date_range.end_date ? format(new Date(opp.recurrence.date_range.end_date), 'MMM d') : undefined
     } : undefined;
     
     return {
-      ...opportunity,
+      ...opp,
       spotsAvailable,
       formattedDates
     };
   }) || [];
 
   const filteredOpportunities = activeTab === "favorites"
-    ? opportunitiesWithSpots.filter(opp => 
+    ? opportunitiesWithSpots.filter((opp) => 
         favoriteOpportunities?.some(fav => fav.opportunity === opp._id.toString())
       )
     : opportunitiesWithSpots;
@@ -177,7 +216,7 @@ export default function Categories() {
                   {!opportunity.formattedDates && opportunity.start_date && (
                     <div className="flex items-center text-xs text-gray-500">
                       <span className="text-sm text-gray-500">
-                        {format(new Date(opportunity.start_date), 'MMM d')} at {opportunity.start_time}
+                        {format(new Date(opportunity.start_date), 'MMM d')} at {opportunity.start_time ? formatTimeToAMPM(opportunity.start_time) : 'Time TBD'}
                       </span>
                     </div>
                   )}

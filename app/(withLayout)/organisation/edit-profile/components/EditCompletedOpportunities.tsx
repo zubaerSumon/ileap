@@ -8,10 +8,10 @@ import { useRouter } from "next/navigation";
 
 export function EditCompletedOpportunities() {
   const [activeTab, setActiveTab] = useState('active');
-  const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const [selectedCard] = useState<string | null>(null);
 
   if (selectedCard) {
-    return <OpportunityDetail onBack={() => setSelectedCard(null)} />;
+    return <OpportunityDetail />;
   }
 
   return (

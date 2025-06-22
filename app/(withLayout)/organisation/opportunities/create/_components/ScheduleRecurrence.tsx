@@ -1,30 +1,23 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
 import { useState } from "react";
 import RecurrenceModal from "./RecurrenceModal";
 import { FormInput } from "@/components/form-input/FormInput";
 import { UseFormReturn, Path } from "react-hook-form";
 import type { OpportunityFormValues } from "./BasicInformation";
+import BackButton from "@/components/buttons/BackButton";
 
 interface ScheduleRecurrenceProps {
   form: UseFormReturn<OpportunityFormValues>;
-  onBack?: () => void;
 }
 
-export default function ScheduleRecurrence({ form, onBack }: ScheduleRecurrenceProps) {
+export default function ScheduleRecurrence({ form }: ScheduleRecurrenceProps) {
   const [isRecurrenceModalOpen, setIsRecurrenceModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#F5F7FA]">
       <div className="container mx-auto py-12">
-        <button
-          onClick={onBack}
-          className="flex items-center text-gray-600 hover:text-gray-900 mb-4"
-        >
-          <ChevronLeft className="h-4 w-4 mr-1" />
-          Back
-        </button>
+        <BackButton />
         <h1 className="text-2xl font-bold mb-6 pb-2">Schedule & Recurrence</h1>
         <h1 className="text-[14px] pb-12 font-normal">
           Fill out the information below so AusLEAP can find you volunteers for

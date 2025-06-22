@@ -26,6 +26,7 @@ import OpportunityTabs from "@/components/layout/organisation/opportunities/Oppo
 import { PaginationWrapper } from "@/components/PaginationWrapper";
 import { usePagination } from "@/hooks/usePagination";
 import { useRouter } from "next/navigation";
+import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 
 export default function OpportunitiesPage() {
   const router = useRouter();
@@ -99,7 +100,7 @@ export default function OpportunitiesPage() {
           <div className="w-full text-center">
             <div className="text-sm font-medium">{formattedDate}</div>
             <div className="text-xs text-gray-500">
-              {opportunity.start_time}
+              {opportunity.start_time ? formatTimeToAMPM(opportunity.start_time) : 'Time TBD'}
             </div>
           </div>
         );
@@ -142,8 +143,12 @@ export default function OpportunitiesPage() {
               View Application
             </DropdownMenuItem>
             <DropdownMenuItem>Edit</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+            {activeTab !== "archived" && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),

@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -23,6 +22,7 @@ import { TRPCClientErrorLike } from "@trpc/client";
 import { AppRouter } from "@/server";
 import { SelectField } from "@/components/form-input/SelectField";
 import { ProfilePhotoInput } from "@/components/form-input/ProfilePhotoInput";
+import BackButton from "@/components/buttons/BackButton";
 
 type OrganizationProfileData = Omit<z.infer<typeof userValidation.organizationProfileSchema>, 'opportunity_types' | 'required_skills'> & {
   opportunity_types: string[];
@@ -199,13 +199,7 @@ export default function OrganizationProfile() {
         {/* Mobile navigation */}
         <div className="md:hidden bg-white rounded-lg p-4 mb-4">
           <div className="flex items-center space-x-4 mb-4">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center text-sm text-gray-600 hover:text-gray-900"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Back
-            </button>
+            <BackButton />
             <h2 className="text-lg font-semibold">Edit Organization Profile</h2>
           </div>
         </div>
@@ -213,13 +207,7 @@ export default function OrganizationProfile() {
         {/* Desktop sidebar */}
         <div className="hidden md:block w-64 shrink-0 bg-white rounded-lg p-6 h-fit">
           <div className="mb-6">
-            <button
-              onClick={() => router.back()}
-              className="flex items-center text-sm text-gray-600 hover:text-gray-900"
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Back
-            </button>
+            <BackButton />
           </div>
 
           <h2 className="text-xl font-semibold mb-4">Edit Organization Profile</h2>
@@ -308,7 +296,7 @@ export default function OrganizationProfile() {
                 name="state"
                 label="State"
                 placeholder="Enter your state"
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const value = e.target.value.replace(/_/g, ' ');
                   form.setValue('state', value);
                 }}
@@ -319,7 +307,7 @@ export default function OrganizationProfile() {
                 name="area"
                 label="Area"
                 placeholder="Enter your Area"
-                onChange={(e) => {
+                onChange={(e: { target: { value: string; }; }) => {
                   const value = e.target.value.replace(/_/g, ' ');
                   form.setValue('area', value);
                 }}

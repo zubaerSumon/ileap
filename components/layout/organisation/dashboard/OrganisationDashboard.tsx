@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { toast } from "react-hot-toast";
+import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 
 interface Volunteer {
   _id: string;
@@ -324,18 +325,20 @@ const OrganisationDashboard = () => {
                             {opportunity.title}
                           </h3>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-gray-500 hover:text-red-600"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setOpportunityToDelete(opportunity);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {tab !== "archived" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-gray-500 hover:text-red-600"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setOpportunityToDelete(opportunity);
+                              setIsDeleteDialogOpen(true);
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
 
                       <div className="flex items-center text-sm text-gray-500 mb-3">
@@ -386,7 +389,7 @@ const OrganisationDashboard = () => {
                             Starts: {new Date(opportunity.start_date).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric'
-                            })} at {opportunity.start_time}
+                            })} at {opportunity.start_time ? formatTimeToAMPM(opportunity.start_time) : 'Time TBD'}
                           </div>
                         )}
                       </div>
