@@ -11,7 +11,7 @@ import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import React from "react";
-import { OpportunityDetails } from "../layout/volunteer/homepage/HomePageCategories";
+import { OpportunityDetails } from "../layout/volunteer/home-page/HomePageCategories";
 import toast from "react-hot-toast";
 
 interface ConfirmationModalProps {

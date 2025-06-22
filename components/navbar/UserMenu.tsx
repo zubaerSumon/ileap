@@ -26,7 +26,7 @@ export function UserMenu({ user }: UserMenuProps) {
   const hasInitialized = useRef(false);
   const userRole =
     user.role === "admin" || user.role === "mentor"
-      ?  "organisation"
+      ? "organisation"
       : user.role;
   const userName = user.name || "User";
   const isOrgUser =
@@ -37,29 +37,32 @@ export function UserMenu({ user }: UserMenuProps) {
   const organizationName = user.organization_profile?.title || "Organization";
 
   // Fetch current availability status
-  const { data: volunteerProfile } = trpc.volunteers.getVolunteerProfile.useQuery(
-    undefined,
-    {
+  const { data: volunteerProfile } =
+    trpc.volunteers.getVolunteerProfile.useQuery(undefined, {
       enabled: isVolunteer,
-    }
-  );
+    });
 
   // Update availability mutation
-  const updateVolunteerProfile = trpc.volunteers.updateVolunteerProfile.useMutation({
-    onSuccess: () => {
-      // Don't update local state here, let the user's choice persist
-      // The server update was successful, so we trust the local state
-    },
-    onError: (error) => {
-      // Revert the switch if update fails
-      setIsAvailable(!isAvailable);
-      console.error("Failed to update availability:", error.message);
-    },
-  });
+  const updateVolunteerProfile =
+    trpc.volunteers.updateVolunteerProfile.useMutation({
+      onSuccess: () => {
+        // Don't update local state here, let the user's choice persist
+        // The server update was successful, so we trust the local state
+      },
+      onError: (error) => {
+        // Revert the switch if update fails
+        setIsAvailable(!isAvailable);
+        console.error("Failed to update availability:", error.message);
+      },
+    });
 
   // Update local state when profile data changes (only on initial load)
   useEffect(() => {
-    if (volunteerProfile && volunteerProfile.is_available !== undefined && !hasInitialized.current) {
+    if (
+      volunteerProfile &&
+      volunteerProfile.is_available !== undefined &&
+      !hasInitialized.current
+    ) {
       setIsAvailable(volunteerProfile.is_available);
       hasInitialized.current = true;
     }
@@ -75,7 +78,10 @@ export function UserMenu({ user }: UserMenuProps) {
       <DropdownMenuTrigger asChild>
         <button className="relative focus:outline-none">
           <Avatar className="h-9 w-9 ring-2 ring-blue-500 border border-white transition-transform duration-200 hover:scale-105">
-            <AvatarImage src={user.image || ""} alt={userName} />
+            <AvatarImage
+              src={user.image || "https://github.com/shadcn.png"}
+              alt={userName}
+            />
             <AvatarFallback className="bg-blue-600 text-white">
               {userName[0].toUpperCase()}
             </AvatarFallback>
@@ -111,7 +117,7 @@ export function UserMenu({ user }: UserMenuProps) {
                 />
               </div>
             )}
-           </div>
+          </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
