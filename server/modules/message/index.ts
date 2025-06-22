@@ -772,7 +772,7 @@ export const messsageRouter = router({
         }
 
         // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
-        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organization";
+        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
         const isGroupAdmin = group.admins.includes(user._id);
         
         if (!isAdminOrMentor && !isGroupAdmin) {

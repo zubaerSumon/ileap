@@ -132,7 +132,7 @@ export default function OpportunitiesPage() {
             <DropdownMenuItem
               onClick={() =>
                 router.push(
-                  `/organization/opportunities/${info.row.original._id}`
+                  `/organisation/opportunities/${info.row.original._id}`
                 )
               }
             >
@@ -171,7 +171,7 @@ export default function OpportunitiesPage() {
                   className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
                   size="lg"
                   onClick={() =>
-                    router.push("/organization/opportunities/create")
+                    router.push("/organisation/opportunities/create")
                   }
                 >
                   <PlusIcon className="mr-2 transform scale-170" />

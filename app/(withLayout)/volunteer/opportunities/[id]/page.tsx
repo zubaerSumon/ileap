@@ -1,8 +1,8 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
-import { PostContent } from "@/components/layout/volunteer/homepage/PostContent";
-import { Sidebar } from "@/components/layout/volunteer/homepage/Sidebar";
+import { PostContent } from "@/components/layout/volunteer/home-page/PostContent";
+import { Sidebar } from "@/components/layout/volunteer/home-page/Sidebar";
 import { useParams } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
