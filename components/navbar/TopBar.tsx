@@ -1,6 +1,13 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, FileUser, MessageCircle, LayoutDashboard } from "lucide-react";
+import {
+  Menu,
+  X,
+  FileUser,
+  MessageCircle,
+  LayoutDashboard,
+  Users,
+ } from "lucide-react";
 import { Session } from "next-auth";
 import { SessionUser } from "@/types/navigation";
 import Logo from "../../public/AusLeap.png";
@@ -42,7 +49,7 @@ export function TopBar({
               width={80}
               height={32}
               className="h-8 w-auto"
-              style={{ width: 'auto', height: '32px' }}
+              style={{ width: "auto", height: "32px" }}
               priority
             />
           </Link>
@@ -80,7 +87,7 @@ export function TopBar({
               session
                 ? session.user?.role === "volunteer"
                   ? "/volunteer"
-                  : "/organisation/dashboard"
+                  : "/organisation"
                 : "/"
             }
             className="flex items-center"
@@ -91,7 +98,7 @@ export function TopBar({
               width={80}
               height={32}
               className="h-8 w-auto"
-              style={{ width: 'auto', height: '32px' }}
+              style={{ width: "auto", height: "32px" }}
               priority
             />
           </Link>
@@ -109,15 +116,27 @@ export function TopBar({
               >
                 <FileUser className="h-4 w-4" /> Opportunities
               </Link>
-              <Link
-                href="/search?type=volunteer"
-                className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
-              >
-                <FileUser className="h-4 w-4" /> Browse Volunteers
-              </Link>
-              
             </>
           )}
+          <Link
+            href={
+              session?.user?.role === "admin" ||
+              session?.user?.role === "mentor"
+                ? "/search?type=volunteer"
+                : "/search?type=opportunity"
+            }
+            className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
+          >
+            {session?.user?.role === "admin" ||
+            session?.user?.role === "mentor" ? (
+              <Users className="h-4 w-4" />
+            ) : (
+              <FileUser className="h-4 w-4" />
+            )}{" "}
+            {session?.user?.role === "admin" || session?.user?.role === "mentor"
+              ? "Browse Volunteers"
+              : "Find Opportunities"}
+          </Link>
         </div>
 
         {isAuthPath ? (
@@ -136,12 +155,17 @@ export function TopBar({
         ) : isProtectedPath ? (
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
-              { session?.user?.role && (
-                <SearchBar role={session.user.role as "volunteer" | "organization" | "admin"} />
+              {session?.user?.role && (
+                <SearchBar
+                  role={
+                    session.user.role as "volunteer" | "organization" | "admin"
+                  }
+                />
               )}
               <Link
                 href={`/${
-                  session?.user?.role === "mentor" || session?.user?.role === "admin"
+                  session?.user?.role === "mentor" ||
+                  session?.user?.role === "admin"
                     ? "organisation"
                     : session?.user?.role
                 }/messages`}
@@ -154,9 +178,7 @@ export function TopBar({
                   </span>
                 )}
               </Link>
-              {session?.user && (
-                <UserMenu user={session.user as SessionUser} />
-              )}
+              {session?.user && <UserMenu user={session.user as SessionUser} />}
             </div>
           </div>
         ) : (
@@ -175,4 +197,4 @@ export function TopBar({
       </div>
     </div>
   );
-} 
+}
