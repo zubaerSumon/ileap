@@ -1,16 +1,18 @@
 import { z } from "zod";
 
 const createOpportunitySchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().min(1, "Description is required"),
-  category: z.array(z.string()).min(1, "At least one category is required"),
-  required_skills: z.array(z.string()).min(1, "At least one skill is required"),
-  commitment_type: z.string().min(1, "Commitment type is required"),
-  location: z.string().min(1, "Location is required"),
-  number_of_volunteers: z.number().min(1, "Number of volunteers must be at least 1"),
-  email_contact: z.string().email("Invalid email address"),
+  title: z.string().min(1, "Please enter a title for your opportunity"),
+  description: z.string().min(1, "Please provide a description of your opportunity"),
+  category: z.array(z.string()).min(1, "Please select at least one category"),
+  required_skills: z.array(z.string()).min(1, "Please select at least one required skill"),
+  commitment_type: z.string().min(1, "Please select a commitment type"),
+  location: z.string().min(1, "Please enter a location"),
+  number_of_volunteers: z.coerce.number().min(1, "Number of volunteers must be at least 1"),
+  email_contact: z.string().email("Please enter a valid email address"),
   phone_contact: z.string().optional(),
   internal_reference: z.string().optional(),
+  start_date: z.string().min(1, "Please select a start date"),
+  start_time: z.string().min(1, "Please select a start time"),
   is_recurring: z.boolean().default(false),
   recurrence: z.object({
     type: z.string(),

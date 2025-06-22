@@ -17,6 +17,8 @@ type Opportunity = {
   commitment_type: string;
   location: string;
   number_of_volunteers: number;
+  start_date: Date;
+  start_time: string;
   organization_profile: {
     _id: string;
     title: string;
@@ -99,6 +101,26 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
             {opportunity?.created_by?.name || "Organization name"}
           </span>
         </Link>
+      </div>
+
+      {/* Start Date & Time */}
+      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+        <h3 className="text-sm font-medium text-gray-900 mb-2">Start Date & Time</h3>
+        <div className="text-sm text-gray-600">
+          <p>
+            <span className="font-medium">Date:</span>{" "}
+            {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            })}
+          </p>
+          <p>
+            <span className="font-medium">Time:</span>{" "}
+            {opportunity.start_time}
+          </p>
+        </div>
       </div>
 
       <div className="prose max-w-none text-gray-700 space-y-4">

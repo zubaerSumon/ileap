@@ -78,6 +78,30 @@ export default function OpportunitiesPage() {
         );
       },
     }),
+    columnHelper.display({
+      id: "startDateTime",
+      header: () => <span>Start Date & Time</span>,
+      cell: (info) => {
+        const opportunity = info.row.original;
+        if (!opportunity.start_date) {
+          return <div className="w-full text-center text-gray-400">Not set</div>;
+        }
+        
+        const startDate = new Date(opportunity.start_date);
+        const formattedDate = startDate.toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric',
+          year: 'numeric'
+        });
+        
+        return (
+          <div className="w-full text-center">
+            <div className="text-sm font-medium">{formattedDate}</div>
+            <div className="text-xs text-gray-500">{opportunity.start_time}</div>
+          </div>
+        );
+      },
+    }),
     columnHelper.accessor("applicantCount", {
       header: "Applicants",
       cell: (info) => (
@@ -183,9 +207,11 @@ export default function OpportunitiesPage() {
                         className={
                           header.id === "role"
                             ? "flex-1"
+                            : header.id === "startDateTime"
+                            ? "w-[140px] text-center"
                             : header.id === "actions"
                             ? "w-[60px] text-center"
-                            : "w-[160px] text-center"
+                            : "w-[120px] text-center"
                         }
                       >
                         {flexRender(
@@ -218,9 +244,11 @@ export default function OpportunitiesPage() {
                         className={
                           cell.column.id === "role"
                             ? "flex-1"
+                            : cell.column.id === "startDateTime"
+                            ? "w-[140px] text-center"
                             : cell.column.id === "actions"
                             ? "w-[60px] text-center"
-                            : "w-[160px] text-center"
+                            : "w-[120px] text-center"
                         }
                       >
                         {flexRender(

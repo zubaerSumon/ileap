@@ -51,9 +51,68 @@ export function PostContent({ opportunity }: PostContentProps) {
         </div>
       </div>
       <Separator />
+      
+      {/* Start Date & Time */}
+      {opportunity.start_date && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="text-sm font-medium text-blue-900 mb-2">Start Date & Time</h3>
+          <div className="text-sm text-blue-800">
+            <p>
+              <span className="font-medium">Date:</span>{" "}
+              {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}
+            </p>
+            <p>
+              <span className="font-medium">Time:</span>{" "}
+              {opportunity.start_time}
+            </p>
+          </div>
+        </div>
+      )}
+      
       <div>
         <h2 className="text-lg font-medium mb-4">{opportunity.title}</h2>
         <EditorContent editor={editor} />
+      </div>
+
+      <Separator />
+
+      {/* Requirements Section */}
+      <div>
+        <h3 className="text-lg font-medium mb-4">Requirements</h3>
+        <div className="space-y-3">
+          <div>
+            <h4 className="font-medium text-sm text-gray-700 mb-2">Required Skills</h4>
+            <div className="flex flex-wrap gap-2">
+              {opportunity.required_skills.map((skill) => (
+                <span
+                  key={skill}
+                  className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                >
+                  {skill}
+                </span>
+              ))}
+            </div>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-sm text-gray-700 mb-2">Categories</h4>
+            <div className="flex flex-wrap gap-2">
+              {opportunity.category.map((cat) => (
+                <span
+                  key={cat}
+                  className="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded-full"
+                >
+                  {cat}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

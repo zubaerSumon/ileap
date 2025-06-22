@@ -21,6 +21,8 @@ export type OpportunityFormValues = {
   email_contact: string;
   phone_contact?: string;
   internal_reference?: string;
+  start_date: string;
+  start_time: string;
   is_recurring: boolean;
   recurrence?: {
     type: string;
@@ -56,6 +58,14 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
       <Card className="bg-white rounded-lg shadow-none border-0 relative" role="dialog" aria-labelledby="basic-info-title">
         <div className="pt-16 px-6 pb-6">
           <h2 id="basic-info-title" className="sr-only">Basic Information Form</h2>
+          
+          {/* Form Instructions */}
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-800">
+              <strong>Note:</strong> Fields marked with <span className="text-red-500">*</span> are required. 
+              Please fill in all required fields to create your opportunity.
+            </p>
+          </div>
           
           <div className="space-y-8">
             {/* Title & Description */}
@@ -237,6 +247,35 @@ export default function BasicInformation({ form }: { form: UseFormReturn<Opportu
                   name={"phone_contact" as Path<OpportunityFormValues>}
                   label="Phone (optional)"
                   placeholder="+61 123 456 789"
+                  control={form.control}
+                  className="w-[382px]"
+                />
+              </div>
+            </div>
+
+            {/* Start Date & Time */}
+            <div>
+              <h2 className="text-lg font-medium mb-1 flex items-center">
+                Start Date & Time
+                <span className="text-red-500 ml-1">*</span>
+              </h2>
+              <p className="text-sm text-gray-500 mb-4">
+                When does this opportunity start? This helps volunteers plan their availability.
+              </p>
+              <div className="space-y-4">
+                <FormInput
+                  name={"start_date" as Path<OpportunityFormValues>}
+                  label="Start Date"
+                  placeholder=""
+                  type="date"
+                  control={form.control}
+                  className="w-[382px]"
+                />
+                <FormInput
+                  name={"start_time" as Path<OpportunityFormValues>}
+                  label="Start Time"
+                  placeholder=""
+                  type="time"
                   control={form.control}
                   className="w-[382px]"
                 />

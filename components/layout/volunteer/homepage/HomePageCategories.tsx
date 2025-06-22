@@ -174,6 +174,13 @@ export default function Categories() {
                       </span>
                     </div>
                   )}
+                  {!opportunity.formattedDates && opportunity.start_date && (
+                    <div className="flex items-center text-xs text-gray-500">
+                      <span className="text-sm text-gray-500">
+                        {format(new Date(opportunity.start_date), 'MMM d')} at {opportunity.start_time}
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex flex-wrap gap-1">

@@ -43,6 +43,7 @@ export const opportunityRouter = router({
           organization_profile: user.organization_profile,
           created_by: sessionUser.id,
           banner_img: input.banner_img || undefined,
+          start_date: new Date(input.start_date),
         };
 
         if (input.recurrence) {
