@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { useSession } from 'next-auth/react';
 import { trpc } from '@/utils/trpc';
-import toast from 'react-hot-toast';
+
+// Global EventSource instance to prevent multiple connections
+let globalEventSource: EventSource | null = null;
+let globalEventSourceRefs = 0;
 
 export const useMessageSubscription = (selectedUserId: string | null, isGroup: boolean) => {
   const { data: session } = useSession();
@@ -14,9 +17,19 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
 
     console.log('📡 Connecting to SSE for user:', session.user.id);
 
-    // Create EventSource connection
+    // Use global EventSource if it exists and is connected
+    if (globalEventSource && globalEventSource.readyState === EventSource.OPEN) {
+      console.log('📡 Reusing existing EventSource connection');
+      eventSourceRef.current = globalEventSource;
+      globalEventSourceRefs++;
+      return;
+    }
+
+    // Create new EventSource connection
     const eventSource = new EventSource('/api/messages/stream');
     eventSourceRef.current = eventSource;
+    globalEventSource = eventSource;
+    globalEventSourceRefs++;
 
     eventSource.onopen = () => {
       console.log('✅ SSE connection opened for user:', session.user.id);
@@ -36,7 +49,6 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
           const messageData = data.data.message as Record<string, unknown>;
           
           // Check if this message is for the current conversation
-          const currentUserId = session?.user?.id;
           const messageSender = (messageData.sender as Record<string, unknown>)?._id;
           const messageReceiver = (messageData.receiver as Record<string, unknown>)?._id;
           const messageGroup = (messageData.group as Record<string, unknown>)?._id;
@@ -62,9 +74,8 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
             ? groupIdStr === selectedUserIdStr
             : (senderIdStr === selectedUserIdStr || receiverIdStr === selectedUserIdStr);
           
-          console.log('📨 Message check:', {
+          console.log('📨 Message check in useMessageSubscription:', {
             isGroup,
-            currentUserId,
             selectedUserId,
             selectedUserIdStr,
             messageSender,
@@ -73,56 +84,19 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
             senderIdStr,
             receiverIdStr,
             groupIdStr,
-            isForCurrentConversation,
-            messageContent: (messageData.content as string)?.substring(0, 50),
-            senderRole: (messageData.sender as Record<string, unknown>)?.role,
-            receiverRole: (messageData.receiver as Record<string, unknown>)?.role
+            isForCurrentConversation
           });
           
-          // Show toast notification if message is not from current user and not for current conversation
-          const isFromCurrentUser = senderIdStr === currentUserId;
-          const shouldShowToast = !isFromCurrentUser && !isForCurrentConversation;
-          
-          console.log('🔔 Toast notification check:', {
-            isFromCurrentUser,
-            isForCurrentConversation,
-            shouldShowToast,
-            senderIdStr,
-            currentUserId
-          });
-          
-          if (shouldShowToast) {
-            const senderName = (messageData.sender as Record<string, unknown>)?.name || 'Someone';
-            const groupName = (messageData.group as Record<string, unknown>)?.name;
-            const messageContent = (messageData.content as string) || '';
-            
-            if (messageData.group) {
-              // Group message
-              console.log('🔔 Showing group message toast:', `${senderName} sent a message in ${groupName}`);
-              toast.success(`${senderName} sent a message in ${groupName}: ${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}`, {
-                duration: 4000,
-                position: 'top-right',
-              });
-            } else {
-              // Direct message
-              console.log('🔔 Showing direct message toast:', `${senderName} sent you a message`);
-              toast.success(`${senderName} sent you a message: ${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}`, {
-                duration: 4000,
-                position: 'top-right',
-              });
-            }
+          if (isForCurrentConversation && selectedUserId) {
+            console.log('🔄 Updating current conversation with new message');
+            // Invalidate and refetch messages
+            utils.messages.getMessages.invalidate({ userId: selectedUserId, limit: 20 });
+            utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId, limit: 20 });
           }
           
-          // Always invalidate conversations and messages to ensure real-time updates
-          console.log('🔄 Invalidating conversations and messages for real-time update');
+          // Always invalidate conversations to update sidebar
           utils.messages.getConversations.invalidate();
           utils.messages.getGroups.invalidate();
-          
-          // If it's for the current conversation, also invalidate messages
-          if (isForCurrentConversation) {
-            console.log('🔄 Invalidating messages for current conversation');
-            utils.messages.getMessages.invalidate();
-          }
         }
         
         if (data.type === 'message_read' && selectedUserId) {
@@ -148,11 +122,39 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
 
     eventSource.onerror = (error) => {
       console.error('SSE connection error:', error);
+      console.error('SSE readyState:', eventSource.readyState);
+      console.error('SSE URL:', eventSource.url);
+      
+      // Log additional error details
+      if (error instanceof Event) {
+        console.error('SSE error event:', {
+          type: error.type,
+          target: error.target,
+          isTrusted: error.isTrusted,
+          timeStamp: error.timeStamp
+        });
+      }
+      
+      // Reset global EventSource on error
+      if (globalEventSource === eventSource) {
+        globalEventSource = null;
+        globalEventSourceRefs = 0;
+      }
     };
 
     return () => {
       console.log('📡 Closing SSE connection for user:', session.user.id);
-      eventSource.close();
+      globalEventSourceRefs--;
+      
+      // Only close if no other components are using it
+      if (globalEventSourceRefs <= 0) {
+        if (eventSource.readyState !== EventSource.CLOSED) {
+          eventSource.close();
+        }
+        globalEventSource = null;
+        globalEventSourceRefs = 0;
+      }
+      
       eventSourceRef.current = null;
     };
   }, [session?.user?.id, selectedUserId, isGroup, utils]);
@@ -161,12 +163,19 @@ export const useMessageSubscription = (selectedUserId: string | null, isGroup: b
   useEffect(() => {
     return () => {
       if (eventSourceRef.current) {
-        eventSourceRef.current.close();
+        globalEventSourceRefs--;
+        if (globalEventSourceRefs <= 0) {
+          if (eventSourceRef.current.readyState !== EventSource.CLOSED) {
+            eventSourceRef.current.close();
+          }
+          globalEventSource = null;
+          globalEventSourceRefs = 0;
+        }
       }
     };
   }, []);
 
   return {
-    isConnected: !!eventSourceRef.current,
+    isConnected: !!eventSourceRef.current && eventSourceRef.current.readyState === EventSource.OPEN,
   };
 }; 
