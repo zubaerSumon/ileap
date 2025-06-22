@@ -13,6 +13,8 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
     email_contact: { type: String, required: true },
     phone_contact: { type: String },
     internal_reference: { type: String },
+    start_date: { type: Date, required: true },
+    start_time: { type: String, required: true },
     is_archived: { type: Boolean, default: false },
     deleted_at: { type: Date, default: null },
     is_recurring: { type: Boolean, default: false },

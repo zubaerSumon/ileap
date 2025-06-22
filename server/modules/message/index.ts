@@ -36,6 +36,14 @@ export const messsageRouter = router({
 
         const senderId = user._id;
 
+        console.log('📤 Sending message:', {
+          senderEmail: sessionUser.email,
+          senderId: senderId.toString(),
+          senderRole: user.role,
+          receiverId,
+          content: content.substring(0, 50) + (content.length > 50 ? '...' : ''),
+        });
+
         const message = await Message.create({
           sender: new Types.ObjectId(senderId),
           receiver: new Types.ObjectId(receiverId),
@@ -52,7 +60,9 @@ export const messsageRouter = router({
           console.log('📤 Publishing message via tRPC:', {
             senderId: senderId.toString(),
             receiverId: receiverId.toString(),
-            messageId: (populatedMessage as any)._id
+            messageId: (populatedMessage as any)._id,
+            senderRole: user.role,
+            receiverRole: (populatedMessage as any).sender?.role || 'unknown'
           });
           
           // Publish to receiver's channel
@@ -306,6 +316,102 @@ export const messsageRouter = router({
 
         // Only invalidate if we actually updated something
         if (result.modifiedCount > 0) {
+          // Publish message read event
+          messagePubSub.publishMessageRead(currentUserId.toString(), conversationId);
+          
+          // Also publish conversation update to refresh the sidebar
+          const conversations = await Message.aggregate([
+            {
+              $match: {
+                $or: [
+                  { sender: new Types.ObjectId(currentUserId) },
+                  { receiver: new Types.ObjectId(currentUserId) },
+                ],
+                group: { $exists: false },
+              },
+            },
+            {
+              $sort: { createdAt: -1 },
+            },
+            {
+              $group: {
+                _id: {
+                  $cond: [
+                    { $eq: ["$sender", new Types.ObjectId(currentUserId)] },
+                    "$receiver",
+                    "$sender",
+                  ],
+                },
+                lastMessage: { $first: "$$ROOT" },
+                unreadCount: {
+                  $sum: {
+                    $cond: [
+                      {
+                        $and: [
+                          { $eq: ["$receiver", new Types.ObjectId(currentUserId)] },
+                          { $eq: ["$isRead", false] },
+                        ],
+                      },
+                      1,
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "_id",
+                foreignField: "_id",
+                as: "user",
+                pipeline: [
+                  {
+                    $lookup: {
+                      from: "organization_profiles",
+                      localField: "organization_profile",
+                      foreignField: "_id",
+                      as: "organization_profile"
+                    }
+                  },
+                  {
+                    $unwind: {
+                      path: "$organization_profile",
+                      preserveNullAndEmptyArrays: true
+                    }
+                  },
+                  {
+                    $project: {
+                      name: 1,
+                      avatar: 1,
+                      role: 1,
+                      organization_profile: {
+                        title: 1
+                      }
+                    },
+                  },
+                ],
+              },
+            },
+            {
+              $unwind: "$user",
+            },
+            {
+              $project: {
+                _id: 1,
+                user: 1,
+                lastMessage: {
+                  content: 1,
+                  isRead: 1,
+                  createdAt: 1,
+                },
+                unreadCount: 1,
+              },
+            },
+          ]);
+
+          messagePubSub.publishConversationUpdate(currentUserId.toString(), conversations as Record<string, unknown>[]);
+          
           return { success: true, updatedCount: result.modifiedCount };
         }
 
@@ -795,4 +901,125 @@ export const messsageRouter = router({
       };
     });
   }),
+
+  // SSE subscription for messages
+  subscribeToMessages: protectedProcedure
+    .input(z.object({
+      userId: z.string().optional(),
+      isGroup: z.boolean().default(false),
+    }))
+    .subscription(async ({ ctx }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser?.email) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to subscribe to messages",
+        });
+      }
+
+      const user = await User.findOne({ email: sessionUser.email });
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      const currentUserId = user._id.toString();
+
+      return observable<{
+        type: 'new_message' | 'message_read' | 'conversation_update' | 'connected';
+        data: any;
+      }>((emit) => {
+        const messageHandler = (event: any) => {
+          console.log('📡 SSE: Emitting message event:', event);
+          emit.next(event);
+        };
+
+        const conversationHandler = (event: any) => {
+          console.log('📡 SSE: Emitting conversation event:', event);
+          emit.next({
+            type: 'conversation_update',
+            data: event
+          });
+        };
+
+        // Subscribe to user-specific messages
+        messagePubSub.on(`message:${currentUserId}`, messageHandler);
+        
+        // Subscribe to conversation updates
+        messagePubSub.on(`conversation:${currentUserId}`, conversationHandler);
+
+        // Send initial connection message
+        emit.next({
+          type: 'connected',
+          data: { userId: currentUserId, timestamp: new Date().toISOString() }
+        });
+
+        return () => {
+          console.log('📡 SSE: Cleaning up subscription for user:', currentUserId);
+          messagePubSub.off(`message:${currentUserId}`, messageHandler);
+          messagePubSub.off(`conversation:${currentUserId}`, conversationHandler);
+        };
+      });
+    }),
+
+  // SSE subscription for conversations
+  subscribeToConversations: protectedProcedure
+    .subscription(async ({ ctx }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser?.email) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to subscribe to conversations",
+        });
+      }
+
+      const user = await User.findOne({ email: sessionUser.email });
+      if (!user) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+
+      const currentUserId = user._id.toString();
+
+      return observable<{
+        type: 'conversation_update' | 'group_update' | 'connected';
+        data: any;
+      }>((emit) => {
+        const conversationHandler = (event: any) => {
+          console.log('📡 SSE: Emitting conversation update:', event);
+          emit.next({
+            type: 'conversation_update',
+            data: event
+          });
+        };
+
+        const groupHandler = (event: any) => {
+          console.log('📡 SSE: Emitting group update:', event);
+          emit.next({
+            type: 'group_update',
+            data: event
+          });
+        };
+
+        // Subscribe to conversation updates
+        messagePubSub.on(`conversation:${currentUserId}`, conversationHandler);
+        messagePubSub.on(`group:${currentUserId}`, groupHandler);
+
+        // Send initial connection message
+        emit.next({
+          type: 'connected',
+          data: { userId: currentUserId, timestamp: new Date().toISOString() }
+        });
+
+        return () => {
+          console.log('📡 SSE: Cleaning up conversation subscription for user:', currentUserId);
+          messagePubSub.off(`conversation:${currentUserId}`, conversationHandler);
+          messagePubSub.off(`group:${currentUserId}`, groupHandler);
+        };
+      });
+    }),
 });

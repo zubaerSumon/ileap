@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
         };
 
         messagePubSub.on(`message:${userId}`, handler);
+        console.log('📡 SSE: Subscribed to channel:', `message:${userId}`);
 
         // Handle client disconnect
         request.signal.addEventListener('abort', () => {

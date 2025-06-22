@@ -367,12 +367,20 @@ const OrganisationDashboard = () => {
                       </div>
 
                       <div className="mt-auto pt-4">
-                        <div className="text-xs text-gray-500 mb-4">
+                        <div className="text-xs text-gray-500 mb-2">
                           Posted{" "}
                           {formatDistanceToNow(opportunity.createdAt, {
                             addSuffix: true,
                           })}
                         </div>
+                        {opportunity.start_date && (
+                          <div className="text-xs text-gray-500">
+                            Starts: {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric'
+                            })} at {opportunity.start_time}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

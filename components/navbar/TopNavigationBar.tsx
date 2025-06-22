@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
@@ -21,6 +21,8 @@ export default function TopNavigationBar() {
   const pathname = usePathname();
   const { data: session } = useSession();
   const { isAuthenticated } = useAuthCheck();
+  const utils = trpc.useUtils();
+  const eventSourceRef = useRef<EventSource | null>(null);
 
   const isAuthPath = AUTH_PATHS.some((path) => pathname?.includes(path));
   const isProtectedPath = PROTECTED_PATHS.some((path) =>
@@ -33,10 +35,10 @@ export default function TopNavigationBar() {
     undefined,
     {
       enabled: isAuthenticated,
-      staleTime: 0, // No stale time to ensure real-time updates
-      refetchOnWindowFocus: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 5000, // Refetch every 5 seconds as backup
+      refetchInterval: false, // No polling
     }
   );
 
@@ -45,12 +47,53 @@ export default function TopNavigationBar() {
     undefined,
     {
       enabled: isAuthenticated,
-      staleTime: 0, // No stale time to ensure real-time updates
-      refetchOnWindowFocus: true,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 5000, // Refetch every 5 seconds as backup
+      refetchInterval: false, // No polling
     }
   );
+
+  // Real-time updates using EventSource
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    console.log('📡 Connecting to EventSource for TopNavigationBar');
+
+    // Create EventSource connection
+    const eventSource = new EventSource('/api/messages/stream');
+    eventSourceRef.current = eventSource;
+
+    eventSource.onopen = () => {
+      console.log('✅ EventSource connection opened for TopNavigationBar');
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        console.log('📨 TopNavigationBar: Received EventSource update:', data);
+        
+        if (data.type === 'new_message' || data.type === 'message_read') {
+          console.log('🔄 TopNavigationBar: Updating unread counts');
+          // Invalidate conversations and groups to update unread counts
+          utils.messages.getConversations.invalidate();
+          utils.messages.getGroups.invalidate();
+        }
+      } catch (error) {
+        console.error('Error parsing EventSource message:', error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('EventSource connection error:', error);
+    };
+
+    return () => {
+      console.log('📡 Closing EventSource connection for TopNavigationBar');
+      eventSource.close();
+      eventSourceRef.current = null;
+    };
+  }, [isAuthenticated, utils]);
 
   // Calculate total unread messages from both conversations and groups
   const conversationsUnreadCount = conversations?.reduce(

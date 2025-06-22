@@ -12,6 +12,8 @@ type Opportunity = {
   commitment_type: string;
   location: string;
   number_of_volunteers: number;
+  start_date: Date;
+  start_time: string;
   organization_profile: {
     _id: string;
     name: string;
@@ -54,6 +56,22 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
           <div>
             <h4 className="text-sm font-medium mb-1">Available Spots</h4>
             <p className="text-sm text-gray-600">{opportunity.number_of_volunteers} spots</p>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-medium mb-1">Start Date</h4>
+            <p className="text-sm text-gray-600">
+              {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-medium mb-1">Start Time</h4>
+            <p className="text-sm text-gray-600">{opportunity.start_time}</p>
           </div>
         </div>
 
