@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import {
-  ArrowLeft,
   FileSpreadsheet,
   Hand,
   MessageCircleCode,
@@ -14,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { PostContent } from "@/components/layout/organisation/opportunities/PostContent";
-import { Sidebar } from "@/components/layout/organisation/opportunities/Sidebar";
+import { OpportunitySidebar } from "@/components/layout/shared/OpportunitySidebar";
 import {
   Applicant,
   ApplicantsCard,
@@ -33,6 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import BackButton from "@/components/buttons/BackButton";
 
 export default function OpportunityDetailsPage() {
   const utils = trpc.useUtils();
@@ -185,14 +185,7 @@ export default function OpportunityDetailsPage() {
         <div className="w-[1240px] mx-auto bg-white rounded-xl min-h-screen ">
           <div className="p-8">
             <div className="mb-8">
-              <Button
-                variant="ghost"
-                onClick={() => router.back()}
-                className="flex items-center gap-2 cursor-pointer mb-4"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </Button>
+              <BackButton />
               <div className="w-full h-[200px] relative mb-6">
                 <Image
                   src={opportunity.banner_img || "/default-banner.svg"}
@@ -236,7 +229,7 @@ export default function OpportunityDetailsPage() {
                 <div className="flex gap-8">
                   <PostContent opportunity={opportunity} />
                   <div className="w-[1px] bg-[#F1F1F1]"></div>
-                  <Sidebar opportunity={opportunity} />
+                  <OpportunitySidebar opportunity={opportunity} userRole="organization" />
                 </div>
               </TabsContent>
 

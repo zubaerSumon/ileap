@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
+import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 
 type Opportunity = {
   _id: string;
@@ -71,7 +72,7 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
 
           <div>
             <h4 className="text-sm font-medium mb-1">Start Time</h4>
-            <p className="text-sm text-gray-600">{opportunity.start_time}</p>
+            <p className="text-sm text-gray-600">{formatTimeToAMPM(opportunity.start_time)}</p>
           </div>
         </div>
 

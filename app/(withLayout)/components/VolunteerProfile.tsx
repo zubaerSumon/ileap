@@ -1,10 +1,10 @@
 'use client';
 
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { trpc } from '@/utils/trpc';
-import { useRouter } from 'next/navigation';
 import { Key } from 'react';
+import BackButton from '@/components/buttons/BackButton';
 
 interface VolunteerProfileProps {
   volunteerId: string;
@@ -27,7 +27,6 @@ interface Application {
 }
 
 export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
-  const router = useRouter();
   const { data: volunteer, isLoading } = trpc.volunteers.getVolunteerById.useQuery(volunteerId);
   const { data: applications, isLoading: isLoadingApplications } = trpc.applications.getVolunteerApplications.useQuery(volunteerId);
 
@@ -50,13 +49,8 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
   return (
     <div className="w-[964px] mx-auto">
       {/* Back Button */}
-      <button
-        onClick={() => router.back()}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4 transition-colors"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back
-      </button>
+      <BackButton />
+      
       {/* Header with background */}
       <div className="relative h-48 rounded-[12px] overflow-hidden">
         <Image

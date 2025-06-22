@@ -2,7 +2,7 @@
 
 import { Loader2 } from "lucide-react";
 import { PostContent } from "@/components/layout/volunteer/home-page/PostContent";
-import { Sidebar } from "@/components/layout/volunteer/home-page/Sidebar";
+import { OpportunitySidebar } from "@/components/layout/shared/OpportunitySidebar";
 import { useParams } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
@@ -50,7 +50,7 @@ export default function OpportunityDetailPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex gap-8 justify-center ">
           <PostContent opportunity={opportunity} />
-          <Sidebar opportunity={opportunity} />
+          <OpportunitySidebar opportunity={opportunity} userRole="volunteer" />
         </div>
       </div>
     </ProtectedLayout>
