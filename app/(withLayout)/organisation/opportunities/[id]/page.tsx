@@ -295,17 +295,7 @@ export default function OpportunityDetailsPage() {
               <TabsContent value="review" className="mt-6">
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <div className="flex gap-8 text-sm">
-                      <button className="text-[#246BFD] border-b-2 border-[#246BFD]">
-                        All ({filteredApplicants?.length || 0})
-                      </button>
-                      <button className="text-gray-500 hover:text-gray-700">
-                        Saved (2)
-                      </button>
-                      <button className="text-gray-500 hover:text-gray-700">
-                        Messaged (3)
-                      </button>
-                    </div>
+                    
                     <div className="w-full border-b border-[#F1F1F1]" />
                     <div className="flex justify-between gap-3 ">
                       <div className="relative max-w-[333px]">

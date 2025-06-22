@@ -43,7 +43,7 @@ export const opportunityRouter = router({
           organization_profile: user.organization_profile,
           created_by: sessionUser.id,
           banner_img: input.banner_img || undefined,
-          start_date: new Date(input.start_date),
+          ...(input.start_date && { start_date: new Date(input.start_date) }),
         };
 
         if (input.recurrence) {
@@ -291,13 +291,46 @@ export const opportunityRouter = router({
           });
         }
 
-        // Soft delete by setting deleted_at timestamp
-        opportunity.deleted_at = new Date();
-        await opportunity.save();
+        // Check if opportunity is already deleted
+        if (opportunity.deleted_at) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Opportunity is already deleted",
+          });
+        }
 
-        return { success: true };
+        // Soft delete by setting deleted_at timestamp
+        const updateResult = await Opportunity.findByIdAndUpdate(
+          opportunityId,
+          { deleted_at: new Date() },
+          { new: true, runValidators: false }
+        );
+
+        if (!updateResult) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to delete opportunity - update failed",
+          });
+        }
+
+        return { success: true, message: "Opportunity deleted successfully" };
       } catch (error) {
         console.error("Error deleting opportunity:", error);
+        
+        // If it's already a TRPC error, re-throw it
+        if (error instanceof TRPCError) {
+          throw error;
+        }
+        
+        // Handle mongoose validation errors
+        if (error && typeof error === 'object' && 'name' in error && error.name === 'ValidationError') {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Validation error while deleting opportunity",
+            cause: error,
+          });
+        }
+        
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to delete opportunity",

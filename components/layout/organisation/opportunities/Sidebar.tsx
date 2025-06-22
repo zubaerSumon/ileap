@@ -34,13 +34,8 @@ export function Sidebar({ opportunity }: SidebarProps) {
 
       <Separator />
 
-      <div className="py-4 rounded-lg mb-4 space-y-3">
-        <div className="flex items-center text-sm">
-          <MapPin className="w-4 h-4 mr-2 text-gray-500" />
-          <span>{opportunity.location}</span>
-        </div>
-        
-        {/* {opportunity.start_date && (
+      {/* <div className="py-4 rounded-lg mb-4 space-y-3 gap-y-3">
+        {opportunity.start_date && (
           <div className="space-y-2">
             <div className="flex items-center text-sm">
               <span className="font-medium">Start Date:</span>
@@ -57,13 +52,13 @@ export function Sidebar({ opportunity }: SidebarProps) {
               <span className="ml-2">{opportunity.start_time}</span>
             </div>
           </div>
-        )} */}
-      </div>
+        )}
+      </div> */}
 
       <Separator />
 
-      <div className="py-4 rounded-lg mb-4">
-        <h3 className="font-semibold mb-3">Organization Information</h3>
+      <div className="py-4 rounded-lg">
+        <h3 className="font-semibold mb-3">Organisation Information</h3>
         <div className="space-y-3">
           {opportunity.organization_profile.contact_email && (
             <div className="flex items-center text-sm">
@@ -99,28 +94,6 @@ export function Sidebar({ opportunity }: SidebarProps) {
               <span>{opportunity.organization_profile.area}, {opportunity.organization_profile.state}</span>
             </div>
           )}
-        </div>
-      </div>
-
-      <Separator />
-
-      <div className="py-4 rounded-lg">
-        <h3 className="font-semibold mb-3">Opportunity Details</h3>
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Commitment Type:</span>
-            <span className="font-medium">
-              {opportunity.commitment_type === "workbased" ? "Work based" : "Event based"}
-            </span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Volunteers Needed:</span>
-            <span className="font-medium">{opportunity.number_of_volunteers}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Categories:</span>
-            <span className="font-medium">{opportunity.category.length}</span>
-          </div>
         </div>
       </div>
     </div>

@@ -3,8 +3,7 @@
 import React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Filter, PlusIcon } from "lucide-react";
+
 import {
   useReactTable,
   getCoreRowModel,
@@ -19,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, PlusIcon } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import type { Opportunity } from "@/types/opportunities";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
@@ -84,20 +83,24 @@ export default function OpportunitiesPage() {
       cell: (info) => {
         const opportunity = info.row.original;
         if (!opportunity.start_date) {
-          return <div className="w-full text-center text-gray-400">Not set</div>;
+          return (
+            <div className="w-full text-center text-gray-400">Not set</div>
+          );
         }
-        
+
         const startDate = new Date(opportunity.start_date);
-        const formattedDate = startDate.toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric',
-          year: 'numeric'
+        const formattedDate = startDate.toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
         });
-        
+
         return (
           <div className="w-full text-center">
             <div className="text-sm font-medium">{formattedDate}</div>
-            <div className="text-xs text-gray-500">{opportunity.start_time}</div>
+            <div className="text-xs text-gray-500">
+              {opportunity.start_time}
+            </div>
           </div>
         );
       },
@@ -183,18 +186,6 @@ export default function OpportunitiesPage() {
                 onTabChange={setActiveTab}
                 openCount={totalItems}
               />
-            </div>
-
-            <div className="p-4 flex justify-between items-center">
-              <Input placeholder="Search" className="max-w-sm" />
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-[33px] px-3 flex items-center gap-1.5 bg-[#F0F1F2] border-0"
-              >
-                <Filter className="h-4 w-4" />
-                Filter
-              </Button>
             </div>
 
             <div className="px-4">

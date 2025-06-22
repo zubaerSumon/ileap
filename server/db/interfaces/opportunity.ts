@@ -11,8 +11,8 @@ export interface IOpportunity extends Document {
   email_contact: string;
   phone_contact: string;
   internal_reference?: string;
-  start_date: Date;
-  start_time: string;
+  start_date?: Date;
+  start_time?: string;
   is_archived: boolean;
   deleted_at: Date | null;
   is_recurring: boolean;
