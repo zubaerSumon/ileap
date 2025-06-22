@@ -160,22 +160,111 @@ export const opportunityRouter = router({
     }
   }),
 
-  getAllOpportunities: protectedProcedure.query(async () => {
-    try {
-      const opportunities = await Opportunity.find()
-        .populate("organization_profile")
-        .populate("created_by")
-        .sort({ createdAt: -1 });
+  getAllOpportunities: protectedProcedure
+    .input(opportunityValidation.getAllOpportunitiesSchema)
+    .query(async ({ input }) => {
+      try {
+        const { page, limit, search, categories, commitmentType, location, availability } = input;
+        const skip = (page - 1) * limit;
 
-      return opportunities;
-    } catch (error) {
-      throw new TRPCError({
-        code: "INTERNAL_SERVER_ERROR",
-        message: "Failed to fetch opportunities",
-        cause: error,
-      });
-    }
-  }),
+        // Build base query
+        const baseQuery: Record<string, unknown> = {};
+
+        // Add search filter
+        if (search) {
+          const searchRegex = new RegExp(search, 'i');
+          baseQuery.$or = [
+            { title: searchRegex },
+            { description: searchRegex },
+            { location: searchRegex },
+            { 'organization_profile.title': searchRegex },
+          ];
+        }
+
+        // Add category filter
+        if (categories && categories.length > 0) {
+          baseQuery.category = { $in: categories };
+        }
+
+        // Add commitment type filter
+        if (commitmentType !== "all") {
+          baseQuery.commitment_type = commitmentType;
+        }
+
+        // Add location filter
+        if (location) {
+          const locationRegex = new RegExp(location, 'i');
+          baseQuery.location = locationRegex;
+        }
+
+        // Add availability filter
+        if (availability?.startDate && availability?.endDate) {
+          // Filter opportunities that have dates within the specified range
+          baseQuery.$or = [
+            // For recurring opportunities with date range
+            {
+              'recurrence.date_range.start_date': { 
+                $exists: true, 
+                $ne: null,
+                $lte: availability.endDate 
+              },
+              'recurrence.date_range.end_date': { 
+                $exists: true, 
+                $ne: null,
+                $gte: availability.startDate 
+              }
+            },
+            // For single date opportunities
+            {
+              start_date: { 
+                $exists: true, 
+                $ne: null,
+                $gte: availability.startDate,
+                $lte: availability.endDate
+              }
+            }
+          ];
+        }
+
+        console.log("Opportunity Query:", JSON.stringify(baseQuery, null, 2));
+
+        // Get total count for pagination
+        const total = await Opportunity.countDocuments(baseQuery);
+        const totalPages = Math.ceil(total / limit);
+
+        console.log("Total opportunities found:", total);
+        console.log("Total pages:", totalPages);
+        console.log("Skip:", skip);
+        console.log("Limit:", limit);
+
+        // Execute query with pagination
+        const opportunities = await Opportunity.find(baseQuery)
+          .populate("organization_profile")
+          .populate("created_by")
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean();
+
+        console.log(`Found ${opportunities.length} opportunities out of ${total} total`);
+
+        return {
+          opportunities,
+          total,
+          totalPages,
+          currentPage: page,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        };
+      } catch (error) {
+        console.error("Error fetching opportunities:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch opportunities",
+          cause: error,
+        });
+      }
+    }),
 
   archiveOpportunity: protectedProcedure
     .input(z.string())

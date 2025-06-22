@@ -1,9 +1,9 @@
 "use client";
 import React from "react";
 import { useSearchParams } from "next/navigation";
+ import ProtectedLayout from "@/components/layout/ProtectedLayout";
+import BrowseVolunteer from "@/components/layout/organisation/find-volunteer";
 import FindOpportunity from "@/components/layout/volunteer/find-opportunity";
-import ProtectedLayout from "@/components/layout/ProtectedLayout";
-import BrowseVolunteer from "@/components/layout/organisation/search/BrowseVolunteer";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
