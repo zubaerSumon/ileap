@@ -2,6 +2,7 @@
 
 import { useSession } from 'next-auth/react';
 import { useEffect, useState } from 'react';
+import { trpc } from "@/utils/trpc";
 
 interface SSEEvent {
   type: string;
@@ -14,6 +15,15 @@ export default function TestSSEPage() {
   const [events, setEvents] = useState<SSEEvent[]>([]);
   const [connectionStatus, setConnectionStatus] = useState('disconnected');
   const [userInfo, setUserInfo] = useState<unknown>(null);
+  const [debugData, setDebugData] = useState<{
+    totalInDB: number;
+    archivedCount: number;
+    nonArchivedCount: number;
+    nonDeletedCount: number;
+    sampleOpportunity: unknown;
+  } | null>(null);
+
+  const debugQuery = trpc.opportunities.debugOpportunities.useQuery();
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -51,6 +61,14 @@ export default function TestSSEPage() {
       setConnectionStatus('disconnected');
     };
   }, [session?.user?.id]);
+
+  const handleDebug = () => {
+    debugQuery.refetch().then((result) => {
+      if (result.data) {
+        setDebugData(result.data);
+      }
+    });
+  };
 
   return (
     <div className="container mx-auto p-8">
@@ -116,6 +134,28 @@ export default function TestSSEPage() {
           <li>Monitor the events log to see if SSE events are being received</li>
         </ol>
       </div>
+
+      <button 
+        onClick={handleDebug}
+        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+      >
+        Debug Opportunities
+      </button>
+
+      {debugData && (
+        <div className="bg-gray-100 p-4 rounded">
+          <h2 className="text-lg font-semibold mb-2">Debug Results:</h2>
+          <pre className="text-sm">{JSON.stringify(debugData, null, 2)}</pre>
+        </div>
+      )}
+
+      {debugQuery.isLoading && <p>Loading...</p>}
+      {debugQuery.error && (
+        <div className="bg-red-100 p-4 rounded mt-4">
+          <h3 className="text-red-800 font-semibold">Error:</h3>
+          <p className="text-red-700">{debugQuery.error.message}</p>
+        </div>
+      )}
     </div>
   );
 } 
