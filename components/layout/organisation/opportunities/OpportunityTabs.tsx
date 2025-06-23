@@ -23,22 +23,21 @@ export default function OpportunityTabs({ activeTab, onTabChange, openCount = 0 
   ];
 
   return (
-    <div className="grid grid-cols-4 mb-6 w-full max-w-full overflow-hidden bg-[#F1F1F2] rounded-[30px]">
+    <div className="grid grid-cols-4 mb-6 w-full max-w-full   overflow-hidden bg-[#F1F1F2] rounded-[30px] ">
       {tabs.map((tab) => (
         <Button
           key={tab.value}
           onClick={() => onTabChange(tab.value)}
           variant={activeTab === tab.value ? "default" : "ghost"}
           className={`
-            h-10 w-full px-1 sm:px-2 rounded-[24px] transition-all text-xs sm:text-sm
+            h-10 w-full px-2 rounded-[24px] transition-all
             ${activeTab === tab.value
               ? "bg-[#246BFD] text-white hover:bg-[#246BFD]/90"
               : "bg-transparent text-gray-600 hover:bg-[#246BFD]/10 hover:text-[#246BFD]"}
           `}
         >
           <span className="truncate">
-            {tab.label} <span className="hidden sm:inline">({tab.count})</span>
-            <span className="sm:hidden">({tab.count})</span>
+            {tab.label} ({tab.count})
           </span>
         </Button>
       ))}

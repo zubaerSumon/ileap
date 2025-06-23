@@ -57,10 +57,10 @@ export default function OpportunitiesTab() {
         endIndex={endIndex}
       />
 
-      <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+      <div className="flex flex-col lg:flex-row gap-8">
         <div className="w-full lg:w-8/12">
           {isLoading ? (
-            <div className="text-center py-8 md:py-12">Loading...</div>
+            <div className="text-center py-12">Loading...</div>
           ) : totalItems > 0 ? (
             <>
               <OpportunityList
@@ -68,7 +68,7 @@ export default function OpportunitiesTab() {
                 isLoading={isLoading}
                 onOpportunityClick={handleOpportunityClick}
               />
-              <div className="mt-6 md:mt-8 flex justify-center">
+              <div className="mt-8 flex justify-center">
                 <PaginationWrapper
                   currentPage={currentPage}
                   totalPages={totalPages}
@@ -78,7 +78,7 @@ export default function OpportunitiesTab() {
               </div>
             </>
           ) : (
-            <div className="text-center py-8 md:py-12">
+            <div className="text-center py-12">
               <div className="text-gray-500 text-lg mb-2">No opportunities found</div>
               <div className="text-gray-400 text-sm mb-4">
                 Try adjusting your filters or search terms
@@ -93,9 +93,7 @@ export default function OpportunitiesTab() {
             </div>
           )}
         </div>
-        <div className="w-full lg:w-4/12">
-          <AdBanner />
-        </div>
+        <AdBanner />
       </div>
     </div>
   );
