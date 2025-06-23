@@ -8,6 +8,7 @@ import { z } from "zod";
 import User from "@/server/db/models/user";
 import VolunteerApplication from "@/server/db/models/volunteer-application";
 import OrganisationRecruitment from "@/server/db/models/organisation-recruitment";
+import { publicProcedure } from "@/server/trpc";
 
 export const opportunityRouter = router({
   createOpportunity: protectedProcedure
@@ -168,17 +169,61 @@ export const opportunityRouter = router({
         const skip = (page - 1) * limit;
 
         // Build base query
-        const baseQuery: Record<string, unknown> = {};
+        const baseQuery: Record<string, unknown> = {
+          is_archived: { $ne: true }, // Exclude archived opportunities
+        };
 
-        // Add search filter
+        // Build search conditions
+        const searchConditions = [];
         if (search) {
           const searchRegex = new RegExp(search, 'i');
-          baseQuery.$or = [
+          searchConditions.push(
             { title: searchRegex },
             { description: searchRegex },
-            { location: searchRegex },
-            { 'organization_profile.title': searchRegex },
-          ];
+            { location: searchRegex }
+          );
+        }
+
+        // Build availability conditions
+        const availabilityConditions = [];
+        if (availability?.startDate && availability?.endDate) {
+          // For recurring opportunities with date range
+          availabilityConditions.push({
+            'recurrence.date_range.start_date': { 
+              $exists: true, 
+              $ne: null,
+              $lte: availability.endDate 
+            },
+            'recurrence.date_range.end_date': { 
+              $exists: true, 
+              $ne: null,
+              $gte: availability.startDate 
+            }
+          });
+          
+          // For single date opportunities
+          availabilityConditions.push({
+            start_date: { 
+              $exists: true, 
+              $ne: null,
+              $gte: availability.startDate,
+              $lte: availability.endDate
+            }
+          });
+        }
+
+        // Combine search and availability conditions
+        const combinedConditions = [];
+        if (searchConditions.length > 0) {
+          combinedConditions.push({ $or: searchConditions });
+        }
+        if (availabilityConditions.length > 0) {
+          combinedConditions.push({ $or: availabilityConditions });
+        }
+
+        // Apply combined conditions if any exist
+        if (combinedConditions.length > 0) {
+          baseQuery.$and = combinedConditions;
         }
 
         // Add category filter
@@ -188,42 +233,19 @@ export const opportunityRouter = router({
 
         // Add commitment type filter
         if (commitmentType !== "all") {
-          baseQuery.commitment_type = commitmentType;
+          if (commitmentType === "eventbased") {
+            baseQuery.commitment_type = { $in: ["eventbased", "oneoff"] };
+          } else if (commitmentType === "workbased") {
+            baseQuery.commitment_type = { $in: ["workbased", "regular"] };
+          } else {
+            baseQuery.commitment_type = commitmentType;
+          }
         }
 
         // Add location filter
         if (location) {
           const locationRegex = new RegExp(location, 'i');
           baseQuery.location = locationRegex;
-        }
-
-        // Add availability filter
-        if (availability?.startDate && availability?.endDate) {
-          // Filter opportunities that have dates within the specified range
-          baseQuery.$or = [
-            // For recurring opportunities with date range
-            {
-              'recurrence.date_range.start_date': { 
-                $exists: true, 
-                $ne: null,
-                $lte: availability.endDate 
-              },
-              'recurrence.date_range.end_date': { 
-                $exists: true, 
-                $ne: null,
-                $gte: availability.startDate 
-              }
-            },
-            // For single date opportunities
-            {
-              start_date: { 
-                $exists: true, 
-                $ne: null,
-                $gte: availability.startDate,
-                $lte: availability.endDate
-              }
-            }
-          ];
         }
 
         console.log("Opportunity Query:", JSON.stringify(baseQuery, null, 2));
@@ -236,6 +258,18 @@ export const opportunityRouter = router({
         console.log("Total pages:", totalPages);
         console.log("Skip:", skip);
         console.log("Limit:", limit);
+
+        // Debug: Check total opportunities in database
+        const totalInDB = await Opportunity.countDocuments({});
+        console.log("Total opportunities in database:", totalInDB);
+        
+        // Debug: Check archived opportunities
+        const archivedCount = await Opportunity.countDocuments({ is_archived: true });
+        console.log("Archived opportunities:", archivedCount);
+        
+        // Debug: Check non-archived opportunities
+        const nonArchivedCount = await Opportunity.countDocuments({ is_archived: { $ne: true } });
+        console.log("Non-archived opportunities:", nonArchivedCount);
 
         // Execute query with pagination
         const opportunities = await Opportunity.find(baseQuery)
@@ -427,4 +461,46 @@ export const opportunityRouter = router({
         });
       }
     }),
+
+  // Debug endpoint to check database without authentication
+  debugOpportunities: publicProcedure.query(async () => {
+    try {
+      console.log("Debug endpoint called");
+      
+      const totalInDB = await Opportunity.countDocuments({});
+      console.log("Total in DB:", totalInDB);
+      
+      const archivedCount = await Opportunity.countDocuments({ is_archived: true });
+      console.log("Archived count:", archivedCount);
+      
+      const nonArchivedCount = await Opportunity.countDocuments({ is_archived: { $ne: true } });
+      console.log("Non-archived count:", nonArchivedCount);
+      
+      const nonDeletedCount = await Opportunity.countDocuments({ deleted_at: { $exists: false } });
+      console.log("Non-deleted count:", nonDeletedCount);
+      
+      // Get a sample opportunity
+      const sampleOpportunity = await Opportunity.findOne({ 
+        is_archived: { $ne: true },
+        deleted_at: { $exists: false }
+      }).lean();
+      
+      console.log("Sample opportunity:", sampleOpportunity);
+      
+      return {
+        totalInDB,
+        archivedCount,
+        nonArchivedCount,
+        nonDeletedCount,
+        sampleOpportunity
+      };
+    } catch (error) {
+      console.error("Error in debug endpoint:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to debug opportunities",
+        cause: error,
+      });
+    }
+  }),
 });
