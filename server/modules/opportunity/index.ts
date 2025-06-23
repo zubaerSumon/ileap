@@ -168,7 +168,10 @@ export const opportunityRouter = router({
         const skip = (page - 1) * limit;
 
         // Build base query
-        const baseQuery: Record<string, unknown> = {};
+        const baseQuery: Record<string, unknown> = {
+          // Only show non-archived opportunities
+          is_archived: false
+        };
 
         // Add search filter
         if (search) {
