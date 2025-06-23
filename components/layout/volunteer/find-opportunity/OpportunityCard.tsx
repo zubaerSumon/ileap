@@ -30,7 +30,7 @@ export default function OpportunityCard({
         <div className="pr-12 space-y-3">
           <div className="">
             <h3 className="text-xl font-semibold text-gray-800 hover:text-blue-600 line-clamp-1">
-              {opportunity.title}
+              {opportunity.title.charAt(0).toUpperCase() + opportunity.title.slice(1)}
             </h3>
             <p
               onClick={(e) => e.stopPropagation()}
