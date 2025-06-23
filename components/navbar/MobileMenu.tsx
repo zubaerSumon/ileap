@@ -6,6 +6,8 @@ import {
   SettingsIcon,
   Layers2,
   LayoutDashboard,
+  Search,
+  Users,
 } from "lucide-react";
 import { Session } from "next-auth";
 import Logo from "../../public/AusLeap.png";
@@ -107,7 +109,7 @@ export function MobileMenu({
           ) : isProtectedPath ? (
             // Protected path menu items
             <div className="space-y-6">
-              {session?.user?.role === "organization" && (
+              {(session?.user?.role === "organization" || session?.user?.role === "admin" || session?.user?.role === "mentor") && (
                 <div className="space-y-1">
                   <NavLink
                     href="/organisation/dashboard"
@@ -118,6 +120,28 @@ export function MobileMenu({
                   <NavLink
                     href="/organisation/opportunities"
                     label="Opportunities"
+                    icon={Layers2}
+                    onClick={handleCloseMenu}
+                  />
+                  <NavLink
+                    href="/search?type=volunteer"
+                    label="Browse Volunteers"
+                    icon={Users}
+                    onClick={handleCloseMenu}
+                  />
+                </div>
+              )}
+              {session?.user?.role === "volunteer" && (
+                <div className="space-y-1">
+                  <NavLink
+                    href="/search?type=opportunity"
+                    label="Browse Opportunities"
+                    icon={Search}
+                    onClick={handleCloseMenu}
+                  />
+                  <NavLink
+                    href="/volunteer/opportunities"
+                    label="My Opportunities"
                     icon={Layers2}
                     onClick={handleCloseMenu}
                   />
