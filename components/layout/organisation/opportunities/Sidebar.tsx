@@ -4,11 +4,11 @@ import { Separator } from "@/components/ui/separator";
 import { MapPin, Mail, Phone, Globe } from "lucide-react";
 import Image from "next/image";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
-import { IOrgnizationPofile } from "@/server/db/interfaces/organization-profile";
+import { IOrganizationProfile } from "@/server/db/interfaces/organization-profile";
 
 interface SidebarProps {
   opportunity: IOpportunity & {
-    organization_profile: IOrgnizationPofile;
+    organization_profile: IOrganizationProfile;
   };
 }
 

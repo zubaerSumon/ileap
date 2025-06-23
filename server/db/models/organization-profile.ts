@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { IOrgnizationPofile } from "../interfaces/organization-profile";
+import { IOrganizationProfile } from "../interfaces/organization-profile";
 
 const allowedTypes = [
   "ngo", "nonprofit", "community_group", "social_enterprise", "charity",
@@ -9,7 +9,7 @@ const allowedTypes = [
   "sports_club", "animal_shelter"
 ];
 
-const OrganizationProfileSchema: Schema = new Schema<IOrgnizationPofile>(
+const OrganizationProfileSchema: Schema = new Schema<IOrganizationProfile>(
   {
     title: { type: String, required: true },
     contact_email: { type: String, required: true },
@@ -22,7 +22,7 @@ const OrganizationProfileSchema: Schema = new Schema<IOrgnizationPofile>(
         validator: function(v: string) {
           return allowedTypes.includes(v);
         },
-        message: props => `${props.value} is not a valid organization type`
+        message: (props: { value: string }) => `${props.value} is not a valid organization type`
       }
     },
     opportunity_types: { type: [String], required: true },
@@ -41,7 +41,7 @@ const OrganizationProfileSchema: Schema = new Schema<IOrgnizationPofile>(
 );
 
 // Add pre-save middleware to ensure arrays are not empty
-OrganizationProfileSchema.pre('save', function(this: IOrgnizationPofile, next) {
+OrganizationProfileSchema.pre('save', function(this: IOrganizationProfile, next) {
   if (this.opportunity_types.length === 0) {
     next(new Error('At least one opportunity type is required'));
   }
@@ -51,6 +51,6 @@ OrganizationProfileSchema.pre('save', function(this: IOrgnizationPofile, next) {
   next();
 });
 
-const OrganizationProfile = mongoose.models.organization_profile || mongoose.model<IOrgnizationPofile>("organization_profile", OrganizationProfileSchema);
+const OrganizationProfile = mongoose.models.organization_profile || mongoose.model<IOrganizationProfile>("organization_profile", OrganizationProfileSchema);
 
 export default OrganizationProfile;
