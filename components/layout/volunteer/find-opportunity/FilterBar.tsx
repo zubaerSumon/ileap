@@ -110,8 +110,8 @@ export default function FilterBar() {
         </div>
       )}
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
-        <div className="lg:col-span-2 flex flex-row lg:flex-col space-x-4 lg:space-x-0 lg:space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-start">
+        <div className="md:col-span-2 lg:col-span-2 flex flex-row md:flex-col space-x-4 md:space-x-0 md:space-y-2">
           <div className="flex items-center space-x-2">
             <Checkbox
               id="work-based"
@@ -119,7 +119,7 @@ export default function FilterBar() {
               onCheckedChange={handleWorkBasedChange}
               className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-500"
             />
-            <label htmlFor="work-based" className="font-medium text-white">
+            <label htmlFor="work-based" className="font-medium text-white text-sm">
               Work Based
             </label>
           </div>
@@ -130,27 +130,27 @@ export default function FilterBar() {
               onCheckedChange={handleEventBasedChange}
               className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-500"
             />
-            <label htmlFor="event-based" className="font-medium text-white">
+            <label htmlFor="event-based" className="font-medium text-white text-sm">
               Event Based
             </label>
           </div>
         </div>
 
-        <div className="lg:col-span-3">
+        <div className="md:col-span-2 lg:col-span-3">
           <Input
             placeholder="Enter Location"
             value={filters.location}
             onChange={(e) => handleLocationChange(e.target.value)}
-            className="bg-white text-gray-800 rounded-md"
+            className="bg-white text-gray-800 rounded-md text-sm"
           />
           <p className="text-xs mt-1 text-blue-200">
             Location of the opportunity or organization
           </p>
         </div>
 
-        <div className="lg:col-span-4 flex items-center justify-center gap-2">
+        <div className="md:col-span-2 lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2">
           <Select onValueChange={handleCategoryChange}>
-            <SelectTrigger className="bg-blue-400 border-none w-auto rounded-full text-white">
+            <SelectTrigger className="bg-blue-400 border-none w-full sm:w-auto rounded-full text-white text-sm">
               <SelectValue placeholder={filters.categories.length > 0 ? `${filters.categories.length} selected` : "Cause Areas"} />
             </SelectTrigger>
             <SelectContent>
@@ -168,7 +168,7 @@ export default function FilterBar() {
             </SelectContent>
           </Select>
           <Select>
-            <SelectTrigger className="bg-blue-400 border-none w-auto rounded-full text-white">
+            <SelectTrigger className="bg-blue-400 border-none w-full sm:w-auto rounded-full text-white text-sm">
               <SelectValue placeholder="Skills" />
             </SelectTrigger>
             <SelectContent>
@@ -179,7 +179,7 @@ export default function FilterBar() {
             </SelectContent>
           </Select>
           <Select>
-            <SelectTrigger className="bg-blue-400 border-none w-auto rounded-full text-white">
+            <SelectTrigger className="bg-blue-400 border-none w-full sm:w-auto rounded-full text-white text-sm">
               <SelectValue placeholder="More Filters" />
             </SelectTrigger>
             <SelectContent>
@@ -190,13 +190,13 @@ export default function FilterBar() {
           </Select>
         </div>
 
-        <div className="lg:col-span-3 flex flex-col items-stretch gap-2">
+        <div className="md:col-span-2 lg:col-span-3 flex flex-col items-stretch gap-2">
           <form onSubmit={handleSearchSubmit} className="w-full relative">
             <Input
               placeholder="Search by Keyword"
               value={localSearchQuery}
               onChange={(e) => setLocalSearchQuery(e.target.value)}
-              className="bg-blue-50 text-gray-800 placeholder:text-gray-500 rounded-full pr-10"
+              className="bg-blue-50 text-gray-800 placeholder:text-gray-500 rounded-full pr-10 text-sm"
             />
             <Button
               type="submit"
