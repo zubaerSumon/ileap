@@ -1,6 +1,6 @@
 import { Document } from "mongoose";
 
-export interface IOrgnizationPofile extends Document {
+export interface IOrganizationProfile extends Document {
   title: string;
   contact_email: string;
   phone_number: string;
@@ -11,7 +11,7 @@ export interface IOrgnizationPofile extends Document {
   state: string;
   area: string;
   abn: string;
-  website: string;
-  profile_img: string;
-  cover_img: string;
+  website?: string;
+  profile_img?: string;
+  cover_img?: string;
 }

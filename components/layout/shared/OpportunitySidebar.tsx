@@ -6,19 +6,19 @@ import { MapPin, Mail, Phone, Globe, Calendar, Clock, Users } from "lucide-react
 import Image from "next/image";
 import Link from "next/link";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
-import { IOrgnizationPofile } from "@/server/db/interfaces/organization-profile";
+import { IOrganizationProfile } from "@/server/db/interfaces/organization-profile";
 import { Types } from "mongoose";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 
 interface OpportunitySidebarProps {
   opportunity: IOpportunity & {
-    organization_profile: IOrgnizationPofile;
+    organization_profile: IOrganizationProfile;
   };
   userRole?: 'volunteer' | 'organization';
 }
 
 // Type for organization profile that can handle both populated and unpopulated cases
-type OrganizationProfileData = IOrgnizationPofile & {
+type OrganizationProfileData = IOrganizationProfile & {
   _id: string | Types.ObjectId;
   title?: string;
   name?: string;

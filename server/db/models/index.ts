@@ -7,6 +7,9 @@ import Opportunity from './opportunity';
 import VolunteerApplication from './volunteer-application';
 import FavoriteOpportunity from './favorite-opportunity';
 import Referral from './referral';
+import { Group } from './group';
+import MentorInvitation from './mentor-invitation';
+import OrganisationRecruitment from './organisation-recruitment';
 
 // Export all models
 export {
@@ -18,4 +21,7 @@ export {
   VolunteerApplication,
   FavoriteOpportunity,
   Referral,
+  Group,
+  MentorInvitation,
+  OrganisationRecruitment,
 };

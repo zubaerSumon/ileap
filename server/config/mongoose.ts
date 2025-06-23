@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import '../db/models'; // Import all models to ensure they are registered
 
 const connectToDatabase = async () => {
   if (mongoose.connection.readyState >= 1) return;
