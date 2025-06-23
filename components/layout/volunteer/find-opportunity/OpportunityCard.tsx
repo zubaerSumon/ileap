@@ -22,15 +22,15 @@ export default function OpportunityCard({
       className="relative group shadow-none gap-0 rounded-none border-0 border-b group-last:border-b-0 border-gray-200 py-0 cursor-pointer hover:bg-gray-50 transition-colors duration-200"
       onClick={() => onOpportunityClick(opportunity._id)}
     >
-      <CardContent className="p-6">
-        <div className="absolute top-6 right-6">
+      <CardContent className="p-4 md:p-6">
+        <div className="absolute top-4 md:top-6 right-4 md:right-6">
           <FavoriteButton opportunityId={opportunity._id} />
         </div>
 
-        <div className="pr-12 space-y-3">
+        <div className="pr-8 md:pr-12 space-y-3">
           <div className="">
-            <h3 className="text-xl font-semibold text-gray-800 hover:text-blue-600 line-clamp-1">
-              {opportunity.title.charAt(0).toUpperCase() + opportunity.title.slice(1)}
+            <h3 className="text-lg md:text-xl font-semibold text-gray-800 hover:text-blue-600 line-clamp-1">
+              {opportunity.title}
             </h3>
             <p
               onClick={(e) => e.stopPropagation()}
@@ -46,12 +46,12 @@ export default function OpportunityCard({
             </p>
           </div>
 
-          <div className="flex items-center space-x-4 text-sm text-gray-600">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-600">
             <div className="flex items-center">
               <MapPin className="w-4 h-4 mr-1 text-blue-500" />
               <span>{opportunity.location}</span>
             </div>
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="outline" className="text-xs w-fit">
               {opportunity.commitment_type === "workbased"
                 ? "Work-based"
                 : "Event-based"}
@@ -92,7 +92,7 @@ export default function OpportunityCard({
             dangerouslySetInnerHTML={{ __html: opportunity.description }}
           />
 
-          <div className="flex items-center space-x-4 text-xs text-gray-500">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-xs text-gray-500">
             {opportunity.start_date && (
               <div className="flex items-center">
                 <Calendar className="w-3 h-3 mr-1" />
@@ -115,7 +115,7 @@ export default function OpportunityCard({
         </div>
       </CardContent>
 
-      <CardFooter onClick={(e) => e.stopPropagation()} className="pb-6 px-6 flex justify-center">
+      <CardFooter onClick={(e) => e.stopPropagation()} className="pb-4 md:pb-6 px-4 md:px-6 flex justify-center">
         <Link href={`#`} className="text-sm text-blue-600 hover:underline hover:text-blue-800">
           View 3 More Opportunities From This Org
         </Link>

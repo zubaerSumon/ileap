@@ -43,7 +43,7 @@ export const opportunityRouter = router({
           ...input,
           organization_profile: user.organization_profile,
           created_by: sessionUser.id,
-          banner_img: input.banner_img || undefined,
+          banner_img: input.banner_img || "/fallbackbanner.png",
           ...(input.start_date && { start_date: new Date(input.start_date) }),
         };
 

@@ -85,137 +85,36 @@ export default function FilterBar() {
 
   return (
     <div className="p-4 md:p-6 bg-blue-500 rounded-lg mb-6 text-white">
-      <AnimatePresence mode="wait">
-        {hasActiveFilters && (
-          <motion.div 
-            className="mb-4 p-2 bg-blue-400 rounded-lg"
-            initial={{ opacity: 0, height: 0, y: -10 }}
-            animate={{ opacity: 1, height: "auto", y: 0 }}
-            exit={{ opacity: 0, height: 0, y: -10 }}
-            transition={{ 
-              duration: 0.4, 
-              ease: [0.4, 0, 0.2, 1],
-              height: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
-            }}
-          >
-            <motion.div 
-              className="flex flex-wrap gap-2 items-center"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                hidden: { opacity: 0 },
-                visible: {
-                  opacity: 1,
-                  transition: {
-                    staggerChildren: 0.08,
-                    delayChildren: 0.15
-                  }
-                }
-              }}
-            >
-              <motion.span 
-                className="text-sm font-medium"
-                variants={{
-                  hidden: { opacity: 0, x: -8 },
-                  visible: { 
-                    opacity: 1, 
-                    x: 0,
-                    transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] }
-                  }
-                }}
-              >
-                Active Filters:
-              </motion.span>
-              {filters.searchQuery && (
-                <motion.div
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.9, y: -3 },
-                    visible: { 
-                      opacity: 1, 
-                      scale: 1, 
-                      y: 0,
-                      transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] }
-                    }
-                  }}
-                  whileHover={{ scale: 1.03, transition: { duration: 0.15 } }}
-                  whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-                >
-                  <Badge variant="secondary" className="bg-white rounded-full text-blue-600 hover:bg-gray-100">
-                    Search: &ldquo;{filters.searchQuery}&rdquo;
-                  </Badge>
-                </motion.div>
-              )}
-              {filters.commitmentType !== "all" && (
-                <motion.div
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.9, y: -3 },
-                    visible: { 
-                      opacity: 1, 
-                      scale: 1, 
-                      y: 0,
-                      transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] }
-                    }
-                  }}
-                  whileHover={{ scale: 1.03, transition: { duration: 0.15 } }}
-                  whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-                >
-                  <Badge variant="secondary" className="bg-white rounded-full text-blue-600 hover:bg-gray-100">
-                    {filters.commitmentType === "workbased"
-                      ? "Work Based"
-                      : "Event Based"}
-                  </Badge>
-                </motion.div>
-              )}
-              {filters.location && (
-                <motion.div
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.9, y: -3 },
-                    visible: { 
-                      opacity: 1, 
-                      scale: 1, 
-                      y: 0,
-                      transition: { duration: 0.25, ease: [0.4, 0, 0.2, 1] }
-                    }
-                  }}
-                  whileHover={{ scale: 1.03, transition: { duration: 0.15 } }}
-                  whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-                >
-                  <Badge variant="secondary" className="bg-white rounded-full text-blue-600 hover:bg-gray-100">
-                    Location: {filters.location}
-                  </Badge>
-                </motion.div>
-              )}
-              {filters.categories.map((category, index) => (
-                <motion.div
-                  key={category}
-                  variants={{
-                    hidden: { opacity: 0, scale: 0.9, y: -3 },
-                    visible: { 
-                      opacity: 1, 
-                      scale: 1, 
-                      y: 0,
-                      transition: { 
-                        duration: 0.25, 
-                        ease: [0.4, 0, 0.2, 1],
-                        delay: index * 0.03
-                      }
-                    }
-                  }}
-                  whileHover={{ scale: 1.03, transition: { duration: 0.15 } }}
-                  whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-                >
-                  <Badge variant="secondary" className="bg-white rounded-full text-blue-600 hover:bg-gray-100">
-                    {getCategoryLabel(category)}
-                  </Badge>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 ">
-        <div className="lg:col-span-2 flex flex-row lg:flex-col space-x-4 lg:space-x-0 lg:space-y-2">
+      {hasActiveFilters && (
+        <div className="mb-4 p-3 bg-blue-400 rounded-lg">
+          <div className="flex flex-wrap gap-2 items-center">
+            <span className="text-sm font-medium">Active Filters:</span>
+            {filters.searchQuery && (
+              <span className="px-2 py-1 bg-white text-blue-600 rounded-full text-xs">
+                Search: &ldquo;{filters.searchQuery}&rdquo;
+              </span>
+            )}
+            {filters.commitmentType !== "all" && (
+              <span className="px-2 py-1 bg-white text-blue-600 rounded-full text-xs">
+                {filters.commitmentType === "workbased" ? "Work Based" : "Event Based"}
+              </span>
+            )}
+            {filters.location && (
+              <span className="px-2 py-1 bg-white text-blue-600 rounded-full text-xs">
+                Location: {filters.location}
+              </span>
+            )}
+            {filters.categories.map(category => (
+              <span key={category} className="px-2 py-1 bg-white text-blue-600 rounded-full text-xs">
+                {getCategoryLabel(category)}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-4 items-start">
+        <div className="md:col-span-2 lg:col-span-2 flex flex-row md:flex-col space-x-4 md:space-x-0 md:space-y-2">
           <div className="flex items-center space-x-2">
             <Checkbox
               id="work-based"
@@ -223,7 +122,7 @@ export default function FilterBar() {
               onCheckedChange={handleWorkBasedChange}
               className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-500"
             />
-            <label htmlFor="work-based" className="font-medium text-white">
+            <label htmlFor="work-based" className="font-medium text-white text-sm">
               Work Based
             </label>
           </div>
@@ -234,34 +133,28 @@ export default function FilterBar() {
               onCheckedChange={handleEventBasedChange}
               className="border-white data-[state=checked]:bg-white data-[state=checked]:text-blue-500"
             />
-            <label htmlFor="event-based" className="font-medium text-white">
+            <label htmlFor="event-based" className="font-medium text-white text-sm">
               Event Based
             </label>
           </div>
         </div>
 
-        <div className="lg:col-span-3  ">
+        <div className="md:col-span-2 lg:col-span-3">
           <Input
             placeholder="Enter Location"
             value={filters.location}
             onChange={(e) => handleLocationChange(e.target.value)}
-            className="bg-white text-gray-800 rounded-md"
+            className="bg-white text-gray-800 rounded-md text-sm"
           />
           <p className="text-xs mt-1 text-blue-200">
             Location of the opportunity or organization
           </p>
         </div>
 
-        <div className="lg:col-span-4 flex items-start  justify-center gap-2">
+        <div className="md:col-span-2 lg:col-span-4 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2">
           <Select onValueChange={handleCategoryChange}>
-            <SelectTrigger className="bg-blue-400 border-none w-auto rounded-full text-white">
-              <SelectValue
-                placeholder={
-                  filters.categories.length > 0
-                    ? `${filters.categories.length} selected`
-                    : "Cause Areas"
-                }
-              />
+            <SelectTrigger className="bg-blue-400 border-none w-full sm:w-auto rounded-full text-white text-sm">
+              <SelectValue placeholder={filters.categories.length > 0 ? `${filters.categories.length} selected` : "Cause Areas"} />
             </SelectTrigger>
             <SelectContent>
               {OPPORTUNITY_CATEGORIES.map((category) => (
@@ -278,7 +171,7 @@ export default function FilterBar() {
             </SelectContent>
           </Select>
           <Select>
-            <SelectTrigger className="bg-blue-400 border-none w-auto rounded-full text-white">
+            <SelectTrigger className="bg-blue-400 border-none w-full sm:w-auto rounded-full text-white text-sm">
               <SelectValue placeholder="Skills" />
             </SelectTrigger>
             <SelectContent>
@@ -289,7 +182,7 @@ export default function FilterBar() {
             </SelectContent>
           </Select>
           <Select>
-            <SelectTrigger className="bg-blue-400 border-none w-auto rounded-full text-white">
+            <SelectTrigger className="bg-blue-400 border-none w-full sm:w-auto rounded-full text-white text-sm">
               <SelectValue placeholder="More Filters" />
             </SelectTrigger>
             <SelectContent>
@@ -300,13 +193,13 @@ export default function FilterBar() {
           </Select>
         </div>
 
-        <div className="lg:col-span-3 flex flex-col items-stretch gap-2">
+        <div className="md:col-span-2 lg:col-span-3 flex flex-col items-stretch gap-2">
           <form onSubmit={handleSearchSubmit} className="w-full relative">
             <Input
               placeholder="Search by Keyword"
               value={localSearchQuery}
               onChange={(e) => setLocalSearchQuery(e.target.value)}
-              className="bg-blue-50 text-gray-800 placeholder:text-gray-500 rounded-full pr-10"
+              className="bg-blue-50 text-gray-800 placeholder:text-gray-500 rounded-full pr-10 text-sm"
             />
             <Button
               type="submit"
