@@ -28,7 +28,10 @@ export default function OpportunitiesHeader({
         <p>
           {totalItems > 0
             ? `Displaying ${startIndex + 1} - ${endIndex} of ${totalItems} Opportunities`
-            : "No opportunities found"}
+            : totalItems === 0
+              ? "No opportunities found"
+              : ""
+          }
         </p>
         <Select defaultValue="new">
           <SelectTrigger className="w-auto focus:ring-0 border-0 shadow-none text-red-500 font-semibold">
