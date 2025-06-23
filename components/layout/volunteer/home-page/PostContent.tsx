@@ -76,7 +76,7 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
 
       <div className="w-full h-[200px] relative mb-6">
         <Image
-          src={opportunity.banner_img || "/default-banner.svg"}
+          src={opportunity.banner_img || "/fallbackbanner.png"}
           alt={`${opportunity.title} Banner`}
           fill
           className="object-cover rounded-lg"
