@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
 import {
   Select,
@@ -15,18 +14,17 @@ import {
 } from "@/components/ui/select";
 import { useSearch } from "@/contexts/SearchContext";
 import { OPPORTUNITY_CATEGORIES } from "@/utils/constants/opportunities";
-import { motion, AnimatePresence } from "framer-motion";
 
 export default function FilterBar() {
-  const {
-    filters,
-    setSearchQuery,
-    setCategories,
-    setCommitmentType,
-    setLocation,
-    clearAllFilters,
+  const { 
+    filters, 
+    setSearchQuery, 
+    setCategories, 
+    setCommitmentType, 
+    setLocation, 
+    clearAllFilters 
   } = useSearch();
-
+  
   const [localSearchQuery, setLocalSearchQuery] = useState(filters.searchQuery);
 
   // Debounced search effect
@@ -63,13 +61,13 @@ export default function FilterBar() {
 
   const handleCategoryChange = (category: string) => {
     const newCategories = filters.categories.includes(category)
-      ? filters.categories.filter((c) => c !== category)
+      ? filters.categories.filter(c => c !== category)
       : [...filters.categories, category];
     setCategories(newCategories);
   };
 
   const getCategoryLabel = (value: string) => {
-    const category = OPPORTUNITY_CATEGORIES.find((c) => c.value === value);
+    const category = OPPORTUNITY_CATEGORIES.find(c => c.value === value);
     return category ? category.label : value;
   };
 
@@ -77,10 +75,9 @@ export default function FilterBar() {
     setLocation(location);
   };
 
-  const hasActiveFilters =
-    filters.categories.length > 0 ||
-    filters.commitmentType !== "all" ||
-    filters.location ||
+  const hasActiveFilters = filters.categories.length > 0 || 
+    filters.commitmentType !== "all" || 
+    filters.location || 
     filters.searchQuery;
 
   return (
@@ -160,7 +157,7 @@ export default function FilterBar() {
               {OPPORTUNITY_CATEGORIES.map((category) => (
                 <SelectItem key={category.value} value={category.value}>
                   <div className="flex items-center gap-2">
-                    <Checkbox
+                    <Checkbox 
                       checked={filters.categories.includes(category.value)}
                       className="h-4 w-4"
                     />
@@ -204,9 +201,9 @@ export default function FilterBar() {
             <Button
               type="submit"
               size="sm"
-              className="absolute cursor-pointer right-1 top-1/2 -translate-y-1/2 bg-transparent text-black hover:bg-blue-500 hover:text-white"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8 p-0 bg-blue-600 hover:bg-blue-700"
             >
-              <Search className="h-4 w-4" />
+              <Search className="h-4 w-4 text-white" />
             </Button>
           </form>
           <Button
@@ -220,4 +217,4 @@ export default function FilterBar() {
       </div>
     </div>
   );
-}
+} 

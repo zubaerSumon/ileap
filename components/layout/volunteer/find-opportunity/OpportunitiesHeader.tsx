@@ -7,7 +7,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useSearch } from "@/contexts/SearchContext";
 
 interface OpportunitiesHeaderProps {
   totalItems: number;
@@ -20,15 +19,10 @@ export default function OpportunitiesHeader({
   startIndex,
   endIndex,
 }: OpportunitiesHeaderProps) {
-  const { filters } = useSearch();
-  
-  // Determine the location text to display
-  const locationText = filters.location ? filters.location : "anywhere";
-
   return (
     <div className="w-full lg:w-8/12 pr-6">
       <h2 className="text-xl font-light text-gray-600">
-        The Best Volunteer Opportunities: Volunteer from {locationText}
+        The Best Volunteer Opportunities in Dhaka | VolunteerMatch
       </h2>
       <div className="flex justify-between items-center mt-2 text-sm text-gray-500 border-b pb-4">
         <p>
