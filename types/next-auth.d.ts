@@ -7,6 +7,22 @@ declare module "next-auth" {
     email: string;
     name: string;
     role: string;
+    organization_profile?: {
+      _id: string;
+      title: string;
+      type: string;
+      contact_email: string;
+      phone_number: string;
+      bio: string;
+      state: string;
+      area: string;
+      abn: string;
+      website?: string;
+      profile_img?: string;
+      cover_img?: string;
+      opportunity_types: string[];
+      required_skills: string[];
+    };
   }
 
   interface Session {
@@ -20,5 +36,21 @@ declare module "next-auth/jwt" {
     email: string;
     name: string;
     role: string;
+    organization_profile?: {
+      _id: string;
+      title: string;
+      type: string;
+      contact_email: string;
+      phone_number: string;
+      bio: string;
+      state: string;
+      area: string;
+      abn: string;
+      website?: string;
+      profile_img?: string;
+      cover_img?: string;
+      opportunity_types: string[];
+      required_skills: string[];
+    };
   }
 }

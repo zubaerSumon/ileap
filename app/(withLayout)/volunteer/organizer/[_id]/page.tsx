@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import Link from "next/link";
 import Image from "next/image";
-import Categories from "@/components/layout/volunteer/home-page/HomePageCategories";
+import OrganizationOpportunities from "@/components/layout/volunteer/home-page/OrganizationOpportunities";
 import { trpc } from "@/utils/trpc";
 import { Loader2 } from "lucide-react";
 import BackButton from "@/components/buttons/BackButton";
@@ -164,7 +164,7 @@ export default function OrganizerDetailPage() {
 
               <div className="mt-8">
                 <h2 className="text-lg font-semibold mb-4">All Opportunities</h2>
-                <Categories />
+                <OrganizationOpportunities organizationId={organizerId as string} />
               </div>
             </div>
           </div>

@@ -103,9 +103,33 @@ export const organizationProfileRouter = router({
         // Get opportunity counts for each organization
         const organizationsWithCounts = await Promise.all(
           organizations.map(async (org) => {
+            const now = new Date();
+            
+            // Count active opportunities
             const opportunityCount = await Opportunity.countDocuments({
               organization_profile: org._id,
               is_archived: false,
+              $or: [
+                // Opportunities without specific dates (always active)
+                {
+                  start_date: { $exists: false },
+                  'recurrence.date_range.start_date': { $exists: false }
+                },
+                // Single-date opportunities that haven't passed
+                {
+                  start_date: { $exists: true, $gte: now },
+                  'recurrence.date_range.start_date': { $exists: false }
+                },
+                // Recurring opportunities that haven't ended
+                {
+                  'recurrence.date_range.end_date': { $exists: true, $gte: now }
+                },
+                // Recurring opportunities without end date (always active)
+                {
+                  'recurrence.date_range.start_date': { $exists: true },
+                  'recurrence.date_range.end_date': { $exists: false }
+                }
+              ]
             });
 
             return {
