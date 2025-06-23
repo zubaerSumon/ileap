@@ -13,6 +13,7 @@ import { trpc } from "@/utils/trpc";
 import { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
 
 // Helper function to map opportunity types to icons
 const getOpportunityTypeIcon = (type: string) => {
@@ -285,11 +286,13 @@ export default function OrganizationsTab() {
 
       {/* Organizations List */}
       <div className="space-y-6">
-        {organizations.map((org, index) => (
+        {organizations.map((org) => (
           <div key={org._id} className="grid grid-cols-12 gap-8 border-t border-gray-200 py-6">
             <div className="col-span-8">
               <h2 className="text-xl font-bold text-blue-500 mb-2">
-                {((currentPage - 1) * 10) + index + 1}. {org.title}
+                <Link href={`/volunteer/organizer/${org._id}`} className="hover:text-blue-700 transition-colors">
+                  {org.title}
+                </Link>
               </h2>
               <p className="text-gray-700 mb-4">{org.bio}</p>
               <div className="flex items-center text-sm text-gray-500">
@@ -307,7 +310,9 @@ export default function OrganizationsTab() {
             <div className="col-span-3">
               {org.opportunityCount > 0 && (
                 <div className="text-right mb-4">
-                  <a href="#" className="text-blue-500 font-semibold">{org.opportunityCount} Active Opportunities</a>
+                  <Link href={`/volunteer/organizer/${org._id}`} className="text-blue-500 font-semibold hover:text-blue-700 transition-colors">
+                    {org.opportunityCount} Active Opportunities
+                  </Link>
                 </div>
               )}
               <div className="space-y-2">
