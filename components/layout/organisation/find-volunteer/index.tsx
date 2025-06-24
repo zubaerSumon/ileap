@@ -9,6 +9,9 @@ import MessageDialog from "../MessageDialog";
 import { SearchBar } from "@/components/navbar/SearchBar";
 import { useSearch } from "@/contexts/SearchContext";
 import { PaginationWrapper } from "@/components/PaginationWrapper";
+import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Volunteer {
   _id: string;
@@ -41,6 +44,7 @@ export default function BrowseVolunteer() {
   const [selectedVolunteer, setSelectedVolunteer] = useState<Volunteer | null>(
     null
   );
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const { searchQuery } = useSearch();
 
    useEffect(() => {
@@ -70,14 +74,53 @@ export default function BrowseVolunteer() {
   const startIndex = (currentPage - 1) * 6;
   const endIndex = Math.min(startIndex + 6, totalItems);
 
+  // Count active filters for mobile display
+  const activeFiltersCount = filters.categories.length + (filters.studentType !== "all" ? 1 : 0);
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row gap-6">
+        {/* Desktop Sidebar */}
         <div className="hidden md:block sticky top-4">
           <FilterSidebar onFilterChange={setFilters} />
         </div>
 
         <div className="flex-1 min-w-0">
+          {/* Mobile Filter Button */}
+          <div className="md:hidden mb-4 flex items-center justify-between">
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setIsFilterModalOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Filter className="h-4 w-4" />
+                Filters
+                {activeFiltersCount > 0 && (
+                  <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+                    {activeFiltersCount}
+                  </span>
+                )}
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setFilters({
+                    categories: [],
+                    studentType: "all",
+                    availability: {
+                      startDate: null,
+                      endDate: null,
+                    },
+                  });
+                }}
+                className="px-4"
+              >
+                Reset
+              </Button>
+            </div>
+          </div>
+
           <div className="mb-6 w-full">
             <SearchBar role="organization" disableOverlay />
           </div>
@@ -153,6 +196,29 @@ export default function BrowseVolunteer() {
             )}
         </div>
       </div>
+
+      {/* Mobile Filter Modal */}
+      <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
+        <DialogContent 
+          className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto [&>button]:hidden" 
+          onEscapeKeyDown={(e) => e.preventDefault()}
+        >
+          <DialogHeader className="sr-only">
+            <DialogTitle>Filter Volunteers</DialogTitle>
+          </DialogHeader>
+          <div className="p-2">
+            <FilterSidebar onFilterChange={setFilters} currentFilters={filters} />
+          </div>
+          <div className="px-4 pb-2 flex justify-center">
+            <Button 
+              onClick={() => setIsFilterModalOpen(false)}
+              className="px-6"
+            >
+              Filter
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <MessageDialog
         isOpen={isMessageDialogOpen}
