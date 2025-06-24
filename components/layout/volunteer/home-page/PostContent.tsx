@@ -18,8 +18,14 @@ type Opportunity = {
   commitment_type: string;
   location: string;
   number_of_volunteers: number;
-  start_date: Date;
-  start_time: string;
+  date: {
+    start_date: Date;
+    end_date?: Date;
+  };
+  time: {
+    start_time: string;
+    end_time?: string;
+  };
   organization_profile: {
     _id: string;
     title: string;
@@ -103,7 +109,7 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
         <div className="text-sm text-gray-600">
           <p>
             <span className="font-medium">Date:</span>{" "}
-            {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+            {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
@@ -112,7 +118,7 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
           </p>
           <p>
             <span className="font-medium">Time:</span>{" "}
-            {formatTimeToAMPM(opportunity.start_time)}
+            {formatTimeToAMPM(opportunity.time.start_time)}
           </p>
         </div>
       </div>

@@ -35,12 +35,12 @@ export function Sidebar({ opportunity }: SidebarProps) {
       <Separator />
 
       {/* <div className="py-4 rounded-lg mb-4 space-y-3 gap-y-3">
-        {opportunity.start_date && (
+        {opportunity.date?.start_date && (
           <div className="space-y-2">
             <div className="flex items-center text-sm">
               <span className="font-medium">Start Date:</span>
               <span className="ml-2">
-                {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+                {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric'
@@ -49,7 +49,7 @@ export function Sidebar({ opportunity }: SidebarProps) {
             </div>
             <div className="flex items-center text-sm">
               <span className="font-medium">Start Time:</span>
-              <span className="ml-2">{formatTimeToAMPM(opportunity.start_time)}</span>
+              <span className="ml-2">{formatTimeToAMPM(opportunity.time?.start_time || '')}</span>
             </div>
           </div>
         )}

@@ -11,10 +11,15 @@ export interface IOpportunity extends Document {
   email_contact: string;
   phone_contact: string;
   internal_reference?: string;
-  start_date?: Date;
-  start_time?: string;
+  date: {
+    start_date: Date;
+    end_date?: Date;
+  };
+  time: {
+    start_time: string;
+    end_time: string;
+  };
   is_archived: boolean;
-  deleted_at: Date | null;
   is_recurring: boolean;
   recurrence?: {
     type: string; // 'daily', 'weekly', 'monthly', 'yearly'

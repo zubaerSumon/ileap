@@ -69,14 +69,14 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
             <p className="text-sm text-gray-600">{opportunity.number_of_volunteers} spots</p>
           </div>
 
-          {opportunity.start_date && (
+          {opportunity.date?.start_date && (
             <div>
               <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 Start Date
               </h4>
               <p className="text-sm text-gray-600">
-                {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+                {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
                   year: 'numeric'
@@ -85,13 +85,13 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
             </div>
           )}
 
-          {opportunity.start_time && (
+          {opportunity.time?.start_time && (
             <div>
               <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 Start Time
               </h4>
-              <p className="text-sm text-gray-600">{formatTimeToAMPM(opportunity.start_time)}</p>
+              <p className="text-sm text-gray-600">{formatTimeToAMPM(opportunity.time.start_time)}</p>
             </div>
           )}
         </div>
