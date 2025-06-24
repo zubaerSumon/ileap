@@ -7,20 +7,25 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
     description: { type: String, required: true },
     category: { type: [String], required: true },
     required_skills: { type: [String], required: true },
-    commitment_type: { type: String, required: true }, 
+    commitment_type: { type: String, required: true },
     location: { type: String, required: true },
     number_of_volunteers: { type: Number, required: true },
     email_contact: { type: String, required: true },
     phone_contact: { type: String },
     internal_reference: { type: String },
-    start_date: { type: Date, required: false },
-    start_time: { type: String, required: false },
+    date: {
+      start_date: { type: Date, required: true },
+      end_date: { type: Date },
+    },
+    time: {
+      start_time: { type: String, required: true },
+      end_time: { type: String },
+    },
     is_archived: { type: Boolean, default: false },
-    deleted_at: { type: Date, default: null },
     is_recurring: { type: Boolean, default: false },
     recurrence: {
-      type: { type: String },  
-      days: { type: [String] },  
+      type: { type: String },
+      days: { type: [String] },
       date_range: {
         start_date: { type: Date },
         end_date: { type: Date },
@@ -29,7 +34,7 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
         start_time: { type: String },
         end_time: { type: String },
       },
-      occurrences: { type: Number },  
+      occurrences: { type: Number },
     },
     banner_img: { type: String },
     organization_profile: {
@@ -46,6 +51,8 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
   { timestamps: true }
 );
 
-const Opportunity = mongoose.models.opportunity || mongoose.model<IOpportunity>("opportunity", OpportunitySchema);
+const Opportunity =
+  mongoose.models.opportunity ||
+  mongoose.model<IOpportunity>("opportunity", OpportunitySchema);
 
 export default Opportunity;

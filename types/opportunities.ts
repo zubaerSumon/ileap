@@ -10,6 +10,14 @@ export type Opportunity = CreateOpportunityInput & {
   _id: string;
   createdAt: Date;
   updatedAt: Date;
+  date: {
+    start_date: Date;
+    end_date?: Date;
+  };
+  time: {
+    start_time: string;
+    end_time?: string;
+  };
   organization_profile: z.infer<
     typeof userValidation.organizationProfileSchema
   > & {

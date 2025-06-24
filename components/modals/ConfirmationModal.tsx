@@ -111,7 +111,7 @@ export function ConfirmationModal({
               </div>
 
               {/* Start Date & Time */}
-              {fullOpportunity?.start_date && (
+              {fullOpportunity?.date?.start_date && (
                 <div className="flex items-start gap-3 text-gray-600">
                   <Calendar className="w-5 h-5 text-blue-500 mt-0.5" />
                   <div>
@@ -119,7 +119,7 @@ export function ConfirmationModal({
                       Start Date
                     </strong>
                     <span className="text-sm">
-                      {new Date(fullOpportunity.start_date).toLocaleDateString(
+                      {new Date(fullOpportunity.date.start_date).toLocaleDateString(
                         "en-US",
                         {
                           weekday: "long",
@@ -133,7 +133,7 @@ export function ConfirmationModal({
                 </div>
               )}
 
-              {fullOpportunity?.start_time && (
+              {fullOpportunity?.time?.start_time && (
                 <div className="flex items-start gap-3 text-gray-600">
                   <Clock className="w-5 h-5 text-blue-500 mt-0.5" />
                   <div>
@@ -141,7 +141,7 @@ export function ConfirmationModal({
                       Start Time
                     </strong>
                     <span className="text-sm">
-                      {formatTimeToAMPM(fullOpportunity.start_time)}
+                      {formatTimeToAMPM(fullOpportunity.time.start_time)}
                     </span>
                   </div>
                 </div>

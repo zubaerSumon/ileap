@@ -40,21 +40,85 @@ export const opportunityRouter = router({
       }
 
       try {
-        const opportunityData = {
-          ...input,
+        // Transform the form data to match the database model structure
+        interface OpportunityData {
+          title: string;
+          description: string;
+          category: string[];
+          required_skills: string[];
+          commitment_type: string;
+          location: string;
+          number_of_volunteers: number;
+          email_contact: string;
+          phone_contact?: string;
+          internal_reference?: string;
+          date: {
+            start_date: Date;
+            end_date?: Date;
+          };
+          time: {
+            start_time: string;
+            end_time?: string;
+          };
+          is_recurring: boolean;
+          banner_img?: string;
+          organization_profile: mongoose.Types.ObjectId;
+          created_by: mongoose.Types.ObjectId;
+          recurrence?: {
+            type: string;
+            days: string[];
+            date_range: {
+              start_date: Date;
+              end_date?: Date;
+            };
+            time_range: {
+              start_time: string;
+              end_time: string;
+            };
+            occurrences?: number;
+          };
+        }
+
+        const opportunityData: OpportunityData = {
+          title: input.title,
+          description: input.description,
+          category: input.category,
+          required_skills: input.required_skills,
+          commitment_type: input.commitment_type,
+          location: input.location,
+          number_of_volunteers: input.number_of_volunteers,
+          email_contact: input.email_contact,
+          phone_contact: input.phone_contact || undefined,
+          internal_reference: input.internal_reference || undefined,
+          // Map date and time fields to the nested structure
+          date: {
+            start_date: input.start_date ? new Date(input.start_date) : new Date(),
+            end_date: undefined, // Will be set if needed
+          },
+          time: {
+            start_time: input.start_time || "09:00",
+            end_time: undefined, // Will be set if needed
+          },
+          is_recurring: input.is_recurring || false,
+          banner_img: input.banner_img || undefined,
           organization_profile: user.organization_profile,
           created_by: sessionUser.id,
-          banner_img: input.banner_img || undefined,
-          ...(input.start_date && { start_date: new Date(input.start_date) }),
         };
 
-        if (input.recurrence) {
+        // Handle recurrence data if it exists
+        if (input.is_recurring && input.recurrence) {
           opportunityData.recurrence = {
-            ...input.recurrence,
+            type: input.recurrence.type,
+            days: input.recurrence.days || [],
             date_range: {
-              start_date: input.recurrence.date_range.start_date,
-              end_date: input.recurrence.date_range.end_date,
+              start_date: input.recurrence.date_range.start_date ? new Date(input.recurrence.date_range.start_date) : new Date(),
+              end_date: input.recurrence.date_range.end_date ? new Date(input.recurrence.date_range.end_date) : undefined,
             },
+            time_range: {
+              start_time: input.recurrence.time_range.start_time,
+              end_time: input.recurrence.time_range.end_time,
+            },
+            occurrences: input.recurrence.occurrences,
           };
         }
 
