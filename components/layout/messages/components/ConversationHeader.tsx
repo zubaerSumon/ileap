@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Avatar from "./Avatar";
 
@@ -11,7 +11,6 @@ interface User {
 
 interface ConversationHeaderProps {
   user: User;
-  onMenuClick: () => void;
   isGroup?: boolean;
   onDeleteGroup?: () => void;
   onDeleteConversation?: () => void;
@@ -19,7 +18,6 @@ interface ConversationHeaderProps {
 
 export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   user,
-  onMenuClick,
   isGroup,
   onDeleteGroup,
   onDeleteConversation
@@ -27,34 +25,37 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   if (!user) return null;
   
   return (
-    <div className="flex items-center justify-between p-4 border-b">
-      <div className="flex items-center gap-3">
+    <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-white">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         {isGroup ? (
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-            <Users className="h-5 w-5 text-blue-500" />
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+            <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
           </div>
         ) : (
-          <Avatar name={user.name || ''} avatar={user.avatar} />
+          <div className="flex-shrink-0">
+            <Avatar name={user.name || ''} avatar={user.avatar} size={32} />
+          </div>
         )}
-        <div>
-          <h2 className="font-semibold">
+        <div className="min-w-0 flex-1">
+          <h2 className="font-semibold text-sm sm:text-base truncate">
             {user.name}
           </h2>
           {isGroup && user.members !== undefined && (
-            <p className="text-sm text-gray-500">{user.members} members</p>
+            <p className="text-xs sm:text-sm text-gray-500">{user.members} members</p>
           )}
         </div>
       </div>
       
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
         {isGroup && onDeleteGroup && (
           <Button
             variant="ghost"
             size="sm"
             onClick={onDeleteGroup}
-            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+            className="text-red-500 hover:text-red-600 hover:bg-red-50 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
           >
-            Delete Group
+            <span className="hidden sm:inline">Delete Group</span>
+            <span className="sm:hidden">Delete</span>
           </Button>
         )}
         {!isGroup && onDeleteConversation && (
@@ -62,19 +63,12 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
             variant="ghost"
             size="sm"
             onClick={onDeleteConversation}
-            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+            className="text-red-500 hover:text-red-600 hover:bg-red-50 text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3"
           >
-            Delete Conversation
+            <span className="hidden sm:inline">Delete Conversation</span>
+            <span className="sm:hidden">Delete</span>
           </Button>
         )}
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={onMenuClick}
-          className="md:hidden"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
       </div>
     </div>
   );

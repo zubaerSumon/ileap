@@ -110,7 +110,7 @@ export default function CreateOpportunityPage() {
     <ProtectedLayout>
       <div className="bg-[#F5F7FA] min-h-screen">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[1240px] mx-auto px-4 py-8">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[1240px] mx-auto px-2 sm:px-4 py-4 sm:py-8">
             <BasicInformation form={form} />
             <CreateFooter
               onCreate={form.handleSubmit(onSubmit)}

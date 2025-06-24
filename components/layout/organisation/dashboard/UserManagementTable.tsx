@@ -92,12 +92,12 @@ export default function UserManagementTable({ organizationId }: { organizationId
       header: "Name",
       cell: (info) => (
         <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
+          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
             {info.getValue()[0].toUpperCase()}
           </div>
-          <div>
-            <p className="font-medium">{info.getValue()}</p>
-            <p className="text-sm text-muted-foreground">{info.row.original.email}</p>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-sm sm:text-base truncate">{info.getValue()}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground truncate">{info.row.original.email}</p>
           </div>
         </div>
       ),
@@ -105,7 +105,7 @@ export default function UserManagementTable({ organizationId }: { organizationId
     columnHelper.accessor("role", {
       header: "Role",
       cell: (info) => (
-        <span className="capitalize">{info.getValue()}</span>
+        <span className="capitalize text-sm sm:text-base">{info.getValue()}</span>
       ),
     }),
     columnHelper.display({
@@ -168,7 +168,8 @@ export default function UserManagementTable({ organizationId }: { organizationId
 
   return (
     <div className="space-y-4">
-      <div className="rounded-md">
+      {/* Desktop Table */}
+      <div className="hidden sm:block rounded-md">
         <table className="w-full caption-bottom text-sm">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -211,7 +212,70 @@ export default function UserManagementTable({ organizationId }: { organizationId
           </tbody>
         </table>
       </div>
-      <div className="flex items-center justify-end space-x-2">
+
+      {/* Mobile Cards */}
+      <div className="sm:hidden space-y-3">
+        {table.getRowModel().rows.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            No users found
+          </div>
+        ) : (
+          table.getRowModel().rows.map((row) => {
+            const user = row.original;
+            const currentUserRole = session?.user?.role || "";
+            const targetUserRole = user.role;
+            const canDelete = currentUserRole === "admin" || 
+              (currentUserRole === "mentor" && targetUserRole === "mentor");
+
+            return (
+              <div key={row.id} className="border rounded-lg p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium flex-shrink-0">
+                      {user.name[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-sm truncate">{user.name}</p>
+                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                    </div>
+                  </div>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="h-8 w-8 p-0">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      {currentUserRole === "admin" && (
+                        <DropdownMenuItem
+                          onClick={() => handleUpdateRole(user._id, targetUserRole)}
+                        >
+                          Change to {targetUserRole === "admin" ? "Mentor" : "Admin"}
+                        </DropdownMenuItem>
+                      )}
+                      {canDelete && (
+                        <DropdownMenuItem
+                          className="text-red-600"
+                          onClick={() => handleDeleteUser(user._id)}
+                        >
+                          Delete User
+                        </DropdownMenuItem>
+                      )}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <span className="text-xs text-muted-foreground">Role:</span>
+                  <span className="capitalize text-sm font-medium">{user.role}</span>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+      
+      {/* Pagination */}
+      <div className="flex items-center justify-center gap-2">
         <Button
           variant="outline"
           size="sm"
