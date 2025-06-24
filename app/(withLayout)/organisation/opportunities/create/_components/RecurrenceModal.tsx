@@ -67,22 +67,22 @@ export default function RecurrenceModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[900px] max-h-[586px] overflow-y-auto">
-        <DialogTitle>Recurrence Settings</DialogTitle>
+      <DialogContent className="sm:max-w-[900px] w-[95vw] max-h-[90vh] sm:max-h-[586px] overflow-y-auto">
+        <DialogTitle className="text-lg sm:text-xl">Recurrence Settings</DialogTitle>
         
-        <div className="px-6 pt-6">
-          <h2 className="text-xl font-semibold mb-4">Recurrence type</h2>
+        <div className="px-4 sm:px-6 pt-4 sm:pt-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4">Recurrence type</h2>
         </div>
 
-        <div className="space-y-6 px-6 pb-6">
+        <div className="space-y-6 px-4 sm:px-6 pb-6">
           {/* Recurrence Type */}
           <div>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-xs sm:text-sm text-gray-500 mb-4">
               Select the pattern that suits your event
             </p>
             <RadioGroup
               defaultValue="weekly"
-              className="grid grid-cols-4 gap-4"
+              className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4"
               onValueChange={(value) => {
                 form.setValue("recurrence.type", value);
                 // Clear days if not weekly
@@ -94,7 +94,7 @@ export default function RecurrenceModal({
               {RECURRENCE_TYPES.map(({ value, label }) => (
                 <div key={value} className="flex items-center space-x-2">
                   <RadioGroupItem value={value} id={value} />
-                  <Label htmlFor={value}>{label}</Label>
+                  <Label htmlFor={value} className="text-sm">{label}</Label>
                 </div>
               ))}
             </RadioGroup>
@@ -103,12 +103,12 @@ export default function RecurrenceModal({
           {/* Recur Days - Only show for weekly recurrence */}
           {form.watch("recurrence.type") === "weekly" && (
             <div>
-              <p className="text-sm mb-2">Recur days that you select</p>
-              <div className="flex flex-row flex-wrap gap-6">
+              <p className="text-xs sm:text-sm mb-2">Recur days that you select</p>
+              <div className="flex flex-row flex-wrap gap-3 sm:gap-6">
                 {WEEKDAYS.map((day) => (
                   <label
                     key={day.value}
-                    className="flex items-center space-x-2 text-base font-medium"
+                    className="flex items-center space-x-2 text-sm sm:text-base font-medium"
                   >
                     <input
                       type="checkbox"
@@ -135,61 +135,61 @@ export default function RecurrenceModal({
 
           {/* Recurrence Date & Time */}
           <div>
-            <h3 className="text-lg font-medium mb-4">Recurrence date & time</h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <h3 className="text-base sm:text-lg font-medium mb-4">Recurrence date & time</h3>
+            <p className="text-xs sm:text-sm text-gray-500 mb-4">
               To help avoid surprises, please be specific. e.g. a few hours
               every day. AusLEAP Australia recommends no more than 15 hours per
               week.
             </p>
             <div className="space-y-4">
-              <div className="flex gap-4">
-                <div>
-                  <Label>Date Range</Label>
-                  <div className="flex items-center gap-2 mt-1">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                  <Label className="text-sm">Date Range</Label>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-1">
                     <FormInput
                       name={"recurrence.date_range.start_date" as Path<OpportunityFormValues>}
                       label=""
                       placeholder=""
                       type="date"
                       control={form.control}
-                      className="w-[150px]"
+                      className="w-full sm:w-[150px]"
                     />
-                    <span>-</span>
+                    <span className="hidden sm:inline">-</span>
                     <FormInput
                       name={"recurrence.date_range.end_date" as Path<OpportunityFormValues>}
                       label=""
                       placeholder=""
                       type="date"
                       control={form.control}
-                      className="w-[150px]"
+                      className="w-full sm:w-[150px]"
                     />
                   </div>
                 </div>
-                <div>
-                  <Label>Time Range</Label>
-                  <div className="flex items-center gap-2 mt-1">
+                <div className="flex-1">
+                  <Label className="text-sm">Time Range</Label>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-1">
                     <FormInput
                       name={"recurrence.time_range.start_time" as Path<OpportunityFormValues>}
                       label=""
                       placeholder=""
                       type="time"
                       control={form.control}
-                      className="w-[120px]"
+                      className="w-full sm:w-[120px]"
                     />
-                    <span>-</span>
+                    <span className="hidden sm:inline">-</span>
                     <FormInput
                       name={"recurrence.time_range.end_time" as Path<OpportunityFormValues>}
                       label=""
                       placeholder=""
                       type="time"
                       control={form.control}
-                      className="w-[120px]"
+                      className="w-full sm:w-[120px]"
                     />
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
                 <div className="flex items-center gap-2">
                   <input 
                     type="radio" 
@@ -201,7 +201,7 @@ export default function RecurrenceModal({
                       }
                     }}
                   />
-                  <Label htmlFor="endAfter">End after</Label>
+                  <Label htmlFor="endAfter" className="text-sm">End after</Label>
                 </div>
                 <FormInput
                   name={"recurrence.occurrences" as Path<OpportunityFormValues>}
@@ -209,17 +209,17 @@ export default function RecurrenceModal({
                   placeholder="10"
                   type="number"
                   control={form.control}
-                  className="w-[80px]"
+                  className="w-full sm:w-[80px]"
                 />
-                <span>Occurrences</span>
+                <span className="text-sm">Occurrences</span>
               </div>
             </div>
           </div>
 
           {/* Location */}
           <div>
-            <h3 className="text-lg font-medium mb-4">Location</h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <h3 className="text-base sm:text-lg font-medium mb-4">Location</h3>
+            <p className="text-xs sm:text-sm text-gray-500 mb-4">
               Where does the volunteer need to work from? Be specific, but
               flexible if you can. Does the work need to be done in person (at a
               physical location) or could it be done online or remotely?
@@ -232,20 +232,20 @@ export default function RecurrenceModal({
 
           {/* Number of Volunteers */}
           <div>
-            <h3 className="text-lg font-medium mb-4">
+            <h3 className="text-base sm:text-lg font-medium mb-4">
               Number of volunteers for this slot
             </h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-xs sm:text-sm text-gray-500 mb-4">
               Which category best represents this opportunity? Volunteers use
               this to help find opportunities they are interested in supporting.
             </p>
-            <Input type="number" placeholder="20" className="w-[120px]" />
+            <Input type="number" placeholder="20" className="w-full sm:w-[120px]" />
           </div>
 
           {/* Save Button */}
-          <div className="mt-6">
+          <div className="mt-6 flex justify-center sm:justify-start">
             <Button 
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto px-6 py-2"
               onClick={handleSave}
             >
               Save

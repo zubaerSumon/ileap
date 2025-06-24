@@ -52,28 +52,28 @@ export default function BasicInformation({
         role="dialog"
         aria-labelledby="basic-info-title"
       >
-        <div className="pt-16 px-6 pb-6">
+        <div className="pt-8 sm:pt-16 px-4 sm:px-6 pb-6">
           <h2 id="basic-info-title" className="sr-only">
             Basic Information Form
           </h2>
 
           {/* Form Instructions */}
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800">
+          <div className="mb-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-xs sm:text-sm text-blue-800">
               <strong>Note:</strong> Fields marked with{" "}
               <span className="text-red-500">*</span> are required. Please fill
               in all required fields to create your opportunity.
             </p>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {/* Title & Description */}
             <div>
-              <h2 className="text-lg font-medium mb-1 flex items-center">
+              <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
                 Opportunity title & description
                 <span className="text-red-500 ml-1">*</span>
               </h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 Ensure your role title is succinct and easily understood by the
                 volunteer e.g. Retail Assistant, Marketing Support, Driver.
               </p>
@@ -83,7 +83,7 @@ export default function BasicInformation({
                   label="Title"
                   placeholder="Enter opportunity title"
                   control={form.control}
-                  className="w-[382px]"
+                  className="w-full sm:w-[382px]"
                 />
                 <FormRichTextEditor
                   name={"description" as Path<OpportunityFormValues>}
@@ -97,11 +97,11 @@ export default function BasicInformation({
 
             {/* Categories & Skills */}
             <div>
-              <h2 className="text-lg font-medium mb-1 flex items-center">
+              <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
                 Categories & Skills
                 <span className="text-red-500 ml-1">*</span>
               </h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 Which categories best represent this opportunity? Volunteers use
                 this to help find opportunities they are interested in
                 supporting.
@@ -147,7 +147,7 @@ export default function BasicInformation({
                   ]}
                   setValue={form.setValue}
                   value={form.watch("category")}
-                  className="w-[382px]"
+                  className="w-full sm:w-[382px]"
                 />
                 <MultiSelectField
                   label="Required Skills"
@@ -168,55 +168,55 @@ export default function BasicInformation({
                   ]}
                   setValue={form.setValue}
                   value={form.watch("required_skills")}
-                  className="w-[382px]"
+                  className="w-full sm:w-[382px]"
                 />
               </div>
             </div>
 
             {/* Commitment Type */}
             <div>
-              <h2 className="text-lg font-medium mb-1 flex items-center">
+              <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
                 Commitment type
                 <span className="text-red-500 ml-1">*</span>
               </h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 How much time does the volunteer need to commit to? Volunteers
                 use this to help find suitable opportunities.
               </p>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="radio"
-                  id="workbased"
-                  {...form.register("commitment_type")}
-                  value="workbased"
-                  checked={form.watch("commitment_type") === "workbased"}
-                  className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
-                />
-                <label htmlFor="workbased" className="text-sm font-medium">
-                  <span>Work based</span>
+              <div className="flex flex-col sm:flex-row sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="workbased"
+                    {...form.register("commitment_type")}
+                    value="workbased"
+                    checked={form.watch("commitment_type") === "workbased"}
+                    className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <span className="text-sm font-medium">Work based</span>
                 </label>
 
-                <input
-                  type="radio"
-                  id="eventbased"
-                  {...form.register("commitment_type")}
-                  value="eventbased"
-                  checked={form.watch("commitment_type") === "eventbased"}
-                  className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
-                />
-                <label htmlFor="eventbased" className="text-sm font-medium">
-                  <span>Event based</span>
+                <label className="flex items-center space-x-2">
+                  <input
+                    type="radio"
+                    id="eventbased"
+                    {...form.register("commitment_type")}
+                    value="eventbased"
+                    checked={form.watch("commitment_type") === "eventbased"}
+                    className="h-4 w-4 border-gray-300 text-primary focus:ring-primary"
+                  />
+                  <span className="text-sm font-medium">Event based</span>
                 </label>
               </div>
             </div>
 
             {/* Location */}
             <div>
-              <h2 className="text-lg font-medium mb-1 flex items-center">
+              <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
                 Location
                 <span className="text-red-500 ml-1">*</span>
               </h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 Where does the volunteer need to work from? Be specific, but
                 flexible if you can. Does the work need to be done in person (at
                 a physical location) or could it be done online or remotely?
@@ -226,17 +226,17 @@ export default function BasicInformation({
                 label="Location"
                 placeholder="21 Darling Dr, Sydney, Australia"
                 control={form.control}
-                className="w-[382px]"
+                className="w-full sm:w-[382px]"
               />
             </div>
 
             {/* Number of Volunteers */}
             <div>
-              <h2 className="text-lg font-medium mb-1 flex items-center">
+              <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
                 Number of volunteers
                 <span className="text-red-500 ml-1">*</span>
               </h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 How many volunteers do you need for this opportunity?
               </p>
               <FormInput
@@ -245,17 +245,17 @@ export default function BasicInformation({
                 placeholder="20"
                 type="number"
                 control={form.control}
-                className="w-[382px]"
+                className="w-full sm:w-[382px]"
               />
             </div>
 
             {/* Contact Information */}
             <div>
-              <h2 className="text-lg font-medium mb-1 flex items-center">
+              <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
                 Contact Information
                 <span className="text-red-500 ml-1">*</span>
               </h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 How can volunteers reach out to you with questions?
               </p>
               <div className="space-y-4">
@@ -265,25 +265,25 @@ export default function BasicInformation({
                   placeholder="contact@organization.com"
                   type="email"
                   control={form.control}
-                  className="w-[382px]"
+                  className="w-full sm:w-[382px]"
                 />
                 <FormInput
                   name={"phone_contact" as Path<OpportunityFormValues>}
                   label="Phone (optional)"
                   placeholder="+61 123 456 789"
                   control={form.control}
-                  className="w-[382px]"
+                  className="w-full sm:w-[382px]"
                 />
               </div>
             </div>
 
             {/* Start Date & Time */}
             <div>
-              <h2 className="text-lg font-medium mb-1 flex items-center">
+              <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
                 Start Date & Time
                 <span className="text-red-500 ml-1">*</span>
               </h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 When does this opportunity start? This helps volunteers plan
                 their availability.
               </p>
@@ -294,7 +294,7 @@ export default function BasicInformation({
                   placeholder=""
                   type="date"
                   control={form.control}
-                  className="w-[382px]"
+                  className="w-full sm:w-[382px]"
                 />
                 <FormInput
                   name={"start_time" as Path<OpportunityFormValues>}
@@ -302,15 +302,15 @@ export default function BasicInformation({
                   placeholder=""
                   type="time"
                   control={form.control}
-                  className="w-[382px]"
+                  className="w-full sm:w-[382px]"
                 />
               </div>
             </div>
 
             {/* Banner Image */}
             <div>
-              <h2 className="text-lg font-medium mb-1">Banner Image</h2>
-              <p className="text-sm text-gray-500 mb-4">
+              <h2 className="text-base sm:text-lg font-medium mb-1">Banner Image</h2>
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 Add a banner image to make your opportunity stand out.
               </p>
               <FormImageInput
@@ -318,7 +318,7 @@ export default function BasicInformation({
                 label="Banner Image"
                 control={form.control}
                 setValue={form.setValue}
-                className="w-[382px]"
+                className="w-full sm:w-[382px]"
               />
             </div>
           </div>
