@@ -46,15 +46,6 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
   { timestamps: true }
 );
 
-// Add a query middleware to exclude soft-deleted documents by default
-OpportunitySchema.pre('find', function() {
-  this.where({ deleted_at: null });
-});
-
-OpportunitySchema.pre('findOne', function() {
-  this.where({ deleted_at: null });
-});
-
 const Opportunity = mongoose.models.opportunity || mongoose.model<IOpportunity>("opportunity", OpportunitySchema);
 
 export default Opportunity;

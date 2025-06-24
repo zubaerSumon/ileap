@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { LucideIcon } from "lucide-react";
+import { ComponentType } from "react";
 
 interface NavLinkProps {
   href: string;
   label: string;
-  icon?: LucideIcon;
+  icon?: ComponentType<{ className?: string }>;
   className?: string;
   onClick?: () => void;
   showBadge?: boolean;

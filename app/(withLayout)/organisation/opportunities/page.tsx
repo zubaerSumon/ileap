@@ -18,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusIcon } from "lucide-react";
+import { MoreHorizontal, PlusIcon, Calendar, Users, UserCheck } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import type { Opportunity } from "@/types/opportunities";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
@@ -164,19 +164,120 @@ export default function OpportunitiesPage() {
     state: { pagination: { pageIndex: currentPage - 1, pageSize: 4 } },
   });
 
+  // Mobile card component for opportunities
+  const OpportunityCard = ({ opportunity }: { opportunity: Opportunity }) => {
+    const org = opportunity.organization_profile;
+    const startDate = opportunity.start_date ? new Date(opportunity.start_date) : null;
+    const formattedDate = startDate?.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+
+    return (
+      <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm hover:shadow-md transition-shadow">
+        <div className="flex items-start justify-between mb-3 gap-3">
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <Avatar className="size-10 flex-shrink-0">
+              <AvatarImage
+                src={org?.profile_img || "/avatar.svg"}
+                alt={org?.title || "Org"}
+              />
+              <AvatarFallback>{org?.title?.slice(0, 2) || "CO"}</AvatarFallback>
+            </Avatar>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-base text-gray-900 break-words leading-tight mb-1">
+                {opportunity.title}
+              </h3>
+              <p className="text-sm text-[#246BFD] font-medium truncate">
+                {org?.title || "Organization"}
+              </p>
+            </div>
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8">
+                <MoreHorizontal className="w-4 h-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() =>
+                  router.push(`/organisation/opportunities/${opportunity._id}`)
+                }
+              >
+                View Application
+              </DropdownMenuItem>
+              <DropdownMenuItem>Edit</DropdownMenuItem>
+              {activeTab !== "archived" && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 text-sm">
+          <div className="flex items-start gap-2">
+            <Calendar className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-gray-500 text-xs">Start Date</p>
+              <p className="font-medium text-sm">
+                {formattedDate || "Not set"}
+              </p>
+              {opportunity.start_time && (
+                <p className="text-xs text-gray-400">
+                  {formatTimeToAMPM(opportunity.start_time)}
+                </p>
+              )}
+            </div>
+          </div>
+          
+          <div className="flex items-start gap-2">
+            <Users className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-gray-500 text-xs">Applicants</p>
+              <p className="font-medium text-sm">{opportunity.applicantCount || 0}</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2">
+            <UserCheck className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-gray-500 text-xs">Recruits</p>
+              <p className="font-medium text-sm">{opportunity.recruitCount || 0}</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-2">
+            <div className="w-4 h-4 flex-shrink-0" />
+            <div className="min-w-0">
+              <p className="text-gray-500 text-xs">Posted</p>
+              <p className="font-medium text-sm">
+                {new Date(opportunity.createdAt).toLocaleDateString()}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <ProtectedLayout>
-      <div className="bg-[#F5F7FA] ">
-        <div className="max-w-[1240px] py-8 h-[900px] mx-auto overflow-auto">
+      <div className="bg-[#F5F7FA] min-h-screen">
+        <div className="max-w-[1240px] py-4 sm:py-8 px-4 mx-auto">
           <div className="bg-white rounded-lg">
             <div className="px-4 pt-5">
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                  <h1 className="text-2xl font-semibold mb-1">Opportunities</h1>
+                  <h1 className="text-xl sm:text-2xl font-semibold mb-1">Opportunities</h1>
                   <p className="text-sm text-gray-500">Posted tasks</p>
                 </div>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full sm:w-auto"
                   size="lg"
                   onClick={() =>
                     router.push("/organisation/opportunities/create")
@@ -193,7 +294,8 @@ export default function OpportunitiesPage() {
               />
             </div>
 
-            <div className="px-4">
+            {/* Desktop Table View */}
+            <div className="hidden md:block px-4">
               <div className="flex items-center py-3 px-6 bg-gray-50 text-sm text-gray-500 rounded-md">
                 {table.getHeaderGroups().map((headerGroup) => (
                   <React.Fragment key={headerGroup.id}>
@@ -255,6 +357,25 @@ export default function OpportunitiesPage() {
                     ))}
                   </div>
                 ))
+              )}
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden px-4">
+              {isLoading ? (
+                <div className="flex justify-center items-center py-10 text-gray-500">
+                  Loading...
+                </div>
+              ) : paginatedData.length === 0 ? (
+                <div className="flex justify-center items-center py-10 text-gray-500">
+                  No opportunities found.
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {paginatedData.map((opportunity) => (
+                    <OpportunityCard key={opportunity._id} opportunity={opportunity} />
+                  ))}
+                </div>
               )}
             </div>
 

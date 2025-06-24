@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "react-hot-toast";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
+import { getGreeting } from "@/utils/helpers/getGreeting";
 
 interface Volunteer {
   _id: string;
@@ -188,10 +189,10 @@ const OrganisationDashboard = () => {
     <div className="max-w-[1240px] mx-auto px-4 py-6 md:py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
         <h2 className="text-lg md:text-xl font-bold tracking-tight">
-          Good afternoon, {session?.user?.name || "Org Name"}
+          {getGreeting()}, {session?.user?.name || "Org Name"}
         </h2>
         <Button
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
+          className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
           size="lg"
           onClick={() => router.push("/organisation/opportunities/create")}
         >
