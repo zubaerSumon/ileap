@@ -96,8 +96,8 @@ const FilterSection = ({
   onClearFilters: () => void;
 }) => {
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 md:p-6 mb-6 md:mb-8">
+      <div className="grid grid-cols-1 gap-4">
         {/* Search Input */}
         <div className="relative">
           <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -106,7 +106,7 @@ const FilterSection = ({
             placeholder="Search organizations..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-10 py-3 md:py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
             autoComplete="off"
           />
           {search && (
@@ -122,7 +122,7 @@ const FilterSection = ({
 
         {/* Category Filter */}
         <Select value={category} onValueChange={setCategory}>
-          <SelectTrigger>
+          <SelectTrigger className="h-12 md:h-10 text-base">
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
@@ -151,13 +151,13 @@ const FilterSection = ({
         </Select>
 
         {/* Clear Filters Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-center md:justify-end">
           <Button
             type="button"
             variant="outline"
             size="sm"
             onClick={onClearFilters}
-            className="flex items-center gap-2 w-[200px] px-4"
+            className="flex items-center gap-2 w-full md:w-[200px] px-4 h-12 md:h-10"
           >
             <FaTimes />
             Clear Filters
@@ -212,7 +212,7 @@ export default function OrganizationsTab() {
 
   if (isLoading) {
     return (
-      <div className="bg-white py-8 px-4 md:px-8 lg:px-16">
+      <div className="bg-white py-6 md:py-8 px-4 md:px-8 lg:px-16">
         <div className="flex items-center justify-center min-h-[400px]">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         </div>
@@ -222,9 +222,9 @@ export default function OrganizationsTab() {
 
   if (error) {
     return (
-      <div className="bg-white py-8 px-4 md:px-8 lg:px-16">
+      <div className="bg-white py-6 md:py-8 px-4 md:px-8 lg:px-16">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600">Error loading organizations</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-red-600">Error loading organizations</h1>
           <p className="text-gray-600 mt-2">{error.message}</p>
         </div>
       </div>
@@ -236,10 +236,10 @@ export default function OrganizationsTab() {
   const totalPages = data?.totalPages || 0;
 
   return (
-    <div className="bg-white py-8 px-4 md:px-8 lg:px-16">
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-gray-800">Find the Best Organizations</h1>
-        <p className="text-gray-600 mt-2">
+    <div className="bg-white py-6 md:py-8 px-4 md:px-8 lg:px-16">
+      <div className="text-center mb-6 md:mb-8">
+        <h1 className="text-2xl md:text-4xl font-bold text-gray-800">Find the Best Organizations</h1>
+        <p className="text-gray-600 mt-2 text-sm md:text-base">
             Learn more about volunteer organizations.
         </p>
       </div>
@@ -254,21 +254,21 @@ export default function OrganizationsTab() {
       />
 
       {/* Results Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-6 gap-4">
         <div className="text-sm text-gray-600">
           <p className="font-medium">{total} organizations found</p>
           <p className="text-gray-500">
             Showing {((currentPage - 1) * 10) + 1} - {Math.min(currentPage * 10, total)} of {total}
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-4">
           <span className="text-sm text-gray-600 font-medium">Sort by:</span>
-          <div className="flex gap-2">
+          <div className="flex gap-2 w-full sm:w-auto">
             <Button
               variant={sortBy === "name" ? "default" : "outline"}
               size="sm"
               onClick={() => handleSortChange("name")}
-              className={sortBy === "name" ? "bg-blue-600 hover:bg-blue-700" : ""}
+              className={`flex-1 sm:flex-none ${sortBy === "name" ? "bg-blue-600 hover:bg-blue-700" : ""}`}
             >
               Name
             </Button>
@@ -276,7 +276,7 @@ export default function OrganizationsTab() {
               variant={sortBy === "updated" ? "default" : "outline"}
               size="sm"
               onClick={() => handleSortChange("updated")}
-              className={sortBy === "updated" ? "bg-blue-600 hover:bg-blue-700" : ""}
+              className={`flex-1 sm:flex-none ${sortBy === "updated" ? "bg-blue-600 hover:bg-blue-700" : ""}`}
             >
               Recently Updated
             </Button>
@@ -285,43 +285,78 @@ export default function OrganizationsTab() {
       </div>
 
       {/* Organizations List */}
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {organizations.map((org) => (
-          <div key={org._id} className="grid grid-cols-12 gap-8 border-t border-gray-200 py-6">
-            <div className="col-span-8">
-              <h2 className="text-xl font-bold text-blue-500 mb-2">
-                <Link href={`/volunteer/organizer/${org._id}`} className="hover:text-blue-700 transition-colors">
-                  {org.title}
-                </Link>
-              </h2>
-              <p className="text-gray-700 mb-4">{org.bio}</p>
-              <div className="flex items-center text-sm text-gray-500">
-                <span>{org.area}, {org.state}</span>
-                <span className="mx-2">|</span>
-                <span>Updated: {formatDistanceToNow(new Date(org.updatedAt), { addSuffix: true })}</span>
+          <div key={org._id} className="border-t border-gray-200 py-4 md:py-6">
+            {/* Mobile Layout */}
+            <div className="block md:hidden">
+              <div className="space-y-3">
+                <h2 className="text-lg md:text-xl font-bold text-blue-500">
+                  <Link href={`/volunteer/organizer/${org._id}`} className="hover:text-blue-700 transition-colors">
+                    {org.title}
+                  </Link>
+                </h2>
+                <p className="text-gray-700 text-sm md:text-base">{org.bio}</p>
+                <div className="flex flex-col sm:flex-row sm:items-center text-sm text-gray-500 gap-1 sm:gap-2">
+                  <span>{org.area}, {org.state}</span>
+                  <span className="hidden sm:inline">|</span>
+                  <span>Updated: {formatDistanceToNow(new Date(org.updatedAt), { addSuffix: true })}</span>
+                </div>
+                {org.opportunityCount > 0 && (
+                  <div className="pt-2">
+                    <Link href={`/volunteer/organizer/${org._id}`} className="text-blue-500 font-semibold hover:text-blue-700 transition-colors text-sm">
+                      {org.opportunityCount} Active Opportunities
+                    </Link>
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {org.opportunity_types.slice(0, 3).map((type: string, i: number) => (
+                    <div key={i} className="flex items-center text-gray-600 text-sm bg-gray-100 px-2 py-1 rounded">
+                      <span>{getOpportunityTypeDisplayName(type)}</span>
+                      <span className="ml-2 text-lg">{getOpportunityTypeIcon(type)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
-            
-            {/* Vertical separator line */}
-            <div className="col-span-1 flex justify-center">
-              <div className="w-px h-full bg-gray-300"></div>
-            </div>
-            
-            <div className="col-span-3">
-              {org.opportunityCount > 0 && (
-                <div className="text-right mb-4">
-                  <Link href={`/volunteer/organizer/${org._id}`} className="text-blue-500 font-semibold hover:text-blue-700 transition-colors">
-                    {org.opportunityCount} Active Opportunities
+
+            {/* Desktop Layout */}
+            <div className="hidden md:grid md:grid-cols-12 md:gap-8">
+              <div className="col-span-8">
+                <h2 className="text-xl font-bold text-blue-500 mb-2">
+                  <Link href={`/volunteer/organizer/${org._id}`} className="hover:text-blue-700 transition-colors">
+                    {org.title}
                   </Link>
+                </h2>
+                <p className="text-gray-700 mb-4">{org.bio}</p>
+                <div className="flex items-center text-sm text-gray-500">
+                  <span>{org.area}, {org.state}</span>
+                  <span className="mx-2">|</span>
+                  <span>Updated: {formatDistanceToNow(new Date(org.updatedAt), { addSuffix: true })}</span>
                 </div>
-              )}
-              <div className="space-y-2">
-                {org.opportunity_types.slice(0, 3).map((type: string, i: number) => (
-                  <div key={i} className="flex items-center justify-end text-gray-600">
-                    <span>{getOpportunityTypeDisplayName(type)}</span>
-                    <span className="ml-3 text-xl">{getOpportunityTypeIcon(type)}</span>
+              </div>
+              
+              {/* Vertical separator line */}
+              <div className="col-span-1 flex justify-center">
+                <div className="w-px h-full bg-gray-300"></div>
+              </div>
+              
+              <div className="col-span-3">
+                {org.opportunityCount > 0 && (
+                  <div className="text-right mb-4">
+                    <Link href={`/volunteer/organizer/${org._id}`} className="text-blue-500 font-semibold hover:text-blue-700 transition-colors">
+                      {org.opportunityCount} Active Opportunities
+                    </Link>
                   </div>
-                ))}
+                )}
+                <div className="space-y-2">
+                  {org.opportunity_types.slice(0, 3).map((type: string, i: number) => (
+                    <div key={i} className="flex items-center justify-end text-gray-600">
+                      <span>{getOpportunityTypeDisplayName(type)}</span>
+                      <span className="ml-3 text-xl">{getOpportunityTypeIcon(type)}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -330,22 +365,24 @@ export default function OrganizationsTab() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex justify-center mt-8">
-          <div className="flex space-x-2">
+        <div className="flex justify-center mt-6 md:mt-8">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:space-x-2">
             <Button
               variant="outline"
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
+              className="w-full sm:w-auto"
             >
               Previous
             </Button>
-            <span className="flex items-center px-4">
+            <span className="flex items-center px-4 text-sm">
               Page {currentPage} of {totalPages}
             </span>
             <Button
               variant="outline"
               onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
+              className="w-full sm:w-auto"
             >
               Next
             </Button>
