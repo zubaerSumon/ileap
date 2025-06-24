@@ -36,12 +36,54 @@ export default function OpportunitiesPage() {
   const { data: opportunities, isLoading } =
     trpc.opportunities.getOrganizationOpportunities.useQuery();
 
-  // Use the pagination hook
-  const { currentPage, totalPages, paginatedData, setCurrentPage, totalItems } =
-    usePagination(opportunities || [], {
+  // Filter opportunities based on active tab
+  const filteredOpportunities = React.useMemo(() => {
+    if (!opportunities) return [];
+    
+    switch (activeTab) {
+      case "open":
+        return opportunities.filter((opp) => !opp.is_archived);
+      case "draft":
+        // Show recently created opportunities (within last 7 days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        return opportunities.filter((opp) => 
+          !opp.is_archived && 
+          new Date(opp.createdAt) >= sevenDaysAgo
+        );
+      case "recruited":
+        return opportunities.filter((opp) => !opp.is_archived && opp.recruitCount && opp.recruitCount > 0);
+      case "archived":
+        return opportunities.filter((opp) => opp.is_archived);
+      default:
+        return opportunities.filter((opp) => !opp.is_archived);
+    }
+  }, [opportunities, activeTab]);
+
+  // Use the pagination hook with filtered data
+  const { currentPage, totalPages, paginatedData, setCurrentPage } =
+    usePagination(filteredOpportunities, {
       pageSize: 4,
       initialPage: 1,
     });
+
+  // Get counts for each tab
+  const tabCounts = React.useMemo(() => {
+    if (!opportunities) return { open: 0, draft: 0, recruited: 0, archived: 0 };
+    
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    return {
+      open: opportunities.filter((opp) => !opp.is_archived).length,
+      draft: opportunities.filter((opp) => 
+        !opp.is_archived && 
+        new Date(opp.createdAt) >= sevenDaysAgo
+      ).length,
+      recruited: opportunities.filter((opp) => !opp.is_archived && opp.recruitCount && opp.recruitCount > 0).length,
+      archived: opportunities.filter((opp) => opp.is_archived).length,
+    };
+  }, [opportunities]);
 
   const columnHelper = createColumnHelper<Opportunity>();
 
@@ -270,7 +312,7 @@ export default function OpportunitiesPage() {
     <ProtectedLayout>
       <div className="bg-[#F5F7FA] min-h-screen">
         <div className="max-w-[1240px] py-4 sm:py-8 px-4 mx-auto">
-          <div className="bg-white rounded-lg">
+          <div className="bg-white rounded-lg flex flex-col min-h-[600px]">
             <div className="px-4 pt-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
@@ -282,96 +324,103 @@ export default function OpportunitiesPage() {
               <OpportunityTabs
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
-                openCount={totalItems}
+                openCount={tabCounts.open}
+                draftCount={tabCounts.draft}
+                recruitedCount={tabCounts.recruited}
+                archivedCount={tabCounts.archived}
               />
             </div>
 
-            {/* Desktop Table View */}
-            <div className="hidden md:block px-4">
-              <div className="flex items-center py-3 px-6 bg-gray-50 text-sm text-gray-500 rounded-md">
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <React.Fragment key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <div
-                        key={header.id}
-                        className={
-                          header.id === "role"
-                            ? "flex-1"
-                            : header.id === "startDateTime"
-                            ? "w-[140px] text-center"
-                            : header.id === "actions"
-                            ? "w-[60px] text-center"
-                            : "w-[120px] text-center"
-                        }
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                      </div>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </div>
+            <div className="flex-1 flex flex-col">
+              {/* Desktop Table View */}
+              <div className="hidden md:block px-4 flex-1 min-h-[400px]">
+                <div className="flex items-center py-3 px-6 bg-gray-50 text-sm text-gray-500 rounded-md">
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <React.Fragment key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <div
+                          key={header.id}
+                          className={
+                            header.id === "role"
+                              ? "flex-1"
+                              : header.id === "startDateTime"
+                              ? "w-[140px] text-center"
+                              : header.id === "actions"
+                              ? "w-[60px] text-center"
+                              : "w-[120px] text-center"
+                          }
+                        >
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                        </div>
+                      ))}
+                    </React.Fragment>
+                  ))}
+                </div>
 
-              {isLoading ? (
-                <div className="flex justify-center items-center py-10 text-gray-500">
-                  Loading...
-                </div>
-              ) : paginatedData.length === 0 ? (
-                <div className="flex justify-center items-center py-10 text-gray-500">
-                  No opportunities found.
-                </div>
-              ) : (
-                table.getRowModel().rows.map((row) => (
-                  <div
-                    key={row.id}
-                    className="flex items-center py-4 px-6 border-b last:border-b-0 hover:bg-gray-50 min-h-[64px]"
-                  >
-                    {row.getVisibleCells().map((cell) => (
+                {isLoading ? (
+                  <div className="flex justify-center items-center py-10 text-gray-500 min-h-[300px]">
+                    Loading...
+                  </div>
+                ) : paginatedData.length === 0 ? (
+                  <div className="flex justify-center items-center py-10 text-gray-500 min-h-[300px]">
+                    No opportunities found.
+                  </div>
+                ) : (
+                  <div className="min-h-[300px]">
+                    {table.getRowModel().rows.map((row) => (
                       <div
-                        key={cell.id}
-                        className={
-                          cell.column.id === "role"
-                            ? "flex-1"
-                            : cell.column.id === "startDateTime"
-                            ? "w-[140px] text-center"
-                            : cell.column.id === "actions"
-                            ? "w-[60px] text-center"
-                            : "w-[120px] text-center"
-                        }
+                        key={row.id}
+                        className="flex items-center py-4 px-6 border-b last:border-b-0 hover:bg-gray-50 min-h-[64px]"
                       >
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                        {row.getVisibleCells().map((cell) => (
+                          <div
+                            key={cell.id}
+                            className={
+                              cell.column.id === "role"
+                                ? "flex-1"
+                                : cell.column.id === "startDateTime"
+                                ? "w-[140px] text-center"
+                                : cell.column.id === "actions"
+                                ? "w-[60px] text-center"
+                                : "w-[120px] text-center"
+                            }
+                          >
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )}
+                          </div>
+                        ))}
                       </div>
                     ))}
                   </div>
-                ))
-              )}
+                )}
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden px-4 flex-1 min-h-[400px]">
+                {isLoading ? (
+                  <div className="flex justify-center items-center py-10 text-gray-500 min-h-[300px]">
+                    Loading...
+                  </div>
+                ) : paginatedData.length === 0 ? (
+                  <div className="flex justify-center items-center py-10 text-gray-500 min-h-[300px]">
+                    No opportunities found.
+                  </div>
+                ) : (
+                  <div className="space-y-4 min-h-[300px]">
+                    {paginatedData.map((opportunity) => (
+                      <OpportunityCard key={opportunity._id} opportunity={opportunity} />
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Mobile Card View */}
-            <div className="md:hidden px-4">
-              {isLoading ? (
-                <div className="flex justify-center items-center py-10 text-gray-500">
-                  Loading...
-                </div>
-              ) : paginatedData.length === 0 ? (
-                <div className="flex justify-center items-center py-10 text-gray-500">
-                  No opportunities found.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {paginatedData.map((opportunity) => (
-                    <OpportunityCard key={opportunity._id} opportunity={opportunity} />
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="p-4 flex items-center justify-center">
+            <div className="p-4 flex items-center justify-center border-t bg-gray-50">
               <PaginationWrapper
                 currentPage={currentPage}
                 totalPages={totalPages}

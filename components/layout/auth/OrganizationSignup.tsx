@@ -15,7 +15,7 @@ import { OrgDetailsStep } from "./OrgDetailsStep";
 import { Loader2 } from "lucide-react";
 import { organizationTypes } from "@/utils/constants/select-options";
 import { UserRole } from "@/server/db/interfaces/user";
- 
+
 export default function OrganizationSignup() {
   const router = useRouter();
   const utils = trpc.useUtils();
@@ -35,20 +35,27 @@ export default function OrganizationSignup() {
     onSuccess: async (data) => {
       try {
         await updateUser.mutate({
-          organization_profile: data._id
+          organization_profile: data._id,
         });
-        
+
         utils.users.profileCheckup.invalidate();
         toast.success("Profile setup completed successfully!");
         setIsProfileSetupComplete(true);
-        
+
         // Wait for profile check to update
         await utils.users.profileCheckup.invalidate();
-        
+
         // Redirect to organization dashboard
         const role = session?.user?.role?.toLowerCase();
         if (role) {
-          router.replace(role === "admin" || role === "mentor" ? "/organisation/dashboard" : `/${role}`);        }
+          router.replace(
+            role === "admin" || role === "mentor"
+              ? "/organisation/dashboard"
+              : role === "volunteer"
+              ? "/search?type=opportunity"
+              : `/${role}`
+          );
+        }
       } catch (error) {
         console.error("Error updating user with profile:", error);
         toast.error("Failed to complete profile setup");
@@ -80,7 +87,7 @@ export default function OrganizationSignup() {
       website: "",
       profile_img: "",
       cover_img: "",
-    }
+    },
   });
 
   // Add debug logging for form state
@@ -89,7 +96,7 @@ export default function OrganizationSignup() {
       values: form.getValues(),
       errors: form.formState.errors,
       isValid: form.formState.isValid,
-      isDirty: form.formState.isDirty
+      isDirty: form.formState.isDirty,
     });
   }, [form.formState]);
 
@@ -122,8 +129,10 @@ export default function OrganizationSignup() {
       // Add debug logging for type field
       console.log("Type field before validation:", {
         value: form.getValues("type"),
-        isValid: organizationTypes.some((opt: { value: string }) => opt.value === form.getValues("type")),
-        errors: form.formState.errors.type
+        isValid: organizationTypes.some(
+          (opt: { value: string }) => opt.value === form.getValues("type")
+        ),
+        errors: form.formState.errors.type,
       });
 
       fieldsToValidate = [
@@ -132,7 +141,7 @@ export default function OrganizationSignup() {
         "required_skills",
         "website",
         "profile_img",
-        "cover_img"
+        "cover_img",
       ];
     }
 
@@ -140,7 +149,7 @@ export default function OrganizationSignup() {
     console.log("Form validation result:", {
       isValid,
       errors: form.formState.errors,
-      values: form.getValues()
+      values: form.getValues(),
     });
 
     if (isValid) {
@@ -185,7 +194,11 @@ export default function OrganizationSignup() {
   useEffect(() => {
     if (!isLoading) {
       if (isAuthenticated && session?.user?.role) {
-         router.replace(session.user.role === "admin" || session.user.role === "mentor" ? "/organisation/dashboard" : `/${session.user.role}`);
+        router.replace(
+          session.user.role === "admin" || session.user.role === "mentor"
+            ? "/organisation/dashboard"
+            : `/${session.user.role}`
+        );
       } else if (session?.user && !isAuthenticated) {
         setStep(2);
         setIsLoggedIn(true);

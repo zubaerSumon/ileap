@@ -2,43 +2,47 @@
 
 import Link from "next/link";
 import { ArrowRight, MapPin, Star } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import MobileTabsSlider from "@/components/ui/mobile-tabs-slider";
 
 export default function Categories() {
+  const [activeTab, setActiveTab] = useState("nearby");
+  
   const opportunities = [
     {
       id: 1,
-      title: "Seek help",
+      title: "Help with homework",
       organization: "All In",
       location: "Sydney, Australia",
       type: "Regular",
       matchingAvailability: true,
       matchedSkills: 3,
-      categories: ["Human Rights", "Health & Medicine", "Education & Literacy"],
+      categories: ["Education & Literacy"],
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
       logoSrc: "/v1.svg",
     },
     {
       id: 2,
-      title: "Environmental Champions Needed!",
-      organization: "Red Cross",
+      title: "Clean up the beach",
+      organization: "All In",
       location: "Sydney, Australia",
       type: "Regular",
       matchingAvailability: true,
       matchedSkills: 3,
-      categories: ["Disaster Relief", "Emergency & Safety"],
+      categories: ["Environment & Conservation"],
       description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
       logoSrc: "/v2.svg",
     },
     {
       id: 3,
-      title: "Seek help",
+      title: "Help with homework",
       organization: "All In",
       location: "Sydney, Australia",
       type: "Regular",
@@ -62,6 +66,12 @@ export default function Categories() {
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore...",
       logoSrc: "/v4.svg",
     },
+  ];
+
+  const mobileTabs = [
+    { label: "Nearby Opportunities", value: "nearby" },
+    { label: "Your interests", value: "interests" },
+    { label: "Newest Opportunities", value: "newest" },
   ];
 
   const OpportunityCard = ({
@@ -179,29 +189,43 @@ export default function Categories() {
           </Link>
         </div>
 
-        <Tabs defaultValue="nearby" className="w-full">
-          <TabsList className="mb-6 bg-transparent inline-flex justify-start space-x-4  p-0 h-auto">
-            <TabsTrigger
-              value="nearby"
-              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
-            >
-              Nearby Opportunities
-            </TabsTrigger>
-            <TabsTrigger
-              value="interests"
-              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
-            >
-              Your interests
-            </TabsTrigger>
-            <TabsTrigger
-              value="newest"
-              className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
-            >
-              Newest Opportunities
-            </TabsTrigger>
-          </TabsList>
+        {/* Mobile Tabs Slider */}
+        <MobileTabsSlider
+          tabs={mobileTabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+          className="mb-6"
+        />
 
-          <TabsContent value="nearby" className="mt-0">
+        {/* Desktop Tabs */}
+        <div className="hidden md:block">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="mb-6 bg-transparent inline-flex justify-start space-x-4 p-0 h-auto">
+              <TabsTrigger
+                value="nearby"
+                className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
+              >
+                Nearby Opportunities
+              </TabsTrigger>
+              <TabsTrigger
+                value="interests"
+                className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
+              >
+                Your interests
+              </TabsTrigger>
+              <TabsTrigger
+                value="newest"
+                className="px-3 py-1.5 rounded-t-lg data-[state=active]:bg-gray-100 data-[state=active]:border-none text-xs font-medium border-0 h-auto"
+              >
+                Newest Opportunities
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {/* Tab Content */}
+        <div className="mt-0">
+          {activeTab === "nearby" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {opportunities.map((opportunity) => (
                 <OpportunityCard
@@ -210,9 +234,9 @@ export default function Categories() {
                 />
               ))}
             </div>
-          </TabsContent>
+          )}
 
-          <TabsContent value="interests" className="mt-0">
+          {activeTab === "interests" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {opportunities.slice(1, 4).map((opportunity) => (
                 <OpportunityCard
@@ -221,9 +245,9 @@ export default function Categories() {
                 />
               ))}
             </div>
-          </TabsContent>
+          )}
 
-          <TabsContent value="newest" className="mt-0">
+          {activeTab === "newest" && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {opportunities.slice(2).map((opportunity) => (
                 <OpportunityCard
@@ -232,8 +256,8 @@ export default function Categories() {
                 />
               ))}
             </div>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </div>
     </section>
   );

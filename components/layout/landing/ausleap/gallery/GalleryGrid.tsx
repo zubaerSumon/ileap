@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
+import MobileTabsSlider from "@/components/ui/mobile-tabs-slider";
 
 type GalleryImage = {
   id: number;
@@ -233,6 +234,11 @@ export default function GalleryGrid() {
   const years = ["2024", "2023", "2022"];
   const [activeYear, setActiveYear] = useState(years[0]);
 
+  const mobileTabs = years.map(year => ({
+    label: year,
+    value: year
+  }));
+
   // Function to get random size class
   const getRandomSize = () => {
     const sizes = [
@@ -247,25 +253,39 @@ export default function GalleryGrid() {
 
   return (
     <section className="py-4 sm:py-8 container mx-auto px-2 sm:px-4">
-      <Tabs
-        defaultValue={activeYear}
-        className="w-full"
-        onValueChange={setActiveYear}
-      >
-        <TabsList className="bg-transparent flex flex-wrap justify-center p-1 sm:p-2 h-auto gap-2">
-          {years.map((year) => (
-            <TabsTrigger
-              key={year}
-              value={year}
-              className="py-1.5 px-3 sm:py-2 sm:px-4 md:px-8 lg:px-20 rounded data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 text-xs sm:text-sm md:text-base font-medium border-0 transition-all"
-            >
-              {year}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      {/* Mobile Tabs Slider */}
+      <MobileTabsSlider
+        tabs={mobileTabs}
+        activeTab={activeYear}
+        onTabChange={setActiveYear}
+        className="mb-6"
+      />
 
+      {/* Desktop Tabs */}
+      <div className="hidden md:block">
+        <Tabs
+          value={activeYear}
+          className="w-full"
+          onValueChange={setActiveYear}
+        >
+          <TabsList className="bg-transparent flex flex-wrap justify-center p-1 sm:p-2 h-auto gap-2">
+            {years.map((year) => (
+              <TabsTrigger
+                key={year}
+                value={year}
+                className="py-1.5 px-3 sm:py-2 sm:px-4 md:px-8 lg:px-20 rounded data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:bg-gray-100 data-[state=inactive]:text-gray-700 text-xs sm:text-sm md:text-base font-medium border-0 transition-all"
+              >
+                {year}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+      </div>
+
+      {/* Tab Content */}
+      <div className="mt-4 sm:mt-8">
         {years.map((year) => (
-          <TabsContent key={year} value={year} className="mt-4 sm:mt-8">
+          <div key={year} className={activeYear === year ? "block" : "hidden"}>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-4 auto-rows-[200px]">
               {galleryImages
                 .filter((img) => img.year === year)
@@ -284,9 +304,9 @@ export default function GalleryGrid() {
                   </div>
                 ))}
             </div>
-          </TabsContent>
+          </div>
         ))}
-      </Tabs>
+      </div>
     </section>
   );
 }
