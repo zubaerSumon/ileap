@@ -22,15 +22,16 @@ export default function VolunteerSignup() {
   const utils = trpc.useUtils();
   const { data: session } = useSession();
   const { isLoading, isAuthenticated } = useAuthCheck();
-  console.log({isLoading, isAuthenticated});
-  
+
   const [step, setStep] = useState(1);
   const [error, setError] = useState<string | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
   const [mediaConsent, setMediaConsent] = useState(false);
-  const [mediaConsentError, setMediaConsentError] = useState<string | null>(null);
+  const [mediaConsentError, setMediaConsentError] = useState<string | null>(
+    null
+  );
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
@@ -40,19 +41,26 @@ export default function VolunteerSignup() {
     onSuccess: async (data) => {
       try {
         await updateUser.mutate({
-          volunteer_profile: data._id
+          volunteer_profile: data._id,
         });
-        
+
         utils.users.profileCheckup.invalidate();
         toast.success("Profile setup completed successfully!");
         setIsProfileSetupComplete(true);
-        
-         await utils.users.profileCheckup.invalidate();
-        
-         setTimeout(() => {
+
+        await utils.users.profileCheckup.invalidate();
+
+        setTimeout(() => {
           const role = session?.user?.role?.toLowerCase();
           if (role) {
-            router.replace(role === "admin" || role === "mentor" ? "/organisation/dashboard" : `/${role}`);          }
+            router.replace(
+              role === "admin" || role === "mentor"
+                ? "/organisation/dashboard"
+                : role === "volunteer"
+                ? "/search?type=opportunity"
+                : `/${role}`
+            );
+          }
         }, 1000);
       } catch (error) {
         console.error("Error updating user with profile:", error);
@@ -156,7 +164,13 @@ export default function VolunteerSignup() {
       if (!isLoading) {
         if (isAuthenticated && session?.user?.role) {
           const role = session.user.role.toLowerCase();
-          await router.replace(`/${role}`);
+          await router.replace(
+            role === "admin" || role === "mentor"
+              ? "/organisation/dashboard"
+              : role === "volunteer"
+              ? "/search?type=opportunity"
+              : `/${role}`
+          );
         } else if (session?.user && !isAuthenticated) {
           setStep(2);
           setIsLoggedIn(true);
@@ -268,7 +282,9 @@ export default function VolunteerSignup() {
                     {isSignupLoading || isProfileLoading ? (
                       <div className="flex items-center">
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        {step === 1 ? "Creating account..." : "Saving profile..."}
+                        {step === 1
+                          ? "Creating account..."
+                          : "Saving profile..."}
                       </div>
                     ) : step === 1 ? (
                       "Signup & Continue"

@@ -26,6 +26,7 @@ import { toast } from "react-hot-toast";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import { getGreeting } from "@/utils/helpers/getGreeting";
 import { CreateOpportunityButton } from "@/components/buttons/CreateOpportunityButton";
+import MobileTabsSlider from "@/components/ui/mobile-tabs-slider";
 
 interface Volunteer {
   _id: string;
@@ -186,6 +187,19 @@ const OrganisationDashboard = () => {
     setIsMessageDialogOpen(true);
   };
 
+  // Prepare mobile tabs data
+  const mobileTabs = TABS.map((t) => ({
+    label: t.label,
+    value: t.key,
+    count: t.key === "open"
+      ? openOpportunities.length
+      : t.key === "active"
+      ? activeContracts.length
+      : t.key === "draft"
+      ? draftOpportunities.length
+      : archivedOpportunities.length,
+  }));
+
   return (
     <div className="max-w-[1240px] mx-auto px-4 py-6 md:py-12">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
@@ -198,7 +212,16 @@ const OrganisationDashboard = () => {
       {/* Overview Section */}
       <h2 className="text-xl md:text-2xl font-semibold mb-4">Overview</h2>
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
-        <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+        {/* Mobile Tabs Slider */}
+        <MobileTabsSlider
+          tabs={mobileTabs}
+          activeTab={tab}
+          onTabChange={setTab}
+          className="md:hidden"
+        />
+
+        {/* Desktop Tabs */}
+        <div className="hidden md:flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
           {TABS.map((t) => (
             <button
               key={t.key}
