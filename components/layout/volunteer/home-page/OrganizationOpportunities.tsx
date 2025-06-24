@@ -37,8 +37,14 @@ interface OpportunityData {
   commitment_type: string;
   location: string;
   number_of_volunteers: number;
-  start_date?: Date;
-  start_time?: string;
+  date: {
+    start_date: Date;
+    end_date?: Date;
+  };
+  time: {
+    start_time: string;
+    end_time?: string;
+  };
   organization_profile: {
     _id: string;
     title: string;
@@ -271,10 +277,10 @@ export default function OrganizationOpportunities({ organizationId }: Organizati
                       </span>
                     </div>
                   )}
-                  {!opportunity.formattedDates && opportunity.start_date && (
+                  {!opportunity.formattedDates && opportunity.date?.start_date && (
                     <div className="flex items-center text-xs text-gray-500">
                       <span className="text-sm text-gray-500">
-                        {format(new Date(opportunity.start_date), 'MMM d')} at {opportunity.start_time ? formatTimeToAMPM(opportunity.start_time) : 'Time TBD'}
+                        {format(new Date(opportunity.date.start_date), 'MMM d')} at {opportunity.time?.start_time ? formatTimeToAMPM(opportunity.time.start_time) : 'Time TBD'}
                       </span>
                     </div>
                   )}

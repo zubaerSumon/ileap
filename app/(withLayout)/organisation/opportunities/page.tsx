@@ -3,6 +3,7 @@
 import React from "react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { CreateOpportunityButton } from "@/components/buttons/CreateOpportunityButton";
 
 import {
   useReactTable,
@@ -18,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusIcon, Calendar, Users, UserCheck } from "lucide-react";
+import { MoreHorizontal, Calendar, Users, UserCheck } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import type { Opportunity } from "@/types/opportunities";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
@@ -83,13 +84,13 @@ export default function OpportunitiesPage() {
       header: () => <span>Start Date & Time</span>,
       cell: (info) => {
         const opportunity = info.row.original;
-        if (!opportunity.start_date) {
+        if (!opportunity.date?.start_date) {
           return (
             <div className="w-full text-center text-gray-400">Not set</div>
           );
         }
 
-        const startDate = new Date(opportunity.start_date);
+        const startDate = new Date(opportunity.date.start_date);
         const formattedDate = startDate.toLocaleDateString("en-US", {
           month: "short",
           day: "numeric",
@@ -100,7 +101,7 @@ export default function OpportunitiesPage() {
           <div className="w-full text-center">
             <div className="text-sm font-medium">{formattedDate}</div>
             <div className="text-xs text-gray-500">
-              {opportunity.start_time ? formatTimeToAMPM(opportunity.start_time) : 'Time TBD'}
+              {opportunity.time?.start_time ? formatTimeToAMPM(opportunity.time.start_time) : 'Time TBD'}
             </div>
           </div>
         );
@@ -167,7 +168,7 @@ export default function OpportunitiesPage() {
   // Mobile card component for opportunities
   const OpportunityCard = ({ opportunity }: { opportunity: Opportunity }) => {
     const org = opportunity.organization_profile;
-    const startDate = opportunity.start_date ? new Date(opportunity.start_date) : null;
+    const startDate = opportunity.date?.start_date ? new Date(opportunity.date.start_date) : null;
     const formattedDate = startDate?.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -227,9 +228,9 @@ export default function OpportunitiesPage() {
               <p className="font-medium text-sm">
                 {formattedDate || "Not set"}
               </p>
-              {opportunity.start_time && (
+              {opportunity.time?.start_time && (
                 <p className="text-xs text-gray-400">
-                  {formatTimeToAMPM(opportunity.start_time)}
+                  {formatTimeToAMPM(opportunity.time.start_time)}
                 </p>
               )}
             </div>
@@ -276,16 +277,7 @@ export default function OpportunitiesPage() {
                   <h1 className="text-xl sm:text-2xl font-semibold mb-1">Opportunities</h1>
                   <p className="text-sm text-gray-500">Posted tasks</p>
                 </div>
-                <Button
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full sm:w-auto"
-                  size="lg"
-                  onClick={() =>
-                    router.push("/organisation/opportunities/create")
-                  }
-                >
-                  <PlusIcon className="mr-2 transform scale-170" />
-                  Post an opportunity
-                </Button>
+                <CreateOpportunityButton />
               </div>
               <OpportunityTabs
                 activeTab={activeTab}

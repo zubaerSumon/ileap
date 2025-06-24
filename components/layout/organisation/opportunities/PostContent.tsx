@@ -55,13 +55,13 @@ export function PostContent({ opportunity }: PostContentProps) {
       <Separator />
       
       {/* Start Date & Time */}
-      {opportunity.start_date && (
+      {opportunity.date?.start_date && (
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <h3 className="text-sm font-medium text-blue-900 mb-2">Start Date & Time</h3>
           <div className="text-sm text-blue-800">
             <p>
               <span className="font-medium">Date:</span>{" "}
-              {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+              {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
                 month: 'long',
@@ -70,7 +70,7 @@ export function PostContent({ opportunity }: PostContentProps) {
             </p>
             <p>
               <span className="font-medium">Time:</span>{" "}
-              {opportunity.start_time ? formatTimeToAMPM(opportunity.start_time) : 'Not set'}
+              {opportunity.time?.start_time ? formatTimeToAMPM(opportunity.time.start_time) : 'Not set'}
             </p>
           </div>
         </div>

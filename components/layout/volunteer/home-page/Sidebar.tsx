@@ -13,8 +13,14 @@ type Opportunity = {
   commitment_type: string;
   location: string;
   number_of_volunteers: number;
-  start_date: Date;
-  start_time: string;
+  date: {
+    start_date: Date;
+    end_date?: Date;
+  };
+  time: {
+    start_time: string;
+    end_time?: string;
+  };
   organization_profile: {
     _id: string;
     name: string;
@@ -62,7 +68,7 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
           <div>
             <h4 className="text-sm font-medium mb-1">Start Date</h4>
             <p className="text-sm text-gray-600">
-              {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+              {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
                 month: 'short',
                 day: 'numeric',
                 year: 'numeric'
@@ -72,7 +78,7 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
 
           <div>
             <h4 className="text-sm font-medium mb-1">Start Time</h4>
-            <p className="text-sm text-gray-600">{formatTimeToAMPM(opportunity.start_time)}</p>
+            <p className="text-sm text-gray-600">{formatTimeToAMPM(opportunity.time.start_time)}</p>
           </div>
         </div>
 

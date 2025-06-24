@@ -93,18 +93,18 @@ export default function OpportunityCard({
           />
 
           <div className="flex items-center space-x-4 text-xs text-gray-500">
-            {opportunity.start_date && (
+            {opportunity.date?.start_date && (
               <div className="flex items-center">
                 <Calendar className="w-3 h-3 mr-1" />
                 <span>
-                  {format(new Date(opportunity.start_date), "MMM d, yyyy")}
+                  {format(new Date(opportunity.date.start_date), "MMM d, yyyy")}
                 </span>
               </div>
             )}
-            {opportunity.start_time && (
+            {opportunity.time?.start_time && (
               <div className="flex items-center">
                 <Clock className="w-3 h-3 mr-1" />
-                <span>{opportunity.start_time}</span>
+                <span>{opportunity.time.start_time}</span>
               </div>
             )}
             <span>

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/navigation";
-import { ChevronRight, PlusIcon, Trash2, MapPin } from "lucide-react";
+import { ChevronRight,   Trash2, MapPin } from "lucide-react";
 import VolunteerCarousel from "./VolunteerCarousel";
 import { useSession } from "next-auth/react";
 import MessageDialog from "../MessageDialog";
@@ -25,6 +25,7 @@ import {
 import { toast } from "react-hot-toast";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import { getGreeting } from "@/utils/helpers/getGreeting";
+import { CreateOpportunityButton } from "@/components/buttons/CreateOpportunityButton";
 
 interface Volunteer {
   _id: string;
@@ -191,14 +192,8 @@ const OrganisationDashboard = () => {
         <h2 className="text-lg md:text-xl font-bold tracking-tight">
           {getGreeting()}, {session?.user?.name || "Org Name"}
         </h2>
-        <Button
-          className="bg-blue-600 cursor-pointer hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full md:w-auto"
-          size="lg"
-          onClick={() => router.push("/organisation/opportunities/create")}
-        >
-          <PlusIcon className="mr-2 transform scale-170" />
-          Post an opportunity
-        </Button>
+        <CreateOpportunityButton />
+
       </div>
       {/* Overview Section */}
       <h2 className="text-xl md:text-2xl font-semibold mb-4">Overview</h2>
@@ -385,12 +380,12 @@ const OrganisationDashboard = () => {
                             addSuffix: true,
                           })}
                         </div>
-                        {opportunity.start_date && (
+                        {opportunity.date?.start_date && (
                           <div className="text-xs text-gray-500">
-                            Starts: {new Date(opportunity.start_date).toLocaleDateString('en-US', {
+                            Starts: {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
                               month: 'short',
                               day: 'numeric'
-                            })} at {opportunity.start_time ? formatTimeToAMPM(opportunity.start_time) : 'Time TBD'}
+                            })} at {opportunity.time?.start_time ? formatTimeToAMPM(opportunity.time.start_time) : 'Time TBD'}
                           </div>
                         )}
                       </div>
