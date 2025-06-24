@@ -22,27 +22,33 @@ const formatMessageDate = (date: Date): string => {
 
 export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwnMessage }) => (
   <div
-    className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-4`}
+    className={`flex ${isOwnMessage ? "justify-end" : "justify-start"} mb-3 sm:mb-4`}
   >
     {!isOwnMessage && message.sender && (
-      <Avatar name={message.sender.name || ''} avatar={message.sender.avatar} size={32} />
+      <div className="flex-shrink-0 mr-2 sm:mr-3">
+        <Avatar name={message.sender.name || ''} avatar={message.sender.avatar} size={28} />
+      </div>
     )}
     <div
       className={cn(
-        "max-w-[70%] rounded-lg p-3 ml-2",
-        isOwnMessage ? "bg-blue-500 text-white" : "bg-gray-100"
+        "max-w-[75%] sm:max-w-[70%] rounded-lg p-2.5 sm:p-3",
+        isOwnMessage 
+          ? "bg-blue-500 text-white ml-2 sm:ml-3" 
+          : "bg-gray-100 text-gray-900"
       )}
     >
-      <p className="break-words">{message.content}</p>
+      <p className="break-words text-sm sm:text-base leading-relaxed">{message.content}</p>
       <p className={cn(
-        "text-xs mt-1",
+        "text-xs mt-1.5 sm:mt-1",
         isOwnMessage ? "text-blue-100" : "text-gray-500"
       )}>
         {formatMessageDate(new Date(message.createdAt))}
       </p>
     </div>
     {isOwnMessage && message.sender && (
-      <Avatar name={message.sender.name || ''} avatar={message.sender.avatar} size={32} />
+      <div className="flex-shrink-0 ml-2 sm:ml-3">
+        <Avatar name={message.sender.name || ''} avatar={message.sender.avatar} size={28} />
+      </div>
     )}
   </div>
 );

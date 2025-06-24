@@ -11,7 +11,6 @@ interface ChatAreaProps {
   messages: Message[] | undefined;
   isLoadingMessages: boolean;
   selectedConversation: Conversation | Group | undefined;
-  onMenuClick: () => void;
   session: { user?: { id?: string } } | null;
   isGroup?: boolean;
   onDeleteGroup?: () => void;
@@ -28,7 +27,6 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   messages, 
   isLoadingMessages,
   selectedConversation,
-  onMenuClick,
   session,
   isGroup,
   onDeleteGroup,
@@ -146,23 +144,39 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
 
   if (!messages || messages.length === 0) {
     return (
-      <div className="flex-1 flex flex-col border">
-        <div className="flex-1 flex flex-col items-center justify-center py-4">
+      <div className="flex-1 flex flex-col">
+        {selectedConversation && headerData && (
+          <ConversationHeader 
+            user={headerData}
+            isGroup={isGroup}
+            onDeleteGroup={onDeleteGroup}
+            onDeleteConversation={onDeleteConversation}
+          />
+        )}
+        <div className="flex-1 flex flex-col items-center justify-center py-8 px-4">
           {isGroup ? (
-            <div className="text-center">
+            <div className="text-center max-w-sm">
               <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-blue-500" />
               </div>
-              <h2 className="text-xl font-semibold mb-2">
-                {(selectedConversation as Group)?.name.length > 15 
-                  ? `${(selectedConversation as Group)?.name.substring(0, 15)}...` 
+              <h2 className="text-xl font-semibold mb-2 text-gray-900">
+                {(selectedConversation as Group)?.name.length > 20 
+                  ? `${(selectedConversation as Group)?.name.substring(0, 20)}...` 
                   : (selectedConversation as Group)?.name}
               </h2>
               <p className="text-sm text-gray-500 mb-4">{(selectedConversation as Group)?.members?.length} members</p>
               <p className="text-sm text-gray-500">Start the conversation by sending a message</p>
             </div>
           ) : (
-            <p className="text-muted-foreground">No messages yet</p>
+            <div className="text-center max-w-sm">
+              <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <svg className="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold mb-2 text-gray-900">No messages yet</h2>
+              <p className="text-sm text-gray-500">Send a message to start the conversation</p>
+            </div>
           )}
         </div>
       </div>
@@ -174,20 +188,19 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
       {selectedConversation && headerData && (
         <ConversationHeader 
           user={headerData}
-          onMenuClick={onMenuClick}
           isGroup={isGroup}
           onDeleteGroup={onDeleteGroup}
           onDeleteConversation={onDeleteConversation}
         />
       )}
 
-      <div className="flex-1 min-h-0 max-h-[800px]">
-        <ScrollArea ref={scrollAreaRef} className="h-[580px]">
+      <div className="flex-1 min-h-0">
+        <ScrollArea ref={scrollAreaRef} className="h-full">
           <div className="space-y-4 px-4 py-4 pb-8">
             {hasMore && !hasReachedTop && (
               <div ref={topRef} className="text-center">
                 {isLoadingMore || isLoading ? (
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground py-2">
                     <Loader2 className="h-4 w-4 animate-spin" />
                     Loading more messages...
                   </div>
@@ -201,6 +214,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
                       setTimeout(() => setIsLoading(false), 1000);
                     }}
                     disabled={isLoadingMore}
+                    className="text-sm"
                   >
                     Load more messages
                   </Button>

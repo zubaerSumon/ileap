@@ -1,16 +1,11 @@
 import React from "react";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { cn } from "@/lib/utils";
 import type { Conversation, Group } from "@/types/message";
 import ConversationList from "./ConversationList";
 import UserList from "./UserList";
 
 interface SidebarProps {
-  showMobileMenu: boolean;
-  onClose: () => void;
   activeTab: string;
   setActiveTab: (tab: string) => void;
   conversations: Conversation[] | undefined;
@@ -26,8 +21,6 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = React.memo(({ 
-  showMobileMenu, 
-  onClose, 
   activeTab, 
   setActiveTab,
   conversations,
@@ -54,68 +47,69 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
   const filteredUsers = availableUsers?.filter(user =>
     user.name?.toLowerCase().includes(searchQuery.toLowerCase()) || false
   );
+  
   return (
-    <aside className={cn(
-      "fixed inset-y-0 left-0 z-39 w-full md:w-80 bg-white  md:relative md:translate-x-0 transition-transform duration-200 ease-in-out",
-      showMobileMenu ? "translate-x-0" : "-translate-x-full"
-    )}>
-      <div className="flex flex-col h-full">
-        <div className="p-4 border-b flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Messages</h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="md:hidden"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
+    <aside className="flex flex-col h-full bg-white border-r border-gray-200">
+      {/* Header */}
+      <div className="flex-shrink-0 p-4 border-b border-gray-200">
+        <h2 className="text-lg font-semibold text-gray-900">Messages</h2>
+      </div>
 
-        <div className="p-4 border-b">
+      {/* Search */}
+      <div className="flex-shrink-0 p-4 border-b border-gray-200">
+        <div className="relative">
           <Input
             placeholder="Search conversations..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
+            className="w-full pl-9 pr-3 h-9 text-sm"
           />
+          <svg 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </div>
+      </div>
 
-        <div className="flex-1 min-h-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-            <div className="px-4 pt-2 flex-shrink-0">
-              <TabsList className={`grid w-full ${userRole === "volunteer" ? "grid-cols-1" : "grid-cols-2"}`}>
-                <TabsTrigger value="conversations">Conversations</TabsTrigger>
-                {userRole !== "volunteer" && (
-                  <TabsTrigger value="applicants">Volunteers</TabsTrigger>
-                )}
-              </TabsList>
-            </div>
+      {/* Tabs and Content */}
+      <div className="flex-1 min-h-0 flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+          <div className="flex-shrink-0 px-4 pt-3 pb-2">
+            <TabsList className={`grid w-full ${userRole === "volunteer" ? "grid-cols-1" : "grid-cols-2"} h-9`}>
+              <TabsTrigger value="conversations" className="text-sm">Conversations</TabsTrigger>
+              {userRole !== "volunteer" && (
+                <TabsTrigger value="applicants" className="text-sm">Volunteers</TabsTrigger>
+              )}
+            </TabsList>
+          </div>
 
-            <TabsContent value="conversations" className="mt-0 flex-1 min-h-0">
-              <ConversationList 
-                conversations={filteredConversations}
-                groups={filteredGroups}
-                selectedUserId={selectedUserId}
+          <TabsContent value="conversations" className="mt-0 flex-1 min-h-0">
+            <ConversationList 
+              conversations={filteredConversations}
+              groups={filteredGroups}
+              selectedUserId={selectedUserId}
+              onSelectUser={onSelectUser}
+              isLoading={isLoadingConversations}
+              isLoadingGroups={isLoadingGroups}
+              onCreateGroup={onGroupCreated}
+              userRole={userRole}
+            />
+          </TabsContent>
+
+          {userRole !== "volunteer" && (
+            <TabsContent value="applicants" className="mt-0 flex-1 min-h-0">
+              <UserList 
+                users={filteredUsers}
                 onSelectUser={onSelectUser}
-                isLoading={isLoadingConversations}
-                isLoadingGroups={isLoadingGroups}
-                onCreateGroup={onGroupCreated}
-                userRole={userRole}
+                isLoading={isLoadingUsers}
               />
             </TabsContent>
-
-            {userRole !== "volunteer" && (
-              <TabsContent value="applicants" className="mt-0 flex-1 min-h-0">
-                <UserList 
-                  users={filteredUsers}
-                  onSelectUser={onSelectUser}
-                  isLoading={isLoadingUsers}
-                />
-              </TabsContent>
-            )}
-          </Tabs>
-        </div>
+          )}
+        </Tabs>
       </div>
     </aside>
   );

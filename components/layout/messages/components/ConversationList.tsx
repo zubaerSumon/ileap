@@ -54,7 +54,7 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
       <div className="flex flex-col h-full">
         {/* Groups Section Header - Always visible for non-volunteers */}
         {userRole !== "volunteer" && (
-          <div className="flex-shrink-0 p-4 flex items-center justify-between">
+          <div className="flex-shrink-0 p-3 sm:p-4 flex items-center justify-between border-b border-gray-100">
             <h3 className="text-sm font-medium text-gray-500">Groups</h3>
             <CreateGroupDialog
               onGroupCreated={onCreateGroup}
@@ -62,16 +62,16 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
           </div>
         )}
 
-        <ScrollArea className="h-[calc(100vh-16rem)]">
-          <div className="pr-4">
+        <ScrollArea className="flex-1">
+          <div className="pr-2 sm:pr-4">
             {isLoading || isLoadingGroups ? (
-              <div className="p-4 text-center text-gray-500">Loading...</div>
+              <div className="p-4 text-center text-gray-500 text-sm">Loading...</div>
             ) : !sortedConversations?.length && !sortedGroups?.length ? (
-              <div className="p-4 text-center text-gray-500">
+              <div className="p-4 text-center text-gray-500 text-sm">
                 No conversations
               </div>
             ) : (
-              <div className="divide-y">
+              <div className="divide-y divide-gray-100">
                 {/* Groups List */}
                 {sortedGroups && sortedGroups.length > 0 && (
                   <>
@@ -80,26 +80,26 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
                         key={group._id}
                         onClick={() => onSelectUser(group._id)}
                         className={cn(
-                          "w-full p-4 hover:bg-gray-50 transition-colors",
-                          selectedUserId === group._id && "bg-gray-50"
+                          "w-full p-3 sm:p-4 hover:bg-gray-50 transition-colors text-left",
+                          selectedUserId === group._id && "bg-blue-50 border-r-2 border-blue-500"
                         )}
                       >
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-                            <Users className="h-4 w-4 text-blue-500" />
+                          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                            <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-500" />
                           </div>
-                          <div className="flex-1 min-w-0 text-left">
-                            <div className="flex justify-between items-start">
-                              <h3 className="font-medium truncate max-w-[150px]">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start mb-1">
+                              <h3 className="font-medium truncate text-sm sm:text-base max-w-[120px] sm:max-w-[150px]">
                                 {group.name.length > 15 ? `${group.name.substring(0, 15)}...` : group.name}
                               </h3>
                               {group.unreadCount > 0 && (
-                                <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
+                                <span className="bg-blue-500 text-white text-xs px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ml-2">
                                   {group.unreadCount}
                                 </span>
                               )}
                             </div>
-                            <div className="flex justify-between items-center">
+                            <div className="flex justify-between items-center mb-1">
                               <p className="text-xs text-gray-400">
                                 {group.members.length} members
                               </p>
@@ -115,7 +115,7 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
                             {group.lastMessage && (
                               <p
                                 className={cn(
-                                  "text-sm truncate mt-1",
+                                  "text-xs sm:text-sm truncate",
                                   group.lastMessage.isRead
                                     ? "text-gray-500"
                                     : "text-gray-900 font-medium"
@@ -134,7 +134,7 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
                 {/* Individual Conversations Section */}
                 {sortedConversations && sortedConversations.length > 0 && (
                   <>
-                    <div className="p-4">
+                    <div className="p-3 sm:p-4 bg-gray-50">
                       <h3 className="text-sm font-medium text-gray-500">
                         Direct Messages
                       </h3>
@@ -144,33 +144,35 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
                         key={conversation._id}
                         onClick={() => onSelectUser(conversation._id)}
                         className={cn(
-                          "w-full p-4 hover:bg-gray-50 transition-colors",
-                          selectedUserId === conversation._id && "bg-gray-50"
+                          "w-full p-3 sm:p-4 hover:bg-gray-50 transition-colors text-left",
+                          selectedUserId === conversation._id && "bg-blue-50 border-r-2 border-blue-500"
                         )}
                       >
                         <div className="flex items-center gap-3">
-                          <Avatar
-                            name={conversation.user.name}
-                            avatar={conversation.user.avatar}
-                            size={32}
-                          />
-                          <div className="flex-1 min-w-0 text-left">
-                            <div className="flex justify-between items-start">
-                              <h3 className="font-medium truncate">
+                          <div className="flex-shrink-0">
+                            <Avatar
+                              name={conversation.user.name}
+                              avatar={conversation.user.avatar}
+                              size={32}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex justify-between items-start mb-1">
+                              <h3 className="font-medium truncate text-sm sm:text-base">
                                 {conversation.user.name}
                               </h3>
                               {conversation.unreadCount > 0 && (
-                                <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full flex-shrink-0">
+                                <span className="bg-blue-500 text-white text-xs px-1.5 sm:px-2 py-0.5 rounded-full flex-shrink-0 ml-2">
                                   {conversation.unreadCount}
                                 </span>
                               )}
                             </div>
-                            <div className="flex justify-between items-center">
-                              <p className="text-xs text-gray-400">
+                            <div className="flex justify-between items-center mb-1">
+                              <p className="text-xs text-gray-400 truncate max-w-[100px] sm:max-w-[120px]">
                                 {conversation.user.organization_profile?.title || conversation.user.role}
                               </p>
                               {conversation.lastMessage && (
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-500 flex-shrink-0">
                                   {format(
                                     new Date(
                                       conversation.lastMessage.createdAt
@@ -183,7 +185,7 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
                             {conversation.lastMessage && (
                               <p
                                 className={cn(
-                                  "text-sm truncate mt-1",
+                                  "text-xs sm:text-sm truncate",
                                   conversation.lastMessage.isRead
                                     ? "text-gray-500"
                                     : "text-gray-900 font-medium"

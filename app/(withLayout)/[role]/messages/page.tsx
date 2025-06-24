@@ -10,8 +10,10 @@ export default function Page() {
 
   return (
     <ProtectedLayout> 
-      <div className="max-w-[1440px] mt-2 mx-auto w-full p-6 md:p-6 h-[800px] overflow-hidden border border-gray-200 rounded-lg space-y-4">
-        <MessageUI initialUserId={userId} />
+      <div className="w-full h-[calc(100vh-2rem)] sm:h-[calc(100vh-4rem)] max-w-7xl mx-auto p-2 sm:p-4 lg:p-6">
+        <div className="w-full h-full bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <MessageUI initialUserId={userId} />
+        </div>
       </div>
     </ProtectedLayout>
   );
