@@ -6,7 +6,9 @@ import {
   SettingsIcon,
   Layers2,
   LayoutDashboard,
+  Users,
 } from "lucide-react";
+import { GiBinoculars } from "react-icons/gi";
 import { Session } from "next-auth";
 import Logo from "../../public/AusLeap.png";
 import { PUBLIC_NAV_OPTIONS, STATIC_LINKS } from "@/utils/constants/navigation";
@@ -49,7 +51,7 @@ export function MobileMenu({
             width={100}
             height={40}
             className="h-10 w-auto"
-            style={{ width: 'auto', height: '40px' }}
+            style={{ width: "auto", height: "40px" }}
             priority
           />
           <button
@@ -107,7 +109,8 @@ export function MobileMenu({
           ) : isProtectedPath ? (
             // Protected path menu items
             <div className="space-y-6">
-              {session?.user?.role === "organization" && (
+              {(session?.user?.role === "mentor" ||
+                session?.user?.role === "admin") && (
                 <div className="space-y-1">
                   <NavLink
                     href="/organisation/dashboard"
@@ -121,12 +124,30 @@ export function MobileMenu({
                     icon={Layers2}
                     onClick={handleCloseMenu}
                   />
+                  <NavLink
+                    href="/search?type=volunteer"
+                    label="Browse Volunteers"
+                    icon={Users}
+                    onClick={handleCloseMenu}
+                  />
+                </div>
+              )}
+              {session?.user?.role === "volunteer" && (
+                <div className="space-y-1">
+                  <NavLink
+                    href="/search?type=opportunity"
+                    label="Find Opportunities"
+                    icon={GiBinoculars}
+                    onClick={handleCloseMenu}
+                  />
+                   
                 </div>
               )}
               <div className="space-y-1">
                 <NavLink
-                    href={`/${
-                      session?.user?.role === "mentor" || session?.user?.role === "admin"
+                  href={`/${
+                    session?.user?.role === "mentor" ||
+                    session?.user?.role === "admin"
                       ? "organisation"
                       : session?.user?.role
                   }/messages`}

@@ -24,6 +24,7 @@ export default function TestSSEPage() {
   } | null>(null);
 
   const debugQuery = trpc.opportunities.debugOpportunities.useQuery();
+  const testQuery = trpc.opportunities.testOpportunities.useQuery();
 
   useEffect(() => {
     if (!session?.user?.id) return;
@@ -142,10 +143,24 @@ export default function TestSSEPage() {
         Debug Opportunities
       </button>
 
+      <button 
+        onClick={() => testQuery.refetch()}
+        className="bg-green-500 text-white px-4 py-2 rounded mb-4 ml-4"
+      >
+        Test Opportunities
+      </button>
+
       {debugData && (
         <div className="bg-gray-100 p-4 rounded">
           <h2 className="text-lg font-semibold mb-2">Debug Results:</h2>
           <pre className="text-sm">{JSON.stringify(debugData, null, 2)}</pre>
+        </div>
+      )}
+
+      {testQuery.data && (
+        <div className="bg-green-100 p-4 rounded mt-4">
+          <h2 className="text-lg font-semibold mb-2">Test Results:</h2>
+          <pre className="text-sm">{JSON.stringify(testQuery.data, null, 2)}</pre>
         </div>
       )}
 

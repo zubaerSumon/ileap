@@ -9,6 +9,7 @@ import User from "@/server/db/models/user";
 import VolunteerApplication from "@/server/db/models/volunteer-application";
 import OrganisationRecruitment from "@/server/db/models/organisation-recruitment";
 import { publicProcedure } from "@/server/trpc";
+import mongoose from "mongoose";
 
 export const opportunityRouter = router({
   createOpportunity: protectedProcedure
@@ -168,70 +169,31 @@ export const opportunityRouter = router({
         const { page, limit, search, categories, commitmentType, location, availability } = input;
         const skip = (page - 1) * limit;
 
-        // Build base query
+        // Simplified base query for debugging
         const baseQuery: Record<string, unknown> = {
           is_archived: { $ne: true }, // Exclude archived opportunities
+          // Temporarily remove deleted_at filter to see if that's the issue
+          // deleted_at: { $exists: false }, // Explicitly exclude deleted opportunities
         };
 
-        // Build search conditions
-        const searchConditions = [];
+        // Temporarily disable complex filtering for debugging
+        console.log("=== DEBUGGING OPPORTUNITIES ===");
+        console.log("Input parameters:", { page, limit, search, categories, commitmentType, location, availability });
+        
+        // Only apply simple filters for now
         if (search) {
           const searchRegex = new RegExp(search, 'i');
-          searchConditions.push(
+          baseQuery.$or = [
             { title: searchRegex },
             { description: searchRegex },
             { location: searchRegex }
-          );
+          ];
         }
 
-        // Build availability conditions
-        const availabilityConditions = [];
-        if (availability?.startDate && availability?.endDate) {
-          // For recurring opportunities with date range
-          availabilityConditions.push({
-            'recurrence.date_range.start_date': { 
-              $exists: true, 
-              $ne: null,
-              $lte: availability.endDate 
-            },
-            'recurrence.date_range.end_date': { 
-              $exists: true, 
-              $ne: null,
-              $gte: availability.startDate 
-            }
-          });
-          
-          // For single date opportunities
-          availabilityConditions.push({
-            start_date: { 
-              $exists: true, 
-              $ne: null,
-              $gte: availability.startDate,
-              $lte: availability.endDate
-            }
-          });
-        }
-
-        // Combine search and availability conditions
-        const combinedConditions = [];
-        if (searchConditions.length > 0) {
-          combinedConditions.push({ $or: searchConditions });
-        }
-        if (availabilityConditions.length > 0) {
-          combinedConditions.push({ $or: availabilityConditions });
-        }
-
-        // Apply combined conditions if any exist
-        if (combinedConditions.length > 0) {
-          baseQuery.$and = combinedConditions;
-        }
-
-        // Add category filter
         if (categories && categories.length > 0) {
           baseQuery.category = { $in: categories };
         }
 
-        // Add commitment type filter
         if (commitmentType !== "all") {
           if (commitmentType === "eventbased") {
             baseQuery.commitment_type = { $in: ["eventbased", "oneoff"] };
@@ -242,13 +204,12 @@ export const opportunityRouter = router({
           }
         }
 
-        // Add location filter
         if (location) {
           const locationRegex = new RegExp(location, 'i');
           baseQuery.location = locationRegex;
         }
 
-        console.log("Opportunity Query:", JSON.stringify(baseQuery, null, 2));
+        console.log("Final base query:", JSON.stringify(baseQuery, null, 2));
 
         // Get total count for pagination
         const total = await Opportunity.countDocuments(baseQuery);
@@ -271,6 +232,10 @@ export const opportunityRouter = router({
         const nonArchivedCount = await Opportunity.countDocuments({ is_archived: { $ne: true } });
         console.log("Non-archived opportunities:", nonArchivedCount);
 
+        // Debug: Check deleted opportunities
+        const deletedCount = await Opportunity.countDocuments({ deleted_at: { $ne: null } });
+        console.log("Deleted opportunities:", deletedCount);
+
         // Execute query with pagination
         const opportunities = await Opportunity.find(baseQuery)
           .populate("organization_profile")
@@ -281,6 +246,37 @@ export const opportunityRouter = router({
           .lean();
 
         console.log(`Found ${opportunities.length} opportunities out of ${total} total`);
+        console.log("Opportunity IDs found:", opportunities.map(opp => opp._id));
+        
+        // Debug: Check if opportunities have organization_profile
+        const opportunitiesWithOrg = opportunities.filter(opp => opp.organization_profile);
+        console.log(`Opportunities with organization_profile: ${opportunitiesWithOrg.length}`);
+        
+        // Debug: Check opportunity details
+        opportunities.forEach((opp, index) => {
+          console.log(`Opportunity ${index + 1}:`, {
+            id: opp._id,
+            title: opp.title,
+            hasOrgProfile: !!opp.organization_profile,
+            orgProfileId: opp.organization_profile?._id,
+            isArchived: opp.is_archived,
+            deletedAt: opp.deleted_at
+          });
+        });
+        
+        // Debug: Check organization_profile references
+        if (opportunities.length > 0) {
+          console.log("Checking organization_profile references...");
+          const orgProfileIds = opportunities.map(opp => opp.organization_profile?._id).filter(id => id);
+          console.log("Organization profile IDs:", orgProfileIds);
+          
+          // Check if these organization profiles exist
+          const OrganizationProfile = mongoose.model('organization_profile');
+          const existingOrgs = await OrganizationProfile.find({ _id: { $in: orgProfileIds } }).lean();
+          console.log(`Found ${existingOrgs.length} existing organization profiles out of ${orgProfileIds.length} references`);
+        }
+        
+        console.log("=== END DEBUGGING ===");
 
         return {
           opportunities,
@@ -467,38 +463,91 @@ export const opportunityRouter = router({
     try {
       console.log("Debug endpoint called");
       
-      const totalInDB = await Opportunity.countDocuments({});
-      console.log("Total in DB:", totalInDB);
+      // Use the native collection to bypass middleware
+      const collection = Opportunity.collection;
       
-      const archivedCount = await Opportunity.countDocuments({ is_archived: true });
-      console.log("Archived count:", archivedCount);
+      const totalInDB = await collection.countDocuments({});
+      console.log("Total in DB (native):", totalInDB);
       
-      const nonArchivedCount = await Opportunity.countDocuments({ is_archived: { $ne: true } });
-      console.log("Non-archived count:", nonArchivedCount);
+      const archivedCount = await collection.countDocuments({ is_archived: true });
+      console.log("Archived count (native):", archivedCount);
       
-      const nonDeletedCount = await Opportunity.countDocuments({ deleted_at: { $exists: false } });
-      console.log("Non-deleted count:", nonDeletedCount);
+      const nonArchivedCount = await collection.countDocuments({ is_archived: { $ne: true } });
+      console.log("Non-archived count (native):", nonArchivedCount);
       
-      // Get a sample opportunity
-      const sampleOpportunity = await Opportunity.findOne({ 
+      const nonDeletedCount = await collection.countDocuments({ deleted_at: { $exists: false } });
+      console.log("Non-deleted count (native):", nonDeletedCount);
+      
+      const deletedCount = await collection.countDocuments({ deleted_at: { $ne: null } });
+      console.log("Deleted count (native):", deletedCount);
+      
+      // Get a sample opportunity using native collection
+      const sampleOpportunity = await collection.findOne({ 
         is_archived: { $ne: true },
         deleted_at: { $exists: false }
-      }).lean();
+      });
       
-      console.log("Sample opportunity:", sampleOpportunity);
+      console.log("Sample opportunity (native):", sampleOpportunity);
+      
+      // Get all opportunities without middleware
+      const allOpportunities = await collection.find({}).toArray();
+      console.log("All opportunities (native):", allOpportunities.length);
       
       return {
         totalInDB,
         archivedCount,
         nonArchivedCount,
         nonDeletedCount,
-        sampleOpportunity
+        deletedCount,
+        sampleOpportunity,
+        allOpportunitiesCount: allOpportunities.length
       };
     } catch (error) {
       console.error("Error in debug endpoint:", error);
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to debug opportunities",
+        cause: error,
+      });
+    }
+  }),
+
+  // Simple test endpoint to get raw opportunities
+  testOpportunities: publicProcedure.query(async () => {
+    try {
+      console.log("Test opportunities endpoint called");
+      
+      // Use the native collection to bypass middleware
+      const collection = Opportunity.collection;
+      
+      // Get all opportunities without any filtering
+      const allOpportunities = await collection.find({}).toArray();
+      console.log("Raw opportunities found:", allOpportunities.length);
+      
+      // Get opportunities without middleware filtering
+      const nonArchivedOpportunities = await collection.find({ 
+        is_archived: { $ne: true } 
+      }).toArray();
+      console.log("Non-archived opportunities:", nonArchivedOpportunities.length);
+      
+      // Get opportunities with explicit deleted_at filter
+      const activeOpportunities = await collection.find({ 
+        is_archived: { $ne: true },
+        deleted_at: { $exists: false }
+      }).toArray();
+      console.log("Active opportunities:", activeOpportunities.length);
+      
+      return {
+        total: allOpportunities.length,
+        nonArchived: nonArchivedOpportunities.length,
+        active: activeOpportunities.length,
+        opportunities: activeOpportunities.slice(0, 5) // Return first 5 for inspection
+      };
+    } catch (error) {
+      console.error("Error in test endpoint:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to test opportunities",
         cause: error,
       });
     }
