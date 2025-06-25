@@ -63,9 +63,9 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   console.log('🔍 MessageUI - Available Users Debug:', {
     totalUsers: availableUsersData?.total || 0,
     returnedUsers: availableUsers.length,
-    currentPage: availableUsersData?.currentPage || 1,
+    currentPage: (availableUsersData as { currentPage?: number })?.currentPage || 1,
     totalPages: availableUsersData?.totalPages || 0,
-    hasNextPage: availableUsersData?.hasNextPage || false,
+    hasNextPage: (availableUsersData as { hasNextPage?: boolean })?.hasNextPage || false,
     userRole: session?.user?.role,
     isEnabled: !!session && session.user?.role !== "volunteer"
   });
