@@ -9,7 +9,6 @@ import {
   Users,
 } from "lucide-react";
 import { useRouter, useParams } from "next/navigation";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { PostContent } from "@/components/layout/organisation/opportunities/PostContent";
@@ -20,7 +19,6 @@ import {
 } from "@/components/layout/organisation/opportunities/ApplicantsCard";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
-import VolunteerModal from "@/components/layout/organisation/opportunities/VolunteerModal";
 import { useState } from "react";
 import MessageApplicantModal from "@/components/layout/organisation/opportunities/MessageApplicantModal";
 import toast from "react-hot-toast";
@@ -33,16 +31,13 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import BackButton from "@/components/buttons/BackButton";
+import { DynamicTabs, TabItem } from "@/components/layout/shared/DynamicTabs";
 
 export default function OpportunityDetailsPage() {
   const utils = trpc.useUtils();
   const router = useRouter();
   const params = useParams();
   const opportunityId = params.id as string;
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedApplicantId, setSelectedApplicantId] = useState<string | null>(
-    null
-  );
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
     null
@@ -155,12 +150,138 @@ export default function OpportunityDetailsPage() {
     applicant.skills.some(skill => skill.toLowerCase().includes(recruitsSearchQuery.toLowerCase()))
   );
 
+  // Define tab content
+  const postContent = (
+    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+      <div className="flex-1">
+        <PostContent opportunity={opportunity} />
+      </div>
+      <div className="hidden lg:block w-[1px] bg-[#F1F1F1]"></div>
+      <div className="lg:w-[350px] flex-shrink-0">
+        <OpportunitySidebar opportunity={opportunity} userRole="organization" />
+      </div>
+    </div>
+  );
+
+  const applicantsContent = (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <div className="w-full border-b border-[#F1F1F1]" />
+        <div className="flex flex-col sm:flex-row justify-between gap-3">
+          <div className="relative flex-1 max-w-[333px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
+            <Input
+              placeholder="Search volunteers"
+              className="pl-10 bg-gray-50 border-0"
+              value={applicantsSearchQuery}
+              onChange={(e) => setApplicantsSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button
+            variant="outline"
+            className="h-10 px-4 flex items-center gap-2 w-full sm:w-auto"
+          >
+            <SlidersHorizontal />
+            Filter
+          </Button>
+        </div>
+      </div>
+      {filteredApplicants?.map((applicant) => (
+        <ApplicantsCard
+          key={applicant.id}
+          applicant={applicant}
+          onMessageClick={() => handleOpenMessageModal(applicant)}
+        />
+      ))}
+      {filteredApplicants?.length === 0 && (
+        <div className="text-center text-gray-500 py-8">
+          {applicantsSearchQuery ? "No matching applicants found" : "No applicants yet"}
+        </div>
+      )}
+    </div>
+  );
+
+  const recruitsContent = (
+    <div className="space-y-6">
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row justify-between gap-3">
+          <div className="relative flex-1 max-w-[333px]">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
+            <Input
+              placeholder="Search volunteers"
+              className="pl-10 bg-gray-50 border-0"
+              value={recruitsSearchQuery}
+              onChange={(e) => setRecruitsSearchQuery(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
+            <Button
+              variant="outline"
+              className="h-10 px-4 flex items-center gap-2 w-full sm:w-auto"
+              onClick={handleCreateGroup}
+              disabled={!recruitedApplicants?.length}
+            >
+              <Users className="w-4 h-4" />
+              Create Group
+            </Button>
+            <Button
+              variant="outline"
+              className="h-10 px-4 flex items-center gap-2 w-full sm:w-auto"
+            >
+              <SlidersHorizontal />
+              Filter
+            </Button>
+          </div>
+        </div>
+        <div className="w-full border-b border-[#F1F1F1]" />
+      </div>
+      {filteredRecruitedApplicants?.map((applicant) => (
+        <ApplicantsCard
+          key={applicant.id}
+          applicant={applicant}
+          onMessageClick={() => handleOpenMessageModal(applicant)}
+          hideRecruitButton
+        />
+      ))}
+      {filteredRecruitedApplicants?.length === 0 && (
+        <div className="text-center text-gray-500 py-8">
+          {recruitsSearchQuery ? "No matching volunteers found" : "No recruited volunteers yet"}
+        </div>
+      )}
+    </div>
+  );
+
+  const tabs: TabItem[] = [
+    {
+      value: "post",
+      label: "Post Details",
+      icon: <FileSpreadsheet />,
+      content: postContent,
+    },
+    {
+      value: "review",
+      label: "Applicants",
+      icon: <MessageCircleCode />,
+      count: applicants?.length || 0,
+      content: applicantsContent,
+    },
+    {
+      value: "recruits",
+      label: "Recruits",
+      icon: <Hand />,
+      count: recruitedApplicants?.length || 0,
+      content: recruitsContent,
+    },
+  ];
+
   if (isLoading || isLoadingApplicants || isLoadingRecruitedApplicants) {
     return (
       <ProtectedLayout>
-        <div className="bg-[#F5F7FA] py-12">
-          <div className="w-[1240px] mx-auto bg-white rounded-xl min-h-screen p-8">
-            Loading...
+        <div className="bg-[#F5F7FA] py-6 sm:py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-xl min-h-screen p-4 sm:p-8">
+              Loading...
+            </div>
           </div>
         </div>
       </ProtectedLayout>
@@ -170,9 +291,11 @@ export default function OpportunityDetailsPage() {
   if (error || !opportunity) {
     return (
       <ProtectedLayout>
-        <div className="bg-[#F5F7FA] py-12">
-          <div className="w-[1240px] mx-auto bg-white rounded-xl min-h-screen p-8">
-            Error loading opportunity
+        <div className="bg-[#F5F7FA] py-6 sm:py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="bg-white rounded-xl min-h-screen p-4 sm:p-8">
+              Error loading opportunity
+            </div>
           </div>
         </div>
       </ProtectedLayout>
@@ -181,168 +304,38 @@ export default function OpportunityDetailsPage() {
 
   return (
     <ProtectedLayout>
-      <div className="bg-[#F5F7FA] border py-12">
-        <div className="w-[1240px] mx-auto bg-white rounded-xl min-h-screen ">
-          <div className="p-8">
-            <div className="mb-8">
-              <BackButton />
-              <div className="w-full h-[200px] relative mb-6">
-                <Image
-                  src={opportunity.banner_img || "/default-banner.svg"}
-                  alt={`${opportunity.title} Banner`}
-                  fill
-                  className="object-cover rounded-lg"
-                />
+      <div className="bg-[#F5F7FA] border py-6 sm:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-white rounded-xl min-h-screen">
+            <div className="p-4 sm:p-8">
+              <div className="mb-6 sm:mb-8">
+                <BackButton />
+                <div className="w-full h-[150px] sm:h-[200px] relative mb-4 sm:mb-6">
+                  <Image
+                    src={opportunity.banner_img || "/default-banner.svg"}
+                    alt={`${opportunity.title} Banner`}
+                    fill
+                    className="object-cover rounded-lg"
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <h1 className="text-lg sm:text-[20px] font-semibold">
+                    {opportunity.title}
+                  </h1>
+                </div>
               </div>
-              <div className="flex items-center justify-between">
-                <h1 className="text-[20px] font-semibold">
-                  {opportunity.title}
-                </h1>
-              </div>
+              <DynamicTabs defaultValue="post" tabs={tabs} className="mb-6 sm:mb-8" />
             </div>
-            <Tabs defaultValue="post" className="mb-8">
-              <TabsList className="grid w-full grid-cols-3  p-0 bg-gray-100  rounded-full h-10">
-                <TabsTrigger
-                  value="post"
-                  className="rounded-full transition-colors data-[state=active]:bg-[#246BFD] data-[state=active]:text-white hover:bg-gray-200 data-[state=active]:hover:bg-[#246BFD] flex items-center gap-2"
-                >
-                  <FileSpreadsheet />
-                  Post Details
-                </TabsTrigger>
-                <TabsTrigger
-                  value="review"
-                  className="rounded-full transition-colors data-[state=active]:bg-[#246BFD] data-[state=active]:text-white hover:bg-gray-200 data-[state=active]:hover:bg-[#246BFD] flex items-center gap-2"
-                >
-                  <MessageCircleCode />
-                  Applicants ({applicants?.length || 0})
-                </TabsTrigger>
-                <TabsTrigger
-                  value="recruits"
-                  className="rounded-full transition-colors data-[state=active]:bg-[#246BFD] data-[state=active]:text-white hover:bg-gray-200 data-[state=active]:hover:bg-[#246BFD] flex items-center gap-2"
-                >
-                  <Hand />
-                  Recruits ({recruitedApplicants?.length || 0})
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="post" className="mt-6">
-                <div className="flex gap-8">
-                  <PostContent opportunity={opportunity} />
-                  <div className="w-[1px] bg-[#F1F1F1]"></div>
-                  <OpportunitySidebar opportunity={opportunity} userRole="organization" />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="recruits" className="mt-6">
-                <div className="space-y-6">
-                  <div className="space-y-6">
-                    <div className="flex justify-between gap-3">
-                      <div className="relative max-w-[333px]">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-                        <Input
-                          placeholder="Search volunteers"
-                          className="pl-10 bg-gray-50 border-0"
-                          value={recruitsSearchQuery}
-                          onChange={(e) => setRecruitsSearchQuery(e.target.value)}
-                        />
-                      </div>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="outline"
-                          className="h-10 px-4 flex items-center gap-2"
-                          onClick={handleCreateGroup}
-                          disabled={!recruitedApplicants?.length}
-                        >
-                          <Users className="w-4 h-4" />
-                          Create Group
-                        </Button>
-                        <Button
-                          variant="outline"
-                          className="h-10 px-4 flex items-center gap-2"
-                        >
-                          <SlidersHorizontal />
-                          Filter
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="w-full border-b border-[#F1F1F1]" />
-                  </div>
-                  {filteredRecruitedApplicants?.map((applicant) => (
-                    <ApplicantsCard
-                      key={applicant.id}
-                      setIsModalOpen={setIsModalOpen}
-                      hideRecruitButton={true}
-                      applicant={applicant}
-                      setSelectedApplicantId={setSelectedApplicantId}
-                      onMessageClick={() => handleOpenMessageModal(applicant)}
-                    />
-                  ))}
-                  {filteredRecruitedApplicants?.length === 0 && (
-                    <div className="text-center text-gray-500 py-8">
-                      {recruitsSearchQuery ? "No matching volunteers found" : "No recruited volunteers yet"}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="review" className="mt-6">
-                <div className="space-y-6">
-                  <div className="space-y-2">
-                    
-                    <div className="w-full border-b border-[#F1F1F1]" />
-                    <div className="flex justify-between gap-3 ">
-                      <div className="relative max-w-[333px]">
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 w-4 h-4" />
-                        <Input
-                          placeholder="Search volunteers"
-                          className="pl-10 bg-gray-50 border-0"
-                          value={applicantsSearchQuery}
-                          onChange={(e) => setApplicantsSearchQuery(e.target.value)}
-                        />
-                      </div>
-                      <Button
-                        variant="outline"
-                        className="h-10 px-4 flex items-center gap-2"
-                      >
-                        <SlidersHorizontal />
-                        Filter
-                      </Button>
-                    </div>
-                  </div>
-                  {filteredApplicants?.map((applicant) => (
-                    <ApplicantsCard
-                      key={applicant.id}
-                      setIsModalOpen={setIsModalOpen}
-                      applicant={applicant}
-                      setSelectedApplicantId={setSelectedApplicantId}
-                      onMessageClick={() => handleOpenMessageModal(applicant)}
-                    />
-                  ))}
-                  {filteredApplicants?.length === 0 && (
-                    <div className="text-center text-gray-500 py-8">
-                      {applicantsSearchQuery ? "No matching applicants found" : "No applicants yet"}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-            </Tabs>
           </div>
         </div>
       </div>
-      <VolunteerModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        volunteer={
-          applicants?.find((a) => a.id === selectedApplicantId) || null
-        }
-      />
       <MessageApplicantModal
         isOpen={isMessageModalOpen}
         onClose={handleCloseMessageModal}
         applicant={selectedApplicant}
       />
       <Dialog open={isGroupMessageModalOpen} onOpenChange={setIsGroupMessageModalOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Send Welcome Message</DialogTitle>
           </DialogHeader>
@@ -353,19 +346,21 @@ export default function OpportunityDetailsPage() {
               onChange={(e) => setGroupMessage(e.target.value)}
               className="min-h-[100px]"
             />
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2">
               <Button
                 variant="outline"
                 onClick={() => {
                   setIsGroupMessageModalOpen(false);
                   router.push("/messages");
                 }}
+                className="w-full sm:w-auto"
               >
                 Skip
               </Button>
               <Button
                 onClick={handleSendGroupMessage}
                 disabled={!groupMessage.trim() || sendGroupMessageMutation.isPending}
+                className="w-full sm:w-auto"
               >
                 {sendGroupMessageMutation.isPending ? "Sending..." : "Send & Go to Messages"}
               </Button>
@@ -375,7 +370,7 @@ export default function OpportunityDetailsPage() {
       </Dialog>
 
       <Dialog open={isCreateGroupModalOpen} onOpenChange={setIsCreateGroupModalOpen}>
-        <DialogContent>
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Create Group</DialogTitle>
           </DialogHeader>
@@ -383,16 +378,18 @@ export default function OpportunityDetailsPage() {
             <p className="text-sm text-gray-600">
               Create a group with all the recruited volunteers for this opportunity?
             </p>
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col sm:flex-row justify-end gap-2">
               <Button
                 variant="outline"
                 onClick={() => setIsCreateGroupModalOpen(false)}
+                className="w-full sm:w-auto"
               >
                 Cancel
               </Button>
               <Button
                 onClick={handleConfirmCreateGroup}
                 disabled={createGroupMutation.isPending}
+                className="w-full sm:w-auto"
               >
                 {createGroupMutation.isPending ? "Creating..." : "Create Group"}
               </Button>
