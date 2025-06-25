@@ -47,8 +47,8 @@ export default function OpportunityDetailPage() {
 
   return (
     <ProtectedLayout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex gap-8 justify-center ">
+      <div className="w-full px-2 md:px-4 py-4 md:py-8">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 justify-center w-full">
           <PostContent opportunity={opportunity} />
           <OpportunitySidebar opportunity={opportunity} userRole="volunteer" />
         </div>
