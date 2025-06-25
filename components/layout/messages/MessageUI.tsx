@@ -10,7 +10,6 @@ import ChatArea from './components/ChatArea';
 import MessageInput from './components/MessageInput';
 import { useConversations } from "@/hooks/useConversations";
 import { useMessages } from "@/hooks/useMessages";
-import { useMessageSubscription } from "@/hooks/useMessageSubscription";
 import { Group } from "@/types/message";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,9 +39,6 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   const selectedGroup = (groups as Group[] | undefined)?.find((g) => g._id === selectedUserId);
   const isGroup = selectedGroup !== undefined;
 
-   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { isConnected: isSubscriptionConnected } = useMessageSubscription(selectedUserId, isGroup);
-
   const { 
     newMessage, 
     setNewMessage, 
@@ -57,12 +53,22 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
 
   const { data: availableUsersData, isLoading: isLoadingUsers } = trpc.users.getAvailableUsers.useQuery({
     page: 1,
-    limit: 50,  
+    limit: 200,  
   }, {
     enabled: !!session && session.user?.role !== "volunteer"
   });
 
   const availableUsers = availableUsersData?.users || [];
+
+  console.log('🔍 MessageUI - Available Users Debug:', {
+    totalUsers: availableUsersData?.total || 0,
+    returnedUsers: availableUsers.length,
+    currentPage: (availableUsersData as { currentPage?: number })?.currentPage || 1,
+    totalPages: availableUsersData?.totalPages || 0,
+    hasNextPage: (availableUsersData as { hasNextPage?: boolean })?.hasNextPage || false,
+    userRole: session?.user?.role,
+    isEnabled: !!session && session.user?.role !== "volunteer"
+  });
 
   const handleSelectUser = (userId: string) => {
     setSelectedUserId(userId);

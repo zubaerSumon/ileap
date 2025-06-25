@@ -77,7 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
 
       {/* Tabs and Content */}
       <div className="flex-1 min-h-0 flex flex-col">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col overflow-hidden">
           <div className="flex-shrink-0 px-4 pt-3 pb-2">
             <TabsList className={`grid w-full ${userRole === "volunteer" ? "grid-cols-1" : "grid-cols-2"} h-9`}>
               <TabsTrigger value="conversations" className="text-sm">Conversations</TabsTrigger>
@@ -87,28 +87,30 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
             </TabsList>
           </div>
 
-          <TabsContent value="conversations" className="mt-0 flex-1 min-h-0">
-            <ConversationList 
-              conversations={filteredConversations}
-              groups={filteredGroups}
-              selectedUserId={selectedUserId}
-              onSelectUser={onSelectUser}
-              isLoading={isLoadingConversations}
-              isLoadingGroups={isLoadingGroups}
-              onCreateGroup={onGroupCreated}
-              userRole={userRole}
-            />
-          </TabsContent>
-
-          {userRole !== "volunteer" && (
-            <TabsContent value="applicants" className="mt-0 flex-1 min-h-0">
-              <UserList 
-                users={filteredUsers}
+          <div className="flex-1 min-h-0 overflow-hidden">
+            <TabsContent value="conversations" className="mt-0 h-full overflow-hidden">
+              <ConversationList 
+                conversations={filteredConversations}
+                groups={filteredGroups}
+                selectedUserId={selectedUserId}
                 onSelectUser={onSelectUser}
-                isLoading={isLoadingUsers}
+                isLoading={isLoadingConversations}
+                isLoadingGroups={isLoadingGroups}
+                onCreateGroup={onGroupCreated}
+                userRole={userRole}
               />
             </TabsContent>
-          )}
+
+            {userRole !== "volunteer" && (
+              <TabsContent value="applicants" className="mt-0 h-full overflow-hidden">
+                <UserList 
+                  users={filteredUsers}
+                  onSelectUser={onSelectUser}
+                  isLoading={isLoadingUsers}
+                />
+              </TabsContent>
+            )}
+          </div>
         </Tabs>
       </div>
     </aside>

@@ -101,7 +101,7 @@ const applyToEventSchema = z.object({
 
 const getAvailableUsersSchema = z.object({
   page: z.number().min(1).default(1),
-  limit: z.number().min(1).max(50).default(6),
+  limit: z.number().min(1).max(200).default(6),
   search: z.string().optional(),
   categories: z.array(z.string()).optional(),
   studentType: z.enum(["all", "yes", "no"]).default("all"),
