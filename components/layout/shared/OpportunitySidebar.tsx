@@ -31,7 +31,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
   const orgImage = orgProfile?.profile_img || '/avatar.svg';
 
   return (
-    <div className="w-full lg:w-[350px] space-y-4">
+    
     <div className="w-full lg:w-[350px] space-y-4">
       {/* Organization Information Card */}
       <Card className="p-3 md:p-4">
