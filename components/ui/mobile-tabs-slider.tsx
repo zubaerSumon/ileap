@@ -31,7 +31,7 @@ export default function MobileTabsSlider({
   return (
     <div className={cn("block md:hidden", className)}>
       <div
-        className="flex gap-3 overflow-x-auto scrollbar-hide py-2"
+        className="flex gap-3 overflow-x-auto scrollbar-hide py-3"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
       >
         {tabs.map((tab) => (
@@ -59,7 +59,7 @@ export default function MobileTabsSlider({
         <div className=" ">
           <Separator
             className={cn(
-              " bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 border-2 border-gray-200",
+              " bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200  border-gray-200",
               separatorClassName
             )}
           />

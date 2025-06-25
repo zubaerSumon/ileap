@@ -92,14 +92,14 @@ export function TopBar({
                   : "/organisation"
                 : "/"
             }
-            className="flex items-center"
+            className="flex items-center cursor-pointer"
           >
             <Image
               src={Logo}
               alt="iLEAP Logo"
               width={80}
               height={32}
-              className="h-8 w-auto"
+              className="h-8 w-auto cursor-pointer"
               style={{ width: "auto", height: "32px" }}
               priority
             />

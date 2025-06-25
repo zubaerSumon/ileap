@@ -158,7 +158,7 @@ export default function OrganizerDetailPage() {
               {organizationProfile.bio && (
                 <div className="mt-8 text-center md:text-left">
                   <h2 className="text-lg font-semibold mb-2">About us</h2>
-                  <p className="text-gray-700">{organizationProfile.bio}</p>
+                  <p className="text-gray-700 text-justify">{organizationProfile.bio}</p>
                 </div>
               )}
 
