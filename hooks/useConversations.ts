@@ -12,7 +12,7 @@ export const useConversations = () => {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 30000, // Poll every 30 seconds for new conversations
+      refetchInterval: 15000, // Poll every 15 seconds for new conversations
     });
 
   const { data: groups, isLoading: isLoadingGroups } =
@@ -21,23 +21,22 @@ export const useConversations = () => {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 30000, // Poll every 30 seconds for new groups
+      refetchInterval: 15000, // Poll every 15 seconds for new groups
     });
-
-  console.log('🔍 useConversations hook state:', {
-    sessionUserId: session?.user?.id,
-    conversationsCount: conversations?.length || 0,
-    groupsCount: groups?.length || 0,
-    isLoadingConversations,
-    isLoadingGroups,
-    conversationsData: conversations?.slice(0, 2).map(c => ({ id: c._id, lastMessage: c.lastMessage?.content?.substring(0, 20) })),
-    groupsData: groups?.slice(0, 2).map(g => ({ id: g._id, lastMessage: g.lastMessage?.content?.substring(0, 20) }))
-  });
 
   const markAsReadMutation = trpc.messages.markAsRead.useMutation({
     onSuccess: () => {
+      // Invalidate and refetch all message-related queries to update unread counts
       utils.messages.getConversations.invalidate();
       utils.messages.getGroups.invalidate();
+      
+      // Also invalidate any infinite queries that might be cached
+      utils.messages.getMessages.invalidate();
+      utils.messages.getGroupMessages.invalidate();
+      
+      // Force refetch to ensure immediate update
+      utils.messages.getConversations.refetch();
+      utils.messages.getGroups.refetch();
     },
   });
 
