@@ -50,11 +50,6 @@ export default function CreateOpportunityPage() {
   const utils = trpc.useUtils();
   const [isImageUploading, setIsImageUploading] = useState(false);
 
-  const handleImageUploadStateChange = (isUploading: boolean) => {
-    console.log('Image upload state changed:', isUploading);
-    setIsImageUploading(isUploading);
-  };
-
   const createOpportunity = trpc.opportunities.createOpportunity.useMutation({
     onSuccess: () => {
       toast.success("Opportunity created successfully!");
@@ -120,13 +115,11 @@ export default function CreateOpportunityPage() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[1240px] mx-auto px-2 sm:px-4 py-4 sm:py-8">
             <BasicInformation 
               form={form} 
-              onImageUploadStateChange={handleImageUploadStateChange}
+              onImageUploadStateChange={setIsImageUploading}
             />
             <CreateFooter
               onCreate={form.handleSubmit(onSubmit)}
-              isLoading={createOpportunity.isPending}
-              form={form}
-              isImageUploading={isImageUploading}
+              isLoading={createOpportunity.isPending || isImageUploading}
             />
           </form>
         </Form>

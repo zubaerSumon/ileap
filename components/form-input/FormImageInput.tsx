@@ -51,6 +51,10 @@ export function FormImageInput<T extends Record<string, unknown>>({
     }
   }, [defaultValue, field]);
 
+  useEffect(() => {
+    onUploadStateChange?.(isUploading);
+  }, [isUploading, onUploadStateChange]);
+
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

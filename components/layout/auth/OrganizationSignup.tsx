@@ -29,6 +29,7 @@ export default function OrganizationSignup() {
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
   const updateUser = trpc.users.updateUser.useMutation();
   const setupOrgProfile = trpc.users.setupOrgProfile.useMutation({
@@ -98,7 +99,7 @@ export default function OrganizationSignup() {
       isValid: form.formState.isValid,
       isDirty: form.formState.isDirty,
     });
-  }, [form.formState]);
+  }, [form, form.formState]);
 
   const handleNext = async () => {
     let fieldsToValidate: Array<keyof OrgSignupFormData> = [];
@@ -261,7 +262,7 @@ export default function OrganizationSignup() {
             />
           )}
           {step === 2 && <OrgProfileStep form={form} />}
-          {step === 3 && <OrgDetailsStep form={form} />}
+          {step === 3 && <OrgDetailsStep form={form} onImageUploadStateChange={setIsImageUploading} />}
 
           <div className="container mx-auto px-4">
             <div className="flex justify-between">
@@ -271,7 +272,7 @@ export default function OrganizationSignup() {
                     type="button"
                     variant="outline"
                     onClick={handleBack}
-                    disabled={isSignupLoading || isProfileLoading}
+                    disabled={isSignupLoading || isProfileLoading || isImageUploading}
                     className="cursor-pointer"
                   >
                     Back
@@ -281,7 +282,7 @@ export default function OrganizationSignup() {
               <Button
                 type="button"
                 onClick={handleNext}
-                disabled={isSignupLoading || isProfileLoading}
+                disabled={isSignupLoading || isProfileLoading || isImageUploading}
                 className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
                 {isSignupLoading || isProfileLoading ? (
