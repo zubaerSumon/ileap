@@ -31,11 +31,11 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
   const orgImage = orgProfile?.profile_img || '/avatar.svg';
 
   return (
-    <div className="w-[350px] space-y-4">
+    <div className="w-full lg:w-[350px] space-y-4">
       {/* Organization Information Card */}
       <Card className="p-4">
         <div className="flex items-center gap-3 mb-4">
-          <div className="relative w-12 h-12">
+          <div className="relative w-12 h-12 flex-shrink-0">
             <Image
               src={orgImage}
               alt={orgName}
@@ -43,8 +43,8 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
               className="object-cover rounded-full"
             />
           </div>
-          <div>
-            <h3 className="font-semibold">{orgName}</h3>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold truncate">{orgName}</h3>
             <p className="text-sm text-gray-500">
               {opportunity.commitment_type === 'workbased' ? 'Work based' : 'Event based'} Opportunity
             </p>
@@ -55,15 +55,15 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
         <div className="space-y-3">
           <div>
             <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
-              <MapPin className="w-4 h-4" />
+              <MapPin className="w-4 h-4 flex-shrink-0" />
               Location
             </h4>
-            <p className="text-sm text-gray-600">{opportunity.location}</p>
+            <p className="text-sm text-gray-600 break-words">{opportunity.location}</p>
           </div>
 
           <div>
             <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
-              <Users className="w-4 h-4" />
+              <Users className="w-4 h-4 flex-shrink-0" />
               Available Spots
             </h4>
             <p className="text-sm text-gray-600">{opportunity.number_of_volunteers} spots</p>
@@ -72,7 +72,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
           {opportunity.date?.start_date && (
             <div>
               <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
+                <Calendar className="w-4 h-4 flex-shrink-0" />
                 Start Date
               </h4>
               <p className="text-sm text-gray-600">
@@ -88,7 +88,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
           {opportunity.time?.start_time && (
             <div>
               <h4 className="text-sm font-medium mb-1 flex items-center gap-2">
-                <Clock className="w-4 h-4" />
+                <Clock className="w-4 h-4 flex-shrink-0" />
                 Start Time
               </h4>
               <p className="text-sm text-gray-600">{formatTimeToAMPM(opportunity.time.start_time)}</p>
@@ -114,27 +114,27 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
           <h3 className="font-semibold mb-3">Organization Information</h3>
           <div className="space-y-3">
             {orgProfile.contact_email && (
-              <div className="flex items-center text-sm">
-                <Mail className="w-4 h-4 mr-2 text-gray-500" />
-                <span>{orgProfile.contact_email}</span>
+              <div className="flex items-start text-sm">
+                <Mail className="w-4 h-4 mr-2 text-gray-500 flex-shrink-0 mt-0.5" />
+                <span className="break-all">{orgProfile.contact_email}</span>
               </div>
             )}
             
             {orgProfile.phone_number && (
               <div className="flex items-center text-sm">
-                <Phone className="w-4 h-4 mr-2 text-gray-500" />
-                <span>{orgProfile.phone_number}</span>
+                <Phone className="w-4 h-4 mr-2 text-gray-500 flex-shrink-0" />
+                <span className="break-all">{orgProfile.phone_number}</span>
               </div>
             )}
             
             {orgProfile.website && (
-              <div className="flex items-center text-sm">
-                <Globe className="w-4 h-4 mr-2 text-gray-500" />
+              <div className="flex items-start text-sm">
+                <Globe className="w-4 h-4 mr-2 text-gray-500 flex-shrink-0 mt-0.5" />
                 <a 
                   href={orgProfile.website} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-blue-600 hover:underline break-all"
                 >
                   {orgProfile.website}
                 </a>
@@ -143,8 +143,8 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
             
             {orgProfile.area && (
               <div className="flex items-start text-sm">
-                <MapPin className="w-4 h-4 mr-2 text-gray-500 mt-0.5" />
-                <span>{orgProfile.area}, {orgProfile.state}</span>
+                <MapPin className="w-4 h-4 mr-2 text-gray-500 flex-shrink-0 mt-0.5" />
+                <span className="break-words">{orgProfile.area}, {orgProfile.state}</span>
               </div>
             )}
           </div>

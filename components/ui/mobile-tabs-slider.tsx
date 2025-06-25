@@ -29,7 +29,7 @@ export default function MobileTabsSlider({
   separatorClassName,
 }: MobileTabsSliderProps) {
   return (
-    <div className={cn("sm:hidden", className)}>
+    <div className={cn("block md:hidden", className)}>
       <div
         className="flex gap-3 overflow-x-auto scrollbar-hide py-2"
         style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
@@ -39,17 +39,15 @@ export default function MobileTabsSlider({
             key={tab.value}
             onClick={() => onTabChange(tab.value)}
             variant={activeTab === tab.value ? "default" : "ghost"}
-            className={`
-              flex-shrink-0 h-10 px-5 rounded-[20px] transition-all whitespace-nowrap shadow-sm
-              ${
-                activeTab === tab.value
-                  ? "bg-[#246BFD] text-white hover:bg-[#246BFD]/90 shadow-lg"
-                  : "bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 border border-blue-200"
-              }
-            `}
+            className={cn(
+              "flex-shrink-0 h-10 px-4 sm:px-5 rounded-[20px] transition-all whitespace-nowrap shadow-sm text-sm",
+              activeTab === tab.value
+                ? "bg-[#246BFD] text-white hover:bg-[#246BFD]/90 shadow-lg"
+                : "bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 border border-blue-200"
+            )}
           >
-            {tab.icon && <span className="mr-2">{tab.icon}</span>}
-            <span className="text-sm font-semibold">
+            {tab.icon && <span className="mr-1 sm:mr-2">{tab.icon}</span>}
+            <span className="font-semibold">
               {tab.label}
               {tab.count !== undefined && ` (${tab.count})`}
             </span>
