@@ -36,7 +36,7 @@ export default function TopNavigationBar() {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 60000, // Poll every 60 seconds for new conversations
+      refetchInterval: 15000, // Poll every 15 seconds for new conversations
     }
   );
 
@@ -48,7 +48,7 @@ export default function TopNavigationBar() {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 60000, // Poll every 60 seconds for new groups
+      refetchInterval: 15000, // Poll every 15 seconds for new groups
     }
   );
 
@@ -64,14 +64,6 @@ export default function TopNavigationBar() {
   ) || 0;
 
   const totalUnreadCount = conversationsUnreadCount + groupsUnreadCount;
-
-  console.log('🔍 TopNavigationBar unread counts:', {
-    conversationsUnreadCount,
-    groupsUnreadCount,
-    totalUnreadCount,
-    conversationsCount: conversations?.length || 0,
-    groupsCount: groups?.length || 0
-  });
 
   // Handle client-side mounting
   useEffect(() => {
