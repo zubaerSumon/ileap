@@ -10,6 +10,7 @@ type ProfilePhotoInputProps = {
   setValue: (name: string, value: string) => void;
   defaultValue?: string;
   label?: string;
+  onUploadStateChange?: (isUploading: boolean) => void;
 };
 
 export function ProfilePhotoInput({
@@ -18,6 +19,7 @@ export function ProfilePhotoInput({
   setValue,
   defaultValue,
   label = "Profile photo",
+  onUploadStateChange,
 }: ProfilePhotoInputProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedLink, setUploadedLink] = useState<string | null>(null);
@@ -30,6 +32,10 @@ export function ProfilePhotoInput({
       setUploadedLink(defaultValue);
     }
   }, [defaultValue]);
+
+  useEffect(() => {
+    onUploadStateChange?.(isUploading);
+  }, [isUploading, onUploadStateChange]);
 
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {

@@ -9,14 +9,29 @@ import {
 } from "@/utils/constants/select-options";
 import { FormImageInput } from "@/components/form-input/FormImageInput";
 import { ProfilePhotoInput } from "@/components/form-input/ProfilePhotoInput";
+import { useState } from "react";
 
 interface OrgDetailsStepProps {
   form: UseFormReturn<OrgSignupFormData>;
+  onImageUploadStateChange?: (isUploading: boolean) => void;
 }
 
-export function OrgDetailsStep({ form }: OrgDetailsStepProps) {
+export function OrgDetailsStep({ form, onImageUploadStateChange }: OrgDetailsStepProps) {
+  const [isProfileImageUploading, setIsProfileImageUploading] = useState(false);
+  const [isCoverImageUploading, setIsCoverImageUploading] = useState(false);
+
   const handleProfilePhotoSetValue = (name: string, value: string) => {
     form.setValue(name as keyof OrgSignupFormData, value);
+  };
+
+  const handleProfileImageUploadStateChange = (isUploading: boolean) => {
+    setIsProfileImageUploading(isUploading);
+    onImageUploadStateChange?.(isUploading || isCoverImageUploading);
+  };
+
+  const handleCoverImageUploadStateChange = (isUploading: boolean) => {
+    setIsCoverImageUploading(isUploading);
+    onImageUploadStateChange?.(isUploading || isProfileImageUploading);
   };
 
   return (
@@ -90,6 +105,7 @@ export function OrgDetailsStep({ form }: OrgDetailsStepProps) {
           name="profile_img"
           setValue={handleProfilePhotoSetValue}
           defaultValue={form.watch("profile_img")}
+          onUploadStateChange={handleProfileImageUploadStateChange}
         />
 
         <FormImageInput<OrgSignupFormData>
@@ -98,6 +114,7 @@ export function OrgDetailsStep({ form }: OrgDetailsStepProps) {
           setValue={form.setValue}
           control={form.control}
           defaultValue={form.watch("cover_img")}
+          onUploadStateChange={handleCoverImageUploadStateChange}
         />
       </div>
     </>

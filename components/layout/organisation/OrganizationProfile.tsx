@@ -15,7 +15,7 @@ import { userValidation } from "@/server/modules/users/users.validation";
 import { MultiSelectField } from "@/components/form-input/MultiSelectField";
 import { PhoneField } from "@/components/form-input/PhoneField";
 import { trpc } from "@/utils/trpc";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { TRPCClientErrorLike } from "@trpc/client";
@@ -50,6 +50,7 @@ export default function OrganizationProfile() {
   const router = useRouter();
   const { data: profileData, isLoading } = trpc.users.profileCheckup.useQuery();
   const utils = trpc.useUtils();
+  const [isImageUploading, setIsImageUploading] = useState(false);
   
   const organizationProfileUpdateMutation = trpc.users.setupOrgProfile.useMutation({
     onSuccess: () => {
@@ -327,6 +328,7 @@ export default function OrganizationProfile() {
                   form.setValue(name as keyof OrganizationProfileData, value);
                 }}
                 defaultValue={form.watch("profile_img")}
+                onUploadStateChange={setIsImageUploading}
               />
 
               <FormInput<OrganizationProfileData>
@@ -339,7 +341,7 @@ export default function OrganizationProfile() {
               <Button 
                 type="submit" 
                 className="w-full"
-                disabled={organizationProfileUpdateMutation.isPending}
+                disabled={organizationProfileUpdateMutation.isPending || isImageUploading}
                 onClick={() => {
                   console.log("Submit button clicked");
                   console.log("Form state:", form.formState);
