@@ -114,11 +114,16 @@ export default function HomePageSuggestions() {
                     </div>
 
                     <div className="flex flex-wrap gap-1 mb-2">
-                      {opportunity.categories.map((category, idx) => (
+                      {opportunity.categories.slice(0, 1).map((category, idx) => (
                         <Badge key={idx} variant="secondary" className="text-[10px] md:text-xs font-normal">
                           {category}
                         </Badge>
                       ))}
+                      {opportunity.categories.length > 1 && (
+                        <Badge variant="secondary" className="text-[10px] md:text-xs font-normal text-gray-500">
+                          +{opportunity.categories.length - 1} more
+                        </Badge>
+                      )}
                     </div>
 
                     <p className="text-xs md:text-sm text-gray-600 mb-2 line-clamp-2 md:line-clamp-3">

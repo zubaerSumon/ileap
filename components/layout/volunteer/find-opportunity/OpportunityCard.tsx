@@ -76,7 +76,7 @@ export default function OpportunityCard({
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {opportunity.category.map((category, idx) => (
+            {opportunity.category.slice(0, 1).map((category, idx) => (
               <Badge
                 key={idx}
                 variant="secondary"
@@ -85,6 +85,14 @@ export default function OpportunityCard({
                 {category}
               </Badge>
             ))}
+            {opportunity.category.length > 1 && (
+              <Badge
+                variant="secondary"
+                className="text-xs font-normal bg-gray-100 text-gray-500 hover:bg-gray-200"
+              >
+                +{opportunity.category.length - 1} more
+              </Badge>
+            )}
           </div>
 
           <div

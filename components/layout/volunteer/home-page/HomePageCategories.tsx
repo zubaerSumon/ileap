@@ -7,7 +7,6 @@ import { ApplyButton } from "@/components/buttons/ApplyButton";
 import { FavoriteButton } from "@/components/buttons/FavoriteButton";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import mapPinGrayIcon from "../../../../public/icons/map-pin-gray-icon.svg";
 import { trpc } from "@/utils/trpc";
 import fileIcon from "../../../../public/icons/file-icon.svg";
 import mapPinIcon from "../../../../public/icons/map-pin-icon.svg";
@@ -229,7 +228,7 @@ export default function Categories() {
                 </div>
 
                 <div className="flex flex-wrap gap-1">
-                  {opportunity.category.map((category: string, idx: number) => (
+                  {opportunity.category.slice(0, 1).map((category: string, idx: number) => (
                     <Badge
                       key={idx}
                       variant="secondary"
@@ -238,18 +237,14 @@ export default function Categories() {
                       {category}
                     </Badge>
                   ))}
-                  <div className="flex items-center w-[150px] rounded-[4px] bg-[#EBF8F4] p-1">
-                    <Image
-                      src={mapPinGrayIcon}
-                      height={16}
-                      width={16}
-                      className="mr-1"
-                      alt="Map pin gray icon"
-                    />
-                    <span className="text-sm text-green-600">
-                      Matching location
-                    </span>
-                  </div>
+                  {opportunity.category.length > 1 && (
+                    <Badge
+                      variant="secondary"
+                      className="text-sm bg-[#F0F0F0] rounded-[4px] font-normal text-gray-500"
+                    >
+                      +{opportunity.category.length - 1} more
+                    </Badge>
+                  )}
                 </div>
 
                 <div className="space-y-1">
