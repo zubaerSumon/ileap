@@ -1,92 +1,182 @@
 "use client";
 
-import { useState } from "react";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Separator } from "@/components/ui/separator";
-import { GiBinoculars } from "react-icons/gi";
-import { Building2 } from "lucide-react";
-import OpportunitiesTab from "./OpportunitiesTab";
-import OrganizationsTab from "./OrganizationsTab";
-import { TabConfig } from "@/types/opportunities";
-import MobileTabsSlider from "@/components/ui/mobile-tabs-slider";
-
-const tabConfig: TabConfig[] = [
-  {
-    value: "opportunities",
-    label: "Find Volunteer Opportunities",
-    icon: GiBinoculars,
-    component: OpportunitiesTab,
-  },
-  {
-    value: "organizations",
-    label: "Organizations",
-    icon: Building2,
-    component: OrganizationsTab,
-  },
-];
+import { useState, useEffect } from "react";
+import { trpc } from "@/utils/trpc";
+import { useSearch } from "@/contexts/SearchContext";
+import { PaginationWrapper } from "@/components/PaginationWrapper";
+import FilterSidebar from "./FilterSidebar";
+import OpportunitiesHeader from "./OpportunitiesHeader";
+import OpportunityList from "./OpportunityList";
+import { Opportunity } from "@/types/opportunities";
+import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function FindOpportunity() {
-  const [activeTab, setActiveTab] = useState("opportunities");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const { filters, clearAllFilters } = useSearch();
 
-  const mobileTabs = tabConfig.map((tab) => ({
-    label: tab.label,
-    value: tab.value,
-    icon: tab.icon ? <tab.icon className="h-5 w-5" /> : undefined,
-  }));
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters.searchQuery, filters.categories, filters.commitmentType, filters.location, filters.availability]);
+
+  const { data: opportunitiesData, isLoading } =
+    trpc.opportunities.getAllOpportunities.useQuery({
+      page: currentPage,
+      limit: 10,
+      search: filters.searchQuery || undefined,
+      categories: filters.categories.length > 0 ? filters.categories : undefined,
+      commitmentType: filters.commitmentType,
+      location: filters.location || undefined,
+      availability: filters.availability || undefined,
+    });
+
+  // Debug logging
+  console.log("Current filters:", filters);
+  console.log("Query result:", opportunitiesData);
+
+  const opportunities = (opportunitiesData?.opportunities ||
+    []) as unknown as Opportunity[];
+  const totalItems = opportunitiesData?.total || 0;
+  const totalPages = opportunitiesData?.totalPages || 0;
+
+  const startIndex = (currentPage - 1) * 10;
+  const endIndex = Math.min(startIndex + 10, totalItems);
+
+  // Count active filters for mobile display
+  const activeFiltersCount = filters.categories.length + 
+    (filters.commitmentType !== "all" ? 1 : 0) + 
+    (filters.location ? 1 : 0) + 
+    (filters.searchQuery ? 1 : 0);
 
   return (
-    <div className="bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <MobileTabsSlider
-          tabs={mobileTabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          className="mb-6"
-        />
-
-        <div className="hidden sm:block">
-          <Tabs
-            value={activeTab}
-            className="w-full gap-0"
-            onValueChange={setActiveTab}
-          >
-            <TabsList className="shadow-none bg-transparent border-gray-200">
-              {tabConfig.map((tab, index) => {
-                const IconComponent = tab.icon;
-                return (
-                  <TabsTrigger
-                    key={tab.value}
-                    value={tab.value}
-                    className={`py-3 px-0 border-b-2 border-transparent data-[state=active]:shadow-none data-[state=active]:text-orange-500 rounded-none text-base text-gray-600 hover:text-orange-400 bg-transparent data-[state=active]:bg-transparent shadow-none ${
-                      index === 0 ? "mr-8 ml-0" : ""
-                    }`}
-                  >
-                    {IconComponent && <IconComponent className="h-5 w-5" />}
-                    {tab.label}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-
-            {activeTab === "organizations" && (
-              <Separator className="my-0 border-gray-200 border-2" />
-            )}
-          </Tabs>
+    <div className="min-h-screen bg-gray-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Hero Section */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Find Your Perfect Volunteer Opportunity
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover meaningful ways to give back to your community and make a
+            difference in the world.
+          </p>
         </div>
 
-        {/* Tab Content */}
-        <div className=" ">
-          {tabConfig.map((tab) => {
-            const TabComponent = tab.component;
-            return (
-              <div
-                key={tab.value}
-                className={activeTab === tab.value ? "block" : "hidden"}
-              >
-                <TabComponent />
+        <div className="flex flex-col md:flex-row gap-6">
+          {/* Desktop Sidebar */}
+          <div className="hidden md:block sticky top-4">
+            <FilterSidebar />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            {/* Mobile Filter Button */}
+            <div className="md:hidden mb-4 flex items-center justify-between">
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsFilterModalOpen(true)}
+                  className="flex items-center gap-2"
+                >
+                  <Filter className="h-4 w-4" />
+                  Filters
+                  {activeFiltersCount > 0 && (
+                    <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+                      {activeFiltersCount}
+                    </span>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => clearAllFilters()}
+                  className="px-4"
+                >
+                  Reset
+                </Button>
               </div>
-            );
-          })}
+            </div>
+
+            <OpportunitiesHeader
+              totalItems={totalItems}
+              startIndex={startIndex}
+              endIndex={endIndex}
+            />
+
+            <div className="w-full">
+              {totalItems > 0 ? (
+                <>
+                  <OpportunityList
+                    opportunities={opportunities}
+                    isLoading={isLoading}
+                  />
+                  <div className="mt-8 flex justify-center">
+                    <PaginationWrapper
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      onPageChange={setCurrentPage}
+                      maxVisiblePages={5}
+                    />
+                  </div>
+                </>
+              ) : !isLoading ? (
+                <div className="text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <div className="text-gray-400 mb-4">
+                      <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No opportunities found</h3>
+                    <p className="text-gray-500 mb-6">
+                      Try adjusting your filters or search terms to find more opportunities.
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => clearAllFilters()}
+                      className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-colors"
+                    >
+                      Clear All Filters
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <OpportunityList
+                  opportunities={[]}
+                  isLoading={isLoading}
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Mobile Filter Modal */}
+          <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
+            <DialogContent 
+              className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto" 
+            >
+              <DialogHeader>
+                <DialogTitle>Filter Opportunities</DialogTitle>
+              </DialogHeader>
+              <div className="p-2">
+                <FilterSidebar />
+              </div>
+              <div className="px-4 pb-2 flex justify-center gap-3">
+                <Button 
+                  variant="outline"
+                  onClick={() => setIsFilterModalOpen(false)}
+                  className="px-6"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => setIsFilterModalOpen(false)}
+                  className="px-6"
+                >
+                  Apply Filters
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
     </div>
