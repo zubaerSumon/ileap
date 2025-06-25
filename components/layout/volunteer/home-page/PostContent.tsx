@@ -77,10 +77,10 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
   };
 
   return (
-    <div className="flex-1 max-w-3xl">
+    <div className="flex-1 w-full lg:max-w-3xl">
       <BackButton />
 
-      <div className="w-full h-[200px] relative mb-6">
+      <div className="w-full h-[150px] md:h-[200px] relative mb-4 md:mb-6">
         <Image
           src={opportunity.banner_img || "/default-banner.svg"}
           alt={`${opportunity.title} Banner`}
@@ -89,22 +89,22 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
         />
       </div>
 
-      <h1 className="text-2xl font-bold mb-4">{opportunity.title}</h1>
+      <h1 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 w-full">{opportunity.title}</h1>
 
-      <div className="text-sm text-gray-600 mb-3">
+      <div className="text-sm text-gray-600 mb-3 w-full">
         Posted by
         <Link
           href={`/volunteer/organizer/${opportunity.organization_profile._id}`}
         >
           <span className="text-blue-600 hover:underline cursor-pointer">
             {" "}
-            {opportunity?.created_by?.name || "Organization name"}
+            {opportunity?.organization_profile?.title || "Organization name"}
           </span>
         </Link>
       </div>
 
       {/* Start Date & Time */}
-      <div className="mb-4 p-4 bg-gray-50 rounded-lg">
+      <div className="mb-4 p-3 md:p-4 bg-gray-50 rounded-lg w-full">
         <h3 className="text-sm font-medium text-gray-900 mb-2">Start Date & Time</h3>
         <div className="text-sm text-gray-600">
           <p>
@@ -123,18 +123,17 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
         </div>
       </div>
 
-      <div className="prose max-w-none text-gray-700 space-y-4">
-        <div className="text-base leading-relaxed">
+      <div className="prose w-full max-w-none text-gray-700 space-y-4">
+        <div className="text-sm md:text-base leading-relaxed w-full text-justify">
           <EditorContent editor={editor} />
-          
         </div>
 
         {!isOrganization && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full">
             <ApplyButton
               opportunityId={opportunity._id}
               opportunityDetails={opportunityDetails}
-              className="bg-blue-600 hover:bg-blue-700 h-8 px-5 font-normal text-sm text-white"
+              className="bg-blue-600 hover:bg-blue-700 h-8 px-4 md:px-5 font-normal text-sm text-white"
             />
             <Star className="h-5 w-5 text-yellow-400 fill-current" />
           </div>
