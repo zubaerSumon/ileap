@@ -35,7 +35,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
     <div className="w-full lg:w-[350px] space-y-4">
       {/* Organization Information Card */}
       <Card className="p-3 md:p-4">
-        <div className="flex flex-col md:flex-row items-center gap-3 mb-4 text-center md:text-left">
+        <div className="flex flex-col items-center gap-3 mb-4 text-center">
           <div className="relative w-10 h-10 md:w-12 md:h-12">
             <Image
               src={orgImage}
@@ -53,9 +53,9 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
         </div>
 
         {/* Opportunity Details */}
-        <div className="space-y-3 text-center md:text-left">
+        <div className="space-y-3 text-center">
           <div>
-            <h4 className="text-sm font-medium mb-1 flex items-center justify-center md:justify-start gap-2">
+            <h4 className="text-sm font-medium mb-1 flex items-center justify-center gap-2">
               <MapPin className="w-4 h-4" />
               Location
             </h4>
@@ -63,7 +63,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
           </div>
 
           <div>
-            <h4 className="text-sm font-medium mb-1 flex items-center justify-center md:justify-start gap-2">
+            <h4 className="text-sm font-medium mb-1 flex items-center justify-center gap-2">
               <Users className="w-4 h-4" />
               Available Spots
             </h4>
@@ -72,7 +72,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
 
           {opportunity.date?.start_date && (
             <div>
-              <h4 className="text-sm font-medium mb-1 flex items-center justify-center md:justify-start gap-2">
+              <h4 className="text-sm font-medium mb-1 flex items-center justify-center gap-2">
                 <Calendar className="w-4 h-4" />
                 Start Date
               </h4>
@@ -88,7 +88,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
 
           {opportunity.time?.start_time && (
             <div>
-              <h4 className="text-sm font-medium mb-1 flex items-center justify-center md:justify-start gap-2">
+              <h4 className="text-sm font-medium mb-1 flex items-center justify-center gap-2">
                 <Clock className="w-4 h-4" />
                 Start Time
               </h4>
@@ -99,7 +99,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
 
         {/* View Organization Profile Button - Only show for volunteers */}
         {userRole === 'volunteer' && orgProfile?._id && (
-          <div className="mt-4 pt-4 border-t flex justify-center md:justify-start">
+          <div className="mt-4 pt-4 border-t flex justify-center">
             <Link href={`/volunteer/organizer/${orgProfile._id.toString()}`}>
               <Button variant="outline" className="w-full md:w-auto">
                 View Organization Profile
@@ -112,24 +112,24 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
       {/* Organization Contact Information Card */}
       {orgProfile && (
         <Card className="p-3 md:p-4">
-          <h3 className="font-semibold mb-3 text-sm md:text-base text-center md:text-left">Organization Information</h3>
-          <div className="space-y-3 text-center md:text-left">
+          <h3 className="font-semibold mb-3 text-sm md:text-base text-center">Organization Information</h3>
+          <div className="space-y-3 text-center">
             {orgProfile.contact_email && (
-              <div className="flex items-center justify-center md:justify-start text-sm">
+              <div className="flex items-center justify-center text-sm">
                 <Mail className="w-4 h-4 mr-2 text-gray-500" />
                 <span className="text-xs md:text-sm">{orgProfile.contact_email}</span>
               </div>
             )}
             
             {orgProfile.phone_number && (
-              <div className="flex items-center justify-center md:justify-start text-sm">
+              <div className="flex items-center justify-center text-sm">
                 <Phone className="w-4 h-4 mr-2 text-gray-500" />
                 <span className="text-xs md:text-sm">{orgProfile.phone_number}</span>
               </div>
             )}
             
             {orgProfile.website && (
-              <div className="flex items-center justify-center md:justify-start text-sm">
+              <div className="flex items-center justify-center text-sm">
                 <Globe className="w-4 h-4 mr-2 text-gray-500" />
                 <a 
                   href={orgProfile.website} 
@@ -143,7 +143,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
             )}
             
             {orgProfile.area && (
-              <div className="flex items-start justify-center md:justify-start text-sm">
+              <div className="flex items-start justify-center text-sm">
                 <MapPin className="w-4 h-4 mr-2 text-gray-500 mt-0.5" />
                 <span className="text-xs md:text-sm">{orgProfile.area}, {orgProfile.state}</span>
               </div>
@@ -155,8 +155,8 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
       {/* Similar Opportunities Card - Only show for volunteers */}
       {userRole === 'volunteer' && (
         <Card className="p-3 md:p-4">
-          <h3 className="font-semibold mb-3 text-sm md:text-base text-center md:text-left">Similar Opportunities</h3>
-          <div className="space-y-3 text-center md:text-left">
+          <h3 className="font-semibold mb-3 text-sm md:text-base text-center">Similar Opportunities</h3>
+          <div className="space-y-3 text-center">
             {/* Similar opportunities will be populated dynamically */}
             <p className="text-sm text-gray-600">No similar opportunities found.</p>
           </div>

@@ -100,7 +100,7 @@ export const opportunityRouter = router({
             end_time: undefined, // Will be set if needed
           },
           is_recurring: input.is_recurring || false,
-          banner_img: input.banner_img || undefined,
+          banner_img: input.banner_img && input.banner_img.trim() !== "" ? input.banner_img : "/fallbackbanner.png",
           organization_profile: user.organization_profile,
           created_by: sessionUser.id,
         };
