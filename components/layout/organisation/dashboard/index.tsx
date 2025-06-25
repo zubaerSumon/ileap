@@ -374,7 +374,7 @@ const OrganisationDashboard = () => {
                             ? "Work based"
                             : "Event based"}
                         </Badge>
-                        {opportunity.category.map(
+                        {opportunity.category.slice(0, 1).map(
                           (cat: string, index: number) => (
                             <Badge
                               key={index}
@@ -384,6 +384,14 @@ const OrganisationDashboard = () => {
                               {cat}
                             </Badge>
                           )
+                        )}
+                        {opportunity.category.length > 1 && (
+                          <Badge
+                            variant="secondary"
+                            className="text-xs font-normal text-gray-500"
+                          >
+                            +{opportunity.category.length - 1} more
+                          </Badge>
                         )}
                       </div>
 

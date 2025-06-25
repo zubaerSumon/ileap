@@ -146,7 +146,7 @@ export default function Categories() {
           </div>
 
           <div className="flex flex-wrap gap-1 mb-3">
-            {opportunity.categories.map((category, idx) => (
+            {opportunity.categories.slice(0, 1).map((category, idx) => (
               <Badge
                 key={idx}
                 variant="secondary"
@@ -155,6 +155,14 @@ export default function Categories() {
                 {category}
               </Badge>
             ))}
+            {opportunity.categories.length > 1 && (
+              <Badge
+                variant="secondary"
+                className="text-xs font-normal text-gray-500"
+              >
+                +{opportunity.categories.length - 1} more
+              </Badge>
+            )}
           </div>
 
           <p className="text-sm text-gray-600 mb-4">
