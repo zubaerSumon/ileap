@@ -1,21 +1,20 @@
 import { Message } from "@/types/message";
 import { trpc } from "@/utils/trpc";
 import { useSession } from "next-auth/react";
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 
 export const useMessages = (selectedUserId: string | null, isGroup: boolean) => {
+    const { data: session } = useSession();
     const utils = trpc.useUtils();
     const [newMessage, setNewMessage] = useState("");
-    const { data: session } = useSession();
-    const eventSourceRef = useRef<EventSource | null>(null);
-  
+
     console.log('🔍 useMessages hook state:', {
       selectedUserId,
       isGroup,
       sessionUserId: session?.user?.id
     });
 
-    // Initial load of messages
+    // Get messages with polling (every 15 seconds)
     const { data: messages, isLoading: isLoadingMessages, fetchNextPage, hasNextPage, isFetchingNextPage } = trpc.messages.getMessages.useInfiniteQuery(
       { 
         userId: selectedUserId || "",
@@ -27,7 +26,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         staleTime: 5 * 60 * 1000, // 5 minutes
-        refetchInterval: 5000, // Poll every 5 seconds for new messages
+        refetchInterval: 15000, // Poll every 15 seconds for new messages
       }
     );
   
@@ -42,96 +41,9 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         staleTime: 5 * 60 * 1000, // 5 minutes
-        refetchInterval: 5000, // Poll every 5 seconds for new messages
+        refetchInterval: 15000, // Poll every 15 seconds for new messages
       }
     );
-
-    // Real-time updates using EventSource
-    useEffect(() => {
-        if (!session?.user?.id) return;
-
-        console.log('📡 Connecting to EventSource for messages');
-
-        // Create EventSource connection
-        const eventSource = new EventSource('/api/messages/stream');
-        eventSourceRef.current = eventSource;
-
-        eventSource.onopen = () => {
-            console.log('✅ EventSource connection opened for messages');
-        };
-
-        eventSource.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                console.log('📨 Received EventSource message:', data);
-                
-                if (data.type === 'new_message') {
-                    const messageData = data.data.message as Record<string, unknown>;
-                    const messageSender = (messageData.sender as Record<string, unknown>)?._id;
-                    const messageReceiver = (messageData.receiver as Record<string, unknown>)?._id;
-                    const messageGroup = (messageData.group as Record<string, unknown>)?._id;
-                    
-                    // Convert IDs to strings for comparison
-                    const senderIdStr = typeof messageSender === 'string' ? messageSender : String(messageSender);
-                    const receiverIdStr = typeof messageReceiver === 'string' ? messageReceiver : String(messageReceiver);
-                    const groupIdStr = typeof messageGroup === 'string' ? messageGroup : String(messageGroup);
-                    const selectedUserIdStr = selectedUserId ? String(selectedUserId) : null;
-                    
-                    // Check if this message is for the current conversation
-                    const isForCurrentConversation = isGroup 
-                        ? groupIdStr === selectedUserIdStr
-                        : (senderIdStr === selectedUserIdStr || receiverIdStr === selectedUserIdStr);
-                    
-                    console.log('📨 Message check in useMessages:', {
-                        isGroup,
-                        selectedUserId,
-                        selectedUserIdStr,
-                        messageSender,
-                        messageReceiver,
-                        messageGroup,
-                        senderIdStr,
-                        receiverIdStr,
-                        groupIdStr,
-                        isForCurrentConversation
-                    });
-                    
-                    if (isForCurrentConversation && selectedUserId) {
-                        console.log('🔄 Updating current conversation with new message');
-                        // Invalidate and refetch messages
-                        utils.messages.getMessages.invalidate({ userId: selectedUserId, limit: 20 });
-                        utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId, limit: 20 });
-                    }
-                    
-                    // Always invalidate conversations to update sidebar
-                    utils.messages.getConversations.invalidate();
-                    utils.messages.getGroups.invalidate();
-                }
-                
-                if (data.type === 'message_read') {
-                    console.log('📖 Message read event received');
-                    // Update read status
-                    utils.messages.getConversations.invalidate();
-                    if (isGroup && selectedUserId) {
-                        utils.messages.getGroupMessages.invalidate({ groupId: selectedUserId, limit: 20 });
-                    } else if (selectedUserId) {
-                        utils.messages.getMessages.invalidate({ userId: selectedUserId, limit: 20 });
-                    }
-                }
-            } catch (error) {
-                console.error('Error parsing EventSource message:', error);
-            }
-        };
-
-        eventSource.onerror = (error) => {
-            console.error('EventSource connection error:', error);
-        };
-
-        return () => {
-            console.log('📡 Closing EventSource connection for messages');
-            eventSource.close();
-            eventSourceRef.current = null;
-        };
-    }, [session?.user?.id, selectedUserId, isGroup, utils]);
 
     console.log('🔍 useMessages query results:', {
       isGroup,
