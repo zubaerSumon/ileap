@@ -76,7 +76,7 @@ export function UserMenu({ user }: UserMenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="relative focus:outline-none">
+        <button className="relative focus:outline-none cursor-pointer">
           <Avatar className="h-9 w-9 ring-2 ring-blue-500 border border-white transition-transform duration-200 hover:scale-105">
             <AvatarImage
               src={user.image || "https://github.com/shadcn.png"}

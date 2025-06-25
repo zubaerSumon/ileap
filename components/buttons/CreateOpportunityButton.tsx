@@ -31,7 +31,7 @@ export function CreateOpportunityButton({
   return (
     <Button
       className={cn(
-        "bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full sm:w-auto",
+        "bg-blue-600 hover:bg-blue-700 text-white cursor-pointer font-semibold py-2 rounded-lg transition-all duration-200 active:scale-95 flex items-center w-full sm:w-auto",
         className
       )}
       size={size}

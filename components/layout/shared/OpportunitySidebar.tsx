@@ -32,6 +32,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
 
   return (
     <div className="w-full lg:w-[350px] space-y-4">
+    <div className="w-full lg:w-[350px] space-y-4">
       {/* Organization Information Card */}
       <Card className="p-3 md:p-4">
         <div className="flex flex-col md:flex-row items-center gap-3 mb-4 text-center md:text-left">
@@ -58,7 +59,7 @@ export function OpportunitySidebar({ opportunity, userRole = 'volunteer' }: Oppo
               <MapPin className="w-4 h-4" />
               Location
             </h4>
-            <p className="text-sm text-gray-600">{opportunity.location}</p>
+            <p className="text-sm text-gray-600 break-words">{opportunity.location}</p>
           </div>
 
           <div>
