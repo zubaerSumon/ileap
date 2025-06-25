@@ -18,6 +18,7 @@ type FormImageInputProps<T extends Record<string, unknown>> = {
   includeMimeType?: boolean;
   label?: string;
   control: Control<T>;
+  onUploadStateChange?: (isUploading: boolean) => void;
 };
 
 export function FormImageInput<T extends Record<string, unknown>>({
@@ -28,6 +29,7 @@ export function FormImageInput<T extends Record<string, unknown>>({
   includeMimeType = false,
   label,
   control,
+  onUploadStateChange,
 }: FormImageInputProps<T>) {
   const { field } = useController({
     name,
@@ -64,6 +66,8 @@ export function FormImageInput<T extends Record<string, unknown>>({
       
       setError('');
       setIsUploading(true);
+      onUploadStateChange?.(true);
+      console.log('FormImageInput: Upload started');
       
       try {
         // Validate file size
@@ -107,9 +111,11 @@ export function FormImageInput<T extends Record<string, unknown>>({
         field.onChange(defaultValue || '');
       } finally {
         setIsUploading(false);
+        onUploadStateChange?.(false);
+        console.log('FormImageInput: Upload finished');
       }
     },
-    [uploadMutation, name, setValue, includeMimeType, defaultValue, field]
+    [uploadMutation, name, setValue, includeMimeType, defaultValue, field, onUploadStateChange]
   );
 
   const { getRootProps, getInputProps, isDragActive, open } = useDropzone({

@@ -41,8 +41,10 @@ export type OpportunityFormValues = {
 
 export default function BasicInformation({
   form,
+  onImageUploadStateChange,
 }: {
   form: UseFormReturn<OpportunityFormValues>;
+  onImageUploadStateChange?: (isUploading: boolean) => void;
 }) {
   return (
     <div className="max-w-[1240px] mx-auto">
@@ -319,6 +321,7 @@ export default function BasicInformation({
                 control={form.control}
                 setValue={form.setValue}
                 className="w-full sm:w-[382px]"
+                onUploadStateChange={onImageUploadStateChange}
               />
             </div>
           </div>

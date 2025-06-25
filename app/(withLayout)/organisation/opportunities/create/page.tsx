@@ -12,6 +12,7 @@ import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
 
 // Client-side validation schema
 const clientValidationSchema = z.object({
@@ -47,6 +48,12 @@ const clientValidationSchema = z.object({
 export default function CreateOpportunityPage() {
   const router = useRouter();
   const utils = trpc.useUtils();
+  const [isImageUploading, setIsImageUploading] = useState(false);
+
+  const handleImageUploadStateChange = (isUploading: boolean) => {
+    console.log('Image upload state changed:', isUploading);
+    setIsImageUploading(isUploading);
+  };
 
   const createOpportunity = trpc.opportunities.createOpportunity.useMutation({
     onSuccess: () => {
@@ -111,10 +118,15 @@ export default function CreateOpportunityPage() {
       <div className="bg-[#F5F7FA] min-h-screen">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[1240px] mx-auto px-2 sm:px-4 py-4 sm:py-8">
-            <BasicInformation form={form} />
+            <BasicInformation 
+              form={form} 
+              onImageUploadStateChange={handleImageUploadStateChange}
+            />
             <CreateFooter
               onCreate={form.handleSubmit(onSubmit)}
               isLoading={createOpportunity.isPending}
+              form={form}
+              isImageUploading={isImageUploading}
             />
           </form>
         </Form>
