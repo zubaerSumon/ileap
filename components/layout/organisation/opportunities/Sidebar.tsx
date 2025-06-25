@@ -17,7 +17,7 @@ export function Sidebar({ opportunity }: SidebarProps) {
     <div className="w-[300px]">
       {/* Organization Logo at Top */}
       <div className="py-4 rounded-lg mb-4">
-        <div className="flex flex-col items-start">
+        <div className="flex flex-col items-center text-center">
           <Image
             src={opportunity.organization_profile.profile_img || "/avatar.svg"}
             alt={opportunity.organization_profile.title}
@@ -58,24 +58,24 @@ export function Sidebar({ opportunity }: SidebarProps) {
       <Separator />
 
       <div className="py-4 rounded-lg">
-        <h3 className="font-semibold mb-3">Organisation Information</h3>
-        <div className="space-y-3">
+        <h3 className="font-semibold mb-3 text-center">Organisation Information</h3>
+        <div className="space-y-3 text-center">
           {opportunity.organization_profile.contact_email && (
-            <div className="flex items-center text-sm">
+            <div className="flex items-center justify-center text-sm">
               <Mail className="w-4 h-4 mr-2 text-gray-500" />
               <span>{opportunity.organization_profile.contact_email}</span>
             </div>
           )}
           
           {opportunity.organization_profile.phone_number && (
-            <div className="flex items-center text-sm">
+            <div className="flex items-center justify-center text-sm">
               <Phone className="w-4 h-4 mr-2 text-gray-500" />
               <span>{opportunity.organization_profile.phone_number}</span>
             </div>
           )}
           
           {opportunity.organization_profile.website && (
-            <div className="flex items-center text-sm">
+            <div className="flex items-center justify-center text-sm">
               <Globe className="w-4 h-4 mr-2 text-gray-500" />
               <a 
                 href={opportunity.organization_profile.website} 
@@ -89,7 +89,7 @@ export function Sidebar({ opportunity }: SidebarProps) {
           )}
           
           {opportunity.organization_profile.area && (
-            <div className="flex items-start text-sm">
+            <div className="flex items-start justify-center text-sm">
               <MapPin className="w-4 h-4 mr-2 text-gray-500 mt-0.5" />
               <span>{opportunity.organization_profile.area}, {opportunity.organization_profile.state}</span>
             </div>
