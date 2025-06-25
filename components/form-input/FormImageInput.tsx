@@ -18,6 +18,7 @@ type FormImageInputProps<T extends Record<string, unknown>> = {
   includeMimeType?: boolean;
   label?: string;
   control: Control<T>;
+  onUploadStateChange?: (isUploading: boolean) => void;
 };
 
 export function FormImageInput<T extends Record<string, unknown>>({
@@ -28,6 +29,7 @@ export function FormImageInput<T extends Record<string, unknown>>({
   includeMimeType = false,
   label,
   control,
+  onUploadStateChange,
 }: FormImageInputProps<T>) {
   const { field } = useController({
     name,
@@ -48,6 +50,10 @@ export function FormImageInput<T extends Record<string, unknown>>({
       field.onChange(defaultValue);
     }
   }, [defaultValue, field]);
+
+  useEffect(() => {
+    onUploadStateChange?.(isUploading);
+  }, [isUploading, onUploadStateChange]);
 
   const convertFileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
