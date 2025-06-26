@@ -83,6 +83,10 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
     utils.messages.getGroups.invalidate();
   };
 
+  const handleGroupUpdated = () => {
+    utils.messages.getGroups.invalidate();
+  };
+
   useEffect(() => {
     if (selectedUserId && isGroup) {
       utils.messages.getGroupMessages.invalidate();
@@ -174,6 +178,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
                   isSending={false} 
                   selectedConversationId={null}
                   onDeleteConversation={!isGroup && (session?.user?.role === "admin" || session?.user?.role === "mentor" || session?.user?.role === "organization") ? handleDeleteConversation : undefined}
+                  onGroupUpdated={isGroup ? handleGroupUpdated : undefined}
                 />
               </div>
               <div className="flex-shrink-0 border-t bg-white">
@@ -242,6 +247,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
                 isSending={false} 
                 selectedConversationId={null}
                 onDeleteConversation={!isGroup && (session?.user?.role === "admin" || session?.user?.role === "mentor" || session?.user?.role === "organization") ? handleDeleteConversation : undefined}
+                onGroupUpdated={isGroup ? handleGroupUpdated : undefined}
               />
             </div>
 

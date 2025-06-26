@@ -15,6 +15,7 @@ interface ChatAreaProps {
   isGroup?: boolean;
   onDeleteGroup?: () => void;
   onDeleteConversation?: () => void;
+  onGroupUpdated?: () => void;
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
@@ -31,6 +32,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   isGroup,
   onDeleteGroup,
   onDeleteConversation,
+  onGroupUpdated,
   onLoadMore,
   hasMore,
   isLoadingMore,
@@ -145,12 +147,13 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   if (!messages || messages.length === 0) {
     return (
       <div className="flex-1 flex flex-col">
-        {selectedConversation && headerData && (
+        {selectedConversation && (
           <ConversationHeader 
-            user={headerData}
+            user={isGroup ? (selectedConversation as Group) : (headerData || { name: "Unknown", avatar: "" })}
             isGroup={isGroup}
             onDeleteGroup={onDeleteGroup}
             onDeleteConversation={onDeleteConversation}
+            onGroupUpdated={onGroupUpdated}
           />
         )}
         <div className="flex-1 flex flex-col items-center justify-center py-8 px-4">
@@ -160,11 +163,11 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
                 <Users className="h-8 w-8 text-blue-500" />
               </div>
               <h2 className="text-xl font-semibold mb-2 text-gray-900">
-                {(selectedConversation as Group)?.name.length > 20 
-                  ? `${(selectedConversation as Group)?.name.substring(0, 20)}...` 
+                {(selectedConversation as Group)?.name?.length > 20 
+                  ? `${(selectedConversation as Group)?.name?.substring(0, 20)}...` 
                   : (selectedConversation as Group)?.name}
               </h2>
-              <p className="text-sm text-gray-500 mb-4">{(selectedConversation as Group)?.members?.length} members</p>
+              <p className="text-sm text-gray-500 mb-4">{(selectedConversation as Group)?.members?.length || 0} members</p>
               <p className="text-sm text-gray-500">Start the conversation by sending a message</p>
             </div>
           ) : (
@@ -185,12 +188,13 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
 
   return (
     <div className="flex flex-col h-full">
-      {selectedConversation && headerData && (
+      {selectedConversation && (
         <ConversationHeader 
-          user={headerData}
+          user={isGroup ? (selectedConversation as Group) : (headerData || { name: "Unknown", avatar: "" })}
           isGroup={isGroup}
           onDeleteGroup={onDeleteGroup}
           onDeleteConversation={onDeleteConversation}
+          onGroupUpdated={onGroupUpdated}
         />
       )}
 
