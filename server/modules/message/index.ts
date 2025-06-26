@@ -797,6 +797,330 @@ export const messsageRouter = router({
       }
     }),
 
+  addMember: protectedProcedure
+    .input(z.object({
+      groupId: z.string(),
+      memberId: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to add members",
+          });
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        // Find the group
+        const group = await Group.findById(input.groupId);
+        if (!group) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Group not found",
+          });
+        }
+
+        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
+        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        const isGroupAdmin = group.admins.includes(user._id);
+        
+        if (!isAdminOrMentor && !isGroupAdmin) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to add members to this group",
+          });
+        }
+
+        // Check if the user to add exists
+        const memberToAdd = await User.findById(input.memberId);
+        if (!memberToAdd) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User to add not found",
+          });
+        }
+
+        // Check if user is already a member
+        if (group.members.includes(new Types.ObjectId(input.memberId))) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "User is already a member of this group",
+          });
+        }
+
+        // Add the member
+        await Group.findByIdAndUpdate(input.groupId, {
+          $addToSet: { members: new Types.ObjectId(input.memberId) }
+        });
+
+        // Get the updated group with populated data
+        const updatedGroup = await Group.findById(input.groupId)
+          .populate('members', 'name avatar role')
+          .populate('admins', 'name avatar role')
+          .lean();
+
+        return updatedGroup;
+      } catch (error: any) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error?.message || "Failed to add member",
+        });
+      }
+    }),
+
+  removeMember: protectedProcedure
+    .input(z.object({
+      groupId: z.string(),
+      memberId: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to remove members",
+          });
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        // Find the group
+        const group = await Group.findById(input.groupId);
+        if (!group) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Group not found",
+          });
+        }
+
+        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
+        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        const isGroupAdmin = group.admins.includes(user._id);
+        
+        if (!isAdminOrMentor && !isGroupAdmin) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to remove members from this group",
+          });
+        }
+
+        // Check if the user to remove is a member
+        if (!group.members.includes(new Types.ObjectId(input.memberId))) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "User is not a member of this group",
+          });
+        }
+
+        // Prevent removing the last admin
+        if (group.admins.includes(new Types.ObjectId(input.memberId))) {
+          const adminCount = group.admins.length;
+          if (adminCount <= 1) {
+            throw new TRPCError({
+              code: "BAD_REQUEST",
+              message: "Cannot remove the last admin from the group",
+            });
+          }
+        }
+
+        // Remove the member (and from admins if they were an admin)
+        await Group.findByIdAndUpdate(input.groupId, {
+          $pull: { 
+            members: new Types.ObjectId(input.memberId),
+            admins: new Types.ObjectId(input.memberId)
+          }
+        });
+
+        // Get the updated group with populated data
+        const updatedGroup = await Group.findById(input.groupId)
+          .populate('members', 'name avatar role')
+          .populate('admins', 'name avatar role')
+          .lean();
+
+        return updatedGroup;
+      } catch (error: any) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error?.message || "Failed to remove member",
+        });
+      }
+    }),
+
+  promoteToAdmin: protectedProcedure
+    .input(z.object({
+      groupId: z.string(),
+      memberId: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to promote members",
+          });
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        // Find the group
+        const group = await Group.findById(input.groupId);
+        if (!group) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Group not found",
+          });
+        }
+
+        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
+        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        const isGroupAdmin = group.admins.includes(user._id);
+        
+        if (!isAdminOrMentor && !isGroupAdmin) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to promote members in this group",
+          });
+        }
+
+        // Check if the user to promote is a member
+        if (!group.members.includes(new Types.ObjectId(input.memberId))) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "User is not a member of this group",
+          });
+        }
+
+        // Check if user is already an admin
+        if (group.admins.includes(new Types.ObjectId(input.memberId))) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "User is already an admin of this group",
+          });
+        }
+
+        // Promote the member to admin
+        await Group.findByIdAndUpdate(input.groupId, {
+          $addToSet: { admins: new Types.ObjectId(input.memberId) }
+        });
+
+        // Get the updated group with populated data
+        const updatedGroup = await Group.findById(input.groupId)
+          .populate('members', 'name avatar role')
+          .populate('admins', 'name avatar role')
+          .lean();
+
+        return updatedGroup;
+      } catch (error: any) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error?.message || "Failed to promote member",
+        });
+      }
+    }),
+
+  demoteFromAdmin: protectedProcedure
+    .input(z.object({
+      groupId: z.string(),
+      memberId: z.string(),
+    }))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to demote admins",
+          });
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        // Find the group
+        const group = await Group.findById(input.groupId);
+        if (!group) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Group not found",
+          });
+        }
+
+        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
+        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        const isGroupAdmin = group.admins.includes(user._id);
+        
+        if (!isAdminOrMentor && !isGroupAdmin) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to demote admins in this group",
+          });
+        }
+
+        // Check if the user to demote is an admin
+        if (!group.admins.includes(new Types.ObjectId(input.memberId))) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "User is not an admin of this group",
+          });
+        }
+
+        // Prevent demoting the last admin
+        const adminCount = group.admins.length;
+        if (adminCount <= 1) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Cannot demote the last admin from the group",
+          });
+        }
+
+        // Demote the admin
+        await Group.findByIdAndUpdate(input.groupId, {
+          $pull: { admins: new Types.ObjectId(input.memberId) }
+        });
+
+        // Get the updated group with populated data
+        const updatedGroup = await Group.findById(input.groupId)
+          .populate('members', 'name avatar role')
+          .populate('admins', 'name avatar role')
+          .lean();
+
+        return updatedGroup;
+      } catch (error: any) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: error?.message || "Failed to demote admin",
+        });
+      }
+    }),
+
   deleteConversation: protectedProcedure
     .input(z.object({
       conversationId: z.string()

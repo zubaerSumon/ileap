@@ -24,7 +24,7 @@ interface ConversationHeaderProps {
   onGroupUpdated?: () => void;
 }
 
-export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
+export const ConversationHeaderOptimized: React.FC<ConversationHeaderProps> = ({
   user,
   isGroup,
   onDeleteGroup,
@@ -33,13 +33,10 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
 }) => {
   if (!user) return null;
 
-  // Helper function to get text size class based on name length
-  const getTextSizeClass = (name: string) => {
-    const length = name.length;
-    if (length <= 15) return "text-sm sm:text-base"; // Default size
-    if (length <= 25) return "text-xs sm:text-sm"; // Medium size
-    if (length <= 35) return "text-xs"; // Small size
-    return "text-xs"; // Very small for very long names
+  // Helper function to truncate long group names
+  const truncateName = (name: string, maxLength: number = 20) => {
+    if (name.length <= maxLength) return name;
+    return `${name.substring(0, maxLength)}...`;
   };
 
   // Get member count for groups
@@ -70,11 +67,11 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
         
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <h2 className={`font-semibold truncate text-gray-900 ${isGroup ? getTextSizeClass(user.name) : 'text-sm sm:text-base'}`}>
-              {user.name}
+            <h2 className="font-semibold text-sm sm:text-base truncate text-gray-900">
+              {isGroup ? truncateName(user.name, 25) : user.name}
             </h2>
             {isGroup && getAdminCount() > 0 && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex-shrink-0">
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                 {getAdminCount()} admin{getAdminCount() !== 1 ? 's' : ''}
               </span>
             )}
@@ -147,6 +144,10 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
                 <DropdownMenuSeparator />
               </>
             )}
+            
+            <DropdownMenuItem className="text-gray-600">
+              <span className="text-xs">Group ID: {'_id' in user ? user._id?.substring(0, 8) : 'N/A'}...</span>
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -154,4 +155,4 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   );
 };
 
-export default ConversationHeader;
+export default ConversationHeaderOptimized; 
