@@ -7,7 +7,7 @@ import {
   MessageCircle,
   LayoutDashboard,
   Users,
- } from "lucide-react";
+} from "lucide-react";
 import { Session } from "next-auth";
 import { SessionUser } from "@/types/navigation";
 import Logo from "../../public/AusLeap.png";
@@ -15,7 +15,7 @@ import { STATIC_LINKS } from "@/utils/constants/navigation";
 import { UserMenu } from "./UserMenu";
 import { SearchBar } from "./SearchBar";
 import { GiBinoculars } from "react-icons/gi";
-
+import { useSearchParams } from "next/navigation";
 
 interface TopBarProps {
   isMenuOpen: boolean;
@@ -39,6 +39,8 @@ export function TopBar({
   totalUnreadCount,
 }: TopBarProps) {
   const handleMenuToggle = () => setIsMenuOpen(!isMenuOpen);
+  const searchParams = useSearchParams();
+  const roleParam = searchParams?.get("role")?.toLowerCase();
 
   if (isResetPasswordPath) {
     return (
@@ -120,25 +122,28 @@ export function TopBar({
               </Link>
             </>
           )}
-          <Link
-            href={
-              session?.user?.role === "admin" ||
+          {isProtectedPath && (
+            <Link
+              href={
+                session?.user?.role === "admin" ||
+                session?.user?.role === "mentor"
+                  ? "/search?type=volunteer"
+                  : "/search?type=opportunity"
+              }
+              className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
+            >
+              {session?.user?.role === "admin" ||
+              session?.user?.role === "mentor" ? (
+                <Users className="h-4 w-4" />
+              ) : (
+                <GiBinoculars className="h-4 w-4" />
+              )}{" "}
+              {session?.user?.role === "admin" ||
               session?.user?.role === "mentor"
-                ? "/search?type=volunteer"
-                : "/search?type=opportunity"
-            }
-            className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
-          >
-            {session?.user?.role === "admin" ||
-            session?.user?.role === "mentor" ? (
-              <Users className="h-4 w-4" />
-            ) : (
-              <GiBinoculars className="h-4 w-4" />
-            )}{" "}
-            {session?.user?.role === "admin" || session?.user?.role === "mentor"
-              ? "Browse Volunteers"
-              : "Find Opportunities"}
-          </Link>
+                ? "Browse Volunteers"
+                : "Find Opportunities"}
+            </Link>
+          )}
         </div>
 
         {isAuthPath ? (
@@ -146,12 +151,25 @@ export function TopBar({
             {session ? (
               <UserMenu user={session.user as SessionUser} />
             ) : (
-              <Link
-                href="/signup"
-                className="text-sm font-normal hover:text-blue-500"
-              >
-                Sign up
-              </Link>
+              <div className="flex items-center space-x-6">
+                <div className="flex items-center gap-3 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
+                  <span className="text-sm text-gray-300">
+                    {roleParam !== "organization"
+                      ? "Wanna join as an organization?"
+                      : "Wanna join as a volunteer?"}
+                  </span>
+                  <Link
+                    href={
+                      roleParam !== "organization"
+                        ? "/signup?role=organization"
+                        : "/signup"
+                    }
+                    className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors duration-200 px-3 py-1 bg-blue-600/20 rounded-md hover:bg-blue-600/30"
+                  >
+                    Sign up
+                  </Link>
+                </div>
+              </div>
             )}
           </div>
         ) : isProtectedPath ? (

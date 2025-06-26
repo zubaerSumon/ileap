@@ -3,6 +3,7 @@ import { PasswordField } from "@/components/form-input/PasswordField";
 import { UseFormReturn } from "react-hook-form";
 import { VolunteerSignupForm } from "@/types/auth";
 import { useState } from "react";
+import Link from "next/link";
 
 interface SignupStepProps {
   form: UseFormReturn<VolunteerSignupForm>;
@@ -115,10 +116,11 @@ export function SignupStep({
 
       <div className="text-center sm:text-left space-y-3">
         <h2 className="mt-6 text-3xl font-bold text-gray-900">
-        Welcome to AusLeap!
+          Welcome to AusLeap!
         </h2>
         <p className=" text-sm text-gray-600">
-        We&apos;re excited to have you join our community. Please provide the following details to get started:
+          We&apos;re excited to have you join our community. Please provide the
+          following details to get started:
         </p>
       </div>
 
@@ -176,31 +178,42 @@ export function SignupStep({
             )}
         </div>
 
-        <div className="flex items-center">
-          <input
-            id="terms"
-            type="checkbox"
-            checked={termsAccepted}
-            onChange={(e) => {
-              setTermsAccepted(e.target.checked);
-              if (!e.target.checked) {
-                setTermsError("You must accept the terms and conditions");
-              } else {
-                setTermsError(null);
-              }
-            }}
-            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-          />
-          <label htmlFor="terms" className="ml-2 block text-sm text-gray-900">
-            I agree to the{" "}
-            <a
-              href="#"
-              className="text-indigo-600 hover:text-indigo-500"
-              onClick={openModal}
+        <div className="flex flex-col items-center sm:flex-row    sm:justify-between">
+          <div className="flex items-center">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => {
+                setTermsAccepted(e.target.checked);
+                if (!e.target.checked) {
+                  setTermsError("You must accept the terms and conditions");
+                } else {
+                  setTermsError(null);
+                }
+              }}
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <label htmlFor="terms" className="ml-2 block text-sm text-gray-600">
+              I agree to the{" "}
+              <a
+                href="#"
+                className="text-indigo-600 hover:text-indigo-500"
+                onClick={openModal}
+              >
+                Terms and Conditions
+              </a>
+            </label>
+          </div>
+          <div className="text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link
+              href="/signin"
+              className="text-indigo-600 underline font-medium hover:text-indigo-500"
             >
-              Terms and Conditions
-            </a>
-          </label>
+              Log In
+            </Link>
+          </div>
         </div>
         {termsError && <p className="text-sm text-red-600">{termsError}</p>}
       </div>

@@ -4,8 +4,13 @@ import { UseFormReturn } from "react-hook-form";
 import { OrgSignupFormData } from "@/types/auth";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+ import Link from "next/link";
 
 interface OrgSignupStepProps {
   form: UseFormReturn<OrgSignupFormData>;
@@ -63,13 +68,13 @@ export function OrgSignupStep({
 
             <h4 className="font-medium">5. Changes to Terms</h4>
             <p>
-              We reserve the right to modify these terms at any time.
-              Continued use constitutes acceptance.
+              We reserve the right to modify these terms at any time. Continued
+              use constitutes acceptance.
             </p>
 
             <p>
-              By clicking &quot;Agree&quot;, you acknowledge that you have
-              read and understood these terms.
+              By clicking &quot;Agree&quot;, you acknowledge that you have read
+              and understood these terms.
             </p>
           </div>
           <div className="mt-6 flex justify-end">
@@ -142,36 +147,46 @@ export function OrgSignupStep({
             )}
         </div>
 
-        <div className="flex items-center">
-          <Checkbox
-            id="terms"
-            checked={termsAccepted}
-            onCheckedChange={(checked) => {
-              setTermsAccepted(checked as boolean);
-              if (!checked) {
-                setTermsError("You must accept the terms and conditions");
-              } else {
-                setTermsError(null);
-              }
-            }}
-            className="mr-2"
-          />
-          <label
-            htmlFor="terms"
-            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-          >
-            I agree to the{" "}
-            <Button
-              variant="link"
-              className="p-0 h-auto font-normal"
-              onClick={(e) => {
-                e.preventDefault();
-                setIsModalOpen(true);
+        <div className="flex flex-col items-center sm:flex-row    sm:justify-between">
+           
+          <div className="flex items-center">
+            <input
+              id="terms"
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => {
+                setTermsAccepted(e.target.checked);
+                if (!e.target.checked) {
+                  setTermsError("You must accept the terms and conditions");
+                } else {
+                  setTermsError(null);
+                }
               }}
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+            />
+            <label htmlFor="terms" className="ml-2 block text-sm text-gray-600">
+              I agree to the{" "}
+              <a
+                href="#"
+                className="text-indigo-600 hover:text-indigo-500"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsModalOpen(true);
+                }}
+              >
+                Terms and Conditions
+              </a>
+            </label>
+          </div>
+          <div className="text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link
+              href="/signin"
+              className="text-indigo-600 underline font-medium hover:text-indigo-500"
             >
-              Terms and Conditions
-            </Button>
-          </label>
+              Log In
+            </Link>
+          </div>
         </div>
         {termsError && <p className="text-sm text-red-600">{termsError}</p>}
       </div>
