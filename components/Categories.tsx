@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import MobileTabsSlider from "@/components/ui/mobile-tabs-slider";
+import MobileTabsSlider from "@/components/layout/shared/MobileTabsSlider";
 
 export default function Categories() {
   const [activeTab, setActiveTab] = useState("nearby");

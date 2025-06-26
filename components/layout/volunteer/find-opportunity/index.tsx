@@ -5,12 +5,12 @@ import { trpc } from "@/utils/trpc";
 import { useSearch } from "@/contexts/SearchContext";
 import { PaginationWrapper } from "@/components/PaginationWrapper";
 import FilterSidebar from "./FilterSidebar";
+import FilterDialog from "./FilterDialog";
 import OpportunitiesHeader from "./OpportunitiesHeader";
 import OpportunityList from "./OpportunityList";
 import { Opportunity } from "@/types/opportunities";
 import { Button } from "@/components/ui/button";
-import { Filter } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Filter, Search } from "lucide-react";
 
 export default function FindOpportunity() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -19,14 +19,21 @@ export default function FindOpportunity() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [filters.searchQuery, filters.categories, filters.commitmentType, filters.location, filters.availability]);
+  }, [
+    filters.searchQuery,
+    filters.categories,
+    filters.commitmentType,
+    filters.location,
+    filters.availability,
+  ]);
 
   const { data: opportunitiesData, isLoading } =
     trpc.opportunities.getAllOpportunities.useQuery({
       page: currentPage,
-      limit: 10,
+      limit: 6,
       search: filters.searchQuery || undefined,
-      categories: filters.categories.length > 0 ? filters.categories : undefined,
+      categories:
+        filters.categories.length > 0 ? filters.categories : undefined,
       commitmentType: filters.commitmentType,
       location: filters.location || undefined,
       availability: filters.availability || undefined,
@@ -41,13 +48,14 @@ export default function FindOpportunity() {
   const totalItems = opportunitiesData?.total || 0;
   const totalPages = opportunitiesData?.totalPages || 0;
 
-  const startIndex = (currentPage - 1) * 10;
-  const endIndex = Math.min(startIndex + 10, totalItems);
+  const startIndex = (currentPage - 1) * 6;
+  const endIndex = Math.min(startIndex + 6, totalItems);
 
   // Count active filters for mobile display
-  const activeFiltersCount = filters.categories.length + 
-    (filters.commitmentType !== "all" ? 1 : 0) + 
-    (filters.location ? 1 : 0) + 
+  const activeFiltersCount =
+    filters.categories.length +
+    (filters.commitmentType !== "all" ? 1 : 0) +
+    (filters.location ? 1 : 0) +
     (filters.searchQuery ? 1 : 0);
 
   return (
@@ -77,12 +85,12 @@ export default function FindOpportunity() {
                 <Button
                   variant="outline"
                   onClick={() => setIsFilterModalOpen(true)}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   <Filter className="h-4 w-4" />
                   Filters
                   {activeFiltersCount > 0 && (
-                    <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
+                    <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
                       {activeFiltersCount}
                     </span>
                   )}
@@ -90,7 +98,7 @@ export default function FindOpportunity() {
                 <Button
                   variant="outline"
                   onClick={() => clearAllFilters()}
-                  className="px-4"
+                  className="px-4 shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   Reset
                 </Button>
@@ -104,32 +112,32 @@ export default function FindOpportunity() {
             />
 
             <div className="w-full">
+              <OpportunityList
+                opportunities={opportunities}
+                isLoading={isLoading}
+              />
+              
               {totalItems > 0 ? (
-                <>
-                  <OpportunityList
-                    opportunities={opportunities}
-                    isLoading={isLoading}
+                <div className="mt-8 flex justify-center">
+                  <PaginationWrapper
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={setCurrentPage}
+                    maxVisiblePages={5}
                   />
-                  <div className="mt-8 flex justify-center">
-                    <PaginationWrapper
-                      currentPage={currentPage}
-                      totalPages={totalPages}
-                      onPageChange={setCurrentPage}
-                      maxVisiblePages={5}
-                    />
-                  </div>
-                </>
+                </div>
               ) : !isLoading ? (
                 <div className="text-center py-16">
                   <div className="max-w-md mx-auto">
                     <div className="text-gray-400 mb-4">
-                      <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                      </svg>
+                      <Search className="mx-auto h-12 w-12" strokeWidth={1.5} />
                     </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No opportunities found</h3>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">
+                      No opportunities found
+                    </h3>
                     <p className="text-gray-500 mb-6">
-                      Try adjusting your filters or search terms to find more opportunities.
+                      Try adjusting your filters or search terms to find more
+                      opportunities.
                     </p>
                     <Button
                       variant="outline"
@@ -140,43 +148,16 @@ export default function FindOpportunity() {
                     </Button>
                   </div>
                 </div>
-              ) : (
-                <OpportunityList
-                  opportunities={[]}
-                  isLoading={isLoading}
-                />
-              )}
+              ) : null}
             </div>
           </div>
 
-          {/* Mobile Filter Modal */}
-          <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
-            <DialogContent 
-              className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto" 
-            >
-              <DialogHeader>
-                <DialogTitle>Filter Opportunities</DialogTitle>
-              </DialogHeader>
-              <div className="p-2">
-                <FilterSidebar />
-              </div>
-              <div className="px-4 pb-2 flex justify-center gap-3">
-                <Button 
-                  variant="outline"
-                  onClick={() => setIsFilterModalOpen(false)}
-                  className="px-6"
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  onClick={() => setIsFilterModalOpen(false)}
-                  className="px-6"
-                >
-                  Apply Filters
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <FilterDialog
+            isOpen={isFilterModalOpen}
+            onOpenChange={setIsFilterModalOpen}
+            activeFiltersCount={activeFiltersCount}
+            onClearAllFilters={clearAllFilters}
+          />
         </div>
       </div>
     </div>
