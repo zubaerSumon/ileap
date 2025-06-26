@@ -147,13 +147,13 @@ export function TopBar({
         </div>
 
         {isAuthPath ? (
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {session ? (
               <UserMenu user={session.user as SessionUser} />
             ) : (
-              <div className="flex items-center space-x-6">
-                <div className="flex items-center gap-3 px-4 py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-                  <span className="text-sm text-gray-300">
+              <div className="flex items-center space-x-2 sm:space-x-6">
+                <div className="flex items-center gap-1 ms-2 sm:ms-0 sm:gap-3 px-2 sm:px-4 py-1 sm:py-2 bg-gray-800/50 rounded-lg border border-gray-700">
+                  <span className="text-xs sm:text-sm text-gray-300">
                     {roleParam !== "organization"
                       ? "Wanna join as an organization?"
                       : "Wanna join as a volunteer?"}
@@ -164,7 +164,7 @@ export function TopBar({
                         ? "/signup?role=organization"
                         : "/signup"
                     }
-                    className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors duration-200 px-3 py-1 bg-blue-600/20 rounded-md hover:bg-blue-600/30"
+                    className="text-xs sm:text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors duration-200 px-2 sm:px-3 py-1 bg-blue-600/20 rounded-md hover:bg-blue-600/30 whitespace-nowrap"
                   >
                     Sign up
                   </Link>
