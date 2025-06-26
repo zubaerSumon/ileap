@@ -11,7 +11,12 @@ import { useSearch } from "@/contexts/SearchContext";
 import { PaginationWrapper } from "@/components/PaginationWrapper";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface Volunteer {
   _id: string;
@@ -47,21 +52,26 @@ export default function BrowseVolunteer() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const { searchQuery } = useSearch();
 
-   useEffect(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [filters, searchQuery]);
 
-  const { data: volunteersData, isLoading } = trpc.users.getAvailableUsers.useQuery({
-    page: currentPage,
-    limit: 6,
-    search: searchQuery || undefined,
-    categories: filters.categories.length > 0 ? filters.categories : undefined,
-    studentType: filters.studentType,
-    availability: filters.availability.startDate && filters.availability.endDate ? {
-      startDate: filters.availability.startDate,
-      endDate: filters.availability.endDate,
-    } : undefined,
-  });
+  const { data: volunteersData, isLoading } =
+    trpc.users.getAvailableUsers.useQuery({
+      page: currentPage,
+      limit: 6,
+      search: searchQuery || undefined,
+      categories:
+        filters.categories.length > 0 ? filters.categories : undefined,
+      studentType: filters.studentType,
+      availability:
+        filters.availability.startDate && filters.availability.endDate
+          ? {
+              startDate: filters.availability.startDate,
+              endDate: filters.availability.endDate,
+            }
+          : undefined,
+    });
 
   const handleConnect = (volunteer: Volunteer) => {
     setSelectedVolunteer(volunteer);
@@ -75,10 +85,20 @@ export default function BrowseVolunteer() {
   const endIndex = Math.min(startIndex + 6, totalItems);
 
   // Count active filters for mobile display
-  const activeFiltersCount = filters.categories.length + (filters.studentType !== "all" ? 1 : 0);
+  const activeFiltersCount =
+    filters.categories.length + (filters.studentType !== "all" ? 1 : 0);
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Hero Section */}
+      <div className="text-center mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          Find Your Perfect Volunteer
+        </h1>
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          Connect with passionate volunteers who are ready to help your organization make a difference in the community.
+        </p>
+      </div>
       <div className="flex flex-col md:flex-row gap-6">
         {/* Desktop Sidebar */}
         <div className="hidden md:block sticky top-4">
@@ -125,13 +145,11 @@ export default function BrowseVolunteer() {
             <SearchBar role="organization" disableOverlay />
           </div>
 
-          {!isLoading &&
-            volunteers.length > 0 && (
-              <div className="mb-4 text-sm text-gray-600">
-                Showing {startIndex + 1} to {endIndex} of {totalItems}{" "}
-                volunteers
-              </div>
-            )}
+          {!isLoading && volunteers.length > 0 && (
+            <div className="mb-4 text-sm text-gray-600">
+              Showing {startIndex + 1} to {endIndex} of {totalItems} volunteers
+            </div>
+          )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[620px]">
             {isLoading ? (
@@ -173,7 +191,10 @@ export default function BrowseVolunteer() {
               </div>
             ) : (
               volunteers.map((volunteer: Record<string, unknown>) => (
-                <div key={volunteer._id as string} className="w-full max-w-[382px]">
+                <div
+                  key={volunteer._id as string}
+                  className="w-full max-w-[382px]"
+                >
                   <VolunteerCard
                     volunteer={volunteer as unknown as Volunteer}
                     onConnect={handleConnect}
@@ -183,34 +204,36 @@ export default function BrowseVolunteer() {
             )}
           </div>
 
-          {!isLoading &&
-            volunteers.length > 0 && (
-              <div className="mt-8 flex justify-center">
-                <PaginationWrapper
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={setCurrentPage}
-                  maxVisiblePages={5}
-                />
-              </div>
-            )}
+          {!isLoading && volunteers.length > 0 && (
+            <div className="mt-8 flex justify-center">
+              <PaginationWrapper
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                maxVisiblePages={5}
+              />
+            </div>
+          )}
         </div>
       </div>
 
       {/* Mobile Filter Modal */}
       <Dialog open={isFilterModalOpen} onOpenChange={setIsFilterModalOpen}>
-        <DialogContent 
-          className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto [&>button]:hidden" 
+        <DialogContent
+          className="w-[95vw] max-w-md max-h-[90vh] overflow-y-auto [&>button]:hidden"
           onEscapeKeyDown={(e) => e.preventDefault()}
         >
           <DialogHeader className="sr-only">
             <DialogTitle>Filter Volunteers</DialogTitle>
           </DialogHeader>
           <div className="p-2">
-            <FilterSidebar onFilterChange={setFilters} currentFilters={filters} />
+            <FilterSidebar
+              onFilterChange={setFilters}
+              currentFilters={filters}
+            />
           </div>
           <div className="px-4 pb-2 flex justify-center">
-            <Button 
+            <Button
               onClick={() => setIsFilterModalOpen(false)}
               className="px-6"
             >
