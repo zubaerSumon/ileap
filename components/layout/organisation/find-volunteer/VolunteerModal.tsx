@@ -1,10 +1,10 @@
 'use client';
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
+import RandomAvatar from "@/components/ui/random-avatar";
 
 interface VolunteerModalProps {
   isOpen: boolean;
@@ -12,15 +12,19 @@ interface VolunteerModalProps {
 }
 
 const VolunteerModal = ({ isOpen, onClose }: VolunteerModalProps) => {
+  const volunteerName = "Tiago Leitao"; // This would come from props in a real implementation
+  
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md p-6">
         <div className="flex flex-col items-center">
-          <Avatar className="h-24 w-24">
-            <AvatarImage src="/volunteer-avatar.jpg" alt="Volunteer" />
-          </Avatar>
+          <RandomAvatar
+            name={volunteerName}
+            size={96}
+            className="h-24 w-24"
+          />
           
-          <h2 className="mt-4 text-xl font-semibold">Tiago Leitao</h2>
+          <h2 className="mt-4 text-xl font-semibold">{volunteerName}</h2>
           
           <div className="flex items-center gap-2 mt-2 text-sm text-gray-600">
             <MapPin className="h-4 w-4" />

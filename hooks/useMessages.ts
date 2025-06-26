@@ -14,7 +14,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
       sessionUserId: session?.user?.id
     });
 
-    // Get messages with polling (every 10 seconds)
+    // Get messages with polling (every 5 seconds)
     const { data: messages, isLoading: isLoadingMessages, fetchNextPage, hasNextPage, isFetchingNextPage } = trpc.messages.getMessages.useInfiniteQuery(
       { 
         userId: selectedUserId || "",
@@ -26,7 +26,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         staleTime: 5 * 60 * 1000, // 5 minutes
-        refetchInterval: 10000, // Poll every 10 seconds for new messages
+        refetchInterval: 5000, // Poll every 5 seconds for new messages
       }
     );
   
@@ -41,7 +41,7 @@ export const useMessages = (selectedUserId: string | null, isGroup: boolean) => 
         refetchOnWindowFocus: false,
         refetchOnMount: true,
         staleTime: 5 * 60 * 1000, // 5 minutes
-        refetchInterval: 10000, // Poll every 10 seconds for new messages
+        refetchInterval: 5000, // Poll every 5 seconds for new messages
       }
     );
 

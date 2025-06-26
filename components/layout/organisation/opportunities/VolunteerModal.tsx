@@ -2,8 +2,8 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
+import RandomAvatar from "@/components/ui/random-avatar";
 
 export interface Volunteer {
   id: string;
@@ -38,12 +38,10 @@ const VolunteerModal = ({ isOpen, onClose, volunteer }: VolunteerModalProps) => 
       <DialogContent className="max-w-md p-6">
         <div className="flex flex-col">
           <div className="relative w-24 h-24">
-            <Image
-              src={volunteer.profileImg}
-              alt={volunteer.name}
-              fill
-              className="rounded-full object-cover"
-              priority
+            <RandomAvatar
+              name={volunteer.name}
+              size={96}
+              className="rounded-full"
             />
           </div>
           
