@@ -36,7 +36,7 @@ export default function TopNavigationBar() {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 15000, // Poll every 15 seconds for new conversations
+      refetchInterval: 5000, // Poll every 5 seconds for new conversations
     }
   );
 
@@ -48,7 +48,7 @@ export default function TopNavigationBar() {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 15000, // Poll every 15 seconds for new groups
+      refetchInterval: 5000, // Poll every 5 seconds for new groups
     }
   );
 
