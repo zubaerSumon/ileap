@@ -12,7 +12,7 @@ export const useConversations = () => {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 15000, // Poll every 15 seconds for new conversations
+      refetchInterval: 5000, // Poll every 5 seconds for new conversations
     });
 
   const { data: groups, isLoading: isLoadingGroups } =
@@ -21,7 +21,7 @@ export const useConversations = () => {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
       refetchOnMount: true,
-      refetchInterval: 15000, // Poll every 15 seconds for new groups
+      refetchInterval: 5000, // Poll every 5 seconds for new groups
     });
 
   const markAsReadMutation = trpc.messages.markAsRead.useMutation({

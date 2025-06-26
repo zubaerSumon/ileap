@@ -1,8 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { MessageCircle } from "lucide-react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import RandomAvatar from "@/components/ui/random-avatar";
 
 interface Volunteer {
   _id: string;
@@ -39,12 +39,10 @@ export default function VolunteerCard({
         <div className="flex flex-col min-h-[280px] max-h-[280px]">
           <div className="flex justify-between items-center mb-4">
             <div className="relative w-12 h-12">
-              <Image
-                src="/avatar.svg"
-                alt="Volunteer Avatar"
-                width={48}
-                height={48}
-                className="rounded-full bg-gray-100"
+              <RandomAvatar
+                name={volunteer.name}
+                size={48}
+                className="rounded-full"
               />
             </div>
             <div className="flex items-center gap-2">
