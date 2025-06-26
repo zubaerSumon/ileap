@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Image from "next/image";
-import MobileTabsSlider from "@/components/ui/mobile-tabs-slider";
+import MobileTabsSlider from "@/components/layout/shared/MobileTabsSlider";
 
 type GalleryImage = {
   id: number;

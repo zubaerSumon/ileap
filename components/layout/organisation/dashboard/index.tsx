@@ -26,7 +26,7 @@ import { toast } from "react-hot-toast";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import { getGreeting } from "@/utils/helpers/getGreeting";
 import { CreateOpportunityButton } from "@/components/buttons/CreateOpportunityButton";
-import MobileTabsSlider from "@/components/ui/mobile-tabs-slider";
+import MobileTabsSlider from "@/components/layout/shared/MobileTabsSlider";
 
 interface Volunteer {
   _id: string;
