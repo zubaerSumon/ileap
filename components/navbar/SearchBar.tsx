@@ -8,7 +8,7 @@ import { SearchInput, MobileSearch, DesktopSearch } from "./search";
 import { useSearch } from "@/contexts/SearchContext";
 
 interface SearchBarProps {
-  role: "mentor" | "volunteer" | "admin";
+  role: "mentor" | "volunteer" | "admin" | "organization";
   disableOverlay?: boolean;
 }
 

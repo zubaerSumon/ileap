@@ -179,7 +179,8 @@ export default function MentorOpportunityDetailsPage() {
           key={applicant.id}
           applicant={applicant}
           onMessageClick={() => handleOpenMessageModal(applicant)}
-          hideRecruitButton={true}
+          opportunityId={opportunityId}
+          showMarkAsMentor={true}
         />
       ))}
       {filteredApplicants?.length === 0 && (
@@ -218,6 +219,8 @@ export default function MentorOpportunityDetailsPage() {
           applicant={applicant}
           onMessageClick={() => handleOpenMessageModal(applicant)}
           hideRecruitButton={true}
+          opportunityId={opportunityId}
+          showMarkAsMentor={true}
         />
       ))}
       {filteredRecruitedApplicants?.length === 0 && (
