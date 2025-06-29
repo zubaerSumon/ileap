@@ -10,6 +10,7 @@ import type { TRPCClientErrorLike } from "@trpc/client";
 import type { AppRouter } from "@/server";
 import { useRecruitmentStatus } from "@/hooks/useRecruitmentStatus";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
 export interface Applicant {
   id: string;
@@ -114,8 +115,8 @@ export function ApplicantsCard({
           </div>
         </Link>
 
-        <div className="flex flex-col sm:flex-row gap-3 mt-4">
-          <div className="flex gap-2">
+        <div className={cn("flex flex-col sm:flex-row space-x-3 mt-4", !hideRecruitButton && "justify-between")}>
+          <div className="flex space-x-2">
          
             {!hideRecruitButton && (
               <Button
