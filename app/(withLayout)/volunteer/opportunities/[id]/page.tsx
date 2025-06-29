@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { Loader2, FileSpreadsheet, MessageCircleCode, Hand, Search, Users } from "lucide-react";
 import { PostContent } from "@/components/layout/volunteer/home-page/PostContent";
-import { OpportunitySidebar } from "@/components/layout/shared/OpportunitySidebar";
+import { OpportunitySidebar } from "@/components/shared/OpportunitySidebar";
 import { useParams } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DynamicTabs, TabItem } from "@/components/layout/shared/DynamicTabs";
+import { DynamicTabs, TabItem } from "@/components/shared/DynamicTabs";
 import { Applicant, ApplicantsCard } from "@/components/layout/organisation/opportunities/ApplicantsCard";
 import MessageApplicantModal from "@/components/layout/organisation/opportunities/MessageApplicantModal";
 import Image from "next/image";

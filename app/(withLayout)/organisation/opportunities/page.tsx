@@ -2,7 +2,6 @@
 
 import React from "react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { CreateOpportunityButton } from "@/components/buttons/CreateOpportunityButton";
 
 import {
@@ -12,25 +11,17 @@ import {
   createColumnHelper,
 } from "@tanstack/react-table";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Calendar, Users, UserCheck } from "lucide-react";
+import { Calendar, Users, UserCheck } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import type { Opportunity } from "@/types/opportunities";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import OpportunityTabs from "@/components/layout/organisation/opportunities/OpportunityTabs";
 import { PaginationWrapper } from "@/components/PaginationWrapper";
 import { usePagination } from "@/hooks/usePagination";
-import { useRouter } from "next/navigation";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
+import OpportunityActionsDropdown from "@/components/layout/organisation/opportunities/OpportunityActionsDropdown";
 
 export default function OpportunitiesPage() {
-  const router = useRouter();
   const [activeTab, setActiveTab] = useState("open");
 
   const { data: opportunities, isLoading } =
@@ -39,7 +30,7 @@ export default function OpportunitiesPage() {
   // Filter opportunities based on active tab
   const filteredOpportunities = React.useMemo(() => {
     if (!opportunities) return [];
-    
+
     switch (activeTab) {
       case "open":
         return opportunities.filter((opp) => !opp.is_archived);
@@ -47,12 +38,13 @@ export default function OpportunitiesPage() {
         // Show recently created opportunities (within last 7 days)
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-        return opportunities.filter((opp) => 
-          !opp.is_archived && 
-          new Date(opp.createdAt) >= sevenDaysAgo
+        return opportunities.filter(
+          (opp) => !opp.is_archived && new Date(opp.createdAt) >= sevenDaysAgo
         );
       case "recruited":
-        return opportunities.filter((opp) => !opp.is_archived && opp.recruitCount && opp.recruitCount > 0);
+        return opportunities.filter(
+          (opp) => !opp.is_archived && opp.recruitCount && opp.recruitCount > 0
+        );
       case "archived":
         return opportunities.filter((opp) => opp.is_archived);
       default:
@@ -70,17 +62,18 @@ export default function OpportunitiesPage() {
   // Get counts for each tab
   const tabCounts = React.useMemo(() => {
     if (!opportunities) return { open: 0, draft: 0, recruited: 0, archived: 0 };
-    
+
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    
+
     return {
       open: opportunities.filter((opp) => !opp.is_archived).length,
-      draft: opportunities.filter((opp) => 
-        !opp.is_archived && 
-        new Date(opp.createdAt) >= sevenDaysAgo
+      draft: opportunities.filter(
+        (opp) => !opp.is_archived && new Date(opp.createdAt) >= sevenDaysAgo
       ).length,
-      recruited: opportunities.filter((opp) => !opp.is_archived && opp.recruitCount && opp.recruitCount > 0).length,
+      recruited: opportunities.filter(
+        (opp) => !opp.is_archived && opp.recruitCount && opp.recruitCount > 0
+      ).length,
       archived: opportunities.filter((opp) => opp.is_archived).length,
     };
   }, [opportunities]);
@@ -143,7 +136,9 @@ export default function OpportunitiesPage() {
           <div className="w-full text-center">
             <div className="text-sm font-medium">{formattedDate}</div>
             <div className="text-xs text-gray-500">
-              {opportunity.time?.start_time ? formatTimeToAMPM(opportunity.time.start_time) : 'Time TBD'}
+              {opportunity.time?.start_time
+                ? formatTimeToAMPM(opportunity.time.start_time)
+                : "Time TBD"}
             </div>
           </div>
         );
@@ -165,35 +160,13 @@ export default function OpportunitiesPage() {
       id: "actions",
       header: "",
       cell: (info) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="ml-auto cursor-pointer"
-            >
-              <MoreHorizontal className="w-5 h-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() =>
-                router.push(
-                  `/organisation/opportunities/${info.row.original._id}`
-                )
-              }
-            >
-              View Application
-            </DropdownMenuItem>
-            <DropdownMenuItem>Edit</DropdownMenuItem>
-            {activeTab !== "archived" && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="w-[60px] text-center">
+          <OpportunityActionsDropdown
+            opportunityId={info.row.original._id}
+            activeTab={activeTab}
+            className="ml-auto"
+          />
+        </div>
       ),
     }),
   ];
@@ -210,7 +183,9 @@ export default function OpportunitiesPage() {
   // Mobile card component for opportunities
   const OpportunityCard = ({ opportunity }: { opportunity: Opportunity }) => {
     const org = opportunity.organization_profile;
-    const startDate = opportunity.date?.start_date ? new Date(opportunity.date.start_date) : null;
+    const startDate = opportunity.date?.start_date
+      ? new Date(opportunity.date.start_date)
+      : null;
     const formattedDate = startDate?.toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
@@ -237,29 +212,12 @@ export default function OpportunitiesPage() {
               </p>
             </div>
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="shrink-0 h-8 w-8">
-                <MoreHorizontal className="w-4 h-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() =>
-                  router.push(`/organisation/opportunities/${opportunity._id}`)
-                }
-              >
-                View Application
-              </DropdownMenuItem>
-              <DropdownMenuItem>Edit</DropdownMenuItem>
-              {activeTab !== "archived" && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem variant="destructive">Delete</DropdownMenuItem>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <OpportunityActionsDropdown
+            opportunityId={opportunity._id}
+            activeTab={activeTab}
+            size="sm"
+            className="shrink-0"
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-3 text-sm">
@@ -277,12 +235,14 @@ export default function OpportunitiesPage() {
               )}
             </div>
           </div>
-          
+
           <div className="flex items-start gap-2">
             <Users className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-gray-500 text-xs">Applicants</p>
-              <p className="font-medium text-sm">{opportunity.applicantCount || 0}</p>
+              <p className="font-medium text-sm">
+                {opportunity.applicantCount || 0}
+              </p>
             </div>
           </div>
 
@@ -290,7 +250,9 @@ export default function OpportunitiesPage() {
             <UserCheck className="w-4 h-4 text-gray-400 mt-0.5 flex-shrink-0" />
             <div className="min-w-0">
               <p className="text-gray-500 text-xs">Recruits</p>
-              <p className="font-medium text-sm">{opportunity.recruitCount || 0}</p>
+              <p className="font-medium text-sm">
+                {opportunity.recruitCount || 0}
+              </p>
             </div>
           </div>
 
@@ -316,7 +278,9 @@ export default function OpportunitiesPage() {
             <div className="px-4 pt-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                  <h1 className="text-xl sm:text-2xl font-semibold mb-1">Opportunities</h1>
+                  <h1 className="text-xl sm:text-2xl font-semibold mb-1">
+                    Opportunities
+                  </h1>
                   <p className="text-sm text-gray-500">Posted tasks</p>
                 </div>
                 <CreateOpportunityButton />
@@ -413,7 +377,10 @@ export default function OpportunitiesPage() {
                 ) : (
                   <div className="space-y-4 min-h-[300px]">
                     {paginatedData.map((opportunity) => (
-                      <OpportunityCard key={opportunity._id} opportunity={opportunity} />
+                      <OpportunityCard
+                        key={opportunity._id}
+                        opportunity={opportunity}
+                      />
                     ))}
                   </div>
                 )}

@@ -12,7 +12,7 @@ import { useRouter, useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import { PostContent } from "@/components/layout/organisation/opportunities/PostContent";
-import { OpportunitySidebar } from "@/components/layout/shared/OpportunitySidebar";
+import { OpportunitySidebar } from "@/components/shared/OpportunitySidebar";
 import {
   Applicant,
   ApplicantsCard,
@@ -31,7 +31,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
 import BackButton from "@/components/buttons/BackButton";
-import { DynamicTabs, TabItem } from "@/components/layout/shared/DynamicTabs";
+import { DynamicTabs, TabItem } from "@/components/shared/DynamicTabs";
 
 export default function OpportunityDetailsPage() {
   const utils = trpc.useUtils();

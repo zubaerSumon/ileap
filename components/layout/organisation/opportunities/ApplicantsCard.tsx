@@ -6,7 +6,6 @@ import {
   UserCheck,
   Loader2,
   CheckCircle2,
-  UserPlus,
 } from "lucide-react";
 import Image from "next/image";
 import { HiClipboardDocumentList } from "react-icons/hi2";
@@ -19,6 +18,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { ApplicantActionsDropdown } from "./ApplicantActionsDropdown";
 
 export interface Applicant {
   id: string;
@@ -55,7 +55,6 @@ export function ApplicantsCard({
     !hideRecruitButton
   );
 
-  // Check if this volunteer is already a mentor for this opportunity
   const { data: opportunityMentors } =
     trpc.mentors.getOpportunityMentors.useQuery(
       { opportunityId: opportunityId || "" },
@@ -64,7 +63,6 @@ export function ApplicantsCard({
       }
     );
 
-  // Update mentor status when opportunity mentors data changes
   useEffect(() => {
     if (opportunityMentors) {
       const isMentor = opportunityMentors.some(
@@ -118,13 +116,21 @@ export function ApplicantsCard({
     });
   };
 
-  // Check if current user can mark as mentor (admin or mentor role)
   const canMarkAsMentor =
     session?.user?.role === "admin" || session?.user?.role === "mentor";
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="bg-white rounded-lg p-4 sm:p-6 border space-y-4 cursor-pointer hover:shadow-md transition-shadow">
+      <div className="bg-white rounded-lg p-4 sm:p-6 border space-y-4 cursor-pointer hover:shadow-md transition-shadow relative">
+        {/* Dropdown Menu */}
+        {showMarkAsMentor && canMarkAsMentor && (
+          <ApplicantActionsDropdown
+            isMentorForOpportunity={isMentorForOpportunity}
+            isMarkingAsMentor={markAsMentorMutation.isPending}
+            onMarkAsMentor={handleMarkAsMentor}
+          />
+        )}
+
         <Link href={`/volunteer/${applicant.id}/profile`} className="block">
           <div className="flex gap-3 sm:gap-4">
             <div className="flex-1 min-w-0">
@@ -185,75 +191,35 @@ export function ApplicantsCard({
           </div>
         </Link>
 
-        <div
-          className={cn(
-            "flex flex-col sm:flex-row space-x-3 mt-4",
-            !hideRecruitButton && "justify-between"
+        <div className={cn("flex flex-col sm:flex-row space-x-3 mt-4 ")}>
+          {!hideRecruitButton && (
+            <Button
+              variant="ghost"
+              size="lg"
+              className={`rounded-[6px] px-4 sm:px-6 font-normal w-full sm:w-auto ${
+                isRecruited
+                  ? "bg-green-50 text-green-600 hover:bg-green-100"
+                  : "bg-gray-100 hover:bg-gray-200"
+              }`}
+              onClick={handleRecruit}
+              disabled={recruitMutation.isPending || isRecruited}
+            >
+              {recruitMutation.isPending ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Recruiting...
+                </div>
+              ) : isRecruited ? (
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Recruited
+                </div>
+              ) : (
+                "Recruit"
+              )}
+            </Button>
           )}
-        >
-          <div className="flex space-x-2">
-            {!hideRecruitButton && (
-              <Button
-                variant="ghost"
-                size="lg"
-                className={`rounded-[6px] px-4 sm:px-6 font-normal w-full sm:w-auto ${
-                  isRecruited
-                    ? "bg-green-50 text-green-600 hover:bg-green-100"
-                    : "bg-gray-100 hover:bg-gray-200"
-                }`}
-                onClick={handleRecruit}
-                disabled={recruitMutation.isPending || isRecruited}
-              >
-                {recruitMutation.isPending ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Recruiting...
-                  </div>
-                ) : isRecruited ? (
-                  <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Recruited
-                  </div>
-                ) : (
-                  "Recruit"
-                )}
-              </Button>
-            )}
 
-            {/* Mark as Mentor button - only show for recruited volunteers when user has permission */}
-            {showMarkAsMentor && canMarkAsMentor && (
-              <Button
-                variant="outline"
-                size="lg"
-                className={`rounded-[6px] px-4 sm:px-6 font-normal w-full sm:w-auto ${
-                  isMentorForOpportunity
-                    ? "bg-purple-50 text-purple-600 border-purple-200"
-                    : "border-purple-200 text-purple-700 hover:bg-purple-50"
-                }`}
-                onClick={handleMarkAsMentor}
-                disabled={
-                  markAsMentorMutation.isPending || isMentorForOpportunity
-                }
-              >
-                {markAsMentorMutation.isPending ? (
-                  <div className="flex items-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Marking...
-                  </div>
-                ) : isMentorForOpportunity ? (
-                  <div className="flex items-center gap-2">
-                    <UserPlus className="w-4 h-4" />
-                    Mentor
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <UserPlus className="w-4 h-4" />
-                    Mark as Mentor
-                  </div>
-                )}
-              </Button>
-            )}
-          </div>
           <Button
             size="lg"
             className="bg-[#246BFD] hover:bg-[#246BFD]/90 text-white px-4 sm:px-6 rounded-[6px] w-full sm:w-auto"

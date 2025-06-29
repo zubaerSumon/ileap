@@ -2,7 +2,7 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ReactNode, useState } from "react";
-import MobileTabsSlider from "@/components/layout/shared/MobileTabsSlider";
+import MobileTabsSlider from "@/components/shared/MobileTabsSlider";
 import { cn } from "@/lib/utils";
 
 export interface TabItem {
