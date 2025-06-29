@@ -11,7 +11,7 @@ interface ChatAreaProps {
   messages: Message[] | undefined;
   isLoadingMessages: boolean;
   selectedConversation: Conversation | Group | undefined;
-  session: { user?: { id?: string } } | null;
+  session: { user?: { id?: string; role?: string } } | null;
   isGroup?: boolean;
   onDeleteGroup?: () => void;
   onDeleteConversation?: () => void;
@@ -154,6 +154,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
             onDeleteGroup={onDeleteGroup}
             onDeleteConversation={onDeleteConversation}
             onGroupUpdated={onGroupUpdated}
+            userRole={session?.user?.role}
           />
         )}
         <div className="flex-1 flex flex-col items-center justify-center py-8 px-4">
@@ -195,6 +196,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
           onDeleteGroup={onDeleteGroup}
           onDeleteConversation={onDeleteConversation}
           onGroupUpdated={onGroupUpdated}
+          userRole={session?.user?.role}
         />
       )}
 

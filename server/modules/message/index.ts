@@ -430,6 +430,7 @@ export const messsageRouter = router({
       description: z.string().optional(),
       memberIds: z.array(z.string()),
       isOrganizationGroup: z.boolean().optional(),
+      adminIds: z.array(z.string()).optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       try {
@@ -465,12 +466,16 @@ export const messsageRouter = router({
           });
         }
 
+        // Create group with opportunity mentors as admins if adminIds provided
+        const adminIds = input.adminIds || [];
+        const allAdmins = [user._id, ...adminIds.map(id => new Types.ObjectId(id))];
+
         const group = await Group.create({
           name: input.name,
           description: input.description,
           createdBy: user._id,
           members: [...input.memberIds.map(id => new Types.ObjectId(id)), user._id],
-          admins: [user._id],
+          admins: allAdmins,
           isOrganizationGroup: input.isOrganizationGroup || false,
         });
 
@@ -487,13 +492,16 @@ export const messsageRouter = router({
           });
         }
 
-        // Convert to the expected format
+        // Convert to the expected format with mentor labels for opportunity mentors
         const formattedGroup = {
           _id: group._id.toString(),
           name: group.name,
           description: group.description,
           members: (populatedGroup as any).members || [],
-          admins: (populatedGroup as any).admins || [],
+          admins: (populatedGroup as any).admins.map((admin: any) => ({
+            ...admin,
+            role: adminIds.includes(admin._id.toString()) ? "mentor" : admin.role
+          })) || [],
           createdBy: group.createdBy.toString(),
           isOrganizationGroup: group.isOrganizationGroup,
           avatar: group.avatar,

@@ -10,6 +10,7 @@ import VolunteerApplication from "@/server/db/models/volunteer-application";
 import OrganisationRecruitment from "@/server/db/models/organisation-recruitment";
 import { publicProcedure } from "@/server/trpc";
 import mongoose from "mongoose";
+import OpportunityMentor from "@/server/db/models/opportunity-mentor";
 
 export const opportunityRouter = router({
   createOpportunity: protectedProcedure
@@ -225,6 +226,108 @@ export const opportunityRouter = router({
       });
     }
   }),
+
+  getMentorOpportunities: protectedProcedure
+    .input(z.object({
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(50).default(6),
+      search: z.string().optional(),
+      categories: z.array(z.string()).optional(),
+      commitmentType: z.string().optional(),
+      location: z.string().optional(),
+      availability: z.string().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to view mentor opportunities",
+        });
+      }
+
+      try {
+        const user = await User.findById(sessionUser.id);
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        // Find all opportunities where the current user is a mentor
+        const mentorAssignments = await OpportunityMentor.find({
+          volunteer: user._id,
+        }).populate('opportunity');
+
+        const mentorOpportunityIds = mentorAssignments.map(
+          (assignment) => assignment.opportunity
+        );
+
+        if (mentorOpportunityIds.length === 0) {
+          return {
+            opportunities: [],
+            total: 0,
+            totalPages: 0,
+            currentPage: input.page,
+          };
+        }
+
+        // Build query for opportunities
+        const query: Record<string, unknown> = {
+          _id: { $in: mentorOpportunityIds },
+        };
+
+        if (input.search) {
+          query.$or = [
+            { title: { $regex: input.search, $options: "i" } },
+            { description: { $regex: input.search, $options: "i" } },
+          ];
+        }
+
+        if (input.categories && input.categories.length > 0) {
+          query.category = { $in: input.categories };
+        }
+
+        if (input.commitmentType && input.commitmentType !== "all") {
+          query.commitment_type = input.commitmentType;
+        }
+
+        if (input.location) {
+          query.location = { $regex: input.location, $options: "i" };
+        }
+
+        if (input.availability && input.availability !== "all") {
+          query.availability = input.availability;
+        }
+
+        // Calculate pagination
+        const skip = (input.page - 1) * input.limit;
+        const total = await Opportunity.countDocuments(query);
+        const totalPages = Math.ceil(total / input.limit);
+
+        // Fetch opportunities with pagination
+        const opportunities = await Opportunity.find(query)
+          .populate("organization_profile")
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(input.limit);
+
+        return {
+          opportunities,
+          total,
+          totalPages,
+          currentPage: input.page,
+        };
+      } catch (error) {
+        console.error("Error fetching mentor opportunities:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to fetch mentor opportunities",
+          cause: error,
+        });
+      }
+    }),
 
   getAllOpportunities: protectedProcedure
     .input(opportunityValidation.getAllOpportunitiesSchema)
