@@ -22,6 +22,7 @@ interface ConversationHeaderProps {
   onDeleteGroup?: () => void;
   onDeleteConversation?: () => void;
   onGroupUpdated?: () => void;
+  userRole?: string;
 }
 
 export const ConversationHeaderOptimized: React.FC<ConversationHeaderProps> = ({
@@ -29,7 +30,8 @@ export const ConversationHeaderOptimized: React.FC<ConversationHeaderProps> = ({
   isGroup,
   onDeleteGroup,
   onDeleteConversation,
-  onGroupUpdated
+  onGroupUpdated,
+  userRole
 }) => {
   if (!user) return null;
 
@@ -106,50 +108,52 @@ export const ConversationHeaderOptimized: React.FC<ConversationHeaderProps> = ({
           />
         )}
         
-        {/* Action Menu - Dropdown for better mobile experience */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 hover:bg-gray-100"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {isGroup && onDeleteGroup && (
-              <>
-                <DropdownMenuItem
-                  onClick={onDeleteGroup}
-                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Group
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-            
-            {!isGroup && onDeleteConversation && (
-              <>
-                <DropdownMenuItem
-                  onClick={onDeleteConversation}
-                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Conversation
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-            
-            <DropdownMenuItem className="text-gray-600">
-              <span className="text-xs">Group ID: {'_id' in user ? user._id?.substring(0, 8) : 'N/A'}...</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Action Menu - Dropdown for better mobile experience - Hidden for volunteers */}
+        {userRole !== "volunteer" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-gray-100"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {isGroup && onDeleteGroup && (
+                <>
+                  <DropdownMenuItem
+                    onClick={onDeleteGroup}
+                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Group
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              
+              {!isGroup && onDeleteConversation && (
+                <>
+                  <DropdownMenuItem
+                    onClick={onDeleteConversation}
+                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Conversation
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              
+              <DropdownMenuItem className="text-gray-600">
+                <span className="text-xs">Group ID: {'_id' in user ? user._id?.substring(0, 8) : 'N/A'}...</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );
