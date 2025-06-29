@@ -53,6 +53,18 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
     if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
     return user.admins?.length || 0;
   };
+
+  // Get mentor count for groups
+  const getMentorCount = () => {
+    if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
+    return user.admins?.filter(admin => admin.role === "volunteer").length || 0;
+  };
+
+  // Get regular admin count (excluding mentors)
+  const getRegularAdminCount = () => {
+    if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
+    return user.admins?.filter(admin => admin.role !== "volunteer").length || 0;
+  };
   
   return (
     <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-white">
@@ -74,9 +86,18 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
               {user.name}
             </h2>
             {isGroup && getAdminCount() > 0 && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex-shrink-0">
-                {getAdminCount()} admin{getAdminCount() !== 1 ? 's' : ''}
-              </span>
+              <div className="flex items-center gap-1">
+                {getMentorCount() > 0 && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 flex-shrink-0">
+                    {getMentorCount()} mentor{getMentorCount() !== 1 ? 's' : ''}
+                  </span>
+                )}
+                {getRegularAdminCount() > 0 && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex-shrink-0">
+                    {getRegularAdminCount()} admin{getRegularAdminCount() !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
             )}
           </div>
           
@@ -86,10 +107,26 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
                 <Users className="h-3 w-3" />
                 {getMemberCount()} member{getMemberCount() !== 1 ? 's' : ''}
               </p>
-              {getAdminCount() > 0 && getAdminCount() !== getMemberCount() && (
+              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
                 <span className="text-xs text-gray-400">•</span>
               )}
-              {getAdminCount() > 0 && getAdminCount() !== getMemberCount() && (
+              {getMentorCount() > 0 && (
+                <p className="text-xs text-blue-600">
+                  {getMentorCount()} mentor{getMentorCount() !== 1 ? 's' : ''}
+                </p>
+              )}
+              {getMentorCount() > 0 && getRegularAdminCount() > 0 && (
+                <span className="text-xs text-gray-400">•</span>
+              )}
+              {getRegularAdminCount() > 0 && (
+                <p className="text-xs text-yellow-600">
+                  {getRegularAdminCount()} admin{getRegularAdminCount() !== 1 ? 's' : ''}
+                </p>
+              )}
+              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
+                <span className="text-xs text-gray-400">•</span>
+              )}
+              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
                 <p className="text-xs text-gray-500">
                   {getMemberCount() - getAdminCount()} regular
                 </p>

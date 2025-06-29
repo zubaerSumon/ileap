@@ -27,17 +27,16 @@ export default function FindOpportunity() {
     filters.availability,
   ]);
 
-  const { data: opportunitiesData, isLoading } =
-    trpc.opportunities.getAllOpportunities.useQuery({
-      page: currentPage,
-      limit: 6,
-      search: filters.searchQuery || undefined,
-      categories:
-        filters.categories.length > 0 ? filters.categories : undefined,
-      commitmentType: filters.commitmentType,
-      location: filters.location || undefined,
-      availability: filters.availability || undefined,
-    });
+  const { data: opportunitiesData, isLoading } = trpc.opportunities.getAllOpportunities.useQuery({
+    page: currentPage,
+    limit: 6,
+    search: filters.searchQuery || undefined,
+    categories:
+      filters.categories.length > 0 ? filters.categories : undefined,
+    commitmentType: filters.commitmentType,
+    location: filters.location || undefined,
+    availability: filters.availability || undefined,
+  });
 
   // Debug logging
   console.log("Current filters:", filters);
@@ -61,17 +60,6 @@ export default function FindOpportunity() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Find Your Perfect Volunteer Opportunity
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Discover meaningful ways to give back to your community and make a
-            difference in the world.
-          </p>
-        </div>
-
         <div className="flex flex-col md:flex-row gap-6">
           {/* Desktop Sidebar */}
           <div className="hidden md:block sticky top-4">
@@ -136,8 +124,7 @@ export default function FindOpportunity() {
                       No opportunities found
                     </h3>
                     <p className="text-gray-500 mb-6">
-                      Try adjusting your filters or search terms to find more
-                      opportunities.
+                      Try adjusting your filters or search terms to find more opportunities.
                     </p>
                     <Button
                       variant="outline"

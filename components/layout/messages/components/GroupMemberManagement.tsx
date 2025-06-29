@@ -196,7 +196,11 @@ export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({
                           <Crown className="h-3 w-3 text-yellow-500" />
                         )}
                       </div>
-                      <span className="text-xs text-gray-500">{member.role}</span>
+                      <span className="text-xs text-gray-500">
+                        {isCurrentUserAdmin(member._id) ? 
+                          (member.role === "volunteer" ? "Mentor" : "Admin") : 
+                          member.role}
+                      </span>
                     </div>
                   </div>
                   
