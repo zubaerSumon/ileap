@@ -41,12 +41,16 @@ export default function LoginPage() {
     if (!isLoading) {
       if (isAuthenticated && session?.user?.role) {
         const role = session.user.role.toLowerCase();
-        router.replace(role === "admin" || role === "mentor" ? "/organisation/dashboard" : "/search?type=opportunity");
+        router.replace(
+          role !== "volunteer"
+            ? "/organisation/dashboard"
+            : `/${role}/dashboard`
+        );
       } else if (!isAuthenticated && session?.user?.role && !hasProfile) {
         const timeoutId = setTimeout(() => {
           router.replace("/signup");
         }, 100);
-        
+
         return () => clearTimeout(timeoutId);
       }
     }
@@ -150,7 +154,6 @@ export default function LoginPage() {
                   />
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <Lock size={18} />
-                     
                   </div>
                   <button
                     type="button"
@@ -187,7 +190,7 @@ export default function LoginPage() {
                 className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium transition-colors flex items-center justify-center"
               >
                 {isSubmitting ? (
-                  <Loader2  className="h-5 w-5 mr-2 animate-spin"/>
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                 ) : null}
                 Sign in
               </button>

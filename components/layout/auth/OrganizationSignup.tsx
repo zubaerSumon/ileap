@@ -43,18 +43,14 @@ export default function OrganizationSignup() {
         toast.success("Profile setup completed successfully!");
         setIsProfileSetupComplete(true);
 
-        // Wait for profile check to update
         await utils.users.profileCheckup.invalidate();
 
-        // Redirect to organization dashboard
         const role = session?.user?.role?.toLowerCase();
         if (role) {
           router.replace(
-            role === "admin" || role === "mentor"
+            role !== "volunteer"
               ? "/organisation/dashboard"
-              : role === "volunteer"
-              ? "/search?type=opportunity"
-              : `/${role}`
+              : `/${role}/dashboard`
           );
         }
       } catch (error) {
@@ -91,7 +87,6 @@ export default function OrganizationSignup() {
     },
   });
 
-  // Add debug logging for form state
   useEffect(() => {
     console.log("Form state:", {
       values: form.getValues(),
@@ -196,9 +191,9 @@ export default function OrganizationSignup() {
     if (!isLoading) {
       if (isAuthenticated && session?.user?.role) {
         router.replace(
-          session.user.role === "admin" || session.user.role === "mentor"
+          session.user.role !== "volunteer"
             ? "/organisation/dashboard"
-            : `/${session.user.role}`
+            : `/${session.user.role}/dashboard`
         );
       } else if (session?.user && !isAuthenticated) {
         setStep(2);
@@ -262,7 +257,12 @@ export default function OrganizationSignup() {
             />
           )}
           {step === 2 && <OrgProfileStep form={form} />}
-          {step === 3 && <OrgDetailsStep form={form} onImageUploadStateChange={setIsImageUploading} />}
+          {step === 3 && (
+            <OrgDetailsStep
+              form={form}
+              onImageUploadStateChange={setIsImageUploading}
+            />
+          )}
 
           <div className="container mx-auto px-4">
             <div className="flex justify-between">
@@ -272,7 +272,9 @@ export default function OrganizationSignup() {
                     type="button"
                     variant="outline"
                     onClick={handleBack}
-                    disabled={isSignupLoading || isProfileLoading || isImageUploading}
+                    disabled={
+                      isSignupLoading || isProfileLoading || isImageUploading
+                    }
                     className="cursor-pointer"
                   >
                     Back
@@ -282,7 +284,9 @@ export default function OrganizationSignup() {
               <Button
                 type="button"
                 onClick={handleNext}
-                disabled={isSignupLoading || isProfileLoading || isImageUploading}
+                disabled={
+                  isSignupLoading || isProfileLoading || isImageUploading
+                }
                 className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
                 {isSignupLoading || isProfileLoading ? (

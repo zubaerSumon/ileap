@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import { VolunteerProfile } from '@/app/(withLayout)/components/VolunteerProfile';
+import { VolunteerProfile } from '@/components/layout/volunteer/profile/VolunteerProfile';
 import ProtectedLayout from '@/components/layout/ProtectedLayout';
 
 export default function VolunteerProfilePage() {
