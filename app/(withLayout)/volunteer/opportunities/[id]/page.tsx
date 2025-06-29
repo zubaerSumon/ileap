@@ -186,7 +186,8 @@ export default function OpportunityDetailPage() {
           key={applicant.id}
           applicant={applicant}
           onMessageClick={() => handleOpenMessageModal(applicant)}
-          hideRecruitButton={true}
+          opportunityId={opportunityId}
+          showMarkAsMentor={true}
         />
       ))}
       {filteredApplicants?.length === 0 && (
