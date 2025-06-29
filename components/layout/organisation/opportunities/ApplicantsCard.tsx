@@ -1,7 +1,13 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MapPin,  UserCheck, Loader2, CheckCircle2, UserPlus } from "lucide-react";
+import {
+  MapPin,
+  UserCheck,
+  Loader2,
+  CheckCircle2,
+  UserPlus,
+} from "lucide-react";
 import Image from "next/image";
 import { HiClipboardDocumentList } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
@@ -12,6 +18,7 @@ import { useRecruitmentStatus } from "@/hooks/useRecruitmentStatus";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 export interface Applicant {
   id: string;
@@ -49,17 +56,21 @@ export function ApplicantsCard({
   );
 
   // Check if this volunteer is already a mentor for this opportunity
-  const { data: opportunityMentors } = trpc.mentors.getOpportunityMentors.useQuery(
-    { opportunityId: opportunityId || "" },
-    { 
-      enabled: !!opportunityId && showMarkAsMentor,
-    }
-  );
+  const { data: opportunityMentors } =
+    trpc.mentors.getOpportunityMentors.useQuery(
+      { opportunityId: opportunityId || "" },
+      {
+        enabled: !!opportunityId && showMarkAsMentor,
+      }
+    );
 
   // Update mentor status when opportunity mentors data changes
   useEffect(() => {
     if (opportunityMentors) {
-      const isMentor = opportunityMentors.some((mentor: { volunteer: { _id: string } }) => mentor.volunteer._id === applicant.id);
+      const isMentor = opportunityMentors.some(
+        (mentor: { volunteer: { _id: string } }) =>
+          mentor.volunteer._id === applicant.id
+      );
       setIsMentorForOpportunity(isMentor);
     }
   }, [opportunityMentors, applicant.id]);
@@ -78,7 +89,9 @@ export function ApplicantsCard({
 
   const markAsMentorMutation = trpc.mentors.markAsMentor.useMutation({
     onSuccess: () => {
-      toast.success("Volunteer has been marked as mentor for this opportunity successfully.");
+      toast.success(
+        "Volunteer has been marked as mentor for this opportunity successfully."
+      );
       setIsMentorForOpportunity(true);
       utils.mentors.getOpportunityMentors.invalidate();
     },
@@ -106,7 +119,8 @@ export function ApplicantsCard({
   };
 
   // Check if current user can mark as mentor (admin or mentor role)
-  const canMarkAsMentor = session?.user?.role === "admin" || session?.user?.role === "mentor";
+  const canMarkAsMentor =
+    session?.user?.role === "admin" || session?.user?.role === "mentor";
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -164,14 +178,20 @@ export function ApplicantsCard({
                 ))}
               </div>
 
-              <p className="text-sm text-gray-600 mt-3 line-clamp-2">{applicant.bio}</p>
+              <p className="text-sm text-gray-600 mt-3 line-clamp-2">
+                {applicant.bio}
+              </p>
             </div>
           </div>
         </Link>
 
-        <div className={cn("flex flex-col sm:flex-row space-x-3 mt-4", !hideRecruitButton && "justify-between")}>
+        <div
+          className={cn(
+            "flex flex-col sm:flex-row space-x-3 mt-4",
+            !hideRecruitButton && "justify-between"
+          )}
+        >
           <div className="flex space-x-2">
-         
             {!hideRecruitButton && (
               <Button
                 variant="ghost"
@@ -211,7 +231,9 @@ export function ApplicantsCard({
                     : "border-purple-200 text-purple-700 hover:bg-purple-50"
                 }`}
                 onClick={handleMarkAsMentor}
-                disabled={markAsMentorMutation.isPending || isMentorForOpportunity}
+                disabled={
+                  markAsMentorMutation.isPending || isMentorForOpportunity
+                }
               >
                 {markAsMentorMutation.isPending ? (
                   <div className="flex items-center gap-2">

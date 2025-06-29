@@ -89,9 +89,9 @@ export function TopBar({
           <Link
             href={
               session
-                ? session.user?.role === "volunteer"
-                  ? "/volunteer"
-                  : "/organisation"
+                ? session.user?.role !== "volunteer"
+                  ? "/organisation/dashboard"
+                  : `/${session?.user?.role}/dashboard`
                 : "/"
             }
             className="flex items-center cursor-pointer"
@@ -106,30 +106,27 @@ export function TopBar({
               priority
             />
           </Link>
-          {session?.user?.role !== "volunteer" && isProtectedPath && (
-            <>
-              <Link
-                href="/organisation/dashboard"
-                className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
-              >
-                <LayoutDashboard className="h-4 w-4" /> Dashboard
-              </Link>
-              <Link
-                href="/organisation/opportunities"
-                className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
-              >
-                <FileUser className="h-4 w-4" /> Opportunities
-              </Link>
-            </>
-          )}
-          {session?.user?.role === "volunteer" && isProtectedPath && (
+          {isProtectedPath && (
             <Link
-              href="/volunteer/dashboard"
+              href={
+                session?.user?.role !== "volunteer"
+                  ? "/organisation/dashboard"
+                  : `/${session?.user?.role}/dashboard`
+              }
               className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
             >
               <LayoutDashboard className="h-4 w-4" /> Dashboard
             </Link>
           )}
+          {session?.user?.role !== "volunteer" && isProtectedPath && (
+            <Link
+              href="/organisation/opportunities"
+              className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
+            >
+              <FileUser className="h-4 w-4" /> Opportunities
+            </Link>
+          )}
+
           {isProtectedPath && (
             <Link
               href={
@@ -162,14 +159,14 @@ export function TopBar({
               <div className="flex items-center space-x-2 sm:space-x-6">
                 <div className="flex items-center gap-1 ms-2 sm:ms-0 sm:gap-3 px-2 sm:px-4 py-1 sm:py-2 bg-gray-800/50 rounded-lg border border-gray-700">
                   <span className="text-xs sm:text-sm text-gray-300">
-                    {roleParam !== "organization"
-                      ? "Wanna join as an organization?"
+                    {roleParam !== "organisation"
+                      ? "Wanna join as an organisation?"
                       : "Wanna join as a volunteer?"}
                   </span>
                   <Link
                     href={
-                      roleParam !== "organization"
-                        ? "/signup?role=organization"
+                      roleParam !== "organisation"
+                        ? "/signup?role=organisation"
                         : "/signup"
                     }
                     className="text-xs sm:text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors duration-200 px-2 sm:px-3 py-1 bg-blue-600/20 rounded-md hover:bg-blue-600/30 whitespace-nowrap"
@@ -186,16 +183,15 @@ export function TopBar({
               {session?.user?.role && (
                 <SearchBar
                   role={
-                    session.user.role as "volunteer" | "organization" | "admin"
+                    session.user.role as "volunteer" | "mentor" | "admin"
                   }
                 />
               )}
               <Link
                 href={`/${
-                  session?.user?.role === "mentor" ||
-                  session?.user?.role === "admin"
+                  session?.user?.role !== "volunteer"
                     ? "organisation"
-                    : session?.user?.role
+                    : `${session?.user?.role}`
                 }/messages`}
                 className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-800 transition-colors relative"
               >

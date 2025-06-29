@@ -8,7 +8,7 @@ import { SearchInput, MobileSearch, DesktopSearch } from "./search";
 import { useSearch } from "@/contexts/SearchContext";
 
 interface SearchBarProps {
-  role: "organization" | "volunteer" | "admin";
+  role: "mentor" | "volunteer" | "admin";
   disableOverlay?: boolean;
 }
 
@@ -24,7 +24,7 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
     "nonprofit marketing",
     "youth mentor",
   ];
-  
+
   const allSuggestions = [
     "environmental cleanup",
     "event volunteer",
@@ -34,7 +34,7 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
     "community outreach",
     "social media for NGOs",
   ];
-  
+
   const suggestions = searchQuery
     ? allSuggestions.filter((s) =>
         s.toLowerCase().includes(searchQuery.toLowerCase())
@@ -64,10 +64,8 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
   }, [overlay]);
 
   const placeholder =
-    role === "organization" || role === "admin"
-      ? "Search for volunteers"
-      : "Search for opportunities";
-  const type = role === "organization" || role === "admin" ? "volunteer" : "opportunity";
+    role !== "volunteer" ? "Search for volunteers" : "Search for opportunities";
+  const type = role !== "volunteer" ? "volunteer" : "opportunity";
 
   const PANEL_HEIGHT = 380;
 
@@ -75,7 +73,9 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
     if (e) e.preventDefault();
     if (searchQuery.trim()) {
       if (!disableOverlay) {
-        router.push(`/search?type=${type}&q=${encodeURIComponent(searchQuery)}`);
+        router.push(
+          `/search?type=${type}&q=${encodeURIComponent(searchQuery)}`
+        );
       }
       setOverlay(false);
     }
@@ -108,7 +108,7 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
               initial={{ height: 160, opacity: 0 }}
               animate={{ height: PANEL_HEIGHT, opacity: 1 }}
               exit={{ height: 160, opacity: 0 }}
-              transition={{ duration: 0.6, ease: 'easeInOut' }}
+              transition={{ duration: 0.6, ease: "easeInOut" }}
               className="fixed top-0 left-0 w-full z-50 bg-white origin-top overflow-hidden"
             >
               <div className="w-full h-full flex flex-col overflow-hidden">
@@ -152,7 +152,9 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
       )}
 
       <div
-        className={`relative ${disableOverlay ? 'flex w-full' : 'hidden md:flex w-[340px]'} h-[40px] items-center rounded-md border border-input bg-background overflow-visible group focus-within:ring-2 focus-within:ring-blue-500`}
+        className={`relative ${
+          disableOverlay ? "flex w-full" : "hidden md:flex w-[340px]"
+        } h-[40px] items-center rounded-md border border-input bg-background overflow-visible group focus-within:ring-2 focus-within:ring-blue-500`}
         style={{ boxShadow: "none" }}
         onClick={disableOverlay ? undefined : () => setOverlay(true)}
       >
@@ -165,7 +167,9 @@ export function SearchBar({ role, disableOverlay = false }: SearchBarProps) {
           onInput={handleInput}
           onSearch={handleSearch}
           readOnly={!disableOverlay}
-          className={`border-none bg-transparent focus:ring-0 focus-visible:ring-0 px-2 text-sm flex-1 placeholder:text-muted-foreground ${!disableOverlay ? 'cursor-pointer' : ''}`}
+          className={`border-none bg-transparent focus:ring-0 focus-visible:ring-0 px-2 text-sm flex-1 placeholder:text-muted-foreground ${
+            !disableOverlay ? "cursor-pointer" : ""
+          }`}
         />
       </div>
     </>

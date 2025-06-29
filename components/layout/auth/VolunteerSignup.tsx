@@ -54,11 +54,9 @@ export default function VolunteerSignup() {
           const role = session?.user?.role?.toLowerCase();
           if (role) {
             router.replace(
-              role === "admin" || role === "mentor"
+              role !== "volunteer"
                 ? "/organisation/dashboard"
-                : role === "volunteer"
-                ? "/search?type=opportunity"
-                : `/${role}`
+                : `/${role}/dashboard`
             );
           }
         }, 1000);
@@ -165,11 +163,9 @@ export default function VolunteerSignup() {
         if (isAuthenticated && session?.user?.role) {
           const role = session.user.role.toLowerCase();
           await router.replace(
-            role === "admin" || role === "mentor"
+            role !== "volunteer"
               ? "/organisation/dashboard"
-              : role === "volunteer"
-              ? "/search?type=opportunity"
-              : `/${role}`
+              : `/${role}/dashboard`
           );
         } else if (session?.user && !isAuthenticated) {
           setStep(2);
