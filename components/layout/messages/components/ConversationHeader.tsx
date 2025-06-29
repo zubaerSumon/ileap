@@ -22,6 +22,7 @@ interface ConversationHeaderProps {
   onDeleteGroup?: () => void;
   onDeleteConversation?: () => void;
   onGroupUpdated?: () => void;
+  userRole?: string;
 }
 
 export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
@@ -29,7 +30,8 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   isGroup,
   onDeleteGroup,
   onDeleteConversation,
-  onGroupUpdated
+  onGroupUpdated,
+  userRole
 }) => {
   if (!user) return null;
 
@@ -53,6 +55,18 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
     if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
     return user.admins?.length || 0;
   };
+
+  // Get mentor count for groups
+  const getMentorCount = () => {
+    if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
+    return user.admins?.filter(admin => admin.role === "volunteer").length || 0;
+  };
+
+  // Get regular admin count (excluding mentors)
+  const getRegularAdminCount = () => {
+    if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
+    return user.admins?.filter(admin => admin.role !== "volunteer").length || 0;
+  };
   
   return (
     <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-white">
@@ -74,9 +88,18 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
               {user.name}
             </h2>
             {isGroup && getAdminCount() > 0 && (
-              <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex-shrink-0">
-                {getAdminCount()} admin{getAdminCount() !== 1 ? 's' : ''}
-              </span>
+              <div className="flex items-center gap-1">
+                {getMentorCount() > 0 && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 flex-shrink-0">
+                    {getMentorCount()} mentor{getMentorCount() !== 1 ? 's' : ''}
+                  </span>
+                )}
+                {getRegularAdminCount() > 0 && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex-shrink-0">
+                    {getRegularAdminCount()} admin{getRegularAdminCount() !== 1 ? 's' : ''}
+                  </span>
+                )}
+              </div>
             )}
           </div>
           
@@ -86,10 +109,26 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
                 <Users className="h-3 w-3" />
                 {getMemberCount()} member{getMemberCount() !== 1 ? 's' : ''}
               </p>
-              {getAdminCount() > 0 && getAdminCount() !== getMemberCount() && (
+              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
                 <span className="text-xs text-gray-400">•</span>
               )}
-              {getAdminCount() > 0 && getAdminCount() !== getMemberCount() && (
+              {getMentorCount() > 0 && (
+                <p className="text-xs text-blue-600">
+                  {getMentorCount()} mentor{getMentorCount() !== 1 ? 's' : ''}
+                </p>
+              )}
+              {getMentorCount() > 0 && getRegularAdminCount() > 0 && (
+                <span className="text-xs text-gray-400">•</span>
+              )}
+              {getRegularAdminCount() > 0 && (
+                <p className="text-xs text-yellow-600">
+                  {getRegularAdminCount()} admin{getRegularAdminCount() !== 1 ? 's' : ''}
+                </p>
+              )}
+              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
+                <span className="text-xs text-gray-400">•</span>
+              )}
+              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
                 <p className="text-xs text-gray-500">
                   {getMemberCount() - getAdminCount()} regular
                 </p>
@@ -100,7 +139,7 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
       </div>
       
       {/* Right side - Action Buttons */}
-      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2">
         {/* Group Member Management - Always visible for groups */}
         {isGroup && onGroupUpdated && user && 'members' in user && Array.isArray(user.members) && (
           <GroupMemberManagement 
@@ -109,46 +148,48 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
           />
         )}
         
-        {/* Action Menu - Dropdown for better mobile experience */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-8 w-8 p-0 hover:bg-gray-100"
-            >
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {isGroup && onDeleteGroup && (
-              <>
-                <DropdownMenuItem
-                  onClick={onDeleteGroup}
-                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Group
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-            
-            {!isGroup && onDeleteConversation && (
-              <>
-                <DropdownMenuItem
-                  onClick={onDeleteConversation}
-                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                >
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  Delete Conversation
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {/* Action Menu - Dropdown for better mobile experience - Hidden for volunteers */}
+        {userRole !== "volunteer" && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-8 w-8 p-0 hover:bg-gray-100"
+              >
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Open menu</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {isGroup && onDeleteGroup && (
+                <>
+                  <DropdownMenuItem
+                    onClick={onDeleteGroup}
+                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Group
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+              
+              {!isGroup && onDeleteConversation && (
+                <>
+                  <DropdownMenuItem
+                    onClick={onDeleteConversation}
+                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Delete Conversation
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Loader2, FileSpreadsheet, MessageCircleCode, Hand, Search, Users } from "lucide-react";
 import { PostContent } from "@/components/layout/volunteer/home-page/PostContent";
 import { OpportunitySidebar } from "@/components/layout/shared/OpportunitySidebar";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,9 @@ import Image from "next/image";
 import BackButton from "@/components/buttons/BackButton";
 import { useSession } from "next-auth/react";
 
-export default function OpportunityDetailPage() {
+export default function MentorOpportunityDetailsPage() {
   const params = useParams();
+  const router = useRouter();
   const { data: session } = useSession();
   const opportunityId = params.id as string;
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -132,18 +133,10 @@ export default function OpportunityDetailPage() {
     );
   }
 
-  // If user is not a mentor for this opportunity, show regular volunteer view
+  // If user is not a mentor for this opportunity, redirect to dashboard
   if (!isCurrentUserMentor) {
-    return (
-      <ProtectedLayout>
-        <div className="w-full px-2 md:px-4 py-4 md:py-8">
-          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 justify-center w-full">
-            <PostContent opportunity={opportunity} />
-            <OpportunitySidebar opportunity={opportunity} userRole="volunteer" />
-          </div>
-        </div>
-      </ProtectedLayout>
-    );
+    router.push("/volunteer/dashboard");
+    return null;
   }
 
   // Define tab content for mentor view
@@ -246,14 +239,14 @@ export default function OpportunityDetailPage() {
       value: "review",
       label: "Applicants",
       icon: <MessageCircleCode />,
-      count: filteredApplicants?.length || 0,
+      count: applicants?.length || 0,
       content: applicantsContent,
     },
     {
       value: "recruits",
       label: "Recruits",
       icon: <Hand />,
-      count: filteredRecruitedApplicants?.length || 0,
+      count: recruitedApplicants?.length || 0,
       content: recruitsContent,
     },
   ];
@@ -296,4 +289,4 @@ export default function OpportunityDetailPage() {
       />
     </ProtectedLayout>
   );
-}
+} 

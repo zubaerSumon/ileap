@@ -5,6 +5,8 @@ import { TRPCError } from "@trpc/server";
 import User from "@/server/db/models/user";
 import OrganizationProfile from "@/server/db/models/organization-profile";
 import MentorInvitation from "@/server/db/models/mentor-invitation";
+import OpportunityMentor from "@/server/db/models/opportunity-mentor";
+import Opportunity from "@/server/db/models/opportunity";
 import { z } from "zod";
 import { sendMentorInvitationMail } from "@/utils/helpers/sendMentorInvitationMail";
 import crypto from "crypto";
@@ -21,6 +23,11 @@ const acceptInvitationSchema = z.object({
   token: z.string().min(1, "Token is required"),
   name: z.string().min(1, "Name is required"),
   password: z.string().min(6, "Password must be at least 6 characters long"),
+});
+
+const markAsMentorSchema = z.object({
+  volunteerId: z.string().min(1, "Volunteer ID is required"),
+  opportunityId: z.string().min(1, "Opportunity ID is required"),
 });
 
 export const organizationMentorRouter = router({
@@ -131,6 +138,116 @@ export const organizationMentorRouter = router({
         return { message: "Invitation accepted successfully" };
       } catch (error) {
         console.error("Error in acceptInvitation:", error);
+        throw error;
+      }
+    }),
+
+  markAsMentor: protectedProcedure
+    .input(markAsMentorSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to mark volunteers as mentors.",
+          });
+        }
+
+        // Check if current user is an admin or mentor
+        const currentUser = await User.findOne({ email: sessionUser.email });
+        if (!currentUser || (currentUser.role !== UserRole.ADMIN && currentUser.role !== UserRole.MENTOR)) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins and mentors can mark volunteers as mentors.",
+          });
+        }
+
+        // Check if opportunity exists and get its organization
+        const opportunity = await Opportunity.findById(input.opportunityId);
+        if (!opportunity) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Opportunity not found.",
+          });
+        }
+
+        // Check if current user belongs to the same organization as the opportunity
+        if (currentUser.organization_profile?.toString() !== opportunity.organization_profile.toString()) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You can only mark volunteers as mentors for opportunities within your organization.",
+          });
+        }
+
+        // Find the volunteer to mark as mentor
+        const volunteer = await User.findById(input.volunteerId);
+        if (!volunteer) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Volunteer not found.",
+          });
+        }
+
+        // Check if volunteer is already a mentor for this opportunity
+        const existingMentorAssignment = await OpportunityMentor.findOne({
+          opportunity: input.opportunityId,
+          volunteer: input.volunteerId,
+        });
+
+        if (existingMentorAssignment) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This volunteer is already a mentor for this opportunity.",
+          });
+        }
+
+        // Create opportunity-specific mentor assignment
+        const mentorAssignment = await OpportunityMentor.create({
+          opportunity: input.opportunityId,
+          volunteer: input.volunteerId,
+          organization_profile: opportunity.organization_profile,
+          assigned_by: currentUser._id,
+          assigned_at: new Date(),
+        });
+
+        return { 
+          message: "Volunteer has been successfully marked as mentor for this opportunity",
+          mentorAssignment: {
+            id: mentorAssignment._id,
+            opportunityId: mentorAssignment.opportunity,
+            volunteerId: mentorAssignment.volunteer,
+            assignedAt: mentorAssignment.assigned_at
+          }
+        };
+      } catch (error) {
+        console.error("Error in markAsMentor:", error);
+        throw error;
+      }
+    }),
+
+  getOpportunityMentors: protectedProcedure
+    .input(z.object({ opportunityId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to view opportunity mentors.",
+          });
+        }
+
+        const mentors = await OpportunityMentor.find({
+          opportunity: input.opportunityId,
+        })
+        .populate('volunteer', 'name email')
+        .populate('assigned_by', 'name email')
+        .sort({ assigned_at: -1 });
+
+        return mentors;
+      } catch (error) {
+        console.error("Error in getOpportunityMentors:", error);
         throw error;
       }
     }),

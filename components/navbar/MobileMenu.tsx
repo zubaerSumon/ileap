@@ -135,6 +135,12 @@ export function MobileMenu({
               {session?.user?.role === "volunteer" && (
                 <div className="space-y-1">
                   <NavLink
+                    href="/volunteer/dashboard"
+                    label="Dashboard"
+                    icon={LayoutDashboard}
+                    onClick={handleCloseMenu}
+                  />
+                  <NavLink
                     href="/search?type=opportunity"
                     label="Find Opportunities"
                     icon={GiBinoculars}

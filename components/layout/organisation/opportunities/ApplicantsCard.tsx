@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MapPin,  UserCheck, Loader2, CheckCircle2 } from "lucide-react";
+import { MapPin,  UserCheck, Loader2, CheckCircle2, UserPlus } from "lucide-react";
 import Image from "next/image";
 import { HiClipboardDocumentList } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
@@ -10,7 +10,8 @@ import type { TRPCClientErrorLike } from "@trpc/client";
 import type { AppRouter } from "@/server";
 import { useRecruitmentStatus } from "@/hooks/useRecruitmentStatus";
 import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 export interface Applicant {
   id: string;
@@ -29,17 +30,39 @@ export function ApplicantsCard({
   hideRecruitButton = false,
   applicant,
   onMessageClick,
+  opportunityId,
+  showMarkAsMentor = false,
 }: {
   setIsModalOpen?: (isOpen: boolean) => void;
   hideRecruitButton?: boolean;
   applicant: Applicant;
   onMessageClick: () => void;
+  opportunityId?: string;
+  showMarkAsMentor?: boolean;
 }) {
   const utils = trpc.useUtils();
+  const { data: session } = useSession();
+  const [isMentorForOpportunity, setIsMentorForOpportunity] = useState(false);
   const { isRecruited, refetchRecruitmentStatus } = useRecruitmentStatus(
     applicant.applicationId,
     !hideRecruitButton
   );
+
+  // Check if this volunteer is already a mentor for this opportunity
+  const { data: opportunityMentors } = trpc.mentors.getOpportunityMentors.useQuery(
+    { opportunityId: opportunityId || "" },
+    { 
+      enabled: !!opportunityId && showMarkAsMentor,
+    }
+  );
+
+  // Update mentor status when opportunity mentors data changes
+  useEffect(() => {
+    if (opportunityMentors) {
+      const isMentor = opportunityMentors.some((mentor: { volunteer: { _id: string } }) => mentor.volunteer._id === applicant.id);
+      setIsMentorForOpportunity(isMentor);
+    }
+  }, [opportunityMentors, applicant.id]);
 
   const recruitMutation = trpc.recruits.recruitApplicant.useMutation({
     onSuccess: () => {
@@ -53,11 +76,37 @@ export function ApplicantsCard({
     },
   });
 
+  const markAsMentorMutation = trpc.mentors.markAsMentor.useMutation({
+    onSuccess: () => {
+      toast.success("Volunteer has been marked as mentor for this opportunity successfully.");
+      setIsMentorForOpportunity(true);
+      utils.mentors.getOpportunityMentors.invalidate();
+    },
+    onError: (error: TRPCClientErrorLike<AppRouter>) => {
+      toast.error(error.message);
+    },
+  });
+
   const handleRecruit = () => {
     recruitMutation.mutate({
       applicationId: applicant.applicationId,
     });
   };
+
+  const handleMarkAsMentor = () => {
+    if (!opportunityId) {
+      toast.error("Opportunity ID is required");
+      return;
+    }
+
+    markAsMentorMutation.mutate({
+      volunteerId: applicant.id,
+      opportunityId: opportunityId,
+    });
+  };
+
+  // Check if current user can mark as mentor (admin or mentor role)
+  const canMarkAsMentor = session?.user?.role === "admin" || session?.user?.role === "mentor";
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -78,6 +127,11 @@ export function ApplicantsCard({
                 <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded flex-shrink-0">
                   Verified
                 </span>
+                {isMentorForOpportunity && (
+                  <span className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded flex-shrink-0">
+                    Mentor
+                  </span>
+                )}
               </div>
 
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm text-gray-500">
@@ -142,6 +196,38 @@ export function ApplicantsCard({
                   </div>
                 ) : (
                   "Recruit"
+                )}
+              </Button>
+            )}
+
+            {/* Mark as Mentor button - only show for recruited volunteers when user has permission */}
+            {showMarkAsMentor && canMarkAsMentor && (
+              <Button
+                variant="outline"
+                size="lg"
+                className={`rounded-[6px] px-4 sm:px-6 font-normal w-full sm:w-auto ${
+                  isMentorForOpportunity
+                    ? "bg-purple-50 text-purple-600 border-purple-200"
+                    : "border-purple-200 text-purple-700 hover:bg-purple-50"
+                }`}
+                onClick={handleMarkAsMentor}
+                disabled={markAsMentorMutation.isPending || isMentorForOpportunity}
+              >
+                {markAsMentorMutation.isPending ? (
+                  <div className="flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Marking...
+                  </div>
+                ) : isMentorForOpportunity ? (
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="w-4 h-4" />
+                    Mentor
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <UserPlus className="w-4 h-4" />
+                    Mark as Mentor
+                  </div>
                 )}
               </Button>
             )}

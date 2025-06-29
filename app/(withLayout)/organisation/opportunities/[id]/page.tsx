@@ -69,6 +69,12 @@ export default function OpportunityDetailsPage() {
       { enabled: !!opportunityId }
     );
 
+  // Fetch opportunity mentors to make them group admins
+  const { data: opportunityMentors } = trpc.mentors.getOpportunityMentors.useQuery(
+    { opportunityId },
+    { enabled: !!opportunityId }
+  );
+
   const createGroupMutation = trpc.messages.createGroup.useMutation({
     onSuccess: (data) => {
       toast.success("Group created successfully!");
@@ -105,11 +111,15 @@ export default function OpportunityDetailsPage() {
   const handleConfirmCreateGroup = () => {
     const memberIds = recruitedApplicants?.map(applicant => applicant.id) || [];
     const groupName = `${opportunity?.title} Volunteers`;
+    
+    // Get mentor IDs to make them group admins
+    const mentorIds = opportunityMentors?.map(mentor => mentor.volunteer._id) || [];
 
     createGroupMutation.mutate({
       name: groupName,
       description: `Group for volunteers of ${opportunity?.title}`,
       memberIds,
+      adminIds: mentorIds, // Pass mentor IDs to make them admins
     });
     setIsCreateGroupModalOpen(false);
   };
@@ -241,6 +251,8 @@ export default function OpportunityDetailsPage() {
           applicant={applicant}
           onMessageClick={() => handleOpenMessageModal(applicant)}
           hideRecruitButton
+          opportunityId={opportunityId}
+          showMarkAsMentor={true}
         />
       ))}
       {filteredRecruitedApplicants?.length === 0 && (

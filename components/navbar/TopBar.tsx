@@ -122,6 +122,14 @@ export function TopBar({
               </Link>
             </>
           )}
+          {session?.user?.role === "volunteer" && isProtectedPath && (
+            <Link
+              href="/volunteer/dashboard"
+              className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
+            >
+              <LayoutDashboard className="h-4 w-4" /> Dashboard
+            </Link>
+          )}
           {isProtectedPath && (
             <Link
               href={
