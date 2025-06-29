@@ -102,20 +102,31 @@ export const organisationRecruitmentRouter = router({
           });
         }
 
-        // Find all recruited applications for this opportunity
+        // Build the match condition based on whether opportunityId is provided
+        const matchCondition = input.opportunityId 
+          ? { opportunity: input.opportunityId }
+          : {};
+
+        // Find all recruited applications
         const recruitedApplications = await OrganisationRecruitment.find()
           .populate({
             path: "application",
-            match: { opportunity: input.opportunityId },
-            populate: {
-              path: "volunteer",
-              select: "name email",
-              populate: {
-                path: "volunteer_profile",
-                select:
-                  "profile_img location bio skills completed_projects availability",
+            match: matchCondition,
+            populate: [
+              {
+                path: "volunteer",
+                select: "name email",
+                populate: {
+                  path: "volunteer_profile",
+                  select:
+                    "profile_img location bio skills completed_projects availability",
+                },
               },
-            },
+              {
+                path: "opportunity",
+                select: "title description category location commitment_type",
+              },
+            ],
           })
           .lean();
 
@@ -142,6 +153,14 @@ export const organisationRecruitmentRouter = router({
                   availability?: string;
                 };
               };
+              opportunity?: {
+                _id: { toString(): string };
+                title?: string;
+                description?: string;
+                category?: string[];
+                location?: string;
+                commitment_type?: string;
+              };
             };
           };
 
@@ -162,6 +181,14 @@ export const organisationRecruitmentRouter = router({
             availability:
               app.application.volunteer.volunteer_profile?.availability || "",
             applicationId: app.application._id.toString(),
+            opportunity: app.application.opportunity ? {
+              id: app.application.opportunity._id.toString(),
+              title: app.application.opportunity.title || "",
+              description: app.application.opportunity.description || "",
+              category: app.application.opportunity.category || [],
+              location: app.application.opportunity.location || "",
+              commitment_type: app.application.opportunity.commitment_type || "",
+            } : null,
           } as const;
         });
       } catch (error) {

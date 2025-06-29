@@ -56,6 +56,14 @@ interface RecruitedApplicant {
   readonly skills: string[];
   readonly completedProjects: number;
   readonly availability: string;
+  readonly opportunity?: {
+    readonly id: string;
+    readonly title: string;
+    readonly description: string;
+    readonly category: string[];
+    readonly location: string;
+    readonly commitment_type: string;
+  } | null;
 }
 
 interface ActiveContract {
@@ -64,6 +72,13 @@ interface ActiveContract {
   jobTitle: string;
   freelancerName: string;
   startedAt: string;
+  opportunityTitle?: string;
+  opportunityId?: string;
+  uniqueKey: string; // Combined key for React rendering
+  opportunities: Array<{
+    id: string;
+    title: string;
+  }>;
 }
 
 const TABS = [
@@ -91,9 +106,9 @@ const OrganisationDashboard = () => {
   // Fetch recruited applicants for 'active' tab
   const { data: recruitedApplicants } =
     trpc.recruits.getRecruitedApplicants.useQuery(
-      { opportunityId: opportunities?.[0]?._id || "" },
+      { opportunityId: "" }, // Empty string to get all recruited applicants
       {
-        enabled: !!opportunities?.[0]?._id,
+        enabled: !!opportunities?.length,
         select: (data) => data as RecruitedApplicant[],
       }
     );
@@ -114,16 +129,41 @@ const OrganisationDashboard = () => {
   // Tab state
   const [tab, setTab] = useState("open");
 
-  // Map recruited applicants to active contracts
-  const activeContracts: ActiveContract[] = (recruitedApplicants || []).map(
-    (c) => ({
-      id: c.id,
-      profileImg: c.profileImg,
-      jobTitle: "Active Contract", // This should come from the opportunity data
-      freelancerName: c.name,
-      startedAt: new Date().toISOString().split("T")[0], // This should come from the contract data
-    })
-  );
+  // Map recruited applicants to active contracts grouped by volunteer
+  const activeContracts: ActiveContract[] = (recruitedApplicants || []).reduce((acc, c) => {
+    const existingContract = acc.find(contract => contract.id === c.id);
+    
+    if (existingContract) {
+      // If volunteer already exists, add the opportunity to their list
+      if (c.opportunity?.title && c.opportunity?.id) {
+        const opportunityExists = existingContract.opportunities.some(opp => opp.id === c.opportunity?.id);
+        if (!opportunityExists && c.opportunity?.id) {
+          existingContract.opportunities.push({
+            id: c.opportunity.id,
+            title: c.opportunity.title
+          });
+        }
+      }
+    } else {
+      // Create new contract for this volunteer
+      acc.push({
+        id: c.id,
+        profileImg: c.profileImg,
+        jobTitle: c.opportunity?.title || "Active Contract",
+        freelancerName: c.name,
+        startedAt: new Date().toISOString().split("T")[0],
+        opportunityTitle: c.opportunity?.title,
+        opportunityId: c.opportunity?.id,
+        uniqueKey: `${c.id}-${c.opportunity?.id || ''}`,
+        opportunities: c.opportunity?.id && c.opportunity?.title ? [{
+          id: c.opportunity.id,
+          title: c.opportunity.title
+        }] : [],
+      });
+    }
+    
+    return acc;
+  }, [] as ActiveContract[]);
 
   // Filtered data for tabs
   const openOpportunities =
@@ -267,7 +307,7 @@ const OrganisationDashboard = () => {
             {tab === "active"
               ? activeContracts.map((contract) => (
                   <div
-                    key={contract.id}
+                    key={contract.uniqueKey}
                     className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
                   >
                     <div className="p-4 h-full flex flex-col">
@@ -284,14 +324,34 @@ const OrganisationDashboard = () => {
                               className="rounded-full"
                             />
                           </div>
-                          <h3 className="text-lg font-semibold">
-                            {contract.jobTitle}
-                          </h3>
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-gray-900">
+                              {contract.freelancerName}
+                            </h3>
+                            <div className="mt-2">
+                              <p className="text-sm text-gray-600 font-medium mb-1">
+                                Active Opportunities ({contract.opportunities.length}):
+                              </p>
+                              <div className="space-y-1">
+                                {contract.opportunities.map((opportunity) => (
+                                  <p 
+                                    key={opportunity.id}
+                                    className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
+                                    onClick={() => {
+                                      router.push(`/organisation/opportunities/${opportunity.id}`);
+                                    }}
+                                  >
+                                    • {opportunity.title}
+                                  </p>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
 
                       <div className="flex items-center text-sm text-gray-500 mb-3">
-                        <span>{contract.freelancerName}</span>
+                        <span className="font-medium">Volunteer</span>
                       </div>
 
                       <div className="mt-auto pt-4">
