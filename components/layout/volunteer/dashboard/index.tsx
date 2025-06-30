@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
 import { useSession } from "next-auth/react";
 import { Opportunity } from "@/types/opportunities";
 import {
-  BookOpen,
-  FileText,
-  GraduationCap,
   ChevronRight,
+  BookOpen,
 } from "lucide-react";
 import { getGreeting } from "@/utils/helpers/getGreeting";
 import MobileTabsSlider from "@/components/shared/MobileTabsSlider";
 import OpportunityCarousel from "./OpportunityCarousel";
 import EmptyState from "@/components/shared/EmptyState";
 import TabwiseOpportunityCard from "./TabwiseOpportunityCard";
+import { PaginationWrapper } from "@/components/PaginationWrapper";
+import {  VolunteerDashboardTabKey, VOLUNTEER_DASHBOARD_TABS } from "@/utils/constants/volunteer-dashboard-tabs";
 
 interface Application {
   _id: string;
@@ -46,26 +46,52 @@ interface Application {
   updatedAt: string;
 }
 
-const TABS = [
-  { key: "applied", label: "Active opportunities" },
-  { key: "recent", label: "Recent opportunities" },
-  { key: "mentor", label: "Mentor assignments" },
-];
-
 export default function VolunteerDashboard() {
   const router = useRouter();
   const { data: session } = useSession();
-  const [tab, setTab] = useState("applied");
+  const [tab, setTab] = useState<VolunteerDashboardTabKey>("applied");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  // Fetch current user's applications
-  const { data: applications, isLoading: isLoadingApplications } =
-    trpc.applications.getCurrentUserApplications.useQuery();
+  // Reset page when tab changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [tab]);
 
-  // Fetch mentor opportunities
-  const { data: mentorOpportunitiesData } =
+  // Fetch all tab counts initially
+  const { data: activeApplicationsCountData } =
+    trpc.applications.getCurrentUserActiveApplicationsCount.useQuery();
+
+  const { data: recentApplicationsCountData } =
+    trpc.applications.getCurrentUserRecentApplicationsCount.useQuery();
+
+  const { data: mentorOpportunitiesCountData } =
+    trpc.opportunities.getMentorOpportunitiesCount.useQuery();
+
+  // Fetch active applications with server-side filtering and pagination
+  const { data: activeApplicationsData, isLoading: isLoadingActiveApplications } =
+    trpc.applications.getCurrentUserActiveApplications.useQuery({
+      page: currentPage,
+      limit: 6,
+    }, {
+      enabled: tab === "applied",
+    });
+
+  // Fetch recent applications with server-side filtering and pagination
+  const { data: recentApplicationsData, isLoading: isLoadingRecentApplications } =
+    trpc.applications.getCurrentUserRecentApplications.useQuery({
+      page: currentPage,
+      limit: 6,
+    }, {
+      enabled: tab === "recent",
+    });
+
+  // Fetch mentor opportunities with pagination
+  const { data: mentorOpportunitiesData, isLoading: isLoadingMentorOpportunities } =
     trpc.opportunities.getMentorOpportunities.useQuery({
-      page: 1,
-      limit: 10,
+      page: currentPage,
+      limit: 6,
+    }, {
+      enabled: tab === "mentor",
     });
 
   // Fetch recent opportunities for the carousel
@@ -77,81 +103,105 @@ export default function VolunteerDashboard() {
     limit: 10,
   });
 
-  const applicationsList = (applications || []) as unknown as Application[];
+  const activeApplications = (activeApplicationsData?.applications || []) as unknown as Application[];
+  const recentApplications = (recentApplicationsData?.applications || []) as unknown as Application[];
   const mentorOpportunities = (mentorOpportunitiesData?.opportunities ||
     []) as unknown as Opportunity[];
   const recentOpportunities = (recentOpportunitiesData?.opportunities ||
     []) as unknown as Opportunity[];
 
-  // Filter applications by status and start date
-  const now = new Date();
-  
-  const appliedApplications = applicationsList.filter((app) => {
-    if (!app.opportunity) return false;
-    
-    // For applied: show all applications where opportunity is current or upcoming
-    if (app.opportunity.date?.start_date) {
-      const startDate = new Date(app.opportunity.date.start_date);
-      return startDate >= now; // Current or future start date
-    }
-    
-    // If no start date, include it in applied (assuming it's upcoming)
-    return true;
-  });
-  
-  const recentApplications = applicationsList.filter((app) => {
-    if (!app.opportunity) return false;
-    
-    // For recent: show all applications where opportunity has already started (past)
-    if (app.opportunity.date?.start_date) {
-      const startDate = new Date(app.opportunity.date.start_date);
-      return startDate < now; // Past start date only
-    }
-    
-    // If no start date, don't include in recent
-    return false;
-  });
-
-  // Prepare mobile tabs data
-  const mobileTabs = TABS.map((t) => ({
-    label: t.label,
-    value: t.key,
-    count:
-      t.key === "applied"
-        ? appliedApplications.length
-        : t.key === "recent"
-        ? recentApplications.length
-        : t.key === "mentor"
-        ? mentorOpportunities.length
-        : 0,
-  }));
-
-  // Empty state configurations for each tab
-  const emptyStates = {
+  // Dynamic tab data mapping with counts from dedicated count queries
+  const tabData = {
     applied: {
-      icon: BookOpen,
-      title: "No active opportunities",
-      description:
-        "You haven't applied to any current or upcoming opportunities yet. Start exploring and applying to opportunities that interest you.",
-      actionLabel: "Explore Opportunities",
-      onAction: () => router.push("/search?type=opportunity"),
+      items: activeApplications,
+      type: "application" as const,
+      tabType: "active" as const,
+      total: activeApplicationsCountData?.total || 0,
+      totalPages: activeApplicationsData?.totalPages || 0,
+      isLoading: isLoadingActiveApplications,
     },
     recent: {
-      icon: FileText,
-      title: "No recent opportunities",
-      description:
-        "You don't have any opportunities that have already started. Your past opportunities will appear here.",
-      actionLabel: "Explore Opportunities",
-      onAction: () => router.push("/search?type=opportunity"),
+      items: recentApplications,
+      type: "application" as const,
+      tabType: "recent" as const,
+      total: recentApplicationsCountData?.total || 0,
+      totalPages: recentApplicationsData?.totalPages || 0,
+      isLoading: isLoadingRecentApplications,
     },
     mentor: {
-      icon: GraduationCap,
-      title: "No mentor assignments",
-      description:
-        "You haven't been assigned as a mentor for any opportunities yet. Organizations will assign you when they need mentorship support.",
-      actionLabel: "Explore Opportunities",
-      onAction: () => router.push("/search?type=opportunity"),
+      items: mentorOpportunities,
+      type: "opportunity" as const,
+      tabType: "mentor" as const,
+      total: mentorOpportunitiesCountData?.total || 0,
+      totalPages: mentorOpportunitiesData?.totalPages || 0,
+      isLoading: isLoadingMentorOpportunities,
     },
+  };
+
+  // Prepare mobile tabs data
+  const mobileTabs = VOLUNTEER_DASHBOARD_TABS.map((t) => ({
+    label: t.label,
+    value: t.key,
+    count: tabData[t.key as keyof typeof tabData].total,
+  }));
+
+  // Get current tab data
+  const currentTabData = tabData[tab as keyof typeof tabData];
+  const currentTabConfig = VOLUNTEER_DASHBOARD_TABS.find(t => t.key === tab);
+
+  // Render tab content dynamically
+  const renderTabContent = () => {
+    const { items, type, tabType, totalPages, isLoading } = currentTabData;
+    
+    if (isLoading) {
+      return (
+        <div className="text-center py-12">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      );
+    }
+    
+    if (items.length > 0) {
+      return (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {items.map((item) => (
+              <TabwiseOpportunityCard
+                key={item._id}
+                item={item}
+                type={type}
+                tabType={tabType}
+              />
+            ))}
+          </div>
+          
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="mt-8 flex justify-center">
+              <PaginationWrapper
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                maxVisiblePages={5}
+              />
+            </div>
+          )}
+        </>
+      );
+    }
+
+    return (
+      <EmptyState
+        icon={currentTabConfig?.icon || BookOpen}
+        title={currentTabConfig?.emptyState.title || "No items found"}
+        description={currentTabConfig?.emptyState.description || "No items available."}
+        actionLabel="Explore Opportunities"
+        onAction={() => router.push("/search?type=opportunity")}
+        variant="card"
+        className="min-h-[400px]"
+      />
+    );
   };
 
   return (
@@ -169,13 +219,13 @@ export default function VolunteerDashboard() {
         <MobileTabsSlider
           tabs={mobileTabs}
           activeTab={tab}
-          onTabChange={setTab}
+          onTabChange={(value) => setTab(value as VolunteerDashboardTabKey)}
           className="md:hidden"
         />
 
         {/* Desktop Tabs */}
         <div className="hidden md:flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
-          {TABS.map((t) => (
+          {VOLUNTEER_DASHBOARD_TABS.map((t) => (
             <button
               key={t.key}
               className={`px-4 md:px-5 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 whitespace-nowrap shadow-sm hover:shadow-md
@@ -188,15 +238,7 @@ export default function VolunteerDashboard() {
               onClick={() => setTab(t.key)}
               style={{ minWidth: "auto" }}
             >
-              {t.label} (
-              {t.key === "applied"
-                ? appliedApplications.length
-                : t.key === "recent"
-                ? recentApplications.length
-                : t.key === "mentor"
-                ? mentorOpportunities.length
-                : 0}
-              )
+              {t.label} ({tabData[t.key as keyof typeof tabData].total})
             </button>
           ))}
         </div>
@@ -212,83 +254,9 @@ export default function VolunteerDashboard() {
 
       {/* Tab Content */}
       <div className="transition-all duration-300 ease-in-out">
-        {isLoadingApplications ? (
-          <div className="text-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading your applications...</p>
-          </div>
-        ) : (
-          <div className="min-h-[400px]">
-            {tab === "applied" && (
-              <>
-                {appliedApplications.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {appliedApplications.map((application) => (
-                      <TabwiseOpportunityCard
-                        key={application._id}
-                        item={application}
-                        type="application"
-                        tabType="active"
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <EmptyState
-                    {...emptyStates.applied}
-                    variant="card"
-                    className="min-h-[400px]"
-                  />
-                )}
-              </>
-            )}
-
-            {tab === "recent" && (
-              <>
-                {recentApplications.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {recentApplications.map((application) => (
-                      <TabwiseOpportunityCard
-                        key={application._id}
-                        item={application}
-                        type="application"
-                        tabType="recent"
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <EmptyState
-                    {...emptyStates.recent}
-                    variant="card"
-                    className="min-h-[400px]"
-                  />
-                )}
-              </>
-            )}
-
-            {tab === "mentor" && (
-              <>
-                {mentorOpportunities.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {mentorOpportunities.map((opportunity) => (
-                      <TabwiseOpportunityCard
-                        key={opportunity._id}
-                        item={opportunity}
-                        type="opportunity"
-                        tabType="mentor"
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <EmptyState
-                    {...emptyStates.mentor}
-                    variant="card"
-                    className="min-h-[400px]"
-                  />
-                )}
-              </>
-            )}
-          </div>
-        )}
+        <div className="min-h-[400px]">
+          {renderTabContent()}
+        </div>
       </div>
 
       {/* Recent Opportunities Carousel */}
