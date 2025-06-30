@@ -23,6 +23,10 @@ import { AppRouter } from "@/server";
 import { SelectField } from "@/components/form-input/SelectField";
 import { ProfilePhotoInput } from "@/components/form-input/ProfilePhotoInput";
 import BackButton from "@/components/buttons/BackButton";
+import { Edit, Building2, Phone, MapPin, Mail, Globe, Hash, Heart } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 type OrganizationProfileData = Omit<z.infer<typeof userValidation.organizationProfileSchema>, 'opportunity_types' | 'required_skills'> & {
   opportunity_types: string[];
@@ -48,6 +52,7 @@ const defaultValues: OrganizationProfileData = {
 
 export default function OrganizationProfile() {
   const router = useRouter();
+  const [isEditMode, setIsEditMode] = useState(false);
   const { data: profileData, isLoading } = trpc.users.profileCheckup.useQuery();
   const utils = trpc.useUtils();
   const [isImageUploading, setIsImageUploading] = useState(false);
@@ -56,6 +61,7 @@ export default function OrganizationProfile() {
     onSuccess: () => {
       utils.users.profileCheckup.invalidate();
       toast.success("Organization profile updated successfully!");
+      setIsEditMode(false); // Exit edit mode after successful update
     },
     onError: (error: TRPCClientErrorLike<AppRouter>) => {
       toast.error(error.message || "Failed to update profile");
@@ -67,30 +73,16 @@ export default function OrganizationProfile() {
     defaultValues,
   });
 
-  // Add form validation state debugging
-  useEffect(() => {
-    console.log("Form validation state:", {
-      isValid: form.formState.isValid,
-      errors: form.formState.errors,
-      isDirty: form.formState.isDirty,
-      isSubmitting: form.formState.isSubmitting
-    });
-  }, [form.formState]);
-
   useEffect(() => {
     if (profileData?.organizationProfile && !isLoading) {
       const profile = profileData.organizationProfile;
-      console.log("Raw profile data:", profile); // Debug log
-      console.log("Organization type from profile:", profile.type); // Debug log
-      console.log("Available organization types:", organizationTypes); // Debug log
-
-      // Create form data with explicit type handling
+      
       const formData = {
         title: profile.title || "",
         contact_email: profile.contact_email || "",
         phone_number: profile.phone_number || "",
         bio: profile.bio || "",
-        type: profile.type || "", // Use the raw type value from the profile
+        type: profile.type || "",
         opportunity_types: Array.isArray(profile.opportunity_types) ? profile.opportunity_types : [],
         required_skills: Array.isArray(profile.required_skills) ? profile.required_skills : [],
         state: profile.state?.replace(/_/g, ' ') || "",
@@ -100,10 +92,7 @@ export default function OrganizationProfile() {
         profile_img: profile.profile_img || "",
         cover_img: profile.cover_img || "",
       };
-
-      console.log("Form data being set:", formData); // Debug log
       
-      // Reset form with the data and skip validation
       form.reset(formData, {
         keepErrors: false,
         keepDirty: false,
@@ -115,27 +104,12 @@ export default function OrganizationProfile() {
     }
   }, [profileData?.organizationProfile, isLoading, form]);
 
-  // Add form state debugging
-  useEffect(() => {
-    const subscription = form.watch((value) => {
-      console.log("Form values changed:", value);
-    });
-    return () => subscription.unsubscribe();
-  }, [form]);
-
   const onSubmit = async (data: OrganizationProfileData) => {
-    console.log("Form submitted with data:", data); // Debug log
-    console.log("Organization type in submitted data:", data.type);
-
     try {
-      // Filter out empty strings from arrays
       const opportunity_types = data.opportunity_types.filter(Boolean);
       const required_skills = data.required_skills.filter(Boolean);
       const type = Array.isArray(data.type) ? data.type[0] : data.type;
 
-      console.log("Filtered arrays:", { opportunity_types, required_skills, type }); // Debug log
-
-      // Validate that arrays are not empty after filtering
       if (opportunity_types.length === 0) {
         toast.error("Please select at least one opportunity type");
         return;
@@ -144,8 +118,6 @@ export default function OrganizationProfile() {
         toast.error("Please select at least one required skill");
         return;
       }
-
-      // Validate organization type
       if (!type) {
         toast.error("Please select an organization type");
         return;
@@ -161,207 +133,427 @@ export default function OrganizationProfile() {
         website: data.website || ""
       };
 
-      console.log("Formatted data for submission:", formattedData); // Debug log
-
-      const loadingToast = toast.loading("Updating profile...");
-
-      try {
-        console.log("Calling mutation..."); // Debug log
-        const result = await organizationProfileUpdateMutation.mutateAsync(formattedData);
-        console.log("Mutation result:", result); // Debug log
-        toast.dismiss(loadingToast);
-        router.refresh();
-      } catch (error) {
-        console.error("Mutation error:", error); // Debug log
-        toast.dismiss(loadingToast);
-        if (error instanceof Error) {
-          toast.error(error.message || "Failed to update profile");
-        } else {
-          toast.error("An unexpected error occurred");
-        }
-      }
-    } catch (error) {
-      console.error("Form submission error:", error); // Debug log
+      await organizationProfileUpdateMutation.mutateAsync(formattedData);
+      router.refresh();
+    } catch {
       toast.error("Failed to process form data");
+    }
+  };
+
+  const handleEditClick = () => {
+    setIsEditMode(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    // Reset form to current profile data
+    if (profileData?.organizationProfile) {
+      const profile = profileData.organizationProfile;
+      const formData = {
+        title: profile.title || "",
+        contact_email: profile.contact_email || "",
+        phone_number: profile.phone_number || "",
+        bio: profile.bio || "",
+        type: profile.type || "",
+        opportunity_types: Array.isArray(profile.opportunity_types) ? profile.opportunity_types : [],
+        required_skills: Array.isArray(profile.required_skills) ? profile.required_skills : [],
+        state: profile.state?.replace(/_/g, ' ') || "",
+        area: profile.area?.replace(/_/g, ' ') || "",
+        abn: profile.abn || "",
+        website: profile.website || "",
+        profile_img: profile.profile_img || "",
+        cover_img: profile.cover_img || "",
+      };
+      form.reset(formData);
     }
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
       </div>
     );
   }
 
+  const profile = profileData?.organizationProfile;
+
   return (
-    <div className="min-h-screen">
-      <div className="max-w-[1046px] mx-auto flex flex-col md:flex-row gap-8 p-6">
-        {/* Mobile navigation */}
-        <div className="md:hidden bg-white rounded-lg p-4 mb-4">
-          <div className="flex items-center space-x-4 mb-4">
-            <BackButton />
-            <h2 className="text-lg font-semibold">Edit Organization Profile</h2>
-          </div>
-        </div>
-
-        {/* Desktop sidebar */}
-        <div className="hidden md:block w-64 shrink-0 bg-white rounded-lg p-6 h-fit">
-          <div className="mb-6">
-            <BackButton />
-          </div>
-
-          <h2 className="text-xl font-semibold mb-4">Edit Organization Profile</h2>
-        </div>
-
-        <div className="flex-1 bg-white rounded-lg p-6">
-          <Form {...form}>
-            <form 
-              onSubmit={form.handleSubmit((data) => {
-                console.log("Form submit event triggered");
-                return onSubmit(data);
-              })} 
-              className="space-y-4"
-            >
-              <FormInput<OrganizationProfileData>
-                control={form.control}
-                name="title"
-                label="Organization Name"
-                placeholder="Enter your organization name"
-              />
-
-              <FormInput<OrganizationProfileData>
-                control={form.control}
-                name="contact_email"
-                label="Contact Email"
-                type="email"
-                placeholder="Enter your organization email"
-              />
-
-              <PhoneField
-                label="Phone number"
-                id="phone_number"
-                placeholder="+61 1243 5978"
-                register={form.register}
-                registerName="phone_number"
-                error={form.formState.errors.phone_number?.message}
-                value={form.watch("phone_number")}
-                setValue={form.setValue}
-              />
-
-              <FormTextarea<OrganizationProfileData>
-                control={form.control}
-                name="bio"
-                label="About Organization"
-                placeholder="Tell us about your organization"
-              />
-
-              <SelectField<OrganizationProfileData>
-                label="Organization Type"
-                id="type"
-                placeholder="Select organization type"
-                register={form.register}
-                registerName="type"
-                error={form.formState.errors.type?.message}
-                options={organizationTypes}
-                value={form.watch("type")}
-                setValue={form.setValue}
-              />
-
-              <MultiSelectField
-                label="Opportunity Types"
-                id="opportunity_types"
-                placeholder="Select opportunity types"
-                register={form.register}
-                registerName="opportunity_types"
-                error={form.formState.errors.opportunity_types?.message}
-                options={volunteerTypes}
-                setValue={form.setValue}
-                value={form.watch("opportunity_types")}
-              />
-
-              <MultiSelectField
-                label="Required Skills"
-                id="required_skills"
-                placeholder="Select required skills"
-                register={form.register}
-                registerName="required_skills"
-                error={form.formState.errors.required_skills?.message}
-                options={volunteerTypes}
-                setValue={form.setValue}
-                value={form.watch("required_skills")}
-              />
-
-              <FormInput<OrganizationProfileData>
-                control={form.control}
-                name="state"
-                label="State"
-                placeholder="Enter your state"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const value = e.target.value.replace(/_/g, ' ');
-                  form.setValue('state', value);
-                }}
-              />
-
-              <FormInput<OrganizationProfileData>
-                control={form.control}
-                name="area"
-                label="Area"
-                placeholder="Enter your Area"
-                onChange={(e: { target: { value: string; }; }) => {
-                  const value = e.target.value.replace(/_/g, ' ');
-                  form.setValue('area', value);
-                }}
-              />
-
-              <FormInput<OrganizationProfileData>
-                control={form.control}
-                name="abn"
-                label="ABN"
-                placeholder="Enter your ABN"
-              />
-
-              <ProfilePhotoInput
-                label="Profile Image"
-                name="profile_img"
-                setValue={(name: string, value: string) => {
-                  form.setValue(name as keyof OrganizationProfileData, value);
-                }}
-                defaultValue={form.watch("profile_img")}
-                onUploadStateChange={setIsImageUploading}
-              />
-
-              <FormInput<OrganizationProfileData>
-                control={form.control}
-                name="website"
-                label="Website"
-                placeholder="Enter your website URL"
-              />
-
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={organizationProfileUpdateMutation.isPending || isImageUploading}
-                onClick={() => {
-                  console.log("Submit button clicked");
-                  console.log("Form state:", form.formState);
-                  console.log("Form values:", form.getValues());
-                }}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-4xl mx-auto p-4 md:p-8">
+        {/* Mobile Header */}
+        <div className="md:hidden mb-6">
+          <div className="flex items-center justify-between bg-white rounded-lg p-4 shadow-sm">
+            <div className="flex items-center space-x-3">
+              <BackButton />
+              <h1 className="text-lg font-semibold text-gray-900">
+                {isEditMode ? "Edit Profile" : "Organization Profile"}
+              </h1>
+            </div>
+            {!isEditMode && (
+              <Button
+                onClick={handleEditClick}
+                size="sm"
+                className="flex items-center gap-2"
               >
-                {organizationProfileUpdateMutation.isPending ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Updating...
-                  </span>
-                ) : (
-                  "Update Profile"
-                )}
+                <Edit className="h-4 w-4" />
+                Edit
               </Button>
-            </form>
-          </Form>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <Card className="sticky top-6">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-lg">
+                    <Building2 className="h-5 w-5" />
+                    Organization
+                  </CardTitle>
+                  <div className="hidden lg:block">
+                    <BackButton />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {!isEditMode && (
+                  <Button
+                    onClick={handleEditClick}
+                    className="w-full flex items-center gap-2"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Update Profile
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-2">
+            {isEditMode ? (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-xl">Edit Organization Profile</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormInput<OrganizationProfileData>
+                          control={form.control}
+                          name="title"
+                          label="Organization Name"
+                          placeholder="Enter your organization name"
+                        />
+
+                        <FormInput<OrganizationProfileData>
+                          control={form.control}
+                          name="contact_email"
+                          label="Contact Email"
+                          type="email"
+                          placeholder="Enter your organization email"
+                        />
+                      </div>
+
+                      <PhoneField
+                        label="Phone Number"
+                        id="phone_number"
+                        placeholder="+61 1243 5978"
+                        register={form.register}
+                        registerName="phone_number"
+                        error={form.formState.errors.phone_number?.message}
+                        value={form.watch("phone_number")}
+                        setValue={form.setValue}
+                      />
+
+                      <FormTextarea<OrganizationProfileData>
+                        control={form.control}
+                        name="bio"
+                        label="About Organization"
+                        placeholder="Tell us about your organization, mission, and values..."
+                      />
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <SelectField<OrganizationProfileData>
+                          label="Organization Type"
+                          id="type"
+                          placeholder="Select organization type"
+                          register={form.register}
+                          registerName="type"
+                          error={form.formState.errors.type?.message}
+                          options={organizationTypes}
+                          value={form.watch("type")}
+                          setValue={form.setValue}
+                        />
+
+                        <FormInput<OrganizationProfileData>
+                          control={form.control}
+                          name="abn"
+                          label="ABN"
+                          placeholder="Enter your ABN"
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <FormInput<OrganizationProfileData>
+                          control={form.control}
+                          name="state"
+                          label="State"
+                          placeholder="Enter your state"
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                            const value = e.target.value.replace(/_/g, ' ');
+                            form.setValue('state', value);
+                          }}
+                        />
+
+                        <FormInput<OrganizationProfileData>
+                          control={form.control}
+                          name="area"
+                          label="Area"
+                          placeholder="Enter your area"
+                          onChange={(e: { target: { value: string; }; }) => {
+                            const value = e.target.value.replace(/_/g, ' ');
+                            form.setValue('area', value);
+                          }}
+                        />
+                      </div>
+
+                      <FormInput<OrganizationProfileData>
+                        control={form.control}
+                        name="website"
+                        label="Website"
+                        placeholder="Enter your website URL"
+                      />
+
+                      <MultiSelectField
+                        label="Opportunity Types"
+                        id="opportunity_types"
+                        placeholder="Select opportunity types"
+                        register={form.register}
+                        registerName="opportunity_types"
+                        error={form.formState.errors.opportunity_types?.message}
+                        options={volunteerTypes}
+                        setValue={form.setValue}
+                        value={form.watch("opportunity_types")}
+                      />
+
+                      <MultiSelectField
+                        label="Required Skills"
+                        id="required_skills"
+                        placeholder="Select required skills"
+                        register={form.register}
+                        registerName="required_skills"
+                        error={form.formState.errors.required_skills?.message}
+                        options={volunteerTypes}
+                        setValue={form.setValue}
+                        value={form.watch("required_skills")}
+                      />
+
+                      <ProfilePhotoInput
+                        label="Profile Image"
+                        name="profile_img"
+                        setValue={(name: string, value: string) => {
+                          form.setValue(name as keyof OrganizationProfileData, value);
+                        }}
+                        defaultValue={form.watch("profile_img")}
+                        onUploadStateChange={setIsImageUploading}
+                      />
+
+                      <div className="flex gap-4 pt-4">
+                        <Button 
+                          type="submit" 
+                          className="flex-1"
+                          disabled={organizationProfileUpdateMutation.isPending || isImageUploading}
+                        >
+                          {organizationProfileUpdateMutation.isPending ? (
+                            <span className="flex items-center justify-center">
+                              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                              </svg>
+                              Saving...
+                            </span>
+                          ) : (
+                            "Save Changes"
+                          )}
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant="outline"
+                          onClick={handleCancelEdit}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            ) : (
+              // View Mode
+              <div className="space-y-6">
+                {/* Profile Header */}
+                <Card>
+                  <CardContent className="pt-6">
+                    <div className="flex items-start space-x-4">
+                      <Avatar className="h-16 w-16">
+                        <AvatarImage src={profile?.profile_img} />
+                        <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
+                          {profile?.title?.charAt(0)?.toUpperCase() || "O"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                          {profile?.title || "Organization Profile"}
+                        </h1>
+                        <div className="flex items-center text-gray-600 mb-2">
+                          <MapPin className="h-4 w-4 mr-1" />
+                          <span>
+                            {profile?.area && profile?.state 
+                              ? `${profile.area}, ${profile.state.replace(/_/g, ' ')}`
+                              : "Location not specified"
+                            }
+                          </span>
+                        </div>
+                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                          {profile?.contact_email && (
+                            <div className="flex items-center">
+                              <Mail className="h-4 w-4 mr-1" />
+                              <span>{profile.contact_email}</span>
+                            </div>
+                          )}
+                          {profile?.phone_number && (
+                            <div className="flex items-center">
+                              <Phone className="h-4 w-4 mr-1" />
+                              <span>{profile.phone_number}</span>
+                            </div>
+                          )}
+                          {profile?.website && (
+                            <div className="flex items-center">
+                              <Globe className="h-4 w-4 mr-1" />
+                              <span>{profile.website}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Organization Details */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {profile?.type && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Building2 className="h-5 w-5" />
+                          Organization Type
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <Badge variant="secondary" className="px-3 py-1 text-sm">
+                          {organizationTypes.find(type => type.value === profile.type)?.label || profile.type}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  )}
+
+                  {profile?.abn && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          <Hash className="h-5 w-5" />
+                          ABN
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p className="text-gray-700 font-mono">{profile.abn}</p>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+
+                {/* About Section */}
+                {profile?.bio && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <Building2 className="h-5 w-5" />
+                        About
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {profile.bio}
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Opportunity Types Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Heart className="h-5 w-5" />
+                      Opportunity Types
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {profile?.opportunity_types && profile.opportunity_types.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {profile.opportunity_types.map((type: string, index: number) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="px-3 py-1 text-sm"
+                          >
+                            {volunteerTypes.find(t => t.value === type)?.label || type}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 italic">No opportunity types specified yet</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Required Skills Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Hash className="h-5 w-5" />
+                      Required Skills
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {profile?.required_skills && profile.required_skills.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {profile.required_skills.map((skill: string, index: number) => (
+                          <Badge
+                            key={index}
+                            variant="outline"
+                            className="px-3 py-1 text-sm"
+                          >
+                            {volunteerTypes.find(s => s.value === skill)?.label || skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 italic">No required skills specified yet</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
