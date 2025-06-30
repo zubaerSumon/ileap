@@ -17,6 +17,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import EmptyState from "@/components/shared/EmptyState";
+import { Users } from "lucide-react";
 
 interface Volunteer {
   _id: string;
@@ -183,12 +185,13 @@ export default function BrowseVolunteer() {
                 </div>
               ))
             ) : volunteers.length === 0 ? (
-              <div className="col-span-full text-center py-12">
-                <p className="text-gray-600 text-lg">No volunteers found</p>
-                <p className="text-gray-500 text-sm mt-2">
-                  Try adjusting your search criteria
-                </p>
-              </div>
+              <EmptyState
+                icon={Users}
+                title="No volunteers found"
+                description="Try adjusting your search criteria to find more volunteers that match your requirements."
+                variant="default"
+                showAction={false}
+              />
             ) : (
               volunteers.map((volunteer: Record<string, unknown>) => (
                 <div

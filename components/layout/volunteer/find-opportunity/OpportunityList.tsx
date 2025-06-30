@@ -1,9 +1,10 @@
 "use client";
 
-import { Card } from "@/components/ui/card";
 import OpportunityCard from "./OpportunityCard";
 import OpportunityCardSkeleton from "./OpportunityCardSkeleton";
 import { Opportunity } from "@/types/opportunities";
+import EmptyState from "@/components/shared/EmptyState";
+import { Search } from "lucide-react";
 
 interface OpportunityListProps {
   opportunities: Opportunity[];
@@ -26,11 +27,13 @@ export default function OpportunityList({
 
   if (opportunities.length === 0) {
     return (
-      <Card className="p-20 shadow-sm border border-gray-200 rounded-xl">
-        <div className="text-center">
-          <p className="text-gray-600 text-lg">No opportunities found.</p>
-        </div>
-      </Card>
+      <EmptyState
+        icon={Search}
+        title="No opportunities found"
+        description="We couldn't find any opportunities matching your criteria. Try adjusting your filters or search terms to discover more opportunities."
+        variant="card"
+        showAction={false}
+      />
     );
   }
 
