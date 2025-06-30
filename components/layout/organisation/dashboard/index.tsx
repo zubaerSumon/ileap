@@ -316,7 +316,7 @@ const OrganisationDashboard = () => {
                           <div className="w-10 h-10 mr-3">
                             <Image
                               src={
-                                contract.profileImg || "/default-org-logo.svg"
+                                contract.profileImg || "/avatar.svg"
                               }
                               alt={contract.freelancerName}
                               width={40}
@@ -382,7 +382,7 @@ const OrganisationDashboard = () => {
                             <Image
                               src={
                                 opportunity?.organization_profile
-                                  ?.profile_img || "/default-org-logo.svg"
+                                  ?.profile_img || "/avatar.svg"
                               }
                               alt={
                                 opportunity?.organization_profile?.title ||

@@ -60,17 +60,31 @@ export const volunteerApplicationRouter = router({
     }),
 
   getCurrentUserApplications: protectedProcedure
-    .query(async ({ ctx }) => {
+    .input(z.object({
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(50).default(6),
+    }))
+    .query(async ({ ctx, input }) => {
       try {
         const sessionUser = ctx.user as JwtPayload;
         if (!sessionUser?.email) {
-          return [];
+          return { applications: [], total: 0, totalPages: 0 };
         }
 
         const user = await User.findOne({ email: sessionUser.email });
         if (!user) {
-          return [];
+          return { applications: [], total: 0, totalPages: 0 };
         }
+
+        const { page, limit } = input;
+        const skip = (page - 1) * limit;
+
+        // Get total count for pagination
+        const total = await VolunteerApplication.countDocuments({
+          volunteer: user._id,
+        });
+
+        const totalPages = Math.ceil(total / limit);
 
         const applications = await VolunteerApplication.find({
           volunteer: user._id,
@@ -78,14 +92,169 @@ export const volunteerApplicationRouter = router({
           .populate({
             path: "opportunity",
             select: "title description category location commitment_type organization_profile createdAt date time",
+            populate: {
+              path: "organization_profile",
+              select: "title profile_img",
+            },
+          })
+          .sort({ createdAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .lean();
+
+        return {
+          applications,
+          total,
+          totalPages,
+          currentPage: page,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        };
+      } catch (error) {
+        console.error("Error fetching current user applications:", error);
+        return { applications: [], total: 0, totalPages: 0 };
+      }
+    }),
+
+  getCurrentUserActiveApplications: protectedProcedure
+    .input(z.object({
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(50).default(6),
+    }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          return { applications: [], total: 0, totalPages: 0 };
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          return { applications: [], total: 0, totalPages: 0 };
+        }
+
+        const { page, limit } = input;
+        const skip = (page - 1) * limit;
+        const now = new Date();
+
+        // First, get all applications for this user
+        const allApplications = await VolunteerApplication.find({
+          volunteer: user._id,
+        })
+          .populate({
+            path: "opportunity",
+            select: "title description category location commitment_type organization_profile createdAt date time",
+            populate: {
+              path: "organization_profile",
+              select: "title profile_img",
+            },
           })
           .sort({ createdAt: -1 })
           .lean();
 
-        return applications;
+        // Filter applications using the same logic as client-side
+        const activeApplications = allApplications.filter((app) => {
+          if (!app.opportunity) return false;
+          
+          // For applied: show all applications where opportunity is current or upcoming
+          if (app.opportunity.date?.start_date) {
+            const startDate = new Date(app.opportunity.date.start_date);
+            return startDate >= now; // Current or future start date
+          }
+          
+          // If no start date, include it in applied (assuming it's upcoming)
+          return true;
+        });
+
+        // Apply pagination to filtered results
+        const total = activeApplications.length;
+        const totalPages = Math.ceil(total / limit);
+        const startIndex = skip;
+        const endIndex = startIndex + limit;
+        const paginatedApplications = activeApplications.slice(startIndex, endIndex);
+
+        return {
+          applications: paginatedApplications,
+          total,
+          totalPages,
+          currentPage: page,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        };
       } catch (error) {
-        console.error("Error fetching current user applications:", error);
-        return [];
+        console.error("Error fetching current user active applications:", error);
+        return { applications: [], total: 0, totalPages: 0 };
+      }
+    }),
+
+  getCurrentUserRecentApplications: protectedProcedure
+    .input(z.object({
+      page: z.number().min(1).default(1),
+      limit: z.number().min(1).max(50).default(6),
+    }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          return { applications: [], total: 0, totalPages: 0 };
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          return { applications: [], total: 0, totalPages: 0 };
+        }
+
+        const { page, limit } = input;
+        const skip = (page - 1) * limit;
+        const now = new Date();
+
+        // First, get all applications for this user
+        const allApplications = await VolunteerApplication.find({
+          volunteer: user._id,
+        })
+          .populate({
+            path: "opportunity",
+            select: "title description category location commitment_type organization_profile createdAt date time",
+            populate: {
+              path: "organization_profile",
+              select: "title profile_img",
+            },
+          })
+          .sort({ createdAt: -1 })
+          .lean();
+
+        // Filter applications using the same logic as client-side
+        const recentApplications = allApplications.filter((app) => {
+          if (!app.opportunity) return false;
+          
+          // For recent: show all applications where opportunity has already started (past)
+          if (app.opportunity.date?.start_date) {
+            const startDate = new Date(app.opportunity.date.start_date);
+            return startDate < now; // Past start date only
+          }
+          
+          // If no start date, don't include in recent
+          return false;
+        });
+
+        // Apply pagination to filtered results
+        const total = recentApplications.length;
+        const totalPages = Math.ceil(total / limit);
+        const startIndex = skip;
+        const endIndex = startIndex + limit;
+        const paginatedApplications = recentApplications.slice(startIndex, endIndex);
+
+        return {
+          applications: paginatedApplications,
+          total,
+          totalPages,
+          currentPage: page,
+          hasNextPage: page < totalPages,
+          hasPrevPage: page > 1,
+        };
+      } catch (error) {
+        console.error("Error fetching current user recent applications:", error);
+        return { applications: [], total: 0, totalPages: 0 };
       }
     }),
 

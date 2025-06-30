@@ -60,7 +60,9 @@ export default function TabwiseOpportunityCard({
 
   const isApplication = type === "application";
   const application = isApplication ? (item as Application) : null;
-  const opportunity = isApplication ? application?.opportunity : (item as Opportunity);
+  const opportunity = isApplication
+    ? application?.opportunity
+    : (item as Opportunity);
 
   if (!opportunity) return null;
 
@@ -138,7 +140,7 @@ export default function TabwiseOpportunityCard({
               <Image
                 src={
                   opportunity?.organization_profile?.profile_img ||
-                  "/default-org-logo.svg"
+                  "/avatar.svg"
                 }
                 alt={
                   opportunity?.organization_profile?.title ||
@@ -175,15 +177,17 @@ export default function TabwiseOpportunityCard({
               ? "Work based"
               : "Event based"}
           </Badge>
-          {opportunity.category?.slice(0, 1).map((cat: string, index: number) => (
-            <Badge
-              key={index}
-              variant="secondary"
-              className="text-xs font-normal"
-            >
-              {cat}
-            </Badge>
-          ))}
+          {opportunity.category
+            ?.slice(0, 1)
+            .map((cat: string, index: number) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="text-xs font-normal"
+              >
+                {cat}
+              </Badge>
+            ))}
           {opportunity.category && opportunity.category.length > 1 && (
             <Badge
               variant="secondary"
@@ -207,7 +211,9 @@ export default function TabwiseOpportunityCard({
           <div className="text-xs text-gray-500 mb-2">
             {getTimestampText()}{" "}
             {formatDistanceToNow(
-              new Date(isApplication ? application!.createdAt : opportunity.createdAt),
+              new Date(
+                isApplication ? application!.createdAt : opportunity.createdAt
+              ),
               {
                 addSuffix: true,
               }
@@ -235,4 +241,4 @@ export default function TabwiseOpportunityCard({
       </div>
     </div>
   );
-} 
+}

@@ -11,11 +11,11 @@ import {
   Users,
   Calendar,
   Clock,
-  Building2,
   Star,
   ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface OpportunityCardProps {
@@ -60,13 +60,13 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
 
   return (
     <Card
-      className="group hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden w-full py-0 cursor-pointer relative bg-white border border-gray-100 hover:border-blue-200"
+      className="group hover:shadow-xl transition-all duration-300 rounded-xl overflow-hidden w-full h-full py-0 cursor-pointer relative bg-white border border-gray-100 hover:border-blue-200"
       onClick={handleCardClick}
     >
       <CardContent className="p-4 flex flex-col h-full space-y-3">
         {/* Title and Favorite Button Row */}
         <div className="flex justify-between items-start   flex-shrink-0">
-          <h3 className="text-base font-bold text-gray-900 line-clamp-2 group-hover:text-blue-600 transition-colors flex-1 pr-2">
+          <h3 className="text-sm sm:text-base font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors flex-1 pr-2">
             {opportunity.title.charAt(0).toUpperCase() +
               opportunity.title.slice(1)}
           </h3>
@@ -88,7 +88,17 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
         {/* Posted by section */}
         <div className="flex items-center gap-2   flex-shrink-0">
           <div className="p-1.5 bg-blue-50 rounded-lg flex-shrink-0">
-            <Building2 className="w-4 h-4 text-blue-600" />
+            <Image
+              src={
+                opportunity?.organization_profile?.profile_img || "/avatar.svg"
+              }
+              alt={
+                opportunity?.organization_profile?.title || "Organization Logo"
+              }
+              width={20}
+              height={20}
+              className="rounded-full"
+            />
           </div>
           <div className="text-sm text-gray-600 min-w-0">
             <span className="text-gray-500 text-xs">Posted by: </span>
@@ -161,7 +171,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
         </div>
 
         {/* Footer */}
-        <div className="mt-auto flex-shrink-0">
+        <div className="!mt-auto flex-shrink-0">
           {/* Date, Time and Type - Always on same line */}
           <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
             <div className="flex items-center gap-3">
@@ -197,13 +207,13 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex gap-2">
+          <div className="flex  gap-2">
             <div onClick={(e) => e.stopPropagation()} className="flex-1">
               <Link
                 href={`/volunteer/opportunities/${opportunity._id}`}
                 className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-center py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 block flex items-center justify-center gap-2"
               >
-                <span>View Details</span>
+                <span className="whitespace-nowrap">View Details</span>
                 <ExternalLink className="w-4 h-4" />
               </Link>
             </div>

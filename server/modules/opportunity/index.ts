@@ -11,7 +11,7 @@ import OrganisationRecruitment from "@/server/db/models/organisation-recruitment
 import { publicProcedure } from "@/server/trpc";
 import mongoose from "mongoose";
 import OpportunityMentor from "@/server/db/models/opportunity-mentor";
-
+ 
 export const opportunityRouter = router({
   createOpportunity: protectedProcedure
     .input(opportunityValidation.createOpportunitySchema)
@@ -263,6 +263,7 @@ export const opportunityRouter = router({
         const mentorOpportunityIds = mentorAssignments.map(
           (assignment) => assignment.opportunity
         );
+        console.log({mentorOpportunityIds});
 
         if (mentorOpportunityIds.length === 0) {
           return {

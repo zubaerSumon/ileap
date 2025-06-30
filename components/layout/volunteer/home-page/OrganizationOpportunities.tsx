@@ -247,7 +247,7 @@ export default function OrganizationOpportunities({
                     <Image
                       src={
                         opportunity?.organization_profile?.profile_img ||
-                        "/default-org-logo.svg"
+                        "/avatar.svg"
                       }
                       alt={
                         opportunity?.created_by?.name || "Unknown Organization"
