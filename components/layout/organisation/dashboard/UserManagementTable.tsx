@@ -1,4 +1,5 @@
 "use client";
+import React, { useMemo } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -13,11 +14,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { MoreHorizontal, Loader2 } from "lucide-react";
+import {
+  MoreHorizontal,
+  Loader2,
+  UserPlus,
+  UserMinus,
+  Crown,
+  Shield,
+} from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
-import { useCallback, useMemo } from "react";
+import { cn } from "@/lib/utils";
 
 interface User {
   _id: string;
@@ -31,6 +39,7 @@ const columnHelper = createColumnHelper<User>();
 
 function useUserMutations() {
   const utils = trpc.useUtils();
+  const { data: session } = useSession();
 
   const updateRoleMutation = trpc.users.updateUserRole.useMutation({
     onSuccess: () => {
@@ -39,6 +48,16 @@ function useUserMutations() {
     },
     onError: (error) => {
       toast.error(error.message || "Failed to update user role");
+    },
+  });
+
+  const demoteMentorMutation = trpc.users.demoteMentor.useMutation({
+    onSuccess: () => {
+      toast.success("Mentor role removed successfully");
+      utils.users.getOrganizationUsers.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to remove mentor role");
     },
   });
 
@@ -52,99 +71,230 @@ function useUserMutations() {
     },
   });
 
+  const handleUpdateRole = (userId: string, currentRole: string) => {
+    const newRole = currentRole === "admin" ? "mentor" : "admin";
+    updateRoleMutation.mutate({ userId, role: newRole as "admin" | "mentor" });
+  };
+
+  const handleToggleMentor = (userId: string, currentRole: string) => {
+    if (currentRole === "mentor") {
+      demoteMentorMutation.mutate({ userId });
+    } else if (currentRole === "volunteer") {
+      updateRoleMutation.mutate({ userId, role: "mentor" });
+    }
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    if (confirm("Are you sure you want to delete this user?")) {
+      deleteUserMutation.mutate({ userId });
+    }
+  };
+
   return {
     updateRoleMutation,
+    demoteMentorMutation,
     deleteUserMutation,
+    handleUpdateRole,
+    handleToggleMentor,
+    handleDeleteUser,
+    session,
   };
 }
 
-export default function UserManagementTable({ organizationId }: { organizationId: string }) {
-  const { data: session } = useSession();
+export default function UserManagementTable({
+  organizationId,
+}: {
+  organizationId: string;
+}) {
   const { data: users, isLoading } = trpc.users.getOrganizationUsers.useQuery(
     { organizationId },
     { enabled: !!organizationId }
   );
-  const { updateRoleMutation, deleteUserMutation } = useUserMutations();
 
-  const handleUpdateRole = useCallback((userId: string, currentRole: string) => {
-    const newRole = currentRole === "admin" ? "mentor" : "admin";
-    updateRoleMutation.mutate({
-      userId,
-      role: newRole,
-    });
-  }, [updateRoleMutation]);
+  const {
+    updateRoleMutation,
+    demoteMentorMutation,
+    handleUpdateRole,
+    handleToggleMentor,
+    handleDeleteUser,
+    session,
+  } = useUserMutations();
 
-  const handleDeleteUser = useCallback((userId: string) => {
-    if (window.confirm("Are you sure you want to delete this user?")) {
-      deleteUserMutation.mutate({
-        userId,
-      });
-    }
-  }, [deleteUserMutation]);
-
-  const filteredUsers = useMemo(() => 
-    users?.filter(user => user._id !== session?.user?.id) || [],
+  const filteredUsers = useMemo(
+    () => users?.filter((user) => user._id !== session?.user?.id) || [],
     [users, session?.user?.id]
   );
 
-  const columns = useMemo(() => [
-    columnHelper.accessor("name", {
-      header: "Name",
-      cell: (info) => (
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
-            {info.getValue()[0].toUpperCase()}
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor("name", {
+        header: "Name",
+        cell: (info) => (
+          <div className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
+              {info.getValue()[0].toUpperCase()}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm sm:text-base truncate">
+                {info.getValue()}
+              </p>
+              <p className="text-xs sm:text-sm text-muted-foreground truncate">
+                {info.row.original.email}
+              </p>
+            </div>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="font-medium text-sm sm:text-base truncate">{info.getValue()}</p>
-            <p className="text-xs sm:text-sm text-muted-foreground truncate">{info.row.original.email}</p>
-          </div>
-        </div>
-      ),
-    }),
-    columnHelper.accessor("role", {
-      header: "Role",
-      cell: (info) => (
-        <span className="capitalize text-sm sm:text-base">{info.getValue()}</span>
-      ),
-    }),
-    columnHelper.display({
-      id: "actions",
-      cell: (info) => {
-        const currentUserRole = session?.user?.role || "";
-        const targetUserRole = info.row.original.role;
-        const canDelete = currentUserRole === "admin" || 
-          (currentUserRole === "mentor" && targetUserRole === "mentor");
+        ),
+      }),
+      columnHelper.accessor("role", {
+        header: "Role",
+        cell: (info) => (
+          <span className="capitalize text-sm sm:text-base">
+            {info.getValue()}
+          </span>
+        ),
+      }),
+      columnHelper.display({
+        id: "actions",
+        cell: (info) => {
+          const currentUserRole = session?.user?.role || "";
+          const targetUserRole = info.row.original.role;
+          const canDelete =
+            currentUserRole === "admin" ||
+            (currentUserRole === "mentor" && targetUserRole === "mentor");
+          const canToggleMentor =
+            currentUserRole === "admin" &&
+            (targetUserRole === "volunteer" || targetUserRole === "mentor");
 
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {currentUserRole === "admin" && (
-                <DropdownMenuItem
-                  onClick={() => handleUpdateRole(info.row.original._id, targetUserRole)}
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-8 w-8 p-0 rounded-full hover:bg-gray-100/80 transition-colors duration-200"
                 >
-                  Change to {targetUserRole === "admin" ? "Mentor" : "Admin"}
-                </DropdownMenuItem>
-              )}
-              {canDelete && (
-                <DropdownMenuItem
-                  className="text-red-600"
-                  onClick={() => handleDeleteUser(info.row.original._id)}
-                >
-                  Delete User
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
-    }),
-  ], [session?.user?.role, handleUpdateRole, handleDeleteUser]);
+                  <MoreHorizontal className="h-4 w-4 text-gray-500" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-64 p-2 bg-white/95 backdrop-blur-md border border-gray-200/60 shadow-xl rounded-xl"
+                sideOffset={8}
+              >
+                {currentUserRole === "admin" &&
+                  targetUserRole !== "volunteer" && (
+                    <DropdownMenuItem
+                      onClick={() =>
+                        handleUpdateRole(info.row.original._id, targetUserRole)
+                      }
+                      disabled={updateRoleMutation.isPending}
+                      className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 font-medium text-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100/50 focus:from-blue-50 focus:to-blue-100/50 focus:outline-none"
+                    >
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-100">
+                        <Crown className="w-3.5 h-3.5 text-blue-600" />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-gray-900 font-medium">
+                          Change to{" "}
+                          {targetUserRole === "admin" ? "Mentor" : "Admin"}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {targetUserRole === "admin"
+                            ? "Demote to mentor role"
+                            : "Promote to admin role"}
+                        </span>
+                      </div>
+                    </DropdownMenuItem>
+                  )}
+                {canToggleMentor && (
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handleToggleMentor(info.row.original._id, targetUserRole)
+                    }
+                    disabled={
+                      updateRoleMutation.isPending ||
+                      demoteMentorMutation.isPending
+                    }
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 font-medium text-sm",
+                      "hover:bg-gradient-to-r hover:shadow-sm focus:outline-none",
+                      "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent",
+                      targetUserRole === "mentor"
+                        ? "hover:from-red-50 hover:to-red-100/50 focus:from-red-50 focus:to-red-100/50"
+                        : "hover:from-emerald-50 hover:to-emerald-100/50 focus:from-emerald-50 focus:to-emerald-100/50"
+                    )}
+                  >
+                    {updateRoleMutation.isPending ||
+                    demoteMentorMutation.isPending ? (
+                      <div className="flex items-center gap-3 w-full">
+                        <div className="flex items-center justify-center w-5 h-5">
+                          <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+                        </div>
+                        <span className="text-gray-600">
+                          {targetUserRole === "mentor"
+                            ? "Removing..."
+                            : "Promoting..."}
+                        </span>
+                      </div>
+                    ) : targetUserRole === "mentor" ? (
+                      <>
+                        <div className="flex items-center justify-center w-5 h-5 rounded-full bg-red-100">
+                          <UserMinus className="w-3.5 h-3.5 text-red-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-gray-900 font-medium">
+                            Remove Mentor Role
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            Demote to volunteer
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100">
+                          <UserPlus className="w-3.5 h-3.5 text-emerald-600" />
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-gray-900 font-medium">
+                            Promote to Mentor
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            Grant mentor privileges
+                          </span>
+                        </div>
+                      </>
+                    )}
+                  </DropdownMenuItem>
+                )}
+                {canDelete && (
+                  <DropdownMenuItem
+                    className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 font-medium text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100/50 focus:from-red-50 focus:to-red-100/50 focus:outline-none"
+                    onClick={() => handleDeleteUser(info.row.original._id)}
+                  >
+                    <div className="flex items-center justify-center w-5 h-5 rounded-full bg-red-100">
+                      <Shield className="w-3.5 h-3.5 text-red-600" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-medium">Delete User</span>
+                      <span className="text-xs text-red-500">
+                        Permanently remove user
+                      </span>
+                    </div>
+                  </DropdownMenuItem>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
+      }),
+    ],
+    [
+      session?.user?.role,
+      handleUpdateRole,
+      handleToggleMentor,
+      handleDeleteUser,
+    ]
+  );
 
   const table = useReactTable({
     data: filteredUsers,
@@ -175,7 +325,10 @@ export default function UserManagementTable({ organizationId }: { organizationId
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id} className="border-b">
                 {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="h-12 px-4 text-left align-middle font-medium text-muted-foreground">
+                  <th
+                    key={header.id}
+                    className="h-12 px-4 text-left align-middle font-medium text-muted-foreground"
+                  >
                     {flexRender(
                       header.column.columnDef.header,
                       header.getContext()
@@ -188,16 +341,16 @@ export default function UserManagementTable({ organizationId }: { organizationId
           <tbody>
             {table.getRowModel().rows.length === 0 ? (
               <tr>
-                <td
-                  colSpan={columns.length}
-                  className="h-24 text-center"
-                >
+                <td colSpan={columns.length} className="h-24 text-center">
                   No users found
                 </td>
               </tr>
             ) : (
               table.getRowModel().rows.map((row) => (
-                <tr key={row.id} className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted">
+                <tr
+                  key={row.id}
+                  className="border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
+                >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="p-4 align-middle">
                       {flexRender(
@@ -224,8 +377,12 @@ export default function UserManagementTable({ organizationId }: { organizationId
             const user = row.original;
             const currentUserRole = session?.user?.role || "";
             const targetUserRole = user.role;
-            const canDelete = currentUserRole === "admin" || 
+            const canDelete =
+              currentUserRole === "admin" ||
               (currentUserRole === "mentor" && targetUserRole === "mentor");
+            const canToggleMentor =
+              currentUserRole === "admin" &&
+              (targetUserRole === "volunteer" || targetUserRole === "mentor");
 
             return (
               <div key={row.id} className="border rounded-lg p-4 space-y-3">
@@ -235,30 +392,130 @@ export default function UserManagementTable({ organizationId }: { organizationId
                       {user.name[0].toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-sm truncate">{user.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      <p className="font-medium text-sm truncate">
+                        {user.name}
+                      </p>
+                      <p className="text-xs text-muted-foreground truncate">
+                        {user.email}
+                      </p>
                     </div>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <MoreHorizontal className="h-4 w-4" />
+                      <Button
+                        variant="ghost"
+                        className="h-8 w-8 p-0 rounded-full hover:bg-gray-100/80 transition-colors duration-200"
+                      >
+                        <MoreHorizontal className="h-4 w-4 text-gray-500" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      {currentUserRole === "admin" && (
+                    <DropdownMenuContent
+                      align="end"
+                      className="w-64 p-2 bg-white/95 backdrop-blur-md border border-gray-200/60 shadow-xl rounded-xl"
+                      sideOffset={8}
+                    >
+                      {currentUserRole === "admin" &&
+                        targetUserRole !== "volunteer" && (
+                          <DropdownMenuItem
+                            onClick={() =>
+                              handleUpdateRole(user._id, targetUserRole)
+                            }
+                            disabled={updateRoleMutation.isPending}
+                            className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 font-medium text-sm hover:bg-gradient-to-r hover:from-blue-50 hover:to-blue-100/50 focus:from-blue-50 focus:to-blue-100/50 focus:outline-none"
+                          >
+                            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-100">
+                              <Crown className="w-3.5 h-3.5 text-blue-600" />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-gray-900 font-medium">
+                                Change to{" "}
+                                {targetUserRole === "admin"
+                                  ? "Mentor"
+                                  : "Admin"}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {targetUserRole === "admin"
+                                  ? "Demote to mentor role"
+                                  : "Promote to admin role"}
+                              </span>
+                            </div>
+                          </DropdownMenuItem>
+                        )}
+                      {canToggleMentor && (
                         <DropdownMenuItem
-                          onClick={() => handleUpdateRole(user._id, targetUserRole)}
+                          onClick={() =>
+                            handleToggleMentor(user._id, targetUserRole)
+                          }
+                          disabled={
+                            updateRoleMutation.isPending ||
+                            demoteMentorMutation.isPending
+                          }
+                          className={cn(
+                            "flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 font-medium text-sm",
+                            "hover:bg-gradient-to-r hover:shadow-sm focus:outline-none",
+                            "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent",
+                            targetUserRole === "mentor"
+                              ? "hover:from-red-50 hover:to-red-100/50 focus:from-red-50 focus:to-red-100/50"
+                              : "hover:from-emerald-50 hover:to-emerald-100/50 focus:from-emerald-50 focus:to-emerald-100/50"
+                          )}
                         >
-                          Change to {targetUserRole === "admin" ? "Mentor" : "Admin"}
+                          {updateRoleMutation.isPending ||
+                          demoteMentorMutation.isPending ? (
+                            <div className="flex items-center gap-3 w-full">
+                              <div className="flex items-center justify-center w-5 h-5">
+                                <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+                              </div>
+                              <span className="text-gray-600">
+                                {targetUserRole === "mentor"
+                                  ? "Removing..."
+                                  : "Promoting..."}
+                              </span>
+                            </div>
+                          ) : targetUserRole === "mentor" ? (
+                            <>
+                              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-red-100">
+                                <UserMinus className="w-3.5 h-3.5 text-red-600" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-gray-900 font-medium">
+                                  Remove Mentor Role
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  Demote to volunteer
+                                </span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100">
+                                <UserPlus className="w-3.5 h-3.5 text-emerald-600" />
+                              </div>
+                              <div className="flex flex-col">
+                                <span className="text-gray-900 font-medium">
+                                  Promote to Mentor
+                                </span>
+                                <span className="text-xs text-gray-500">
+                                  Grant mentor privileges
+                                </span>
+                              </div>
+                            </>
+                          )}
                         </DropdownMenuItem>
                       )}
                       {canDelete && (
                         <DropdownMenuItem
-                          className="text-red-600"
+                          className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer transition-all duration-200 font-medium text-sm text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100/50 focus:from-red-50 focus:to-red-100/50 focus:outline-none"
                           onClick={() => handleDeleteUser(user._id)}
                         >
-                          Delete User
+                          <div className="flex items-center justify-center w-5 h-5 rounded-full bg-red-100">
+                            <Shield className="w-3.5 h-3.5 text-red-600" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-medium">Delete User</span>
+                            <span className="text-xs text-red-500">
+                              Permanently remove user
+                            </span>
+                          </div>
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -266,14 +523,16 @@ export default function UserManagementTable({ organizationId }: { organizationId
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t">
                   <span className="text-xs text-muted-foreground">Role:</span>
-                  <span className="capitalize text-sm font-medium">{user.role}</span>
+                  <span className="capitalize text-sm font-medium">
+                    {user.role}
+                  </span>
                 </div>
               </div>
             );
           })
         )}
       </div>
-      
+
       {/* Pagination */}
       <div className="flex items-center justify-center gap-2">
         <Button
@@ -295,4 +554,4 @@ export default function UserManagementTable({ organizationId }: { organizationId
       </div>
     </div>
   );
-} 
+}

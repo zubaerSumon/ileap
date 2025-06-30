@@ -2,22 +2,43 @@
 
 import React, { useState, useEffect } from "react";
 import { trpc } from "@/utils/trpc";
-import { Loader2, Users, UserPlus, Settings, ChevronRight } from "lucide-react";
+import { Loader2, Users, UserPlus, Settings, ChevronRight, UserMinus } from "lucide-react";
 import InviteMentorDialog from "@/components/layout/organisation/dashboard/InviteMentorDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import UserManagementTable from "@/components/layout/organisation/dashboard/UserManagementTable";
 import { useSession } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export default function OrganizationSettingsPage() {
   const [activeSection, setActiveSection] = useState("users");
   const { data: session } = useSession();
   const { data: profileData } = trpc.users.profileCheckup.useQuery();
-  const { data: mentors, isLoading: isLoadingMentors } = trpc.mentors.getMentors.useQuery(
+  const { data: mentors, isLoading: isLoadingMentors, refetch: refetchMentors } = trpc.mentors.getMentors.useQuery(
     { organizationId: profileData?.organizationProfile?._id || "" },
     { enabled: !!profileData?.organizationProfile?._id }
   );
+
+  const utils = trpc.useUtils();
+
+  const demoteMentorMutation = trpc.users.demoteMentor.useMutation({
+    onSuccess: () => {
+      toast.success("Mentor role removed successfully");
+      refetchMentors();
+      utils.users.getOrganizationUsers.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to remove mentor role");
+    },
+  });
+
+  const handleRemoveMentorRole = (mentorId: string) => {
+    demoteMentorMutation.mutate({
+      userId: mentorId
+    });
+  };
 
   const isVolunteer = session?.user?.role === "volunteer";
   const isOrganization = session?.user?.role === "admin" || session?.user?.role === "mentor";
@@ -210,6 +231,22 @@ export default function OrganizationSettingsPage() {
                               <h3 className="font-medium text-gray-900">{mentor.name}</h3>
                               <p className="text-sm text-gray-500">{mentor.email}</p>
                             </div>
+                            {session?.user?.role === "admin" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => handleRemoveMentorRole(mentor._id)}
+                                disabled={demoteMentorMutation.isPending}
+                                className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 font-medium"
+                              >
+                                {demoteMentorMutation.isPending ? (
+                                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                                ) : (
+                                  <UserMinus className="w-4 h-4 mr-2" />
+                                )}
+                                <span>Remove Role</span>
+                              </Button>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -323,6 +360,22 @@ export default function OrganizationSettingsPage() {
                             <h3 className="font-medium text-gray-900">{mentor.name}</h3>
                             <p className="text-sm text-gray-500">{mentor.email}</p>
                           </div>
+                          {session?.user?.role === "admin" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleRemoveMentorRole(mentor._id)}
+                              disabled={demoteMentorMutation.isPending}
+                              className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 font-medium"
+                            >
+                              {demoteMentorMutation.isPending ? (
+                                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                              ) : (
+                                <UserMinus className="w-4 h-4 mr-2" />
+                              )}
+                              <span>Remove Role</span>
+                            </Button>
+                          )}
                         </div>
                       ))}
                     </div>

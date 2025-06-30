@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import MobileTabsSlider from "@/components/layout/shared/MobileTabsSlider";
+import MobileTabsSlider from "@/components/shared/MobileTabsSlider";
 
 interface TabItem {
   label: string;

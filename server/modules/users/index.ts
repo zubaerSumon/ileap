@@ -598,6 +598,65 @@ export const userRouter = router({
       return userToUpdate;
     }),
 
+  demoteMentor: protectedProcedure
+    .input(z.object({
+      userId: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.email) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to demote mentors.",
+        });
+      }
+
+      const currentUser = await User.findOne({ email: sessionUser.email });
+      if (!currentUser) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Current user not found.",
+        });
+      }
+
+      // Only admins can demote mentors
+      if (currentUser.role !== "admin") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Only admins can demote mentors.",
+        });
+      }
+
+      const userToDemote = await User.findById(input.userId);
+      if (!userToDemote) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User to demote not found.",
+        });
+      }
+
+      // Ensure user belongs to the same organization
+      if (userToDemote.organization_profile?.toString() !== currentUser.organization_profile?.toString()) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Cannot demote user from a different organization.",
+        });
+      }
+
+      // Only allow demoting mentors
+      if (userToDemote.role !== "mentor") {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Can only demote users with mentor role.",
+        });
+      }
+
+      userToDemote.role = "volunteer";
+      await userToDemote.save();
+
+      return userToDemote;
+    }),
+
   deleteUser: protectedProcedure
     .input(z.object({
       userId: z.string(),
