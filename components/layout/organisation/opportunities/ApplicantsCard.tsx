@@ -79,6 +79,9 @@ export function ApplicantsCard({
       setIsModalOpen?.(false);
       refetchRecruitmentStatus();
       utils.recruits.getRecruitedApplicants.invalidate();
+      utils.applications.getOpportunityApplicants.invalidate();
+      utils.applications.getApplicationStatus.invalidate();
+      utils.opportunities.getOrganizationOpportunities.invalidate();
     },
     onError: (error: TRPCClientErrorLike<AppRouter>) => {
       toast.error(error.message);

@@ -59,6 +59,36 @@ export const volunteerApplicationRouter = router({
       }
     }),
 
+  getCurrentUserApplications: protectedProcedure
+    .query(async ({ ctx }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          return [];
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          return [];
+        }
+
+        const applications = await VolunteerApplication.find({
+          volunteer: user._id,
+        })
+          .populate({
+            path: "opportunity",
+            select: "title description category location commitment_type organization_profile createdAt date time",
+          })
+          .sort({ createdAt: -1 })
+          .lean();
+
+        return applications;
+      } catch (error) {
+        console.error("Error fetching current user applications:", error);
+        return [];
+      }
+    }),
+
   applyToOpportunity: protectedProcedure
     .input(volunteerApplicationValidation.applyToOpportunitySchema)
     .mutation(async ({ ctx, input }) => {

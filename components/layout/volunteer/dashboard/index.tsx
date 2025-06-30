@@ -1,227 +1,303 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { trpc } from "@/utils/trpc";
-import { useSearch } from "@/contexts/SearchContext";
-import { PaginationWrapper } from "@/components/PaginationWrapper";
-import FilterSidebar from "@/components/layout/volunteer/find-opportunity/FilterSidebar";
-import FilterDialog from "@/components/layout/volunteer/find-opportunity/FilterDialog";
-import OpportunitiesHeader from "@/components/layout/volunteer/find-opportunity/OpportunitiesHeader";
-import OpportunityList from "@/components/layout/volunteer/find-opportunity/OpportunityList";
+import { useSession } from "next-auth/react";
 import { Opportunity } from "@/types/opportunities";
-import { Button } from "@/components/ui/button";
-import { Filter, Search, Users, Briefcase } from "lucide-react";
- 
+import {
+  BookOpen,
+  FileText,
+  GraduationCap,
+  ChevronRight,
+} from "lucide-react";
+import { getGreeting } from "@/utils/helpers/getGreeting";
+import MobileTabsSlider from "@/components/shared/MobileTabsSlider";
+import OpportunityCarousel from "./OpportunityCarousel";
+import EmptyState from "@/components/shared/EmptyState";
+import TabwiseOpportunityCard from "./TabwiseOpportunityCard";
+
+interface Application {
+  _id: string;
+  status: "pending" | "approved" | "rejected";
+  opportunity: {
+    _id: string;
+    title: string;
+    description: string;
+    category: string[];
+    location: string;
+    commitment_type: string;
+    organization_profile?: {
+      _id: string;
+      title: string;
+      profile_img?: string;
+    };
+    createdAt: string;
+    date?: {
+      start_date?: string;
+      end_date?: string;
+    };
+    time?: {
+      start_time?: string;
+      end_time?: string;
+    };
+  } | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+const TABS = [
+  { key: "applied", label: "Active opportunities" },
+  { key: "recent", label: "Recent opportunities" },
+  { key: "mentor", label: "Mentor assignments" },
+];
+
 export default function VolunteerDashboard() {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  const { filters, clearAllFilters } = useSearch();
+  const { data: session } = useSession();
+  const [tab, setTab] = useState("applied");
 
-  // Get current tab from URL or default to "all"
-  const currentTab = searchParams.get("tab") || "all";
+  // Fetch current user's applications
+  const { data: applications, isLoading: isLoadingApplications } =
+    trpc.applications.getCurrentUserApplications.useQuery();
 
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [
-    filters.searchQuery,
-    filters.categories,
-    filters.commitmentType,
-    filters.location,
-    filters.availability,
-    currentTab,
-  ]);
+  // Fetch mentor opportunities
+  const { data: mentorOpportunitiesData } =
+    trpc.opportunities.getMentorOpportunities.useQuery({
+      page: 1,
+      limit: 10,
+    });
 
-  // Use different query based on tab
-  const { data: opportunitiesData, isLoading } =
-    currentTab === "mentor"
-      ? trpc.opportunities.getMentorOpportunities.useQuery({
-          page: currentPage,
-          limit: 6,
-          search: filters.searchQuery || undefined,
-          categories:
-            filters.categories.length > 0 ? filters.categories : undefined,
-          commitmentType: filters.commitmentType,
-          location: filters.location || undefined,
-          availability: filters.availability?.startDate || undefined,
-        })
-      : trpc.opportunities.getAllOpportunities.useQuery({
-          page: currentPage,
-          limit: 6,
-          search: filters.searchQuery || undefined,
-          categories:
-            filters.categories.length > 0 ? filters.categories : undefined,
-          commitmentType: filters.commitmentType,
-          location: filters.location || undefined,
-          availability: filters.availability || undefined,
-        });
+  // Fetch recent opportunities for the carousel
+  const {
+    data: recentOpportunitiesData,
+    isLoading: isLoadingRecentOpportunities,
+  } = trpc.opportunities.getAllOpportunities.useQuery({
+    page: 1,
+    limit: 10,
+  });
 
-  // Debug logging
-  console.log("Current filters:", filters);
-  console.log("Current tab:", currentTab);
-  console.log("Query result:", opportunitiesData);
-
-  const opportunities = (opportunitiesData?.opportunities ||
+  const applicationsList = (applications || []) as unknown as Application[];
+  const mentorOpportunities = (mentorOpportunitiesData?.opportunities ||
     []) as unknown as Opportunity[];
-  const totalItems = opportunitiesData?.total || 0;
-  const totalPages = opportunitiesData?.totalPages || 0;
+  const recentOpportunities = (recentOpportunitiesData?.opportunities ||
+    []) as unknown as Opportunity[];
 
-  const startIndex = (currentPage - 1) * 6;
-  const endIndex = Math.min(startIndex + 6, totalItems);
-
-  // Count active filters for mobile display
-  const activeFiltersCount =
-    filters.categories.length +
-    (filters.commitmentType !== "all" ? 1 : 0) +
-    (filters.location ? 1 : 0) +
-    (filters.searchQuery ? 1 : 0);
-
-  // Handle tab change
-  const handleTabChange = (tab: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (tab === "all") {
-      params.delete("tab");
-    } else {
-      params.set("tab", tab);
+  // Filter applications by status and start date
+  const now = new Date();
+  
+  const appliedApplications = applicationsList.filter((app) => {
+    if (!app.opportunity) return false;
+    
+    // For applied: show all applications where opportunity is current or upcoming
+    if (app.opportunity.date?.start_date) {
+      const startDate = new Date(app.opportunity.date.start_date);
+      return startDate >= now; // Current or future start date
     }
-    router.push(`/volunteer/dashboard?${params.toString()}`);
+    
+    // If no start date, include it in applied (assuming it's upcoming)
+    return true;
+  });
+  
+  const recentApplications = applicationsList.filter((app) => {
+    if (!app.opportunity) return false;
+    
+    // For recent: show all applications where opportunity has already started (past)
+    if (app.opportunity.date?.start_date) {
+      const startDate = new Date(app.opportunity.date.start_date);
+      return startDate < now; // Past start date only
+    }
+    
+    // If no start date, don't include in recent
+    return false;
+  });
+
+  // Prepare mobile tabs data
+  const mobileTabs = TABS.map((t) => ({
+    label: t.label,
+    value: t.key,
+    count:
+      t.key === "applied"
+        ? appliedApplications.length
+        : t.key === "recent"
+        ? recentApplications.length
+        : t.key === "mentor"
+        ? mentorOpportunities.length
+        : 0,
+  }));
+
+  // Empty state configurations for each tab
+  const emptyStates = {
+    applied: {
+      icon: BookOpen,
+      title: "No active opportunities",
+      description:
+        "You haven't applied to any current or upcoming opportunities yet. Start exploring and applying to opportunities that interest you.",
+      actionLabel: "Explore Opportunities",
+      onAction: () => router.push("/search?type=opportunity"),
+    },
+    recent: {
+      icon: FileText,
+      title: "No recent opportunities",
+      description:
+        "You don't have any opportunities that have already started. Your past opportunities will appear here.",
+      actionLabel: "Explore Opportunities",
+      onAction: () => router.push("/search?type=opportunity"),
+    },
+    mentor: {
+      icon: GraduationCap,
+      title: "No mentor assignments",
+      description:
+        "You haven't been assigned as a mentor for any opportunities yet. Organizations will assign you when they need mentorship support.",
+      actionLabel: "Explore Opportunities",
+      onAction: () => router.push("/search?type=opportunity"),
+    },
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Volunteer Dashboard
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Manage your volunteer opportunities and mentor assignments in one
-            place.
-          </p>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex justify-center mb-8">
-          <div className="flex bg-white rounded-lg p-1 shadow-sm">
-            <button
-              onClick={() => handleTabChange("all")}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                currentTab === "all"
-                  ? "bg-blue-100 text-blue-700"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
-            >
-              <Briefcase className="h-4 w-4" />
-              All Opportunities
-            </button>
-            <button
-              onClick={() => handleTabChange("mentor")}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
-                currentTab === "mentor"
-                  ? "bg-purple-100 text-purple-700"
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
-            >
-              <Users className="h-4 w-4" />
-              Mentor Opportunities
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row gap-6">
-          {/* Desktop Sidebar */}
-          <div className="hidden md:block sticky top-4">
-            <FilterSidebar />
-          </div>
-
-          <div className="flex-1 min-w-0">
-            {/* Mobile Filter Button */}
-            <div className="md:hidden mb-4 flex items-center justify-between">
-              <div className="flex gap-3">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsFilterModalOpen(true)}
-                  className="flex items-center gap-2 shadow-sm hover:shadow-md transition-all duration-200"
-                >
-                  <Filter className="h-4 w-4" />
-                  Filters
-                  {activeFiltersCount > 0 && (
-                    <span className="bg-blue-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                      {activeFiltersCount}
-                    </span>
-                  )}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => clearAllFilters()}
-                  className="px-4 shadow-sm hover:shadow-md transition-all duration-200"
-                >
-                  Reset
-                </Button>
-              </div>
-            </div>
-
-            <OpportunitiesHeader
-              totalItems={totalItems}
-              startIndex={startIndex}
-              endIndex={endIndex}
-            />
-
-            <div className="w-full">
-              <OpportunityList
-                opportunities={opportunities}
-                isLoading={isLoading}
-              />
-
-              {totalItems > 0 ? (
-                <div className="mt-8 flex justify-center">
-                  <PaginationWrapper
-                    currentPage={currentPage}
-                    totalPages={totalPages}
-                    onPageChange={setCurrentPage}
-                    maxVisiblePages={5}
-                  />
-                </div>
-              ) : !isLoading ? (
-                <div className="text-center py-16">
-                  <div className="max-w-md mx-auto">
-                    <div className="text-gray-400 mb-4">
-                      <Search className="mx-auto h-12 w-12" strokeWidth={1.5} />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      {currentTab === "mentor"
-                        ? "No mentor opportunities found"
-                        : "No opportunities found"}
-                    </h3>
-                    <p className="text-gray-500 mb-6">
-                      {currentTab === "mentor"
-                        ? "You haven't been assigned as a mentor for any opportunities yet. Organizations will assign you as a mentor when they need your guidance."
-                        : "Try adjusting your filters or search terms to find more opportunities."}
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => clearAllFilters()}
-                      className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-colors"
-                    >
-                      Clear All Filters
-                    </Button>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-
-          <FilterDialog
-            isOpen={isFilterModalOpen}
-            onOpenChange={setIsFilterModalOpen}
-            activeFiltersCount={activeFiltersCount}
-            onClearAllFilters={clearAllFilters}
-          />
-        </div>
+    <div className="max-w-[1240px] mx-auto px-4 py-6 md:py-12">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 md:mb-8">
+        <h2 className="text-lg md:text-xl font-bold tracking-tight">
+          {getGreeting()}, {session?.user?.name || "Volunteer"}
+        </h2>
       </div>
+
+      {/* Overview Section */}
+      <h2 className="text-xl md:text-2xl font-semibold mb-4">Overview</h2>
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+        {/* Mobile Tabs Slider */}
+        <MobileTabsSlider
+          tabs={mobileTabs}
+          activeTab={tab}
+          onTabChange={setTab}
+          className="md:hidden"
+        />
+
+        {/* Desktop Tabs */}
+        <div className="hidden md:flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
+          {TABS.map((t) => (
+            <button
+              key={t.key}
+              className={`px-4 md:px-5 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 whitespace-nowrap shadow-sm hover:shadow-md
+                ${
+                  tab === t.key
+                    ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                    : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
+                }
+              `}
+              onClick={() => setTab(t.key)}
+              style={{ minWidth: "auto" }}
+            >
+              {t.label} (
+              {t.key === "applied"
+                ? appliedApplications.length
+                : t.key === "recent"
+                ? recentApplications.length
+                : t.key === "mentor"
+                ? mentorOpportunities.length
+                : 0}
+              )
+            </button>
+          ))}
+        </div>
+
+        <button
+          className="flex cursor-pointer items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
+          onClick={() => router.push("/search?type=opportunity")}
+        >
+          Find more opportunities{" "}
+          <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div className="transition-all duration-300 ease-in-out">
+        {isLoadingApplications ? (
+          <div className="text-center py-12">
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading your applications...</p>
+          </div>
+        ) : (
+          <div className="min-h-[400px]">
+            {tab === "applied" && (
+              <>
+                {appliedApplications.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {appliedApplications.map((application) => (
+                      <TabwiseOpportunityCard
+                        key={application._id}
+                        item={application}
+                        type="application"
+                        tabType="active"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    {...emptyStates.applied}
+                    variant="card"
+                    className="min-h-[400px]"
+                  />
+                )}
+              </>
+            )}
+
+            {tab === "recent" && (
+              <>
+                {recentApplications.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {recentApplications.map((application) => (
+                      <TabwiseOpportunityCard
+                        key={application._id}
+                        item={application}
+                        type="application"
+                        tabType="recent"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    {...emptyStates.recent}
+                    variant="card"
+                    className="min-h-[400px]"
+                  />
+                )}
+              </>
+            )}
+
+            {tab === "mentor" && (
+              <>
+                {mentorOpportunities.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {mentorOpportunities.map((opportunity) => (
+                      <TabwiseOpportunityCard
+                        key={opportunity._id}
+                        item={opportunity}
+                        type="opportunity"
+                        tabType="mentor"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    {...emptyStates.mentor}
+                    variant="card"
+                    className="min-h-[400px]"
+                  />
+                )}
+              </>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Recent Opportunities Carousel */}
+      <OpportunityCarousel
+        opportunities={recentOpportunities}
+        isLoading={isLoadingRecentOpportunities}
+        title="Discover new opportunities"
+        viewAllLink="/search?type=opportunity"
+      />
     </div>
   );
 }

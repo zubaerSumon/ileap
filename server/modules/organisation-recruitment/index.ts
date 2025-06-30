@@ -73,10 +73,18 @@ export const organisationRecruitmentRouter = router({
           });
         }
 
+        // Create the recruitment record
         const organisationRecruitment = await OrganisationRecruitment.create({
           application: input.applicationId,
           recruited_by: recruiter._id,
         });
+
+        // Update the volunteer application status to approved
+        await VolunteerApplication.findByIdAndUpdate(
+          input.applicationId,
+          { status: "approved" },
+          { new: true }
+        );
 
         // Send recruitment confirmation email
         await sendRecruitmentConfirmationMail(input.applicationId);

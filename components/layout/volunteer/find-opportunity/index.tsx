@@ -11,6 +11,7 @@ import OpportunityList from "./OpportunityList";
 import { Opportunity } from "@/types/opportunities";
 import { Button } from "@/components/ui/button";
 import { Filter, Search } from "lucide-react";
+import EmptyState from "@/components/shared/EmptyState";
 
 export default function FindOpportunity() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,16 +28,17 @@ export default function FindOpportunity() {
     filters.availability,
   ]);
 
-  const { data: opportunitiesData, isLoading } = trpc.opportunities.getAllOpportunities.useQuery({
-    page: currentPage,
-    limit: 6,
-    search: filters.searchQuery || undefined,
-    categories:
-      filters.categories.length > 0 ? filters.categories : undefined,
-    commitmentType: filters.commitmentType,
-    location: filters.location || undefined,
-    availability: filters.availability || undefined,
-  });
+  const { data: opportunitiesData, isLoading } =
+    trpc.opportunities.getAllOpportunities.useQuery({
+      page: currentPage,
+      limit: 6,
+      search: filters.searchQuery || undefined,
+      categories:
+        filters.categories.length > 0 ? filters.categories : undefined,
+      commitmentType: filters.commitmentType,
+      location: filters.location || undefined,
+      availability: filters.availability || undefined,
+    });
 
   // Debug logging
   console.log("Current filters:", filters);
@@ -60,6 +62,14 @@ export default function FindOpportunity() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto px-4 py-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+            Find Your Perfect Opportunity
+          </h1>
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Discover meaningful volunteer opportunities that match your skills, interests, and schedule. Make a difference in your community today.
+          </p>
+        </div>
         <div className="flex flex-col md:flex-row gap-6">
           {/* Desktop Sidebar */}
           <div className="hidden md:block sticky top-4">
@@ -104,7 +114,7 @@ export default function FindOpportunity() {
                 opportunities={opportunities}
                 isLoading={isLoading}
               />
-              
+
               {totalItems > 0 ? (
                 <div className="mt-8 flex justify-center">
                   <PaginationWrapper
@@ -115,26 +125,14 @@ export default function FindOpportunity() {
                   />
                 </div>
               ) : !isLoading ? (
-                <div className="text-center py-16">
-                  <div className="max-w-md mx-auto">
-                    <div className="text-gray-400 mb-4">
-                      <Search className="mx-auto h-12 w-12" strokeWidth={1.5} />
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      No opportunities found
-                    </h3>
-                    <p className="text-gray-500 mb-6">
-                      Try adjusting your filters or search terms to find more opportunities.
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => clearAllFilters()}
-                      className="text-blue-600 border-blue-600 hover:bg-blue-50 transition-colors"
-                    >
-                      Clear All Filters
-                    </Button>
-                  </div>
-                </div>
+                <EmptyState
+                  icon={Search}
+                  title="No opportunities found"
+                  description="Try adjusting your filters or search terms to find more opportunities."
+                  actionLabel="Clear All Filters"
+                  onAction={() => clearAllFilters()}
+                  variant="default"
+                />
               ) : null}
             </div>
           </div>
