@@ -30,6 +30,16 @@ const markAsMentorSchema = z.object({
   opportunityId: z.string().min(1, "Opportunity ID is required"),
 });
 
+const removeMentorSchema = z.object({
+  volunteerId: z.string().min(1, "Volunteer ID is required"),
+  opportunityId: z.string().min(1, "Opportunity ID is required"),
+});
+
+const toggleMentorSchema = z.object({
+  volunteerId: z.string().min(1, "Volunteer ID is required"),
+  opportunityId: z.string().min(1, "Opportunity ID is required"),
+});
+
 export const organizationMentorRouter = router({
   inviteMentor: protectedProcedure
     .input(inviteMentorSchema)
@@ -222,6 +232,157 @@ export const organizationMentorRouter = router({
         };
       } catch (error) {
         console.error("Error in markAsMentor:", error);
+        throw error;
+      }
+    }),
+
+  removeMentor: protectedProcedure
+    .input(removeMentorSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to remove mentors.",
+          });
+        }
+
+        // Check if current user is an admin or mentor
+        const currentUser = await User.findOne({ email: sessionUser.email });
+        if (!currentUser || (currentUser.role !== UserRole.ADMIN && currentUser.role !== UserRole.MENTOR)) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins and mentors can remove mentors.",
+          });
+        }
+
+        // Check if opportunity exists and get its organization
+        const opportunity = await Opportunity.findById(input.opportunityId);
+        if (!opportunity) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Opportunity not found.",
+          });
+        }
+
+        // Check if current user belongs to the same organization as the opportunity
+        if (currentUser.organization_profile?.toString() !== opportunity.organization_profile.toString()) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You can only remove mentors for opportunities within your organization.",
+          });
+        }
+
+        // Find and remove the mentor assignment
+        const mentorAssignment = await OpportunityMentor.findOneAndDelete({
+          opportunity: input.opportunityId,
+          volunteer: input.volunteerId,
+        });
+
+        if (!mentorAssignment) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Mentor assignment not found.",
+          });
+        }
+
+        return { 
+          message: "Mentor has been successfully removed from this opportunity"
+        };
+      } catch (error) {
+        console.error("Error in removeMentor:", error);
+        throw error;
+      }
+    }),
+
+  toggleMentor: protectedProcedure
+    .input(toggleMentorSchema)
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to toggle mentor status.",
+          });
+        }
+
+        // Check if current user is an admin or mentor
+        const currentUser = await User.findOne({ email: sessionUser.email });
+        if (!currentUser || (currentUser.role !== UserRole.ADMIN && currentUser.role !== UserRole.MENTOR)) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins and mentors can toggle mentor status.",
+          });
+        }
+
+        // Check if opportunity exists and get its organization
+        const opportunity = await Opportunity.findById(input.opportunityId);
+        if (!opportunity) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Opportunity not found.",
+          });
+        }
+
+        // Check if current user belongs to the same organization as the opportunity
+        if (currentUser.organization_profile?.toString() !== opportunity.organization_profile.toString()) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You can only toggle mentor status for opportunities within your organization.",
+          });
+        }
+
+        // Find the volunteer
+        const volunteer = await User.findById(input.volunteerId);
+        if (!volunteer) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Volunteer not found.",
+          });
+        }
+
+        // Check if volunteer is already a mentor for this opportunity
+        const existingMentorAssignment = await OpportunityMentor.findOne({
+          opportunity: input.opportunityId,
+          volunteer: input.volunteerId,
+        });
+
+        if (existingMentorAssignment) {
+          // Remove mentor
+          await OpportunityMentor.findOneAndDelete({
+            opportunity: input.opportunityId,
+            volunteer: input.volunteerId,
+          });
+
+          return { 
+            message: "Mentor has been successfully removed from this opportunity",
+            action: "removed"
+          };
+        } else {
+          // Add mentor
+          const mentorAssignment = await OpportunityMentor.create({
+            opportunity: input.opportunityId,
+            volunteer: input.volunteerId,
+            organization_profile: opportunity.organization_profile,
+            assigned_by: currentUser._id,
+            assigned_at: new Date(),
+          });
+
+          return { 
+            message: "Volunteer has been successfully marked as mentor for this opportunity",
+            action: "added",
+            mentorAssignment: {
+              id: mentorAssignment._id,
+              opportunityId: mentorAssignment.opportunity,
+              volunteerId: mentorAssignment.volunteer,
+              assignedAt: mentorAssignment.assigned_at
+            }
+          };
+        }
+      } catch (error) {
+        console.error("Error in toggleMentor:", error);
         throw error;
       }
     }),

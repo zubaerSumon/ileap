@@ -85,12 +85,15 @@ export function ApplicantsCard({
     },
   });
 
-  const markAsMentorMutation = trpc.mentors.markAsMentor.useMutation({
-    onSuccess: () => {
-      toast.success(
-        "Volunteer has been marked as mentor for this opportunity successfully."
-      );
-      setIsMentorForOpportunity(true);
+  const toggleMentorMutation = trpc.mentors.toggleMentor.useMutation({
+    onSuccess: (data) => {
+      if (data.action === "added") {
+        toast.success("Volunteer has been marked as mentor for this opportunity successfully.");
+        setIsMentorForOpportunity(true);
+      } else {
+        toast.success("Mentor has been removed from this opportunity successfully.");
+        setIsMentorForOpportunity(false);
+      }
       utils.mentors.getOpportunityMentors.invalidate();
     },
     onError: (error: TRPCClientErrorLike<AppRouter>) => {
@@ -104,13 +107,13 @@ export function ApplicantsCard({
     });
   };
 
-  const handleMarkAsMentor = () => {
+  const handleToggleMentor = () => {
     if (!opportunityId) {
       toast.error("Opportunity ID is required");
       return;
     }
 
-    markAsMentorMutation.mutate({
+    toggleMentorMutation.mutate({
       volunteerId: applicant.id,
       opportunityId: opportunityId,
     });
@@ -126,8 +129,8 @@ export function ApplicantsCard({
         {showMarkAsMentor && canMarkAsMentor && (
           <ApplicantActionsDropdown
             isMentorForOpportunity={isMentorForOpportunity}
-            isMarkingAsMentor={markAsMentorMutation.isPending}
-            onMarkAsMentor={handleMarkAsMentor}
+            isMarkingAsMentor={toggleMentorMutation.isPending}
+            onToggleMentor={handleToggleMentor}
           />
         )}
 
