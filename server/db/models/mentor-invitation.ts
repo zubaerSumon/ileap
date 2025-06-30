@@ -33,9 +33,6 @@ const MentorInvitationSchema: Schema = new Schema(
   { timestamps: true }
 );
 
-// Create index for token lookup
-MentorInvitationSchema.index({ token: 1 });
-
 // Create TTL index to automatically delete expired invitations
 MentorInvitationSchema.index({ expires: 1 }, { expireAfterSeconds: 0 });
 
