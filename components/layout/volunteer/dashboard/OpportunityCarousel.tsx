@@ -39,30 +39,30 @@ const OpportunityCarousel = ({
       </div>
 
       <div className="relative">
-        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 hidden sm:block">
+        <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 z-20 hidden sm:flex items-center justify-center">
           <button
-            className="border border-blue-600 text-blue-700 bg-white rounded-full p-2 hover:bg-blue-100 flex items-center justify-center transition-colors shadow"
+            className="border border-blue-600 text-blue-700 bg-white rounded-full p-2 hover:bg-blue-100 flex items-center justify-center transition-colors shadow w-10 h-10"
             title="Scroll left"
             id="opp-swiper-prev"
           >
-            <ChevronLeft />
+            <ChevronLeft className="w-5 h-5" />
           </button>
         </div>
-        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-20 hidden sm:block">
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 z-20 hidden sm:flex items-center justify-center">
           <button
-            className="border border-blue-600 text-blue-700 bg-white rounded-full p-2 hover:bg-blue-100 flex items-center justify-center transition-colors shadow"
+            className="border border-blue-600 text-blue-700 bg-white rounded-full p-2 hover:bg-blue-100 flex items-center justify-center transition-colors shadow w-10 h-10"
             title="Scroll right"
             id="opp-swiper-next"
           >
-            <ChevronRight />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="min-h-[400px]">
+        <div className="h-[350px]">
           <Swiper
             spaceBetween={24}
             slidesPerView={1}
-            className="pb-12"
+            className="h-full w-full"
             modules={[Navigation, Pagination]}
             navigation={{
               nextEl: "#opp-swiper-next",
@@ -103,9 +103,9 @@ const OpportunityCarousel = ({
                 Array.from({ length: 4 }).map((_, index) => (
                   <SwiperSlide
                     key={`loading-${index}`}
-                    className="!flex !justify-center h-auto"
+                    className="!flex !justify-center h-full"
                   >
-                    <div className="w-full">
+                    <div className="w-full h-full">
                       <OpportunityCardSkeleton />
                     </div>
                   </SwiperSlide>
@@ -113,7 +113,7 @@ const OpportunityCarousel = ({
               : opportunities.map((opportunity) => (
                   <SwiperSlide 
                     key={opportunity._id} 
-                    className="!flex !justify-center h-auto"
+                    className="!flex !justify-center h-full"
                   >
                     <div className="w-full h-full">
                       <OpportunityCard opportunity={opportunity} />

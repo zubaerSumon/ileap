@@ -57,6 +57,16 @@ export default function VolunteerDashboard() {
     setCurrentPage(1);
   }, [tab]);
 
+  // Fetch all tab counts initially
+  const { data: activeApplicationsCountData } =
+    trpc.applications.getCurrentUserActiveApplicationsCount.useQuery();
+
+  const { data: recentApplicationsCountData } =
+    trpc.applications.getCurrentUserRecentApplicationsCount.useQuery();
+
+  const { data: mentorOpportunitiesCountData } =
+    trpc.opportunities.getMentorOpportunitiesCount.useQuery();
+
   // Fetch active applications with server-side filtering and pagination
   const { data: activeApplicationsData, isLoading: isLoadingActiveApplications } =
     trpc.applications.getCurrentUserActiveApplications.useQuery({
@@ -100,13 +110,13 @@ export default function VolunteerDashboard() {
   const recentOpportunities = (recentOpportunitiesData?.opportunities ||
     []) as unknown as Opportunity[];
 
-  // Dynamic tab data mapping
+  // Dynamic tab data mapping with counts from dedicated count queries
   const tabData = {
     applied: {
       items: activeApplications,
       type: "application" as const,
       tabType: "active" as const,
-      total: activeApplicationsData?.total || 0,
+      total: activeApplicationsCountData?.total || 0,
       totalPages: activeApplicationsData?.totalPages || 0,
       isLoading: isLoadingActiveApplications,
     },
@@ -114,7 +124,7 @@ export default function VolunteerDashboard() {
       items: recentApplications,
       type: "application" as const,
       tabType: "recent" as const,
-      total: recentApplicationsData?.total || 0,
+      total: recentApplicationsCountData?.total || 0,
       totalPages: recentApplicationsData?.totalPages || 0,
       isLoading: isLoadingRecentApplications,
     },
@@ -122,7 +132,7 @@ export default function VolunteerDashboard() {
       items: mentorOpportunities,
       type: "opportunity" as const,
       tabType: "mentor" as const,
-      total: mentorOpportunitiesData?.total || 0,
+      total: mentorOpportunitiesCountData?.total || 0,
       totalPages: mentorOpportunitiesData?.totalPages || 0,
       isLoading: isLoadingMentorOpportunities,
     },

@@ -258,6 +258,98 @@ export const volunteerApplicationRouter = router({
       }
     }),
 
+  getCurrentUserActiveApplicationsCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          return { total: 0 };
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          return { total: 0 };
+        }
+
+        const now = new Date();
+
+        // Get all applications for this user
+        const allApplications = await VolunteerApplication.find({
+          volunteer: user._id,
+        })
+          .populate({
+            path: "opportunity",
+            select: "date",
+          })
+          .lean();
+
+        // Filter applications using the same logic
+        const activeApplications = allApplications.filter((app) => {
+          if (!app.opportunity) return false;
+          
+          // For applied: show all applications where opportunity is current or upcoming
+          if (app.opportunity.date?.start_date) {
+            const startDate = new Date(app.opportunity.date.start_date);
+            return startDate >= now; // Current or future start date
+          }
+          
+          // If no start date, include it in applied (assuming it's upcoming)
+          return true;
+        });
+
+        return { total: activeApplications.length };
+      } catch (error) {
+        console.error("Error fetching current user active applications count:", error);
+        return { total: 0 };
+      }
+    }),
+
+  getCurrentUserRecentApplicationsCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          return { total: 0 };
+        }
+
+        const user = await User.findOne({ email: sessionUser.email });
+        if (!user) {
+          return { total: 0 };
+        }
+
+        const now = new Date();
+
+        // Get all applications for this user
+        const allApplications = await VolunteerApplication.find({
+          volunteer: user._id,
+        })
+          .populate({
+            path: "opportunity",
+            select: "date",
+          })
+          .lean();
+
+        // Filter applications using the same logic
+        const recentApplications = allApplications.filter((app) => {
+          if (!app.opportunity) return false;
+          
+          // For recent: show all applications where opportunity has already started (past)
+          if (app.opportunity.date?.start_date) {
+            const startDate = new Date(app.opportunity.date.start_date);
+            return startDate < now; // Past start date only
+          }
+          
+          // If no start date, don't include in recent
+          return false;
+        });
+
+        return { total: recentApplications.length };
+      } catch (error) {
+        console.error("Error fetching current user recent applications count:", error);
+        return { total: 0 };
+      }
+    }),
+
   applyToOpportunity: protectedProcedure
     .input(volunteerApplicationValidation.applyToOpportunitySchema)
     .mutation(async ({ ctx, input }) => {

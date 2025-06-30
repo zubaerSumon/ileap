@@ -277,6 +277,7 @@ export const opportunityRouter = router({
         // Build query for opportunities
         const query: Record<string, unknown> = {
           _id: { $in: mentorOpportunityIds },
+          is_archived: { $ne: true }, // Exclude archived opportunities
         };
 
         if (input.search) {
@@ -327,6 +328,45 @@ export const opportunityRouter = router({
           message: "Failed to fetch mentor opportunities",
           cause: error,
         });
+      }
+    }),
+
+  getMentorOpportunitiesCount: protectedProcedure
+    .query(async ({ ctx }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.id) {
+        return { total: 0 };
+      }
+
+      try {
+        const user = await User.findById(sessionUser.id);
+        if (!user) {
+          return { total: 0 };
+        }
+
+        // Find all opportunities where the current user is a mentor
+        const mentorAssignments = await OpportunityMentor.find({
+          volunteer: user._id,
+        });
+
+        const mentorOpportunityIds = mentorAssignments.map(
+          (assignment) => assignment.opportunity
+        );
+
+        if (mentorOpportunityIds.length === 0) {
+          return { total: 0 };
+        }
+
+        // Count opportunities that are not archived
+        const total = await Opportunity.countDocuments({
+          _id: { $in: mentorOpportunityIds },
+          is_archived: { $ne: true },
+        });
+
+        return { total };
+      } catch (error) {
+        console.error("Error fetching mentor opportunities count:", error);
+        return { total: 0 };
       }
     }),
 
