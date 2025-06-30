@@ -70,30 +70,6 @@ export default function FilterSidebar() {
       <div className="flex-1 overflow-hidden">
         <ScrollArea className="h-full pr-4">
           <div className="space-y-6">
-            {/* Active Filters Display - At Top */}
-            {hasActiveFilters && (
-              <div>
-                <h4 className="font-medium mb-3">Active Filters</h4>
-                <div className="space-y-2">
-                  {filters.commitmentType !== "all" && (
-                    <div className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">
-                      {filters.commitmentType === "workbased" ? "Work Based" : "Event Based"}
-                    </div>
-                  )}
-                  {filters.location && (
-                    <div className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">
-                      Location: {filters.location}
-                    </div>
-                  )}
-                  {filters.categories.map((category) => (
-                    <div key={category} className="bg-blue-50 text-blue-700 px-2 py-1 rounded text-xs">
-                      {OPPORTUNITY_CATEGORIES.find(c => c.value === category)?.label || category}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Location */}
             <div>
               <h4 className="font-medium mb-3">Location</h4>

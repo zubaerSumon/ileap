@@ -1,9 +1,12 @@
 export const OPPORTUNITY_CATEGORIES = [
-  { value: "education", label: "Education & Literacy" },
-  { value: "health", label: "Health & Medicine" },
-  { value: "environment", label: "Environment" },
-  { value: "community", label: "Community Development" },
-  { value: "humanRights", label: "Human Rights" },
+  { value: "Community & Social Services", label: "Community & Social Services" },
+  { value: "Education & Mentorship", label: "Education & Mentorship" },
+  { value: "Healthcare & Medical Volunteering", label: "Healthcare & Medical Volunteering" },
+  { value: "Corporate & Skilled Volunteering", label: "Corporate & Skilled Volunteering" },
+  { value: "Technology & Digital Volunteering", label: "Technology & Digital Volunteering" },
+  { value: "Animal Welfare", label: "Animal Welfare" },
+  { value: "Arts, Culture & Heritage", label: "Arts, Culture & Heritage" },
+  { value: "Environmental & Conservation", label: "Environmental & Conservation" },
 ] as const;
 
 export const COMMITMENT_TYPES = [
