@@ -1,4 +1,4 @@
-import { LogOut, Settings, User, MessageCircle } from "lucide-react";
+import { LogOut, User, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { SessionUser } from "@/types/navigation";
@@ -139,6 +139,7 @@ export function UserMenu({ user }: UserMenuProps) {
               <span className="truncate">Messages</span>
             </Link>
           </DropdownMenuItem>
+          {/* Settings temporarily hidden
           <DropdownMenuItem asChild>
             <Link
               href={`/${userRole}/settings`}
@@ -148,6 +149,7 @@ export function UserMenu({ user }: UserMenuProps) {
               <span className="truncate">Settings</span>
             </Link>
           </DropdownMenuItem>
+          */}
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem
