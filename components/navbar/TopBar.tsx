@@ -15,7 +15,8 @@ import { STATIC_LINKS } from "@/utils/constants/navigation";
 import { UserMenu } from "./UserMenu";
 import { SearchBar } from "./SearchBar";
 import { GiBinoculars } from "react-icons/gi";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface TopBarProps {
   isMenuOpen: boolean;
@@ -40,6 +41,7 @@ export function TopBar({
 }: TopBarProps) {
   const handleMenuToggle = () => setIsMenuOpen(!isMenuOpen);
   const searchParams = useSearchParams();
+  const isSigninPath = usePathname().includes("signin");
   const roleParam = searchParams?.get("role")?.toLowerCase();
 
   if (isResetPasswordPath) {
@@ -157,15 +159,24 @@ export function TopBar({
               <UserMenu user={session.user as SessionUser} />
             ) : (
               <div className="flex items-center space-x-2 sm:space-x-6">
-                <div className="flex items-center gap-1 ms-2 sm:ms-0 sm:gap-3 px-2 sm:px-4 py-1 sm:py-2 bg-gray-800/50 rounded-lg border border-gray-700">
-                  <span className="text-xs sm:text-sm text-gray-300">
-                    {roleParam !== "organisation"
-                      ? "Wanna join as an organisation?"
-                      : "Wanna join as a volunteer?"}
-                  </span>
+                <div
+                  className={cn(
+                    "flex items-center gap-1 ms-2 sm:ms-0 sm:gap-3 px-2 sm:px-4 py-1 sm:py-2 bg-gray-800/50 rounded-lg border border-gray-700",
+                    isSigninPath && "border-none bg-transparent"
+                  )}
+                >
+                  {!isSigninPath && (
+                    <span className="text-xs sm:text-sm text-gray-300">
+                      {roleParam !== "organisation"
+                        ? "Wanna join as an organisation?"
+                        : "Wanna join as a volunteer?"}
+                    </span>
+                  )}
                   <Link
                     href={
-                      roleParam !== "organisation"
+                      isSigninPath
+                        ? "/signup"
+                        : roleParam !== "organisation"
                         ? "/signup?role=organisation"
                         : "/signup"
                     }
@@ -182,9 +193,7 @@ export function TopBar({
             <div className="flex items-center space-x-4">
               {session?.user?.role && (
                 <SearchBar
-                  role={
-                    session.user.role as "volunteer" | "mentor" | "admin"
-                  }
+                  role={session.user.role as "volunteer" | "mentor" | "admin"}
                 />
               )}
               <Link
