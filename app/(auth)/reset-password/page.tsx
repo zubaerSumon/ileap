@@ -29,7 +29,7 @@ const ResetPasswordPage = () => {
   const resetPasswordMutation = trpc.users.resetPassword.useMutation({
     onSuccess: () => {
       toast.success("Password reset successfully!");
-      router.push("/signin?reset=success");
+      router.push("/login?reset=success");
     },
     onError: (error) => {
       setFormError(error.message || "Failed to reset password");

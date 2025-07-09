@@ -9,12 +9,12 @@ export const PUBLIC_NAV_OPTIONS: NavItem[] = [
   },
   {
     label: "Organization sign up",
-    href: "/signup?role=organization",
+    href: "/signup?role=organisation",
     className: "hover:text-blue-500",
   },
    {
-    label: "Sign in",
-    href: "/signin",
+    label: "Log in",
+    href: "/login",
     className: "hover:text-blue-500",
   },
   
@@ -37,7 +37,7 @@ export const STATIC_LINKS: NavItem[] = [
 
 export const PROTECTED_PATHS = ["/organisation", "/volunteer", "/profile", "/settings", "/messages", "/search"];
 
-export const AUTH_PATHS = ["/signin", "/signup", "/reset-password"];
+export const AUTH_PATHS = ["/login", "/signup", "/reset-password"];
 
 export interface SessionUser {
   id: string;

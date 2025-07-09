@@ -7,7 +7,7 @@ export default function HeroSection() {
       {/* Background image */}
       <div className="absolute inset-0">
         <Image
-          src={"/ausleapHeader.jpg"}
+          src={"/images/ausleap-landing-hero.jpg"}
           alt="Group of volunteers with arms around each other"
           fill
           className="object-cover"

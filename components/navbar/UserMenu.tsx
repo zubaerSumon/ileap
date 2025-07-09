@@ -108,7 +108,7 @@ export function UserMenu({ user }: UserMenuProps) {
             {isVolunteer && (
               <div className="flex items-center justify-between pt-1">
                 <span className="text-xs text-muted-foreground">
-                  Available to serve
+                  Open to volunteer
                 </span>
                 <Switch
                   checked={isAvailable}
@@ -154,7 +154,7 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="text-red-600 focus:text-red-600 cursor-pointer"
-          onClick={() => signOut({ callbackUrl: "/signin" })}
+          onClick={() => signOut({ callbackUrl: "/login" })}
         >
           <LogOut className="mr-2 h-4 w-4 flex-shrink-0" />
           <span className="truncate">Sign out</span>

@@ -113,17 +113,7 @@ export default function TopNavigationBar() {
 
   return (
     <div>
-      {!isAuthPath && !isProtectedPath && !isResetPasswordPath && (
-        <div className="bg-blue-600 text-white py-1 px-4">
-          <div className="container mx-auto flex justify-end space-x-4 text-sm">
-            {PUBLIC_NAV_OPTIONS.map((option, index) => (
-              <Link key={index} href={option.href} className={option.className}>
-                {option.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+     
 
       <TopBar
         isMenuOpen={isMenuOpen}
@@ -143,6 +133,17 @@ export default function TopNavigationBar() {
         session={session}
         totalUnreadCount={totalUnreadCount}
       />
+       {!isAuthPath && !isProtectedPath && !isResetPasswordPath && (
+        <div className="bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 text-white py-1 px-4">
+          <div className="container mx-auto flex justify-end space-x-4 text-sm">
+            {PUBLIC_NAV_OPTIONS.map((option, index) => (
+              <Link key={index} href={option.href} className={option.className}>
+                {option.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
