@@ -83,7 +83,7 @@ interface ActiveContract {
 
 const TABS = [
   { key: "open", label: "Open opportunity posts" },
-  { key: "active", label: "Active contracts" },
+  { key: "active", label: "Active volunteers" },
   { key: "archived", label: "Archived opportunity posts" },
 ];
 
