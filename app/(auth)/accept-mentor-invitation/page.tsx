@@ -21,7 +21,7 @@ export default function AcceptMentorInvitationPage() {
   const acceptInvitation = trpc.mentors.acceptInvitation.useMutation({
     onSuccess: () => {
       toast.success("Invitation accepted successfully! You can now log in.");
-      signOut({ callbackUrl: "/signin" })
+      signOut({ callbackUrl: "/login" })
      },
     onError: (error) => {
       toast.error(error.message || "Failed to accept invitation");

@@ -197,7 +197,7 @@ export default function VolunteerDashboard() {
         title={currentTabConfig?.emptyState.title || "No items found"}
         description={currentTabConfig?.emptyState.description || "No items available."}
         actionLabel="Explore Opportunities"
-        onAction={() => router.push("/search?type=opportunity")}
+        onAction={() => router.push("/find-opportunity")}
         variant="card"
         className="min-h-[400px]"
       />
@@ -245,7 +245,7 @@ export default function VolunteerDashboard() {
 
         <button
           className="flex cursor-pointer items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
-          onClick={() => router.push("/search?type=opportunity")}
+          onClick={() => router.push("/find-opportunity")}
         >
           Find more opportunities{" "}
           <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />
@@ -264,7 +264,7 @@ export default function VolunteerDashboard() {
         opportunities={recentOpportunities}
         isLoading={isLoadingRecentOpportunities}
         title="Discover new opportunities"
-        viewAllLink="/search?type=opportunity"
+        viewAllLink="/find-opportunity"
       />
     </div>
   );

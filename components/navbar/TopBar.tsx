@@ -10,10 +10,9 @@ import {
 } from "lucide-react";
 import { Session } from "next-auth";
 import { SessionUser } from "@/types/navigation";
-import Logo from "../../public/AusLeap.png";
+import Logo from "../../public/images/logos/gradrient-ausleap-logo.png";
 import { STATIC_LINKS } from "@/utils/constants/navigation";
 import { UserMenu } from "./UserMenu";
-import { SearchBar } from "./SearchBar";
 import { GiBinoculars } from "react-icons/gi";
 import { useSearchParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -54,16 +53,16 @@ export function TopBar({
               alt="iLEAP Logo"
               width={80}
               height={32}
-              className="h-8 w-auto"
+              className="h-8 w-auto bg-amber-200"
               style={{ width: "auto", height: "32px" }}
               priority
             />
           </Link>
           <Link
-            href="/signin"
+            href="/login"
             className="text-sm font-normal hover:text-blue-500"
           >
-            Sign in
+            Log in
           </Link>
         </div>
       </div>
@@ -134,8 +133,8 @@ export function TopBar({
               href={
                 session?.user?.role === "admin" ||
                 session?.user?.role === "mentor"
-                  ? "/search?type=volunteer"
-                  : "/search?type=opportunity"
+                  ? "/find-volunteer"
+                  : "/find-opportunity"
               }
               className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
             >
@@ -147,7 +146,7 @@ export function TopBar({
               )}{" "}
               {session?.user?.role === "admin" ||
               session?.user?.role === "mentor"
-                ? "Browse Volunteers"
+                ? "Find Volunteers"
                 : "Find Opportunities"}
             </Link>
           )}
@@ -191,11 +190,6 @@ export function TopBar({
         ) : isProtectedPath ? (
           <div className="flex items-center space-x-6">
             <div className="flex items-center space-x-4">
-              {session?.user?.role && (
-                <SearchBar
-                  role={session.user.role as "volunteer" | "mentor" | "admin"}
-                />
-              )}
               <Link
                 href={`/${
                   session?.user?.role !== "volunteer"

@@ -208,7 +208,7 @@ export function SignupStep({
           <div className="text-sm text-gray-600">
             Already have an account?{" "}
             <Link
-              href="/signin"
+              href="/login"
               className="text-indigo-600 underline font-medium hover:text-indigo-500"
             >
               Log In

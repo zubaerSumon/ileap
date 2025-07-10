@@ -7,7 +7,7 @@ export default function SignupPage() {
   const searchParams = useSearchParams();
   const paramRole = searchParams?.get("role")?.toLowerCase();
 
-  return paramRole === "organization" ? (
+  return paramRole === "organisation" ? (
     <OrganizationSignup />
   ) : (
     <VolunteerSignup />

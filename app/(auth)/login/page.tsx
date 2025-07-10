@@ -192,7 +192,7 @@ export default function LoginPage() {
                 {isSubmitting ? (
                   <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                 ) : null}
-                Sign in
+                Log in
               </button>
             </form>
           </div>

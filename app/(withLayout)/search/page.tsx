@@ -2,8 +2,8 @@
 import React from "react";
 import { useSearchParams } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
-import BrowseVolunteer from "@/components/layout/organisation/find-volunteer";
-import FindOpportunity from "@/components/layout/volunteer/find-opportunity";
+ import FindOpportunity from "@/components/layout/volunteer/find-opportunity";
+import FindVolunteer from "@/components/layout/organisation/find-volunteer";
 
 const SearchPage = () => {
   const searchParams = useSearchParams();
@@ -11,7 +11,7 @@ const SearchPage = () => {
  
   return (
     <ProtectedLayout> 
-      {type === "volunteer" && <BrowseVolunteer />}
+      {type === "volunteer" && <FindVolunteer/>}
       {type === "opportunity" && <FindOpportunity />}
       {!type && (
         <div>Please specify a search type (volunteer or opportunity)</div>

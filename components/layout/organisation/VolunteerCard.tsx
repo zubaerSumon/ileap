@@ -101,7 +101,9 @@ export default function VolunteerCard({
               variant="outline"
               className="flex-1 flex items-center justify-center gap-1 text-sm h-9 border-gray-200 cursor-pointer"
               onClick={() =>
-                router.push(`/organisation/volunteer/${volunteer._id}/profile`)
+                router.push(
+                  `/find-volunteer/volunteer/details/${volunteer._id}`
+                )
               }
             >
               View Profile

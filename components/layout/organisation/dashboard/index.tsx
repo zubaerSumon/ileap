@@ -83,7 +83,7 @@ interface ActiveContract {
 
 const TABS = [
   { key: "open", label: "Open opportunity posts" },
-  { key: "active", label: "Active contracts" },
+  { key: "active", label: "Active volunteers" },
   { key: "archived", label: "Archived opportunity posts" },
 ];
 
@@ -494,7 +494,7 @@ const OrganisationDashboard = () => {
           </h3>
           <button
             className="flex items-center gap-1 text-blue-700 font-semibold hover:underline text-sm transition-colors whitespace-nowrap hover:text-blue-800"
-            onClick={() => router.push("/search?type=volunteer")}
+            onClick={() => router.push("/find-volunteer")}
           >
             View All volunteers{" "}
             <ChevronRight className="inline h-4 w-4 ml-1 text-blue-700 transition-transform group-hover:translate-x-0.5" />

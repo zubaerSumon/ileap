@@ -1,9 +1,14 @@
-import { LogOut, User, MessageCircle } from "lucide-react";
+import { LogOut, User, MessageCircle, Info } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { SessionUser } from "@/types/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Switch } from "../ui/switch";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "../ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -106,16 +111,35 @@ export function UserMenu({ user }: UserMenuProps) {
               </p>
             )}
             {isVolunteer && (
-              <div className="flex items-center justify-between pt-1">
-                <span className="text-xs text-muted-foreground">
-                  Available to serve
-                </span>
-                <Switch
-                  checked={isAvailable}
-                  onCheckedChange={handleAvailabilityChange}
-                  className="scale-75 cursor-pointer data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-blue-200"
-                />
-              </div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-between pt-1 cursor-help hover:bg-slate-50 rounded-md px-1 -mx-1 transition-colors duration-200">
+                    <span className="text-xs text-muted-foreground font-medium">
+                      Open to volunteer
+                    </span>
+                    <Switch
+                      checked={isAvailable}
+                      onCheckedChange={handleAvailabilityChange}
+                      className="scale-75 cursor-pointer data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-blue-200 hover:scale-90 transition-transform duration-150"
+                    />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-[180px] p-2.5 bg-slate-900 border-slate-700 shadow-lg">
+                  <div className="flex items-start gap-2">
+                    <Info className="h-3.5 w-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
+                    <div className="space-y-1">
+                      <p className="text-xs font-medium text-slate-100">
+                        {isAvailable ? "Available for Opportunities" : "Currently Unavailable"}
+                      </p>
+                      <p className="text-xs text-slate-300 leading-relaxed">
+                        {isAvailable 
+                          ? "Organizations can see your profile and contact you for volunteer work."
+                          : "Your profile is hidden from organizations. Toggle to become visible again."}
+                      </p>
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
             )}
           </div>
         </DropdownMenuLabel>
@@ -154,7 +178,7 @@ export function UserMenu({ user }: UserMenuProps) {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="text-red-600 focus:text-red-600 cursor-pointer"
-          onClick={() => signOut({ callbackUrl: "/signin" })}
+          onClick={() => signOut({ callbackUrl: "/login" })}
         >
           <LogOut className="mr-2 h-4 w-4 flex-shrink-0" />
           <span className="truncate">Sign out</span>
