@@ -146,7 +146,7 @@ export default function Categories() {
             key={opportunity._id}
             className="rounded-lg overflow-hidden w-full py-0 h-[340px] cursor-pointer hover:shadow-lg transition-shadow relative"
             onClick={() =>
-              router.push(`/volunteer/opportunities/${opportunity._id}`)
+              router.push(`/find-opportunity/opportunity/details/${opportunity._id}`)
             }
           >
             <CardContent className="px-4 pt-4">

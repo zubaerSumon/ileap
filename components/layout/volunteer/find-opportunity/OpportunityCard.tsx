@@ -31,7 +31,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
     (opportunity.recruitCount || 0) > opportunity.number_of_volunteers * 0.7;
 
   const handleCardClick = () => {
-    router.push(`/volunteer/opportunities/${opportunity._id}`);
+    router.push(`/find-opportunity/opportunity/details/${opportunity._id}`);
   };
 
   // Convert 24-hour format to 12-hour format
@@ -210,7 +210,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
           <div className="flex  gap-2">
             <div onClick={(e) => e.stopPropagation()} className="flex-1">
               <Link
-                href={`/volunteer/opportunities/${opportunity._id}`}
+                href={`/find-opportunity/opportunity/details/${opportunity._id}`}
                 className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 text-center py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 block flex items-center justify-center gap-2"
               >
                 <span className="whitespace-nowrap">View Details</span>
