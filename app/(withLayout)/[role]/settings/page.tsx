@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import UserManagementTable from "@/components/layout/organisation/dashboard/UserManagementTable";
+import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 
@@ -16,6 +17,20 @@ export default function OrganizationSettingsPage() {
   const [activeSection, setActiveSection] = useState("users");
   const { data: session } = useSession();
   const { data: profileData } = trpc.users.profileCheckup.useQuery();
+  const updateUserMutation = trpc.users.updateUser.useMutation({
+    onSuccess: async () => {
+      utils.users.profileCheckup.invalidate();
+      toast.success("Profile picture updated successfully!");
+      // Force a page refresh to ensure the session is updated
+      console.log('Profile picture updated, refreshing page...');
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile picture");
+    },
+  });
   const { data: mentors, isLoading: isLoadingMentors, refetch: refetchMentors } = trpc.mentors.getMentors.useQuery(
     { organizationId: profileData?.organizationProfile?._id || "" },
     { enabled: !!profileData?.organizationProfile?._id }
@@ -185,12 +200,21 @@ export default function OrganizationSettingsPage() {
                   </CardHeader>
                   <CardContent>
                     {isVolunteer ? (
-                      <div className="text-center py-12">
-                        <div className="text-gray-400 mb-2">
-                          <Users className="h-12 w-12 mx-auto" />
+                      <div className="space-y-6">
+                        <div className="flex justify-center">
+                          <ProfilePictureUpload
+                            currentImage={session?.user?.image || undefined}
+                            onImageChange={(imageUrl) => {
+                              updateUserMutation.mutate({ image: imageUrl });
+                            }}
+                            userName={session?.user?.name || "User"}
+                            size="lg"
+                          />
                         </div>
-                        <p className="text-gray-500 font-medium">Account Management</p>
-                        <p className="text-sm text-gray-400 mt-1">Manage your volunteer account settings</p>
+                        <div className="text-center">
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">Account Information</h3>
+                          <p className="text-sm text-gray-500">Update your profile picture and manage account settings</p>
+                        </div>
                       </div>
                     ) : (
                       <UserManagementTable organizationId={profileData?.organizationProfile?._id || ""} />

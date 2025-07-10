@@ -3,7 +3,7 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import RandomAvatar from "@/components/ui/random-avatar";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 export interface Volunteer {
   id: string;
@@ -38,8 +38,8 @@ const VolunteerModal = ({ isOpen, onClose, volunteer }: VolunteerModalProps) => 
       <DialogContent className="max-w-md p-6">
         <div className="flex flex-col">
           <div className="relative w-24 h-24">
-            <RandomAvatar
-              name={volunteer.name}
+            <UserAvatar
+              user={volunteer}
               size={96}
               className="rounded-full"
             />

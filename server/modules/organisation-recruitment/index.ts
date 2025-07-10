@@ -123,11 +123,11 @@ export const organisationRecruitmentRouter = router({
             populate: [
               {
                 path: "volunteer",
-                select: "name email",
+                select: "name email image",
                 populate: {
                   path: "volunteer_profile",
                   select:
-                    "profile_img location bio skills completed_projects availability",
+                    "location bio skills completed_projects availability",
                 },
               },
               {
@@ -152,8 +152,8 @@ export const organisationRecruitmentRouter = router({
                 _id: { toString(): string };
                 name?: string;
                 email?: string;
+                image?: string;
                 volunteer_profile?: {
-                  profile_img?: string;
                   location?: string;
                   bio?: string;
                   skills?: string[];
@@ -177,7 +177,7 @@ export const organisationRecruitmentRouter = router({
             name: app.application.volunteer.name || "",
             email: app.application.volunteer.email || "",
             profileImg:
-              app.application.volunteer.volunteer_profile?.profile_img ||
+              app.application.volunteer.image ||
               "/avatar.svg",
             location:
               app.application.volunteer.volunteer_profile?.location || "",

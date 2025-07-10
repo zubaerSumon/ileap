@@ -20,6 +20,7 @@ const UserSchema: Schema = new Schema<IUser>(
       type: String,
       enum: Object.values(UserRole),
     },
+    image: { type: String },
     referred_by: { type: String },
     is_verified: {
       type: Boolean,

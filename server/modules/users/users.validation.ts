@@ -25,6 +25,7 @@ const updateUserSchema = z.object({
   role: z
     .enum([UserRole.ADMIN, UserRole.VOLUNTEER, UserRole.MENTOR, UserRole.ORGANIZATION])
     .optional(),
+  image: z.string().optional(),
   reffered_by: z.string().optional(),
   is_verified: z.boolean().optional(),
   volunteer_profile: z.string().optional(),

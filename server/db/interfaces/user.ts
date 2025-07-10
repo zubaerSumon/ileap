@@ -19,6 +19,7 @@ export interface IUser extends Document {
   password: string;
   role: UserRole;
   provider: AuthProvider;
+  image?: string;
   is_verified: boolean;
   referred_by: string;
   volunteer_profile?: mongoose.Types.ObjectId;

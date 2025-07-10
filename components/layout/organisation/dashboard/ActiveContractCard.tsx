@@ -1,5 +1,6 @@
 import { format } from "date-fns";
 import { MessageCircle } from "lucide-react";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 interface ActiveContractCardProps {
   avatar: string;
@@ -21,10 +22,10 @@ const ActiveContractCard = ({
   return (
     <div className="bg-white border-b border-gray-200 flex flex-row items-center justify-between px-6 h-24 last:border-b-0">
       <div className="flex items-center gap-4 min-w-0 h-full w-1/3">
-        <img
-          src={avatar}
-          alt={freelancerName}
-          className="h-12 w-12 rounded-full object-cover border border-gray-200"
+        <UserAvatar
+          user={{ name: freelancerName, image: avatar }}
+          size={48}
+          className="rounded-full border border-gray-200"
         />
         <div className="min-w-0">
           <div className="font-semibold text-base truncate">{jobTitle}</div>

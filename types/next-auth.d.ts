@@ -7,6 +7,7 @@ declare module "next-auth" {
     email: string;
     name: string;
     role: string;
+    image?: string | null;
     organization_profile?: {
       _id: string;
       title: string;
@@ -36,6 +37,7 @@ declare module "next-auth/jwt" {
     email: string;
     name: string;
     role: string;
+    image?: string;
     organization_profile?: {
       _id: string;
       title: string;

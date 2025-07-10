@@ -6,7 +6,7 @@ export type VolunteerProfileFormData = z.infer<typeof volunteerValidation.update
 export interface Volunteer {
   _id: string;
   name: string;
-  avatar?: string;
+  image?: string;
   volunteer_profile?: {
     student_type?: string;
     course?: string;

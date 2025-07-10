@@ -18,9 +18,11 @@ import toast from "react-hot-toast";
 import { VolunteerProfileFormData } from "@/types/volunteers";
 import BackButton from "@/components/buttons/BackButton";
 import { Edit, User, Phone, MapPin, Heart } from "lucide-react";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
+import { useSession } from "next-auth/react";
 
 const volunteerTypes = [
   { value: "animal_welfare", label: "Animal welfare" },
@@ -34,7 +36,30 @@ const volunteerTypes = [
 export function VolunteerProfileForm() {
   const [isEditMode, setIsEditMode] = useState(false);
   const { data: volunteerProfile, isLoading } = trpc.volunteers.getVolunteerProfile.useQuery();
+  const { data: session, update: updateSession } = useSession();
   const utils = trpc.useUtils();
+  
+  const updateUserMutation = trpc.users.updateUser.useMutation({
+    onSuccess: async () => {
+      utils.users.profileCheckup.invalidate();
+      toast.success("Profile picture updated successfully!");
+      
+      // Try to update the session first
+      try {
+        await updateSession();
+      } catch (error) {
+        console.error('Session update failed:', error);
+      }
+      
+      // Force a page refresh to show the updated profile picture
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile picture");
+    },
+  });
   
   const volunteerProfileUpdateMutation = trpc.volunteers.updateVolunteerProfile.useMutation({
     onSuccess: () => {
@@ -183,6 +208,18 @@ export function VolunteerProfileForm() {
                 <CardContent>
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      {/* Profile Picture Upload */}
+                      <div className="flex justify-center">
+                        <ProfilePictureUpload
+                          currentImage={session?.user?.image || undefined}
+                          onImageChange={(imageUrl) => {
+                            updateUserMutation.mutate({ image: imageUrl });
+                          }}
+                          userName={volunteerProfile?.name || session?.user?.name || "User"}
+                          size="lg"
+                        />
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormInput
                           control={form.control}
@@ -285,9 +322,17 @@ export function VolunteerProfileForm() {
                   <CardContent className="pt-6">
                     <div className="flex items-start space-x-4">
                       <Avatar className="h-16 w-16">
-                        <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
-                          {volunteerProfile?.name?.charAt(0)?.toUpperCase() || "V"}
-                        </AvatarFallback>
+                        {session?.user?.image ? (
+                          <AvatarImage
+                            src={session.user.image!}
+                            alt={volunteerProfile?.name || "Profile"}
+                            className="object-cover"
+                          />
+                        ) : (
+                          <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
+                            {volunteerProfile?.name?.charAt(0)?.toUpperCase() || "V"}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
                       <div className="flex-1">
                         <h1 className="text-2xl font-bold text-gray-900 mb-1">

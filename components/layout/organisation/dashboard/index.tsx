@@ -27,11 +27,12 @@ import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import { getGreeting } from "@/utils/helpers/getGreeting";
 import { CreateOpportunityButton } from "@/components/buttons/CreateOpportunityButton";
 import MobileTabsSlider from "@/components/shared/MobileTabsSlider";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 interface Volunteer {
   _id: string;
   name: string;
-  avatar?: string;
+  image?: string;
   role: string;
   volunteer_profile?: {
     student_type?: "yes" | "no";
@@ -177,7 +178,7 @@ const OrganisationDashboard = () => {
     availableVolunteers?.map((volunteer) => ({
       _id: volunteer._id,
       name: volunteer.name || "Anonymous",
-      avatar: volunteer.avatar || "/avatar.svg",
+      image: volunteer.image,
       role: volunteer.role || "Volunteer",
       volunteer_profile: volunteer.volunteer_profile,
     })) || [];
@@ -314,13 +315,9 @@ const OrganisationDashboard = () => {
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center">
                           <div className="w-10 h-10 mr-3">
-                            <Image
-                              src={
-                                contract.profileImg || "/avatar.svg"
-                              }
-                              alt={contract.freelancerName}
-                              width={40}
-                              height={40}
+                            <UserAvatar
+                              user={{ name: contract.freelancerName, image: contract.profileImg }}
+                              size={40}
                               className="rounded-full"
                             />
                           </div>

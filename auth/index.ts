@@ -51,22 +51,70 @@ export const {
 
       return false;
     },
-    async jwt({ token, user, trigger, session }) {
-      if (trigger === 'signIn' || (trigger === 'update' && session)) {
-        const retrievedUser = await User.findOne({ email: user?.email || token.email })
-          .populate("organization_profile");
-        
-        if (retrievedUser) {
-          token.id = retrievedUser.id;
-          token.email = retrievedUser.email;
-          token.name = retrievedUser.name || user?.name;
-          token.role = retrievedUser.role || '';
-          token.organization_profile = retrievedUser.organization_profile;
+    async jwt({ token, user, trigger }) {
+      console.log('JWT callback triggered:', { trigger, hasToken: !!token, hasUser: !!user });
+      
+      // Always fetch the latest user data to ensure profile updates are reflected
+      if (token.email) {
+        try {
+          const retrievedUser = await User.findOne({ email: token.email })
+            .populate("organization_profile");
+          
+          if (retrievedUser) {
+            token.id = retrievedUser.id;
+            token.email = retrievedUser.email;
+            token.name = retrievedUser.name;
+            token.role = retrievedUser.role || '';
+            token.image = retrievedUser.image;
+            token.organization_profile = retrievedUser.organization_profile;
+            
+            console.log('JWT callback - Updated token with fresh user data:', {
+              name: retrievedUser.name,
+              image: retrievedUser.image,
+              email: retrievedUser.email
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching user data in JWT callback:', error);
         }
       }
+      
+      // Handle initial sign in
+      if (trigger === 'signIn' && user) {
+        try {
+          const retrievedUser = await User.findOne({ email: user.email })
+            .populate("organization_profile");
+          
+          if (retrievedUser) {
+            token.id = retrievedUser.id;
+            token.email = retrievedUser.email;
+            token.name = retrievedUser.name || user.name;
+            token.role = retrievedUser.role || '';
+            token.image = retrievedUser.image;
+            token.organization_profile = retrievedUser.organization_profile;
+            
+            console.log('JWT callback - Initial sign in with user data:', {
+              name: retrievedUser.name,
+              image: retrievedUser.image,
+              email: retrievedUser.email
+            });
+          }
+        } catch (error) {
+          console.error('Error fetching user data on sign in:', error);
+        }
+      }
+      
+      // Handle session update
+      if (trigger === 'update') {
+        console.log('JWT callback - Update trigger received');
+        // The session update should trigger a fresh fetch of user data
+      }
+      
       return token;
     },
     async session({ session, token }) {
+      console.log('Session callback triggered:', { hasToken: !!token, hasSession: !!session });
+      
       if (!token) {
         return {
           ...session,
@@ -79,15 +127,24 @@ export const {
         };
       }
       
+      const sessionUser = {
+        id: typeof token.id === 'string' ? token.id : '',
+        email: typeof token.email === 'string' ? token.email : '',
+        name: typeof token.name === 'string' ? token.name : '',
+        role: typeof token.role === 'string' ? token.role : '',
+        image: typeof token.image === 'string' ? token.image : null,
+        organization_profile: token.organization_profile,
+      };
+      
+      console.log('Session callback - Creating session with user data:', {
+        name: sessionUser.name,
+        image: sessionUser.image,
+        email: sessionUser.email
+      });
+      
       return {
         ...session,
-        user: {
-          id: typeof token.id === 'string' ? token.id : '',
-          email: typeof token.email === 'string' ? token.email : '',
-          name: typeof token.name === 'string' ? token.name : '',
-          role: typeof token.role === 'string' ? token.role : '',
-          organization_profile: token.organization_profile,
-        },
+        user: sessionUser,
       };
     },
   },
