@@ -133,8 +133,8 @@ export function TopBar({
               href={
                 session?.user?.role === "admin" ||
                 session?.user?.role === "mentor"
-                  ? "/search?type=volunteer"
-                  : "/search?type=opportunity"
+                  ? "/find-volunteer"
+                  : "/find-opportunity"
               }
               className="text-xs items-center gap-2 py-[6px] px-3 bg-[#343434] rounded-md font-medium hover:text-blue-500 hidden md:flex"
             >
@@ -146,7 +146,7 @@ export function TopBar({
               )}{" "}
               {session?.user?.role === "admin" ||
               session?.user?.role === "mentor"
-                ? "Browse Volunteers"
+                ? "Find Volunteers"
                 : "Find Opportunities"}
             </Link>
           )}

@@ -125,8 +125,8 @@ export function MobileMenu({
                     onClick={handleCloseMenu}
                   />
                   <NavLink
-                    href="/search?type=volunteer"
-                    label="Browse Volunteers"
+                    href="/find-volunteer"
+                    label="Find Volunteers"
                     icon={Users}
                     onClick={handleCloseMenu}
                   />
@@ -141,7 +141,7 @@ export function MobileMenu({
                     onClick={handleCloseMenu}
                   />
                   <NavLink
-                    href="/search?type=opportunity"
+                    href="/find-opportunity"
                     label="Find Opportunities"
                     icon={GiBinoculars}
                     onClick={handleCloseMenu}

@@ -37,7 +37,7 @@ interface Volunteer {
   };
 }
 
-export default function BrowseVolunteer() {
+export default function FindVolunteer() {
   const [filters, setFilters] = useState<VolunteerFilters>({
     categories: [],
     studentType: "all",
