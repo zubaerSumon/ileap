@@ -99,21 +99,21 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
                 </div>
               )}
 
-              {/* Interests */}
+              {/* Skills */}
               {volunteer.interested_on &&
                 volunteer.interested_on.length > 0 && (
                   <div className="mb-4 sm:mb-6">
                     <h3 className="text-sm font-medium text-gray-500 mb-2">
-                      Interests
+                      Skills
                     </h3>
                     <div className="flex flex-wrap gap-2">
                       {volunteer.interested_on.map(
-                        (interest: string, index: Key | null | undefined) => (
+                        (skill: string, index: Key | null | undefined) => (
                           <span
                             key={index}
                             className="bg-blue-50 text-blue-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm"
                           >
-                            {interest.replace(/_/g, " ")}
+                            {skill}
                           </span>
                         )
                       )}

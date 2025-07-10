@@ -67,9 +67,15 @@ export const FormSelect = <T extends FieldValues>({
   onChange,
 }: SelectFieldProps<T>) => {
   const [open, setOpen] = useState(false);
+  const [zIndex, setZIndex] = useState(1000);
 
   const renderSearchableSelect = (field: ControllerRenderProps<T, Path<T>>) => (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={(isOpen) => {
+      setOpen(isOpen);
+      if (isOpen) {
+        setZIndex(prev => prev + 1);
+      }
+    }}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -96,7 +102,8 @@ export const FormSelect = <T extends FieldValues>({
         </Button>
       </PopoverTrigger>
       <PopoverContent 
-        className="w-full p-0" 
+        className="w-full p-0 bg-white border shadow-lg" 
+        style={{ zIndex }}
         align="start"
         sideOffset={4}
       >
@@ -149,6 +156,11 @@ export const FormSelect = <T extends FieldValues>({
         field.onChange(newValue);
         onChange?.(newValue);
       }}
+      onOpenChange={(isOpen) => {
+        if (isOpen) {
+          setZIndex(prev => prev + 1);
+        }
+      }}
       disabled={disabled || loading}
     >
       <SelectTrigger 
@@ -166,7 +178,7 @@ export const FormSelect = <T extends FieldValues>({
           <SelectValue placeholder={placeholder || `Select ${label}`} />
         )}
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent style={{ zIndex }} className="bg-white border shadow-lg">
         {options.map((option) => (
           <SelectItem 
             key={option.value} 

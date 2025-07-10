@@ -10,6 +10,7 @@ export const signupBaseSchema = userValidation.userSchema.pick({
 export const profileBasicSchema = userValidation.volunteerProfileSchema.pick({
   bio: true,
   interested_on: true,
+  interested_categories: true,
   phone_number: true,
   state: true,
   area: true,

@@ -11,6 +11,10 @@ const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
       type: [String],
       required: true,
     },
+    interested_categories: {
+      type: [String],
+      default: [],
+    },
     phone_number: {
       type: String,
       required: true,
