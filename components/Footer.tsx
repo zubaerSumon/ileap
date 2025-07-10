@@ -6,7 +6,7 @@ import { Instagram, Linkedin } from 'lucide-react';
 export default function Footer() {
   return (
     <footer className="bg-[#F5F7FA] border-t">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Recruit volunteer section */}
           <div className="space-y-4">

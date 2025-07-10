@@ -1,4 +1,4 @@
-import { BookOpen, FileText, GraduationCap } from "lucide-react";
+import { BookOpen, FileText, GraduationCap, Heart } from "lucide-react";
 export const VOLUNTEER_DASHBOARD_TABS = [
   {
     key: "applied",
@@ -28,6 +28,16 @@ export const VOLUNTEER_DASHBOARD_TABS = [
       title: "No mentor assignments",
       description:
         "You haven't been assigned as a mentor for any opportunities yet. Organizations will assign you when they need mentorship support.",
+    },
+  },
+  {
+    key: "favorites",
+    label: "Favorite opportunities",
+    icon: Heart,
+    emptyState: {
+      title: "No favorite opportunities",
+      description:
+        "You haven't saved any opportunities to your favorites yet. Click the heart icon on any opportunity to save it here.",
     },
   },
 ] as const;

@@ -48,7 +48,7 @@ interface Application {
 interface TabwiseOpportunityCardProps {
   item: Application | Opportunity;
   type: "application" | "opportunity";
-  tabType: "active" | "recent" | "mentor";
+  tabType: "active" | "recent" | "mentor" | "favorites";
 }
 
 export default function TabwiseOpportunityCard({
@@ -72,6 +72,46 @@ export default function TabwiseOpportunityCard({
         className: "bg-purple-100 text-purple-700 border-purple-200",
         icon: <Users className="h-3 w-3 mr-1" />,
         text: "Mentor",
+      };
+    }
+
+    if (tabType === "favorites") {
+      const now = new Date();
+      const startDate = opportunity.date?.start_date ? new Date(opportunity.date.start_date) : null;
+      const endDate = opportunity.date?.end_date ? new Date(opportunity.date.end_date) : null;
+
+      // Check if opportunity is open (hasn't started yet)
+      if (startDate && startDate > now) {
+        return {
+          className: "bg-green-100 text-green-700 border-green-200",
+          icon: <CheckCircle className="h-3 w-3 mr-1" />,
+          text: "Open",
+        };
+      }
+
+      // Check if opportunity is closed (has ended)
+      if (startDate && startDate < now && endDate && endDate < now) {
+        return {
+          className: "bg-gray-100 text-gray-700 border-gray-200",
+          icon: <XCircle className="h-3 w-3 mr-1" />,
+          text: "Closed",
+        };
+      }
+
+      // If no specific date, consider it open
+      if (!startDate) {
+        return {
+          className: "bg-green-100 text-green-700 border-green-200",
+          icon: <CheckCircle className="h-3 w-3 mr-1" />,
+          text: "Open",
+        };
+      }
+
+      // For ongoing opportunities (has started but not ended)
+      return {
+        className: "bg-blue-100 text-blue-700 border-blue-200",
+        icon: <ClockIcon className="h-3 w-3 mr-1" />,
+        text: "Ongoing",
       };
     }
 
@@ -122,6 +162,9 @@ export default function TabwiseOpportunityCard({
   const getTimestampText = () => {
     if (tabType === "mentor") {
       return "Posted";
+    }
+    if (tabType === "favorites") {
+      return "Saved";
     }
     if (tabType === "recent") {
       return "Applied";
