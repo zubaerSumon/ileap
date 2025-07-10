@@ -6,13 +6,16 @@ import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form-input/FormInput";
 import { FormTextarea } from "@/components/form-input/FormTextarea";
+import { FormSelect } from "@/components/form-input/FormSelect";
 import { Button } from "@/components/ui/button";
 import {
   organizationTypes,
   volunteerTypes,
 } from "@/utils/constants/select-options";
+import { locations } from "@/utils/constants/select-options";
+import { suburbs } from "@/utils/constants/suburb";
 import { userValidation } from "@/server/modules/users/users.validation";
-import { MultiSelectField } from "@/components/form-input/MultiSelectField";
+
 import { PhoneField } from "@/components/form-input/PhoneField";
 import { trpc } from "@/utils/trpc";
 import { useEffect, useState } from "react";
@@ -21,7 +24,6 @@ import { z } from "zod";
 import { TRPCClientErrorLike } from "@trpc/client";
 import { AppRouter } from "@/server";
 import { SelectField } from "@/components/form-input/SelectField";
-import { ProfilePhotoInput } from "@/components/form-input/ProfilePhotoInput";
 import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
 import BackButton from "@/components/buttons/BackButton";
 import { Edit, Building2, Phone, MapPin, Mail, Globe, Hash, Heart } from "lucide-react";
@@ -29,6 +31,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
+import { MultiSelectField } from "@/components/form-input/MultiSelectField";
 
 type OrganizationProfileData = Omit<z.infer<typeof userValidation.organizationProfileSchema>, 'opportunity_types' | 'required_skills'> & {
   opportunity_types: string[];
@@ -58,7 +61,6 @@ export default function OrganizationProfile() {
   const { data: profileData, isLoading } = trpc.users.profileCheckup.useQuery();
   const { data: session } = useSession();
   const utils = trpc.useUtils();
-  const [isImageUploading, setIsImageUploading] = useState(false);
   
   const updateUserMutation = trpc.users.updateUser.useMutation({
     onSuccess: async () => {
@@ -103,7 +105,7 @@ export default function OrganizationProfile() {
         type: profile.type || "",
         opportunity_types: Array.isArray(profile.opportunity_types) ? profile.opportunity_types : [],
         required_skills: Array.isArray(profile.required_skills) ? profile.required_skills : [],
-        state: profile.state?.replace(/_/g, ' ') || "",
+        state: profile.state || "",
         area: profile.area?.replace(/_/g, ' ') || "",
         abn: profile.abn || "",
         website: profile.website || "",
@@ -146,8 +148,6 @@ export default function OrganizationProfile() {
         type,
         opportunity_types,
         required_skills,
-        state: data.state?.replace(/\s+/g, '_').toLowerCase(),
-        area: data.area?.replace(/\s+/g, '_').toLowerCase(),
         website: data.website || ""
       };
 
@@ -175,7 +175,7 @@ export default function OrganizationProfile() {
         type: profile.type || "",
         opportunity_types: Array.isArray(profile.opportunity_types) ? profile.opportunity_types : [],
         required_skills: Array.isArray(profile.required_skills) ? profile.required_skills : [],
-        state: profile.state?.replace(/_/g, ' ') || "",
+        state: profile.state || "",
         area: profile.area?.replace(/_/g, ' ') || "",
         abn: profile.abn || "",
         website: profile.website || "",
@@ -332,26 +332,26 @@ export default function OrganizationProfile() {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormInput<OrganizationProfileData>
-                          control={form.control}
-                          name="state"
+                        <FormSelect<OrganizationProfileData>
                           label="State"
-                          placeholder="Enter your state"
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            const value = e.target.value.replace(/_/g, ' ');
-                            form.setValue('state', value);
-                          }}
+                          id="state"
+                          placeholder="Select your state"
+                          control={form.control}
+                          registerName="state"
+                          error={form.formState.errors.state?.message}
+                          options={locations}
+                          searchEnabled
                         />
 
-                        <FormInput<OrganizationProfileData>
-                          control={form.control}
-                          name="area"
+                        <FormSelect<OrganizationProfileData>
                           label="Area"
-                          placeholder="Enter your area"
-                          onChange={(e: { target: { value: string; }; }) => {
-                            const value = e.target.value.replace(/_/g, ' ');
-                            form.setValue('area', value);
-                          }}
+                          id="area"
+                          placeholder="Select your area"
+                          control={form.control}
+                          registerName="area"
+                          error={form.formState.errors.area?.message}
+                          options={suburbs}
+                          searchEnabled
                         />
                       </div>
 
@@ -371,7 +371,7 @@ export default function OrganizationProfile() {
                         error={form.formState.errors.opportunity_types?.message}
                         options={volunteerTypes}
                         setValue={form.setValue}
-                        value={form.watch("opportunity_types")}
+                        value={form.watch("opportunity_types") || []}
                       />
 
                       <MultiSelectField
@@ -381,26 +381,27 @@ export default function OrganizationProfile() {
                         register={form.register}
                         registerName="required_skills"
                         error={form.formState.errors.required_skills?.message}
-                        options={volunteerTypes}
+                        options={[
+                          { value: "Communication", label: "Communication" },
+                          { value: "Leadership", label: "Leadership" },
+                          { value: "Teamwork", label: "Teamwork" },
+                          { value: "Problem Solving", label: "Problem Solving" },
+                          { value: "Time Management", label: "Time Management" },
+                          { value: "Adaptability", label: "Adaptability" },
+                          { value: "Creativity", label: "Creativity" },
+                          { value: "Technical Skills", label: "Technical Skills" },
+                        ]}
                         setValue={form.setValue}
-                        value={form.watch("required_skills")}
+                        value={form.watch("required_skills") || []}
                       />
 
-                      <ProfilePhotoInput
-                        label="Profile Image"
-                        name="profile_img"
-                        setValue={(name: string, value: string) => {
-                          form.setValue(name as keyof OrganizationProfileData, value);
-                        }}
-                        defaultValue={form.watch("profile_img")}
-                        onUploadStateChange={setIsImageUploading}
-                      />
+
 
                       <div className="flex gap-4 pt-4">
                         <Button 
                           type="submit" 
                           className="flex-1"
-                          disabled={organizationProfileUpdateMutation.isPending || isImageUploading}
+                          disabled={organizationProfileUpdateMutation.isPending}
                         >
                           {organizationProfileUpdateMutation.isPending ? (
                             <span className="flex items-center justify-center">

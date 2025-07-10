@@ -18,14 +18,17 @@ export const volunteerTypes = [
 ];
 
 export const locations = [
-  { value: "sydney_nsw", label: "Sydney, New South Wales" },
-  { value: "melbourne_vic", label: "Melbourne, Victoria" },
-  { value: "brisbane_qld", label: "Brisbane, Queensland" },
-  { value: "perth_wa", label: "Perth, Western Australia" },
-  { value: "adelaide_sa", label: "Adelaide, South Australia" },
-  { value: "hobart_tas", label: "Hobart, Tasmania" },
-  { value: "darwin_nt", label: "Darwin, Northern Territory" },
-  { value: "canberra_act", label: "Canberra, Australian Capital Territory" },
+  { value: "New South Wales", label: "New South Wales" },
+  { value: "Victoria", label: "Victoria" },
+  { value: "Queensland", label: "Queensland" },
+  { value: "Western Australia", label: "Western Australia" },
+  { value: "South Australia", label: "South Australia" },
+  { value: "Tasmania", label: "Tasmania" },
+  { value: "Northern Territory", label: "Northern Territory" },
+  {
+    value: "Australian Capital Territory",
+    label: "Australian Capital Territory",
+  },
 ];
 
 export const organizationTypes = [
@@ -36,9 +39,9 @@ export const organizationTypes = [
   { value: "charity", label: "Charity" },
   { value: "educational_institution", label: "Educational Institution" },
   { value: "healthcare_provider", label: "Healthcare Provider" },
-  { value: "religious_institution", label: "Religious Institution" },
+
   { value: "environmental_group", label: "Environmental Organization" },
-  { value: "youth_organization", label: "Youth Organization" },
+
   { value: "arts_culture_group", label: "Arts & Culture Organization" },
   { value: "disaster_relief_agency", label: "Disaster Relief Agency" },
   { value: "advocacy_group", label: "Advocacy Group" },

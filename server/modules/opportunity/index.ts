@@ -53,6 +53,7 @@ export const opportunityRouter = router({
           email_contact: string;
           phone_contact?: string;
           internal_reference?: string;
+          external_event_link?: string;
           date: {
             start_date: Date;
             end_date?: Date;
@@ -91,6 +92,7 @@ export const opportunityRouter = router({
           email_contact: input.email_contact,
           phone_contact: input.phone_contact || undefined,
           internal_reference: input.internal_reference || undefined,
+          external_event_link: input.external_event_link || undefined,
           // Map date and time fields to the nested structure
           date: {
             start_date: input.start_date ? new Date(input.start_date) : new Date(),

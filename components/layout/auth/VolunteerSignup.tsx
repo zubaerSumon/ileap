@@ -132,6 +132,7 @@ export default function VolunteerSignup() {
           await setupVolunteerProfile.mutate({
             bio: formData.bio,
             interested_on: formData.interested_on,
+            interested_categories: formData.interested_categories,
             phone_number: formData.phone_number,
             state: formData.state,
             area: formData.area,

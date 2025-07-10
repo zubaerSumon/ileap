@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form-input/FormInput";
 import { FormTextarea } from "@/components/form-input/FormTextarea";
+import { FormSelect } from "@/components/form-input/FormSelect";
 import { Button } from "@/components/ui/button";
 import {
   VolunteerProfileUpdateData,
@@ -12,10 +13,12 @@ import {
 } from "@/utils/constants";
 import { MultiSelectField } from "@/components/form-input/MultiSelectField";
 import { PhoneField } from "@/components/form-input/PhoneField";
+import { locations } from "@/utils/constants/select-options";
+import { suburbs } from "@/utils/constants/suburb";
 import { trpc } from "@/utils/trpc";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { VolunteerProfileFormData } from "@/types/volunteers";
+
 import BackButton from "@/components/buttons/BackButton";
 import { Edit, User, Phone, MapPin, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -24,14 +27,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
 import { useSession } from "next-auth/react";
 
-const volunteerTypes = [
-  { value: "animal_welfare", label: "Animal welfare" },
-  { value: "homeless", label: "Homelessness" },
-  { value: "education", label: "Education & literacy" },
-  { value: "environment", label: "Environment" },
-  { value: "health", label: "Health & Medicine" },
-  { value: "seniors", label: "Seniors" },
-];
+
 
 export function VolunteerProfileForm() {
   const [isEditMode, setIsEditMode] = useState(false);
@@ -72,13 +68,14 @@ export function VolunteerProfileForm() {
     },
   });
 
-  const form = useForm<VolunteerProfileFormData>({
+  const form = useForm<VolunteerProfileUpdateData>({
     resolver: zodResolver(VolunteerProfileUpdateSchema),
     defaultValues: {
       name: "",
       phone_number: "",
       bio: "",
       interested_on: [],
+      interested_categories: [],
       state: "",
       area: "",
       availability_date: {
@@ -95,7 +92,8 @@ export function VolunteerProfileForm() {
         phone_number: volunteerProfile.phone_number,
         bio: volunteerProfile.bio,
         interested_on: volunteerProfile.interested_on,
-        state: volunteerProfile.state?.replace(/_/g, ' '),
+        interested_categories: volunteerProfile.interested_categories || [],
+        state: volunteerProfile.state,
         area: volunteerProfile.area?.replace(/_/g, ' '),
         availability_date: volunteerProfile.availability_date
       });
@@ -106,7 +104,6 @@ export function VolunteerProfileForm() {
     try {
       const formattedData = {
         ...data,
-        state: data.state?.replace(/_/g, ' '),
         area: data.area?.replace(/_/g, ' ')
       };
       await volunteerProfileUpdateMutation.mutateAsync(formattedData);
@@ -128,7 +125,8 @@ export function VolunteerProfileForm() {
         phone_number: volunteerProfile.phone_number,
         bio: volunteerProfile.bio,
         interested_on: volunteerProfile.interested_on,
-        state: volunteerProfile.state?.replace(/_/g, ' '),
+        interested_categories: volunteerProfile.interested_categories || [],
+        state: volunteerProfile.state,
         area: volunteerProfile.area?.replace(/_/g, ' '),
         availability_date: volunteerProfile.availability_date
       });
@@ -201,11 +199,11 @@ export function VolunteerProfileForm() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {isEditMode ? (
-              <Card>
+              <Card className="relative">
                 <CardHeader>
                   <CardTitle className="text-xl">Edit Profile</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="relative">
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                       {/* Profile Picture Upload */}
@@ -241,26 +239,26 @@ export function VolunteerProfileForm() {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormInput
-                          control={form.control}
-                          name="state"
+                        <FormSelect
                           label="State"
-                          placeholder="Enter your state"
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/_/g, ' ');
-                            form.setValue('state', value);
-                          }}
+                          id="state"
+                          placeholder="Select your state"
+                          control={form.control}
+                          registerName="state"
+                          error={form.formState.errors.state?.message}
+                          options={locations}
+                          searchEnabled
                         />
 
-                        <FormInput
-                          control={form.control}
-                          name="area"
+                        <FormSelect
                           label="Area"
-                          placeholder="Enter your area"
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/_/g, ' ');
-                            form.setValue('area', value);
-                          }}
+                          id="area"
+                          placeholder="Select your area"
+                          control={form.control}
+                          registerName="area"
+                          error={form.formState.errors.area?.message}
+                          options={suburbs}
+                          searchEnabled
                         />
                       </div>
 
@@ -272,16 +270,48 @@ export function VolunteerProfileForm() {
                       />
 
                       <MultiSelectField
-                        label="Volunteer Interests"
+                        label="Volunteer Skills"
                         id="interested_on"
-                        placeholder="Select volunteer work types"
+                        placeholder="Select your skills"
                         register={form.register}
                         registerName="interested_on"
                         error={form.formState.errors.interested_on?.message}
-                        options={volunteerTypes}
+                        options={[
+                          { value: "Communication", label: "Communication" },
+                          { value: "Leadership", label: "Leadership" },
+                          { value: "Teamwork", label: "Teamwork" },
+                          { value: "Problem Solving", label: "Problem Solving" },
+                          { value: "Time Management", label: "Time Management" },
+                          { value: "Adaptability", label: "Adaptability" },
+                          { value: "Creativity", label: "Creativity" },
+                          { value: "Technical Skills", label: "Technical Skills" },
+                        ]}
                         setValue={form.setValue}
                         value={form.watch("interested_on")}
                       />
+
+                      <MultiSelectField
+                        label="Interested In"
+                        id="interested_categories"
+                        placeholder="Select opportunity categories you're interested in"
+                        register={form.register}
+                        registerName="interested_categories"
+                        error={form.formState.errors.interested_categories?.message}
+                        options={[
+                          { value: "Community & Social Services", label: "Community & Social Services" },
+                          { value: "Education & Mentorship", label: "Education & Mentorship" },
+                          { value: "Healthcare & Medical Volunteering", label: "Healthcare & Medical Volunteering" },
+                          { value: "Corporate & Skilled Volunteering", label: "Corporate & Skilled Volunteering" },
+                          { value: "Technology & Digital Volunteering", label: "Technology & Digital Volunteering" },
+                          { value: "Animal Welfare", label: "Animal Welfare" },
+                          { value: "Arts, Culture & Heritage", label: "Arts, Culture & Heritage" },
+                          { value: "Environmental & Conservation", label: "Environmental & Conservation" },
+                        ]}
+                        setValue={form.setValue}
+                        value={form.watch("interested_categories")}
+                      />
+                      
+
 
                       <div className="flex gap-4 pt-4">
                         <Button 
@@ -375,24 +405,51 @@ export function VolunteerProfileForm() {
                   </Card>
                 )}
 
-                {/* Interests Section */}
+                {/* Skills Section */}
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg flex items-center gap-2">
                       <Heart className="h-5 w-5" />
-                      Volunteer Interests
+                      Volunteer Skills
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
                     {volunteerProfile?.interested_on && volunteerProfile.interested_on.length > 0 ? (
                       <div className="flex flex-wrap gap-2">
-                        {volunteerProfile.interested_on.map((interest: string, index: number) => (
+                        {volunteerProfile.interested_on.map((skill: string, index: number) => (
                           <Badge
                             key={index}
                             variant="secondary"
                             className="px-3 py-1 text-sm"
                           >
-                            {volunteerTypes.find(type => type.value === interest)?.label || interest}
+                            {skill}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-gray-500 italic">No skills specified yet</p>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Interested In Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <Heart className="h-5 w-5" />
+                      Interested In
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {volunteerProfile?.interested_categories && volunteerProfile.interested_categories.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {volunteerProfile.interested_categories.map((category: string, index: number) => (
+                          <Badge
+                            key={index}
+                            variant="secondary"
+                            className="px-3 py-1 text-sm"
+                          >
+                            {category}
                           </Badge>
                         ))}
                       </div>

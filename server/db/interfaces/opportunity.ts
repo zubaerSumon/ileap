@@ -11,6 +11,7 @@ export interface IOpportunity extends Document {
   email_contact: string;
   phone_contact: string;
   internal_reference?: string;
+  external_event_link?: string;
   date: {
     start_date: Date;
     end_date?: Date;

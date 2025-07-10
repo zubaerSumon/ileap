@@ -13,6 +13,7 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
     email_contact: { type: String, required: true },
     phone_contact: { type: String },
     internal_reference: { type: String },
+    external_event_link: { type: String },
     date: {
       start_date: { type: Date, required: true },
       end_date: { type: Date },

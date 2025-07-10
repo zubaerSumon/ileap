@@ -1,8 +1,8 @@
 "use client";
 
 import { FieldValues, Path, UseFormRegister, UseFormSetValue, PathValue } from "react-hook-form";
-import Select from "react-select";
 import { Label } from "@/components/ui/label";
+import { MultiSelect } from "@/components/ui/multi-select";
 import { cn } from "@/lib/utils";
 
 interface Option {
@@ -20,7 +20,8 @@ interface MultiSelectFieldProps<T extends FieldValues> {
   options: Option[];
   setValue: UseFormSetValue<T>;
   value?: string[];
-  className?:string;
+  className?: string;
+  disabled?: boolean;
 }
 
 export const MultiSelectField = <T extends FieldValues>({
@@ -28,81 +29,36 @@ export const MultiSelectField = <T extends FieldValues>({
   id,
   placeholder,
   registerName,
+  register,
   error,
   options,
   setValue,
-  className="",
+  className = "",
   value = [],
+  disabled = false,
 }: MultiSelectFieldProps<T>) => {
-  const selectedOptions = options.filter((option) => value.includes(option.value));
+  const handleValueChange = (newValue: string[]) => {
+    setValue(registerName, newValue as PathValue<T, Path<T>>);
+  };
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-2 relative", className)}>
       <Label htmlFor={id}>{label}</Label>
-      <Select
-        isMulti
-        id={id}
+      {/* Hidden input to ensure field is registered with react-hook-form */}
+      <input
+        type="hidden"
+        {...register(registerName)}
+      />
+      <MultiSelect
         options={options}
-        value={selectedOptions}
-        onChange={(newValue) => {
-          setValue(
-            registerName,
-            (newValue as Option[]).map((option) => option.value) as PathValue<T, Path<T>>
-          );
-        }}
+        onValueChange={handleValueChange}
+        defaultValue={value}
         placeholder={placeholder}
-        classNamePrefix="react-select"
-        theme={(theme) => ({
-          ...theme,
-          colors: {
-            ...theme.colors,
-            primary: 'hsl(var(--primary))',
-            primary75: 'hsl(var(--primary) / 0.75)',
-            primary50: 'hsl(var(--primary) / 0.5)',
-            primary25: 'hsl(var(--primary) / 0.25)',
-          },
-        })}
-        styles={{
-          control: (base) => ({
-            ...base,
-            backgroundColor: 'transparent',
-            border: '1px solid #CBCBCB',
-            borderRadius: '8px',
-            padding: '4px 8px',
-            width: '100%',
-            '&:hover': {
-              borderColor: '#CBCBCB',
-            },
-          }),
-          option: (base, state) => ({
-            ...base,
-            backgroundColor: state.isSelected
-              ? 'hsl(var(--primary))'
-              : state.isFocused
-              ? 'hsl(var(--accent))'
-              : 'transparent',
-            color: state.isSelected ? 'white' : 'inherit',
-          }),
-          multiValue: (base) => ({
-            ...base,
-            backgroundColor: 'transparent',
-            border: '1px solid #CBCBCB',
-            borderRadius: '6px',
-          }),
-          multiValueLabel: (base) => ({
-            ...base,
-            color: 'inherit',
-            padding: '2px 6px',
-          }),
-          multiValueRemove: (base) => ({
-            ...base,
-            color: 'inherit',
-            ':hover': {
-              backgroundColor: 'transparent',
-              color: 'red',
-            },
-          }),
-        }}
+        disabled={disabled}
+        className={cn(
+          "w-full",
+          disabled && "opacity-50 cursor-not-allowed"
+        )}
       />
       {error && <p className="text-sm text-destructive">{error}</p>}
     </div>

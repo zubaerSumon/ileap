@@ -146,6 +146,19 @@ export function PostContent({ opportunity }: PostContentProps) {
             <span className="text-gray-600 text-sm">Volunteers Needed:</span>
             <span className="font-medium text-sm">{opportunity.number_of_volunteers}</span>
           </div>
+          {opportunity.external_event_link && (
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-2 border-b border-gray-100 gap-1 sm:gap-0">
+              <span className="text-gray-600 text-sm">External Event Link:</span>
+              <a
+                href={opportunity.external_event_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-sm text-blue-600 hover:underline break-all"
+              >
+                External Event Link
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>
