@@ -36,11 +36,14 @@ type Opportunity = {
     name: string;
   };
   banner_img?: string;
+  external_event_link?: string;
 };
 
 export function PostContent({ opportunity }: { opportunity: Opportunity }) {
   const { data: session } = useSession();
   const isOrganization = session?.user?.role === "organization";
+  
+
 
   const editor = useEditor({
     extensions: [
@@ -103,10 +106,10 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
         </Link>
       </div>
 
-      {/* Start Date & Time */}
+      {/* Opportunity Details */}
       <div className="mb-4 p-3 md:p-4 bg-gray-50 rounded-lg w-full">
-        <h3 className="text-sm font-medium text-gray-900 mb-2">Start Date & Time</h3>
-        <div className="text-sm text-gray-600">
+        <h3 className="text-sm font-medium text-gray-900 mb-2">Opportunity Details</h3>
+        <div className="text-sm text-gray-600 space-y-2">
           <p>
             <span className="font-medium">Date:</span>{" "}
             {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
@@ -120,6 +123,19 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
             <span className="font-medium">Time:</span>{" "}
             {formatTimeToAMPM(opportunity.time.start_time)}
           </p>
+          {opportunity.external_event_link && (
+            <p>
+              <span className="font-medium">External Event Link:</span>{" "}
+              <a
+                href={opportunity.external_event_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline break-all"
+              >
+                External Event Link
+              </a>
+            </p>
+          )}
         </div>
       </div>
 

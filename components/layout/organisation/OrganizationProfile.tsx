@@ -61,7 +61,6 @@ export default function OrganizationProfile() {
   const { data: profileData, isLoading } = trpc.users.profileCheckup.useQuery();
   const { data: session } = useSession();
   const utils = trpc.useUtils();
-  const [openDropdown, setOpenDropdown] = useState<null | 'opportunity_types' | 'required_skills'>(null);
   
   const updateUserMutation = trpc.users.updateUser.useMutation({
     onSuccess: async () => {
@@ -373,9 +372,6 @@ export default function OrganizationProfile() {
                         options={volunteerTypes}
                         setValue={form.setValue}
                         value={form.watch("opportunity_types") || []}
-                        disabled={openDropdown === 'required_skills'}
-                        onMenuOpen={() => setOpenDropdown('opportunity_types')}
-                        onMenuClose={() => setOpenDropdown(null)}
                       />
 
                       <MultiSelectField
@@ -397,9 +393,6 @@ export default function OrganizationProfile() {
                         ]}
                         setValue={form.setValue}
                         value={form.watch("required_skills") || []}
-                        disabled={openDropdown === 'opportunity_types'}
-                        onMenuOpen={() => setOpenDropdown('required_skills')}
-                        onMenuClose={() => setOpenDropdown(null)}
                       />
 
 

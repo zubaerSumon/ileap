@@ -20,6 +20,7 @@ export type OpportunityFormValues = {
   email_contact: string;
   phone_contact?: string;
   internal_reference?: string;
+  external_event_link?: string;
   start_date: string;
   start_time: string;
   is_recurring: boolean;
@@ -277,6 +278,14 @@ export default function BasicInformation({
                   name={"phone_contact" as Path<OpportunityFormValues>}
                   label="Phone (optional)"
                   placeholder="+61 123 456 789"
+                  control={form.control}
+                  className="w-full sm:w-[382px]"
+                />
+                <FormInput
+                  name={"external_event_link" as Path<OpportunityFormValues>}
+                  label="External Event Link (optional)"
+                  placeholder="https://example.com/event"
+                  type="url"
                   control={form.control}
                   className="w-full sm:w-[382px]"
                 />
