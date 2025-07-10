@@ -1,7 +1,7 @@
-import { Star } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { ApplyButton } from "@/components/buttons/ApplyButton";
+import { FavoriteButton } from "@/components/buttons/FavoriteButton";
 import { useSession } from "next-auth/react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -38,8 +38,12 @@ type Opportunity = {
   banner_img?: string;
   external_event_link?: string;
 };
+interface PostContentProps {
+  opportunity: Opportunity;
+  isMentor?: boolean;
+}
 
-export function PostContent({ opportunity }: { opportunity: Opportunity }) {
+export function PostContent({ opportunity, isMentor }: PostContentProps) {
   const { data: session } = useSession();
   const isOrganization = session?.user?.role === "organization";
   
@@ -81,18 +85,24 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
 
   return (
     <div className="flex-1 w-full lg:max-w-3xl">
-      <BackButton />
+      {!isMentor && <BackButton />}
 
-      <div className="w-full h-[150px] md:h-[200px] relative mb-4 md:mb-6">
-        <Image
-          src={opportunity.banner_img || "/fallbackbanner.png"}
-          alt={`${opportunity.title} Banner`}
-          fill
-          className="object-cover rounded-lg"
-        />
-      </div>
+      {!isMentor && (
+        <>
+          <div className="w-full h-[150px] md:h-[200px] relative mb-4 md:mb-6">
+            <Image
+              src={opportunity.banner_img || "/fallbackbanner.png"}
+              alt={`${opportunity.title} Banner`}
+              fill
+              className="object-cover rounded-lg"
+            />
+          </div>
 
-      <h1 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 w-full">{opportunity.title}</h1>
+          <h1 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 w-full">
+            {opportunity.title}
+          </h1>
+        </>
+      )}
 
       <div className="text-sm text-gray-600 mb-3 w-full">
         Posted by
@@ -112,11 +122,11 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
         <div className="text-sm text-gray-600 space-y-2">
           <p>
             <span className="font-medium">Date:</span>{" "}
-            {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
+            {new Date(opportunity.date.start_date).toLocaleDateString("en-US", {
+              weekday: "long",
+              year: "numeric",
+              month: "long",
+              day: "numeric",
             })}
           </p>
           <p>
@@ -151,7 +161,7 @@ export function PostContent({ opportunity }: { opportunity: Opportunity }) {
               opportunityDetails={opportunityDetails}
               className="bg-blue-600 hover:bg-blue-700 h-8 px-4 md:px-5 font-normal text-sm text-white"
             />
-            <Star className="h-5 w-5 text-yellow-400 fill-current" />
+            <FavoriteButton opportunityId={opportunity._id} />
           </div>
         )}
       </div>
