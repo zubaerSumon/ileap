@@ -67,6 +67,9 @@ export default function VolunteerDashboard() {
   const { data: mentorOpportunitiesCountData } =
     trpc.opportunities.getMentorOpportunitiesCount.useQuery();
 
+  const { data: favoriteOpportunitiesCountData } =
+    trpc.volunteers.getFavoriteOpportunitiesCount.useQuery();
+
   // Fetch active applications with server-side filtering and pagination
   const { data: activeApplicationsData, isLoading: isLoadingActiveApplications } =
     trpc.applications.getCurrentUserActiveApplications.useQuery({
@@ -94,6 +97,15 @@ export default function VolunteerDashboard() {
       enabled: tab === "mentor",
     });
 
+  // Fetch favorite opportunities with pagination
+  const { data: favoriteOpportunitiesData, isLoading: isLoadingFavoriteOpportunities } =
+    trpc.volunteers.getFavoriteOpportunitiesWithPagination.useQuery({
+      page: currentPage,
+      limit: 6,
+    }, {
+      enabled: tab === "favorites",
+    });
+
   // Fetch recent opportunities for the carousel
   const {
     data: recentOpportunitiesData,
@@ -106,6 +118,8 @@ export default function VolunteerDashboard() {
   const activeApplications = (activeApplicationsData?.applications || []) as unknown as Application[];
   const recentApplications = (recentApplicationsData?.applications || []) as unknown as Application[];
   const mentorOpportunities = (mentorOpportunitiesData?.opportunities ||
+    []) as unknown as Opportunity[];
+  const favoriteOpportunities = (favoriteOpportunitiesData?.opportunities ||
     []) as unknown as Opportunity[];
   const recentOpportunities = (recentOpportunitiesData?.opportunities ||
     []) as unknown as Opportunity[];
@@ -136,18 +150,39 @@ export default function VolunteerDashboard() {
       totalPages: mentorOpportunitiesData?.totalPages || 0,
       isLoading: isLoadingMentorOpportunities,
     },
+    favorites: {
+      items: favoriteOpportunities,
+      type: "opportunity" as const,
+      tabType: "favorites" as const,
+      total: favoriteOpportunitiesCountData?.total || 0,
+      totalPages: favoriteOpportunitiesData?.totalPages || 0,
+      isLoading: isLoadingFavoriteOpportunities,
+    },
   };
 
-  // Prepare mobile tabs data
+  // Prepare mobile tabs data - filter out mentor tab if count is 0
   const mobileTabs = VOLUNTEER_DASHBOARD_TABS.map((t) => ({
     label: t.label,
     value: t.key,
     count: tabData[t.key as keyof typeof tabData].total,
-  }));
+  })).filter((t) => {
+    // Hide mentor tab if count is 0
+    if (t.value === "mentor") {
+      return tabData.mentor.total > 0;
+    }
+    return true;
+  });
 
   // Get current tab data
   const currentTabData = tabData[tab as keyof typeof tabData];
   const currentTabConfig = VOLUNTEER_DASHBOARD_TABS.find(t => t.key === tab);
+
+  // Handle tab switching if current tab becomes unavailable
+  useEffect(() => {
+    if (tab === "mentor" && tabData.mentor.total === 0) {
+      setTab("applied");
+    }
+  }, [tab, tabData.mentor.total]);
 
   // Render tab content dynamically
   const renderTabContent = () => {
@@ -225,22 +260,29 @@ export default function VolunteerDashboard() {
 
         {/* Desktop Tabs */}
         <div className="hidden md:flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
-          {VOLUNTEER_DASHBOARD_TABS.map((t) => (
-            <button
-              key={t.key}
-              className={`px-4 md:px-5 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 whitespace-nowrap shadow-sm hover:shadow-md
-                ${
-                  tab === t.key
-                    ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                    : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
-                }
-              `}
-              onClick={() => setTab(t.key)}
-              style={{ minWidth: "auto" }}
-            >
-              {t.label} ({tabData[t.key as keyof typeof tabData].total})
-            </button>
-          ))}
+          {VOLUNTEER_DASHBOARD_TABS.map((t) => {
+            // Hide mentor tab if count is 0
+            if (t.key === "mentor" && tabData.mentor.total === 0) {
+              return null;
+            }
+            
+            return (
+              <button
+                key={t.key}
+                className={`px-4 md:px-5 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 whitespace-nowrap shadow-sm hover:shadow-md
+                  ${
+                    tab === t.key
+                      ? "bg-blue-600 text-white border-blue-600 shadow-md"
+                      : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
+                  }
+                `}
+                onClick={() => setTab(t.key)}
+                style={{ minWidth: "auto" }}
+              >
+                {t.label} ({tabData[t.key as keyof typeof tabData].total})
+              </button>
+            );
+          })}
         </div>
 
         <button

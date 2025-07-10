@@ -145,4 +145,6 @@ export const volunteerProfileRouter = router({
   getFavoriteStatus: favoriteOpportunityRouter.getFavoriteStatus,
   toggleFavorite: favoriteOpportunityRouter.toggleFavorite,
   getFavoriteOpportunities: favoriteOpportunityRouter.getFavoriteOpportunities,
+  getFavoriteOpportunitiesWithPagination: favoriteOpportunityRouter.getFavoriteOpportunitiesWithPagination,
+  getFavoriteOpportunitiesCount: favoriteOpportunityRouter.getFavoriteOpportunitiesCount,
 });

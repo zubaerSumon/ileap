@@ -25,7 +25,10 @@ export const useFavorite = (opportunityId: string) => {
   // Mutation to toggle favorite status
   const toggleFavoriteMutation = trpc.volunteers.toggleFavorite.useMutation({
     onSuccess: (data: FavoriteStatus) => {
+      // Invalidate both the opportunities list and count queries
       utils.volunteers.getFavoriteOpportunities.invalidate();
+      utils.volunteers.getFavoriteOpportunitiesWithPagination.invalidate();
+      utils.volunteers.getFavoriteOpportunitiesCount.invalidate();
       setIsFavorite(data.isFavorite);
     },
   });
