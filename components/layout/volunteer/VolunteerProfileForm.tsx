@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { FormInput } from "@/components/form-input/FormInput";
 import { FormTextarea } from "@/components/form-input/FormTextarea";
+import { FormSelect } from "@/components/form-input/FormSelect";
 import { Button } from "@/components/ui/button";
 import {
   VolunteerProfileUpdateData,
@@ -12,6 +13,8 @@ import {
 } from "@/utils/constants";
 import { MultiSelectField } from "@/components/form-input/MultiSelectField";
 import { PhoneField } from "@/components/form-input/PhoneField";
+import { locations } from "@/utils/constants/select-options";
+import { suburbs } from "@/utils/constants/suburb";
 import { trpc } from "@/utils/trpc";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
@@ -236,22 +239,26 @@ export function VolunteerProfileForm() {
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <FormInput
-                          control={form.control}
-                          name="state"
+                        <FormSelect
                           label="State"
-                          placeholder="Enter your state"
+                          id="state"
+                          placeholder="Select your state"
+                          control={form.control}
+                          registerName="state"
+                          error={form.formState.errors.state?.message}
+                          options={locations}
+                          searchEnabled
                         />
 
-                        <FormInput
-                          control={form.control}
-                          name="area"
+                        <FormSelect
                           label="Area"
-                          placeholder="Enter your area"
-                          onChange={(e) => {
-                            const value = e.target.value.replace(/_/g, ' ');
-                            form.setValue('area', value);
-                          }}
+                          id="area"
+                          placeholder="Select your area"
+                          control={form.control}
+                          registerName="area"
+                          error={form.formState.errors.area?.message}
+                          options={suburbs}
+                          searchEnabled
                         />
                       </div>
 

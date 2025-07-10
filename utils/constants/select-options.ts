@@ -25,7 +25,10 @@ export const locations = [
   { value: "South Australia", label: "South Australia" },
   { value: "Tasmania", label: "Tasmania" },
   { value: "Northern Territory", label: "Northern Territory" },
-  { value: "Australian Capital Territory", label: "Australian Capital Territory" },
+  {
+    value: "Australian Capital Territory",
+    label: "Australian Capital Territory",
+  },
 ];
 
 export const organizationTypes = [
@@ -36,9 +39,9 @@ export const organizationTypes = [
   { value: "charity", label: "Charity" },
   { value: "educational_institution", label: "Educational Institution" },
   { value: "healthcare_provider", label: "Healthcare Provider" },
-  { value: "religious_institution", label: "Religious Institution" },
+
   { value: "environmental_group", label: "Environmental Organization" },
-  { value: "youth_organization", label: "Youth Organization" },
+
   { value: "arts_culture_group", label: "Arts & Culture Organization" },
   { value: "disaster_relief_agency", label: "Disaster Relief Agency" },
   { value: "advocacy_group", label: "Advocacy Group" },
