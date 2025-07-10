@@ -5,7 +5,7 @@ import Image from "next/image";
 import { trpc } from "@/utils/trpc";
 import { Key, useState } from "react";
 import BackButton from "@/components/buttons/BackButton";
-import RandomAvatar from "@/components/ui/random-avatar";
+import UserAvatar from "@/components/ui/UserAvatar";
 import { Button } from "@/components/ui/button";
 import MessageDialog from "@/components/layout/organisation/MessageDialog";
 
@@ -70,8 +70,8 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
         />
         <div className="absolute bottom-3 left-3 sm:bottom-6 sm:left-6">
           <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl">
-            <RandomAvatar
-              name={volunteer.name}
+            <UserAvatar
+              user={volunteer}
               size={48}
               className="rounded-lg sm:rounded-xl"
             />

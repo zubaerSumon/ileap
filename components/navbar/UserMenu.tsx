@@ -29,6 +29,15 @@ interface UserMenuProps {
 export function UserMenu({ user }: UserMenuProps) {
   const [isAvailable, setIsAvailable] = useState(true);
   const hasInitialized = useRef(false);
+  
+  // Debug logging
+  console.log('UserMenu user object:', {
+    name: user.name,
+    image: user.image,
+    role: user.role
+  });
+  
+
   const userRole =
     user.role === "admin" || user.role === "mentor"
       ? "organisation"
@@ -84,7 +93,7 @@ export function UserMenu({ user }: UserMenuProps) {
         <button className="relative focus:outline-none cursor-pointer">
           <Avatar className="h-9 w-9 ring-2 ring-blue-500 border border-white transition-transform duration-200 hover:scale-105">
             <AvatarImage
-              src={user.image || "https://github.com/shadcn.png"}
+              src={user.image && user.image !== null ? user.image : undefined}
               alt={userName}
             />
             <AvatarFallback className="bg-blue-600 text-white">

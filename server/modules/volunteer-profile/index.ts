@@ -32,7 +32,7 @@ export const volunteerProfileRouter = router({
         _id: user._id,
         name: user.name,
         email: user.email,
-        avatar: user.avatar,
+        image: user.image,
         ...user.volunteer_profile._doc,
       };
     }),
@@ -137,6 +137,7 @@ export const volunteerProfileRouter = router({
     return {
       name: user.name,
       email: user.email,
+      image: user.image,
       ...user.volunteer_profile._doc,
     };
   }),

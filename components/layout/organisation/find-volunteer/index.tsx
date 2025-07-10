@@ -23,7 +23,7 @@ import { Users } from "lucide-react";
 interface Volunteer {
   _id: string;
   name: string;
-  avatar?: string;
+  image?: string;
   role: string;
   volunteer_profile?: {
     student_type?: "yes" | "no";

@@ -168,7 +168,7 @@ export const userRouter = router({
       let users;
       if (currentUser.role === "volunteer") {
         users = await User.find(baseQuery)
-          .select("name avatar role")
+          .select("name image role")
           .populate("organization_profile")
           .skip(skip)
           .limit(limit)
@@ -227,7 +227,7 @@ export const userRouter = router({
           {
             $project: {
               name: 1,
-              avatar: 1,
+              image: 1,
               role: 1,
               volunteer_profile: {
                 student_type: 1,
@@ -274,7 +274,7 @@ export const userRouter = router({
       const updatedUser = await User.findOneAndUpdate(
         { email: sessionUser.email },
         { ...input },
-        { new: true }
+        { new: true, runValidators: true }
       );
 
       if (!updatedUser) {

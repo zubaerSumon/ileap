@@ -507,7 +507,7 @@ export const volunteerApplicationRouter = router({
             path: "volunteer",
             populate: {
               path: "user",
-              select: "name email avatar",
+              select: "name email image",
             },
           })
           .lean();
@@ -517,7 +517,7 @@ export const volunteerApplicationRouter = router({
           _id: app.volunteer._id,
           name: app.volunteer.user.name,
           email: app.volunteer.user.email,
-          avatar: app.volunteer.user.avatar,
+          image: app.volunteer.user.image,
           status: app.status,
           appliedAt: app.createdAt,
         }));
@@ -550,11 +550,11 @@ export const volunteerApplicationRouter = router({
         })
           .populate({
             path: "volunteer",
-            select: "name email",
+            select: "name email image",
             populate: {
               path: "volunteer_profile",
               select:
-                "profile_img location bio skills completed_projects availability",
+                "location bio skills completed_projects availability",
             },
           })
           .lean();
@@ -573,8 +573,8 @@ export const volunteerApplicationRouter = router({
               _id: { toString(): string };
               name?: string;
               email?: string;
+              image?: string;
               volunteer_profile?: {
-                profile_img?: string;
                 location?: string;
                 bio?: string;
                 skills?: string[];
@@ -589,7 +589,7 @@ export const volunteerApplicationRouter = router({
             name: app.volunteer.name || "",
             email: app.volunteer.email || "",
             profileImg:
-              app.volunteer.volunteer_profile?.profile_img || "/avatar.svg",
+              app.volunteer.image || "/avatar.svg",
             location: app.volunteer.volunteer_profile?.location || "",
             bio: app.volunteer.volunteer_profile?.bio || "",
             skills: app.volunteer.volunteer_profile?.skills || [],

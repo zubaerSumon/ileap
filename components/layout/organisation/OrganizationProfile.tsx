@@ -22,11 +22,13 @@ import { TRPCClientErrorLike } from "@trpc/client";
 import { AppRouter } from "@/server";
 import { SelectField } from "@/components/form-input/SelectField";
 import { ProfilePhotoInput } from "@/components/form-input/ProfilePhotoInput";
+import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
 import BackButton from "@/components/buttons/BackButton";
 import { Edit, Building2, Phone, MapPin, Mail, Globe, Hash, Heart } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useSession } from "next-auth/react";
 
 type OrganizationProfileData = Omit<z.infer<typeof userValidation.organizationProfileSchema>, 'opportunity_types' | 'required_skills'> & {
   opportunity_types: string[];
@@ -54,8 +56,24 @@ export default function OrganizationProfile() {
   const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
   const { data: profileData, isLoading } = trpc.users.profileCheckup.useQuery();
+  const { data: session } = useSession();
   const utils = trpc.useUtils();
   const [isImageUploading, setIsImageUploading] = useState(false);
+  
+  const updateUserMutation = trpc.users.updateUser.useMutation({
+    onSuccess: async () => {
+      utils.users.profileCheckup.invalidate();
+      toast.success("Profile picture updated successfully!");
+      // Force a page refresh to ensure the session is updated
+      console.log('Profile picture updated, refreshing page...');
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to update profile picture");
+    },
+  });
   
   const organizationProfileUpdateMutation = trpc.users.setupOrgProfile.useMutation({
     onSuccess: () => {
@@ -245,6 +263,18 @@ export default function OrganizationProfile() {
                 <CardContent>
                   <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                      {/* Profile Picture Upload */}
+                      <div className="flex justify-center">
+                        <ProfilePictureUpload
+                          currentImage={session?.user?.image}
+                          onImageChange={(imageUrl) => {
+                            updateUserMutation.mutate({ image: imageUrl });
+                          }}
+                          userName={profile?.title || session?.user?.name || "Organization"}
+                          size="lg"
+                        />
+                      </div>
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormInput<OrganizationProfileData>
                           control={form.control}
@@ -405,10 +435,15 @@ export default function OrganizationProfile() {
                   <CardContent className="pt-6">
                     <div className="flex items-start space-x-4">
                       <Avatar className="h-16 w-16">
-                        <AvatarImage src={profile?.profile_img} />
-                        <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
-                          {profile?.title?.charAt(0)?.toUpperCase() || "O"}
-                        </AvatarFallback>
+                        {session?.user?.image ? (
+                          <AvatarImage src={session.user.image!} alt={profile?.title || "Organization"} />
+                        ) : profile?.profile_img ? (
+                          <AvatarImage src={profile.profile_img} alt={profile.title || "Organization"} />
+                        ) : (
+                          <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
+                            {profile?.title?.charAt(0)?.toUpperCase() || "O"}
+                          </AvatarFallback>
+                        )}
                       </Avatar>
                       <div className="flex-1">
                         <h1 className="text-2xl font-bold text-gray-900 mb-1">

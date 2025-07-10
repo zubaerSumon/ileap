@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Session } from "next-auth";
 import { SessionUser } from "@/types/navigation";
-import Logo from "../../public/images/logos/gradrient-ausleap-logo.png";
+import ausleapnewlogo from "../../public/ausleapnewlogo.jpg";
 import { STATIC_LINKS } from "@/utils/constants/navigation";
 import { UserMenu } from "./UserMenu";
 import { GiBinoculars } from "react-icons/gi";
@@ -49,12 +49,12 @@ export function TopBar({
         <div className="container mx-auto flex justify-between items-center">
           <Link href="/">
             <Image
-              src={Logo}
+              src={ausleapnewlogo}
               alt="iLEAP Logo"
-              width={80}
-              height={32}
-              className="h-8 w-auto bg-amber-200"
-              style={{ width: "auto", height: "32px" }}
+              width={150}
+              height={40}
+              className="h-10 w-auto bg-amber-200"
+              style={{ width: "auto", height: "40px" }}
               priority
             />
           </Link>
@@ -98,12 +98,12 @@ export function TopBar({
             className="flex items-center cursor-pointer"
           >
             <Image
-              src={Logo}
+              src={ausleapnewlogo}
               alt="iLEAP Logo"
-              width={80}
-              height={32}
-              className="h-8 w-auto cursor-pointer"
-              style={{ width: "auto", height: "32px" }}
+              width={150}
+              height={40}
+              className="h-10 w-auto cursor-pointer"
+              style={{ width: "auto", height: "40px" }}
               priority
             />
           </Link>

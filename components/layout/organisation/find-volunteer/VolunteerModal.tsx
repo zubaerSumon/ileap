@@ -4,7 +4,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin } from "lucide-react";
-import RandomAvatar from "@/components/ui/random-avatar";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 interface VolunteerModalProps {
   isOpen: boolean;
@@ -18,8 +18,8 @@ const VolunteerModal = ({ isOpen, onClose }: VolunteerModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md p-6">
         <div className="flex flex-col items-center">
-          <RandomAvatar
-            name={volunteerName}
+          <UserAvatar
+            user={{ name: volunteerName }}
             size={96}
             className="h-24 w-24"
           />
