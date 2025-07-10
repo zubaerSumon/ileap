@@ -28,6 +28,7 @@ export const MultiSelectField = <T extends FieldValues>({
   id,
   placeholder,
   registerName,
+  register,
   error,
   options,
   setValue,
@@ -37,8 +38,13 @@ export const MultiSelectField = <T extends FieldValues>({
   const selectedOptions = options.filter((option) => value.includes(option.value));
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-2 relative", className)}>
       <Label htmlFor={id}>{label}</Label>
+      {/* Hidden input to ensure field is registered with react-hook-form */}
+      <input
+        type="hidden"
+        {...register(registerName)}
+      />
       <Select
         isMulti
         id={id}
@@ -52,6 +58,9 @@ export const MultiSelectField = <T extends FieldValues>({
         }}
         placeholder={placeholder}
         classNamePrefix="react-select"
+        className="z-50"
+        menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+        menuPosition="fixed"
         theme={(theme) => ({
           ...theme,
           colors: {
@@ -73,6 +82,14 @@ export const MultiSelectField = <T extends FieldValues>({
             '&:hover': {
               borderColor: '#CBCBCB',
             },
+          }),
+          menu: (base) => ({
+            ...base,
+            zIndex: 9999,
+          }),
+          menuList: (base) => ({
+            ...base,
+            maxHeight: '200px',
           }),
           option: (base, state) => ({
             ...base,

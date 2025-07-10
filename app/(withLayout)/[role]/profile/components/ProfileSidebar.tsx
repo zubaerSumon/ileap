@@ -52,11 +52,11 @@ export function ProfileSidebar() {
       </div>
 
       <div className="pb-6 border-b">
-        <h3 className="font-medium mb-2">Interests</h3>
+        <h3 className="font-medium mb-2">Skills</h3>
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary" className="bg-gray-200 text-gray-500 text-[8px]">Homeless</Badge>
-          <Badge variant="secondary" className="bg-gray-200 text-gray-500 text-[8px]">Disaster Relief</Badge>
-          <Badge variant="secondary" className="bg-gray-200 text-gray-500 text-[8px]">Emergency & Safety</Badge>
+          <Badge variant="secondary" className="bg-gray-200 text-gray-500 text-[8px]">Communication</Badge>
+          <Badge variant="secondary" className="bg-gray-200 text-gray-500 text-[8px]">Leadership</Badge>
+          <Badge variant="secondary" className="bg-gray-200 text-gray-500 text-[8px]">Teamwork</Badge>
         </div>
       </div>
 

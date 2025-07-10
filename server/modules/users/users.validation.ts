@@ -50,6 +50,9 @@ const volunteerProfileSchema = z.object({
   interested_on: z
     .array(z.string())
     .nonempty("Please select at least one interest"),
+  interested_categories: z
+    .array(z.string())
+    .optional(),
   phone_number: z.string().nonempty("Phone number is required"),
   country: z.string().optional(),
   state: z.string().nonempty("State is required"),

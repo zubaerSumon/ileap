@@ -18,14 +18,14 @@ export const volunteerTypes = [
 ];
 
 export const locations = [
-  { value: "sydney_nsw", label: "Sydney, New South Wales" },
-  { value: "melbourne_vic", label: "Melbourne, Victoria" },
-  { value: "brisbane_qld", label: "Brisbane, Queensland" },
-  { value: "perth_wa", label: "Perth, Western Australia" },
-  { value: "adelaide_sa", label: "Adelaide, South Australia" },
-  { value: "hobart_tas", label: "Hobart, Tasmania" },
-  { value: "darwin_nt", label: "Darwin, Northern Territory" },
-  { value: "canberra_act", label: "Canberra, Australian Capital Territory" },
+  { value: "New South Wales", label: "New South Wales" },
+  { value: "Victoria", label: "Victoria" },
+  { value: "Queensland", label: "Queensland" },
+  { value: "Western Australia", label: "Western Australia" },
+  { value: "South Australia", label: "South Australia" },
+  { value: "Tasmania", label: "Tasmania" },
+  { value: "Northern Territory", label: "Northern Territory" },
+  { value: "Australian Capital Territory", label: "Australian Capital Territory" },
 ];
 
 export const organizationTypes = [

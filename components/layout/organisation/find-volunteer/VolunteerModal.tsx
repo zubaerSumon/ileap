@@ -45,11 +45,11 @@ const VolunteerModal = ({ isOpen, onClose }: VolunteerModalProps) => {
           </div>
 
           <div className="mt-6 w-full">
-            <h3 className="text-sm font-semibold mb-2">Interests</h3>
+            <h3 className="text-sm font-semibold mb-2">Skills</h3>
             <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">Homeless</Badge>
-              <Badge variant="secondary">Disaster Relief</Badge>
-              <Badge variant="secondary">Emergency & Safety</Badge>
+              <Badge variant="secondary">Communication</Badge>
+              <Badge variant="secondary">Leadership</Badge>
+              <Badge variant="secondary">Teamwork</Badge>
             </div>
           </div>
 

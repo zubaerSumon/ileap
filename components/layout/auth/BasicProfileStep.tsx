@@ -6,7 +6,7 @@ import { VolunteerSignupForm } from "@/types/auth";
 import { FormSelect } from "@/components/form-input/FormSelect";
 import { useEffect } from "react";
 import { suburbs } from "@/utils/constants/suburb";
-import { locations, volunteerTypes } from "@/utils/constants/select-options";
+import { locations } from "@/utils/constants/select-options";
 
 interface BasicProfileStepProps {
   form: UseFormReturn<VolunteerSignupForm>;
@@ -54,15 +54,45 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
         />
 
         <MultiSelectField
-          label="What type of volunteer work are you interested in?"
+          label="What skills do you have?"
           id="interested_on"
-          placeholder="Select volunteer work"
+          placeholder="Select your skills"
           register={form.register}
           registerName="interested_on"
           error={form.formState.errors.interested_on?.message}
-          options={volunteerTypes}
+          options={[
+            { value: "Communication", label: "Communication" },
+            { value: "Leadership", label: "Leadership" },
+            { value: "Teamwork", label: "Teamwork" },
+            { value: "Problem Solving", label: "Problem Solving" },
+            { value: "Time Management", label: "Time Management" },
+            { value: "Adaptability", label: "Adaptability" },
+            { value: "Creativity", label: "Creativity" },
+            { value: "Technical Skills", label: "Technical Skills" },
+          ]}
           setValue={form.setValue}
           value={form.watch("interested_on")}
+        />
+
+        <MultiSelectField
+          label="What types of volunteer work are you interested in?"
+          id="interested_categories"
+          placeholder="Select opportunity categories"
+          register={form.register}
+          registerName="interested_categories"
+          error={form.formState.errors.interested_categories?.message}
+          options={[
+            { value: "Community & Social Services", label: "Community & Social Services" },
+            { value: "Education & Mentorship", label: "Education & Mentorship" },
+            { value: "Healthcare & Medical Volunteering", label: "Healthcare & Medical Volunteering" },
+            { value: "Corporate & Skilled Volunteering", label: "Corporate & Skilled Volunteering" },
+            { value: "Technology & Digital Volunteering", label: "Technology & Digital Volunteering" },
+            { value: "Animal Welfare", label: "Animal Welfare" },
+            { value: "Arts, Culture & Heritage", label: "Arts, Culture & Heritage" },
+            { value: "Environmental & Conservation", label: "Environmental & Conservation" },
+          ]}
+          setValue={form.setValue}
+          value={form.watch("interested_categories")}
         />
 
         <PhoneField

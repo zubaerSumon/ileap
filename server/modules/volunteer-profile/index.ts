@@ -85,7 +85,8 @@ export const volunteerProfileRouter = router({
         ...input,
         // Ensure required fields are not removed
         bio: input.bio || existingProfile.bio,
-        interested_on: input.interested_on || existingProfile.interested_on,
+        interested_on: input.interested_on !== undefined ? input.interested_on : existingProfile.interested_on,
+        interested_categories: input.interested_categories !== undefined ? input.interested_categories : existingProfile.interested_categories,
         phone_number: input.phone_number || existingProfile.phone_number,
         state: input.state || existingProfile.state,
         area: input.area || existingProfile.area,
