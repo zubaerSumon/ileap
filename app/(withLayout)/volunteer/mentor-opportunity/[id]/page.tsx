@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { Loader2, FileSpreadsheet, MessageCircleCode, Hand, Search, Users } from "lucide-react";
-import { PostContent } from "@/components/layout/volunteer/home-page/PostContent";
-import { OpportunitySidebar } from "@/components/shared/OpportunitySidebar";
+import { OpportunityDetail } from "@/components/layout/volunteer/home-page/OpportunityDetail";
 import { useParams, useRouter } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
@@ -141,15 +140,11 @@ export default function MentorOpportunityDetailsPage() {
 
   // Define tab content for mentor view
   const postContent = (
-    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-      <div className="flex-1">
-        <PostContent opportunity={opportunity} />
-      </div>
-      <div className="hidden lg:block w-[1px] bg-[#F1F1F1]"></div>
-      <div className="lg:w-[350px] flex-shrink-0">
-        <OpportunitySidebar opportunity={opportunity} userRole="volunteer" />
-      </div>
-    </div>
+    <OpportunityDetail 
+      opportunity={opportunity} 
+      userRole="volunteer" 
+      isMentor={true}
+    />
   );
 
   const applicantsContent = (

@@ -11,8 +11,7 @@ import {
 import { useRouter, useParams } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import { PostContent } from "@/components/layout/organisation/opportunities/PostContent";
-import { OpportunitySidebar } from "@/components/shared/OpportunitySidebar";
+import { OpportunityDetail } from "@/components/layout/volunteer/home-page/OpportunityDetail";
 import {
   Applicant,
   ApplicantsCard,
@@ -162,15 +161,10 @@ export default function OpportunityDetailsPage() {
 
   // Define tab content
   const postContent = (
-    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-      <div className="flex-1">
-        <PostContent opportunity={opportunity} />
-      </div>
-      <div className="hidden lg:block w-[1px] bg-[#F1F1F1]"></div>
-      <div className="lg:w-[350px] flex-shrink-0">
-        <OpportunitySidebar opportunity={opportunity} userRole="organization" />
-      </div>
-    </div>
+    <OpportunityDetail 
+      opportunity={opportunity} 
+      userRole="organization" 
+    />
   );
 
   const applicantsContent = (

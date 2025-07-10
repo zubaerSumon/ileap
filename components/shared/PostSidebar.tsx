@@ -19,7 +19,7 @@ import { Types } from "mongoose";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import { formatText } from "@/utils/helpers/formatText";
 
-interface OpportunitySidebarProps {
+interface PostSidebarProps {
   opportunity: IOpportunity & {
     organization_profile: IOrgnizationPofile;
   };
@@ -33,10 +33,10 @@ type OrganizationProfileData = IOrgnizationPofile & {
   name?: string;
 };
 
-export function OpportunitySidebar({
+export function PostSidebar({
   opportunity,
   userRole = "volunteer",
-}: OpportunitySidebarProps) {
+    }: PostSidebarProps) {
   // Handle both populated and unpopulated organization_profile
   const orgProfile =
     opportunity.organization_profile as unknown as OrganizationProfileData;

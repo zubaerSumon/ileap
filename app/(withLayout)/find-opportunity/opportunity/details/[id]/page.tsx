@@ -9,8 +9,7 @@ import {
   Search,
   Users,
 } from "lucide-react";
-import { PostContent } from "@/components/layout/volunteer/home-page/PostContent";
-import { OpportunitySidebar } from "@/components/shared/OpportunitySidebar";
+import { OpportunityDetail } from "@/components/layout/volunteer/home-page/OpportunityDetail";
 import { useParams } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
@@ -163,34 +162,25 @@ export default function OpportunityDetailPage() {
     );
   }
 
-  // If user is not a mentor for this opportunity, show regular volunteer view
   if (!isCurrentUserMentor) {
     return (
       <ProtectedLayout>
         <div className="w-full px-2 md:px-4 py-4 md:py-8">
-          <div className="flex flex-col lg:flex-row gap-4 lg:gap-8 justify-center w-full">
-            <PostContent opportunity={opportunity} />
-            <OpportunitySidebar
-              opportunity={opportunity}
-              userRole="volunteer"
-            />
-          </div>
+          <OpportunityDetail 
+            opportunity={opportunity} 
+            userRole="volunteer" 
+          />
         </div>
       </ProtectedLayout>
     );
   }
 
-  // Define tab content for mentor view
   const postContent = (
-    <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
-      <div className="flex-1">
-        <PostContent opportunity={opportunity} />
-      </div>
-      <div className="hidden lg:block w-[1px] bg-[#F1F1F1]"></div>
-      <div className="lg:w-[350px] flex-shrink-0">
-        <OpportunitySidebar opportunity={opportunity} userRole="volunteer" />
-      </div>
-    </div>
+    <OpportunityDetail 
+      opportunity={opportunity} 
+      userRole="volunteer" 
+      isMentor={true}
+    />
   );
 
   const applicantsContent = (
@@ -299,41 +289,40 @@ export default function OpportunityDetailPage() {
 
   return (
     <ProtectedLayout>
-      <div className="bg-[#F5F7FA] border py-6 sm:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-xl min-h-screen">
-            <div className="p-4 sm:p-8">
-              <div className="mb-6 sm:mb-8">
-                <BackButton />
-                <div className="w-full h-[150px] sm:h-[200px] relative mb-4 sm:mb-6">
-                  <Image
-                    src={opportunity.banner_img || "/fallbackbanner.png"}
-                    alt={`${opportunity.title} Banner`}
-                    fill
-                    className="object-cover rounded-lg"
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <h1 className="text-lg sm:text-[20px] font-semibold">
-                    {opportunity.title}
-                  </h1>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm text-purple-600 font-medium">
-                      Mentor View
-                    </span>
-                  </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="">
+          <div className="p-4 sm:p-8">
+            <div className="mb-6 sm:mb-8">
+              <BackButton />
+              <div className="w-full h-[150px] sm:h-[200px] relative mb-4 sm:mb-6">
+                <Image
+                  src={opportunity.banner_img || "/fallbackbanner.png"}
+                  alt={`${opportunity.title} Banner`}
+                  fill
+                  className="object-cover rounded-lg"
+                />
+              </div>
+              <div className="flex items-center justify-between">
+                <h1 className="text-lg sm:text-[20px] font-semibold">
+                  {opportunity.title}
+                </h1>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-purple-600" />
+                  <span className="text-sm text-purple-600 font-medium">
+                    Mentor View
+                  </span>
                 </div>
               </div>
-              <DynamicTabs
-                defaultValue="post"
-                tabs={tabs}
-                className="mb-6 sm:mb-8"
-              />
             </div>
+            <DynamicTabs
+              defaultValue="post"
+              tabs={tabs}
+              className="mb-6 sm:mb-8"
+            />
           </div>
         </div>
       </div>
+
       <MessageApplicantModal
         isOpen={isMessageModalOpen}
         onClose={handleCloseMessageModal}
