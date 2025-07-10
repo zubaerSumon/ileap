@@ -84,7 +84,7 @@ export function ConfirmationModal({
             <p className="text-center mb-4 text-sm sm:text-base text-gray-600 px-4">
               Here are the opportunity details for{" "}
               <Link
-                href={`/volunteer/opportunities/${opportunityDetails.id}`}
+                href={`/find-opportunity/opportunity/details/${opportunityDetails.id}`}
                 className="text-blue-600 font-semibold"
               >
                 {opportunityDetails.title}
@@ -119,15 +119,14 @@ export function ConfirmationModal({
                       Start Date
                     </strong>
                     <span className="text-sm">
-                      {new Date(fullOpportunity.date.start_date).toLocaleDateString(
-                        "en-US",
-                        {
-                          weekday: "long",
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                        }
-                      )}
+                      {new Date(
+                        fullOpportunity.date.start_date
+                      ).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
                     </span>
                   </div>
                 </div>

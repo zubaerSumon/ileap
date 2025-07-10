@@ -154,7 +154,7 @@ export default function TabwiseOpportunityCard({
             <h3
               className="text-lg font-semibold cursor-pointer hover:text-blue-600"
               onClick={() =>
-                router.push(`/volunteer/opportunities/${opportunity._id}`)
+                router.push(`/find-opportunity/opportunity/details/${opportunity._id}`)
               }
             >
               {opportunity.title}
