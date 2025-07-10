@@ -266,7 +266,7 @@ export default function OrganizationProfile() {
                       {/* Profile Picture Upload */}
                       <div className="flex justify-center">
                         <ProfilePictureUpload
-                          currentImage={session?.user?.image}
+                          currentImage={session?.user?.image || undefined}
                           onImageChange={(imageUrl) => {
                             updateUserMutation.mutate({ image: imageUrl });
                           }}

@@ -40,7 +40,7 @@ export function TopBar({
 }: TopBarProps) {
   const handleMenuToggle = () => setIsMenuOpen(!isMenuOpen);
   const searchParams = useSearchParams();
-  const isSigninPath = usePathname().includes("signin");
+  const isSigninPath = usePathname().includes("login");
   const roleParam = searchParams?.get("role")?.toLowerCase();
 
   if (isResetPasswordPath) {
