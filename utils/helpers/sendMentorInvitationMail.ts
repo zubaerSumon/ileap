@@ -13,10 +13,10 @@ export const sendMentorInvitationMail = async (
     const organization = await OrganizationProfile.findById(organizationId);
 
     if (!organization) {
-      throw new Error("Organization not found");
+      throw new Error("Organisation not found");
     }
 
-    const organizationName = organization.title || "Organization";
+    const organizationName = organization.title || "Organisation";
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
     const emailTemplate = MENTOR_INVITATION_TEMPLATE;

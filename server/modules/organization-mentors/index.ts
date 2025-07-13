@@ -16,7 +16,7 @@ import bcrypt from "bcryptjs";
 const inviteMentorSchema = z.object({
   email: z.string().email("Invalid email address"),
   name: z.string().min(1, "Name is required"),
-  organizationId: z.string().min(1, "Organization ID is required"),
+  organizationId: z.string().min(1, "Organisation ID is required"),
 });
 
 const acceptInvitationSchema = z.object({
@@ -67,7 +67,7 @@ export const organizationMentorRouter = router({
         if (!organization) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Organization not found.",
+            message: "Organisation not found.",
           });
         }
 

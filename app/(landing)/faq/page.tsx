@@ -28,7 +28,7 @@ const AusLEAPFAQs = [
   {
     question: "What's AusLEAP?",
     answer:
-      "AusLEAP is our specialized program focused on volunteer opportunities across Australia. It connects Australian organizations with volunteers who want to make a difference in their local communities.",
+      "AusLEAP is our specialized program focused on volunteer opportunities across Australia. It connects Australian organisations with volunteers who want to make a difference in their local communities.",
   },
   {
     question: "If I'm not an international student, can I still get involved in this program?",
@@ -55,7 +55,7 @@ const AusLEAPFAQs = [
     question:
       "Will I receive certification for my participation in the program?",
     answer:
-      "Yes, you will receive confirmation emails for all your volunteer applications and acceptances. Organizations may also provide certificates or documentation of your volunteer service upon completion of programs.",
+      "Yes, you will receive confirmation emails for all your volunteer applications and acceptances. Organisations may also provide certificates or documentation of your volunteer service upon completion of programs.",
   },
 ];
 

@@ -41,7 +41,7 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
           <div className="relative w-12 h-12">
             <Image
               src={opportunity?.organization_profile?.profile_img || '/avatar.svg'}
-              alt={opportunity?.created_by?.name || opportunity?.organization_profile?.name || 'Organization Logo'}
+              alt={opportunity?.created_by?.name || opportunity?.organization_profile?.name || 'Organisation Logo'}
               fill
               className="object-cover rounded-full"
             />

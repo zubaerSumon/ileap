@@ -478,7 +478,7 @@ export const userRouter = router({
           message:
             error instanceof Error
               ? error.message
-              : "Failed to process organization profile",
+              : "Failed to process organisation profile",
           cause: error,
         });
       }
@@ -535,7 +535,7 @@ export const userRouter = router({
       if (currentUser.role !== "admin" && currentUser.role !== "mentor") {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "Only admins can view organization users.",
+          message: "Only admins can view organisation users.",
         });
       }
 

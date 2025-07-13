@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
   title: "AusLeap - Volunteer Platform",
-  description: "Connect organizations with passionate volunteers",
+  description: "Connect organisations with passionate volunteers",
 };
 
 export default async function RootLayout({

@@ -279,8 +279,8 @@ export default function OrganizationProfile() {
                         <FormInput<OrganizationProfileData>
                           control={form.control}
                           name="title"
-                          label="Organization Name"
-                          placeholder="Enter your organization name"
+                          label="Organisation Name"
+                          placeholder="Enter your organisation name"
                         />
 
                         <FormInput<OrganizationProfileData>
@@ -288,7 +288,7 @@ export default function OrganizationProfile() {
                           name="contact_email"
                           label="Contact Email"
                           type="email"
-                          placeholder="Enter your organization email"
+                          placeholder="Enter your organisation email"
                         />
                       </div>
 
