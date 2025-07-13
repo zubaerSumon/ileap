@@ -191,7 +191,7 @@ export const opportunityRouter = router({
       const opportunities = await Opportunity.find({
         organization_profile: user.organization_profile,
       })
-        .populate("organisation_profile")
+        .populate("organization_profile")
         .sort({ createdAt: -1 });
 
       // Get applicant and recruit counts for each opportunity
