@@ -450,12 +450,23 @@ export const messsageRouter = router({
           });
         }
 
-        // Check if user is a volunteer
-        if (user.role === "volunteer") {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Volunteers cannot create groups",
+        // Check if user can create groups
+        const canCreateGroups = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        
+        // If user is a volunteer, check if they are assigned as a mentor for any opportunity
+        if (!canCreateGroups && user.role === "volunteer") {
+          // Check if the user is assigned as a mentor for any opportunity
+          const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
+          const mentorAssignment = await OpportunityMentor.findOne({
+            volunteer: user._id,
           });
+          
+          if (!mentorAssignment) {
+            throw new TRPCError({
+              code: "FORBIDDEN",
+              message: "Volunteers cannot create groups unless they are assigned as mentors",
+            });
+          }
         }
 
         // Check if user is an admin or mentor when creating an organization group
