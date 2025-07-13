@@ -34,16 +34,17 @@ export default function VolunteerCard({
   const router = useRouter();
 
   return (
-    <Card className="hover:shadow-lg transition-all  duration-300 rounded-lg overflow-hidden w-full py-0 relative bg-white">
+    <Card
+      className="hover:shadow-lg transition-all  duration-300 rounded-lg overflow-hidden w-full py-0 relative bg-white cursor-pointer"
+      onClick={() =>
+        router.push(`/find-volunteer/volunteer/details/${volunteer._id}`)
+      }
+    >
       <CardContent className="p-4 ">
         <div className="flex flex-col min-h-[280px] max-h-[280px]">
           <div className="flex justify-between items-center mb-4">
             <div className="relative w-12 h-12">
-              <UserAvatar
-                user={volunteer}
-                size={48}
-                className="rounded-full"
-              />
+              <UserAvatar user={volunteer} size={48} className="rounded-full" />
             </div>
             <div className="flex items-center gap-2">
               {volunteer.volunteer_profile?.is_available ? (

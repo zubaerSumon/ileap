@@ -1,7 +1,7 @@
 import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFavorite } from "@/hooks/useFavorite";
- import Loading from "@/app/loading";
+import { Loader2 } from "lucide-react";
 
 interface FavoriteButtonProps {
   opportunityId: string;
@@ -16,9 +16,7 @@ export function FavoriteButton({
 
   if (isLoading) {
     return (
-      <Loading size="medium">
-        <p className="text-gray-600 mt-2">Wait a sec...</p>
-      </Loading>
+      <Loader2 className="h-5 w-5 animate-spin text-gray-400" />
     );
   }
 
