@@ -321,35 +321,47 @@ const OrganisationDashboard = () => {
                               className="rounded-full"
                             />
                           </div>
-                          <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-gray-900">
-                              {contract.freelancerName}
-                            </h3>
-                            <div className="mt-2">
-                              <p className="text-sm text-gray-600 font-medium mb-1">
-                                Active Opportunities ({contract.opportunities.length}):
-                              </p>
-                              <div className="space-y-1">
-                                {contract.opportunities.map((opportunity) => (
-                                  <p 
-                                    key={opportunity.id}
-                                    className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
-                                    onClick={() => {
-                                      router.push(`/organisation/opportunities/${opportunity.id}`);
-                                    }}
-                                  >
-                                    • {opportunity.title}
-                                  </p>
-                                ))}
-                              </div>
-                            </div>
-                          </div>
+                          <h3 
+                            className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                            onClick={() => {
+                              router.push(`/find-volunteer/volunteer/details/${contract.id}`);
+                            }}
+                          >
+                            {contract.freelancerName}
+                          </h3>
                         </div>
                       </div>
 
-                      <div className="flex items-center text-sm text-gray-500 mb-3">
-                        <span className="font-medium">Volunteer</span>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-600 font-medium mb-1">
+                          Active Opportunities ({contract.opportunities.length}):
+                        </p>
+                        <div className="space-y-1">
+                          {contract.opportunities.slice(0, 6).map((opportunity) => (
+                            <p 
+                              key={opportunity.id}
+                              className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
+                              onClick={() => {
+                                router.push(`/organisation/opportunities/${opportunity.id}`);
+                              }}
+                            >
+                              • {opportunity.title}
+                            </p>
+                          ))}
+                          {contract.opportunities.length > 6 && (
+                            <p 
+                              className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors font-medium"
+                              onClick={() => {
+                                router.push(`/find-volunteer/volunteer/details/${contract.id}`);
+                              }}
+                            >
+                              +{contract.opportunities.length - 6} more
+                            </p>
+                          )}
+                        </div>
                       </div>
+
+                      
 
                       <div className="mt-auto pt-4">
                         <div className="text-xs text-gray-500 mb-4">
