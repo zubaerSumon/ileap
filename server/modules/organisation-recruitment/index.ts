@@ -143,8 +143,8 @@ export const organisationRecruitmentRouter = router({
           (recruitment) => recruitment.application && recruitment.application.volunteer
         );
 
-        // Transform the data to match the expected format
-        return validRecruitedApplications.map((recruitment) => {
+        // Transform the data to match the expected format and deduplicate by volunteer ID
+        const transformedData = validRecruitedApplications.map((recruitment) => {
           const app = recruitment as unknown as {
             application: {
               _id: { toString(): string };
@@ -199,6 +199,13 @@ export const organisationRecruitmentRouter = router({
             } : null,
           } as const;
         });
+
+        // Deduplicate by volunteer ID to prevent showing the same person multiple times
+        const uniqueRecruits = Array.from(
+          new Map(transformedData.map(item => [item.id, item])).values()
+        );
+
+        return uniqueRecruits;
       } catch (error) {
         console.error("Error in getRecruitedApplicants:", error);
         throw error;

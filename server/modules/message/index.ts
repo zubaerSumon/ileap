@@ -431,6 +431,7 @@ export const messsageRouter = router({
       memberIds: z.array(z.string()),
       isOrganizationGroup: z.boolean().optional(),
       adminIds: z.array(z.string()).optional(),
+      opportunityId: z.string().optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       try {
@@ -453,19 +454,35 @@ export const messsageRouter = router({
         // Check if user can create groups
         const canCreateGroups = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
         
-        // If user is a volunteer, check if they are assigned as a mentor for any opportunity
+        // If user is a volunteer, check if they are assigned as a mentor
         if (!canCreateGroups && user.role === "volunteer") {
-          // Check if the user is assigned as a mentor for any opportunity
           const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
-          const mentorAssignment = await OpportunityMentor.findOne({
-            volunteer: user._id,
-          });
           
-          if (!mentorAssignment) {
-            throw new TRPCError({
-              code: "FORBIDDEN",
-              message: "Volunteers cannot create groups unless they are assigned as mentors",
+          if (input.opportunityId) {
+            // Check if the user is assigned as a mentor for this specific opportunity
+            const mentorAssignment = await OpportunityMentor.findOne({
+              volunteer: user._id,
+              opportunity: input.opportunityId,
             });
+            
+            if (!mentorAssignment) {
+              throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "You can only create groups for opportunities where you are assigned as a mentor",
+              });
+            }
+          } else {
+            // Check if the user is assigned as a mentor for any opportunity
+            const mentorAssignment = await OpportunityMentor.findOne({
+              volunteer: user._id,
+            });
+            
+            if (!mentorAssignment) {
+              throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "Volunteers cannot create groups unless they are assigned as mentors",
+              });
+            }
           }
         }
 

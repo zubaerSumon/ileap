@@ -16,6 +16,7 @@ interface CreateGroupModalProps {
   onGroupCreated: (groupId: string) => void;
   recruitedApplicants?: Array<{ id: string; name: string }>;
   opportunityTitle?: string;
+  opportunityId?: string;
 }
 
 export function CreateGroupModal({
@@ -24,6 +25,7 @@ export function CreateGroupModal({
   onGroupCreated,
   recruitedApplicants = [],
   opportunityTitle = "",
+  opportunityId,
 }: CreateGroupModalProps) {
   const utils = trpc.useUtils();
 
@@ -53,6 +55,7 @@ export function CreateGroupModal({
       memberIds,
       description: `Group for recruited volunteers of ${opportunityTitle}`,
       isOrganizationGroup: false,
+      opportunityId,
     });
   };
 
