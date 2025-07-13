@@ -281,6 +281,8 @@ export default function VolunteerSignup() {
                         <Loader2 className="h-4 w-4 animate-spin mr-2" />
                         {step === 1
                           ? "Creating account..."
+                          : step === 3
+                          ? "Saving profile..."
                           : "Saving profile..."}
                       </div>
                     ) : step === 1 ? (
