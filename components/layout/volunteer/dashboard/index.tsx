@@ -191,7 +191,7 @@ export default function VolunteerDashboard() {
     if (isLoading) {
       return (
         <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <div className="animate-spin h-7 w-7 border-3 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       );

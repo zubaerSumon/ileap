@@ -175,7 +175,12 @@ export default function TabwiseOpportunityCard({
   const badgeConfig = getBadgeConfig();
 
   return (
-    <div className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[300px]">
+    <div 
+      className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[300px] cursor-pointer"
+      onClick={() =>
+        router.push(`/find-opportunity/opportunity/details/${opportunity._id}`)
+      }
+    >
       <div className="p-4 h-full flex flex-col">
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center">
@@ -194,12 +199,7 @@ export default function TabwiseOpportunityCard({
                 className="rounded-full"
               />
             </div>
-            <h3
-              className="text-lg font-semibold cursor-pointer hover:text-blue-600"
-              onClick={() =>
-                router.push(`/find-opportunity/opportunity/details/${opportunity._id}`)
-              }
-            >
+            <h3  className="text-lg font-semibold hover:text-blue-600">
               {opportunity.title}
             </h3>
           </div>

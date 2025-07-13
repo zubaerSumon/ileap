@@ -58,7 +58,7 @@ const OpportunityCarousel = ({
           </button>
         </div>
 
-        <div className="h-[350px]">
+        <div className="h-[380px]">
           <Swiper
             spaceBetween={24}
             slidesPerView={1}
