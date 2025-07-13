@@ -1,13 +1,14 @@
 "use client";
 
-import { Loader2, MessageCircle } from "lucide-react";
-import Image from "next/image";
+ import Image from "next/image";
 import { trpc } from "@/utils/trpc";
 import { Key, useState } from "react";
 import BackButton from "@/components/buttons/BackButton";
 import UserAvatar from "@/components/ui/UserAvatar";
 import { Button } from "@/components/ui/button";
 import MessageDialog from "@/components/layout/organisation/MessageDialog";
+import Loading from "@/app/loading";
+import { MessageCircle } from "lucide-react";
 
 interface VolunteerProfileProps {
   volunteerId: string;
@@ -38,9 +39,9 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
 
   if (isLoading || isLoadingApplications) {
     return (
-      <div className="flex items-center justify-center min-h-[400px] px-4">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
+      <Loading size="medium">
+        <p className="text-gray-600 mt-2">Wait a sec...</p>
+      </Loading>
     );
   }
 
