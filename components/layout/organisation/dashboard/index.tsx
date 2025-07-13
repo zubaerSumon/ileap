@@ -28,6 +28,8 @@ import { getGreeting } from "@/utils/helpers/getGreeting";
 import { CreateOpportunityButton } from "@/components/buttons/CreateOpportunityButton";
 import MobileTabsSlider from "@/components/layout/shared/MobileTabsSlider";
 import UserAvatar from "@/components/ui/UserAvatar";
+import EmptyState from "@/components/layout/shared/EmptyState";
+import { ORGANISATION_DASHBOARD_TABS, OrganisationDashboardTabKey } from "@/utils/constants/organisation-dashboard-tabs";
 
 interface Volunteer {
   _id: string;
@@ -82,12 +84,6 @@ interface ActiveContract {
   }>;
 }
 
-const TABS = [
-  { key: "open", label: "Open opportunity posts" },
-  { key: "active", label: "Active volunteers" },
-  { key: "archived", label: "Archived opportunity posts" },
-];
-
 const OrganisationDashboard = () => {
   const router = useRouter();
   const { data: session } = useSession();
@@ -128,7 +124,7 @@ const OrganisationDashboard = () => {
   const availableVolunteers = availableVolunteersData || [];
 
   // Tab state
-  const [tab, setTab] = useState("open");
+  const [tab, setTab] = useState<OrganisationDashboardTabKey>("open");
 
   // Map recruited applicants to active contracts grouped by volunteer
   const activeContracts: ActiveContract[] = (recruitedApplicants || []).reduce((acc, c) => {
@@ -169,7 +165,6 @@ const OrganisationDashboard = () => {
   // Filtered data for tabs
   const openOpportunities =
     opportunities?.filter((opp) => !opp.is_archived) || [];
-  const draftOpportunities: Opportunity[] = []; // Since we don't have draft status anymore
   const archivedOpportunities =
     opportunities?.filter((opp) => opp.is_archived) || [];
 
@@ -228,16 +223,251 @@ const OrganisationDashboard = () => {
     setIsMessageDialogOpen(true);
   };
 
+  // Get current tab config
+  const currentTabConfig = ORGANISATION_DASHBOARD_TABS.find(t => t.key === tab);
+
+  // Render tab content dynamically
+  const renderTabContent = () => {
+    if (isLoadingOpportunities) {
+      return (
+        <div className="text-center py-12">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading opportunities...</p>
+        </div>
+      );
+    }
+
+    if (tab === "active") {
+      if (activeContracts.length > 0) {
+        return (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {activeContracts.map((contract) => (
+              <div
+                key={contract.uniqueKey}
+                className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
+              >
+                <div className="p-4 h-full flex flex-col">
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="flex items-center">
+                      <div className="w-10 h-10 mr-3">
+                        <UserAvatar
+                          user={{ name: contract.freelancerName, image: contract.profileImg }}
+                          size={40}
+                          className="rounded-full"
+                        />
+                      </div>
+                      <h3 
+                        className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
+                        onClick={() => {
+                          router.push(`/find-volunteer/volunteer/details/${contract.id}`);
+                        }}
+                      >
+                        {contract.freelancerName}
+                      </h3>
+                    </div>
+                  </div>
+
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-600 font-medium mb-1">
+                      Active Opportunities ({contract.opportunities.length}):
+                    </p>
+                    <div className="space-y-1">
+                      {contract.opportunities.slice(0, 6).map((opportunity) => (
+                        <p 
+                          key={opportunity.id}
+                          className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
+                          onClick={() => {
+                            router.push(`/organisation/opportunities/${opportunity.id}`);
+                          }}
+                        >
+                          • {opportunity.title}
+                        </p>
+                      ))}
+                      {contract.opportunities.length > 6 && (
+                        <p 
+                          className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors font-medium"
+                          onClick={() => {
+                            router.push(`/find-volunteer/volunteer/details/${contract.id}`);
+                          }}
+                        >
+                          +{contract.opportunities.length - 6} more
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="mt-auto pt-4">
+                    <div className="text-xs text-gray-500 mb-4">
+                      Started{" "}
+                      {formatDistanceToNow(new Date(contract.startedAt), {
+                        addSuffix: true,
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        );
+      } else {
+        return (
+          <EmptyState
+            icon={currentTabConfig?.icon}
+            title={currentTabConfig?.emptyState.title || "No active volunteers"}
+            description={currentTabConfig?.emptyState.description || "No active volunteers found."}
+            actionLabel="Find Volunteers"
+            onAction={() => router.push("/find-volunteer")}
+            variant="card"
+            className="min-h-[400px]"
+          />
+        );
+      }
+    }
+
+    // For open and archived tabs
+    const opportunities = tab === "open" ? openOpportunities : archivedOpportunities;
+    
+    if (opportunities.length > 0) {
+      return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {opportunities.map((opportunity) => (
+            <div
+              key={opportunity._id}
+              className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[300px]"
+            >
+              <div className="p-4 h-full flex flex-col">
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 mr-3">
+                      <Image
+                        src={
+                          opportunity?.organization_profile
+                            ?.profile_img || "/avatar.svg"
+                        }
+                        alt={
+                          opportunity?.organization_profile?.title ||
+                          "Organization Logo"
+                        }
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    </div>
+                    <h3
+                      className="text-lg font-semibold cursor-pointer hover:text-blue-600"
+                      onClick={() =>
+                        router.push(
+                          `/organisation/opportunities/${opportunity._id}`
+                        )
+                      }
+                    >
+                      {opportunity.title}
+                    </h3>
+                  </div>
+                  {tab !== "archived" && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-gray-500 hover:text-red-600"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setOpportunityToDelete(opportunity);
+                        setIsDeleteDialogOpen(true);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+
+                <div className="flex items-center text-sm text-gray-500 mb-3">
+                  <MapPin className="w-4 h-4 mr-1 text-blue-500" />
+                  <span>{opportunity.location}</span>
+                </div>
+
+                <div className="flex flex-wrap gap-1 mb-3">
+                  <Badge
+                    variant="outline"
+                    className="ml-2 px-2 py-0.5 text-xs"
+                  >
+                    {opportunity.commitment_type === "workbased"
+                      ? "Work based"
+                      : "Event based"}
+                  </Badge>
+                  {opportunity.category.slice(0, 1).map(
+                    (cat: string, index: number) => (
+                      <Badge
+                        key={index}
+                        variant="secondary"
+                        className="text-xs font-normal"
+                      >
+                        {cat}
+                      </Badge>
+                    )
+                  )}
+                  {opportunity.category.length > 1 && (
+                    <Badge
+                      variant="secondary"
+                      className="text-xs font-normal text-gray-500"
+                    >
+                      +{opportunity.category.length - 1} more
+                    </Badge>
+                  )}
+                </div>
+
+                <div className="flex-1">
+                  <div
+                    className="text-sm text-gray-600 line-clamp-3"
+                    dangerouslySetInnerHTML={{
+                      __html: opportunity.description,
+                    }}
+                  />
+                </div>
+
+                <div className="mt-auto pt-4">
+                  <div className="text-xs text-gray-500 mb-2">
+                    Posted{" "}
+                    {formatDistanceToNow(opportunity.createdAt, {
+                      addSuffix: true,
+                    })}
+                  </div>
+                  {opportunity.date?.start_date && (
+                    <div className="text-xs text-gray-500">
+                      Starts: {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric'
+                      })} at {opportunity.time?.start_time ? formatTimeToAMPM(opportunity.time.start_time) : 'Time TBD'}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      );
+    } else {
+      return (
+        <EmptyState
+          icon={currentTabConfig?.icon}
+          title={currentTabConfig?.emptyState.title || "No items found"}
+          description={currentTabConfig?.emptyState.description || "No items available."}
+          actionLabel={tab === "open" ? "Create Opportunity" : "View All Opportunities"}
+          onAction={() => router.push(tab === "open" ? "/organisation/opportunities/create" : "/organisation/opportunities")}
+          variant="card"
+          className="min-h-[400px]"
+        />
+      );
+    }
+  };
+
   // Prepare mobile tabs data
-  const mobileTabs = TABS.map((t) => ({
+  const mobileTabs = ORGANISATION_DASHBOARD_TABS.map((t) => ({
     label: t.label,
     value: t.key,
     count: t.key === "open"
       ? openOpportunities.length
       : t.key === "active"
       ? activeContracts.length
-      : t.key === "draft"
-      ? draftOpportunities.length
       : archivedOpportunities.length,
   }));
 
@@ -257,13 +487,13 @@ const OrganisationDashboard = () => {
         <MobileTabsSlider
           tabs={mobileTabs}
           activeTab={tab}
-          onTabChange={setTab}
+          onTabChange={(value) => setTab(value as OrganisationDashboardTabKey)}
           className="md:hidden"
         />
 
         {/* Desktop Tabs */}
         <div className="hidden md:flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0">
-          {TABS.map((t) => (
+          {ORGANISATION_DASHBOARD_TABS.map((t) => (
             <button
               key={t.key}
               className={`px-4 md:px-5 py-2.5 rounded-full border text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-300 whitespace-nowrap shadow-sm hover:shadow-md
@@ -281,8 +511,6 @@ const OrganisationDashboard = () => {
                 ? openOpportunities.length
                 : t.key === "active"
                 ? activeContracts.length
-                : t.key === "draft"
-                ? draftOpportunities.length
                 : archivedOpportunities.length}
               )
             </button>
@@ -298,202 +526,9 @@ const OrganisationDashboard = () => {
       </div>
       {/* Tab Content */}
       <div className="transition-all duration-300 ease-in-out">
-        {isLoadingOpportunities ? (
-          <div className="text-center py-12">
-            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading opportunities...</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {tab === "active"
-              ? activeContracts.map((contract) => (
-                  <div
-                    key={contract.uniqueKey}
-                    className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
-                  >
-                    <div className="p-4 h-full flex flex-col">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 mr-3">
-                            <UserAvatar
-                              user={{ name: contract.freelancerName, image: contract.profileImg }}
-                              size={40}
-                              className="rounded-full"
-                            />
-                          </div>
-                          <h3 
-                            className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-                            onClick={() => {
-                              router.push(`/find-volunteer/volunteer/details/${contract.id}`);
-                            }}
-                          >
-                            {contract.freelancerName}
-                          </h3>
-                        </div>
-                      </div>
-
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-600 font-medium mb-1">
-                          Active Opportunities ({contract.opportunities.length}):
-                        </p>
-                        <div className="space-y-1">
-                          {contract.opportunities.slice(0, 6).map((opportunity) => (
-                            <p 
-                              key={opportunity.id}
-                              className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
-                              onClick={() => {
-                                router.push(`/organisation/opportunities/${opportunity.id}`);
-                              }}
-                            >
-                              • {opportunity.title}
-                            </p>
-                          ))}
-                          {contract.opportunities.length > 6 && (
-                            <p 
-                              className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors font-medium"
-                              onClick={() => {
-                                router.push(`/find-volunteer/volunteer/details/${contract.id}`);
-                              }}
-                            >
-                              +{contract.opportunities.length - 6} more
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      
-
-                      <div className="mt-auto pt-4">
-                        <div className="text-xs text-gray-500 mb-4">
-                          Started{" "}
-                          {formatDistanceToNow(new Date(contract.startedAt), {
-                            addSuffix: true,
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              : (tab === "open"
-                  ? openOpportunities
-                  : tab === "draft"
-                  ? draftOpportunities
-                  : archivedOpportunities
-                )?.map((opportunity) => (
-                  <div
-                    key={opportunity._id}
-                    className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[300px]"
-                  >
-                    <div className="p-4 h-full flex flex-col">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center">
-                          <div className="w-10 h-10 mr-3">
-                            <Image
-                              src={
-                                opportunity?.organization_profile
-                                  ?.profile_img || "/avatar.svg"
-                              }
-                              alt={
-                                opportunity?.organization_profile?.title ||
-                                "Organization Logo"
-                              }
-                              width={40}
-                              height={40}
-                              className="rounded-full"
-                            />
-                          </div>
-                          <h3
-                            className="text-lg font-semibold cursor-pointer hover:text-blue-600"
-                            onClick={() =>
-                              router.push(
-                                `/organisation/opportunities/${opportunity._id}`
-                              )
-                            }
-                          >
-                            {opportunity.title}
-                          </h3>
-                        </div>
-                        {tab !== "archived" && (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 text-gray-500 hover:text-red-600"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setOpportunityToDelete(opportunity);
-                              setIsDeleteDialogOpen(true);
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-
-                      <div className="flex items-center text-sm text-gray-500 mb-3">
-                        <MapPin className="w-4 h-4 mr-1 text-blue-500" />
-                        <span>{opportunity.location}</span>
-                      </div>
-
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        <Badge
-                          variant="outline"
-                          className="ml-2 px-2 py-0.5 text-xs"
-                        >
-                          {opportunity.commitment_type === "workbased"
-                            ? "Work based"
-                            : "Event based"}
-                        </Badge>
-                        {opportunity.category.slice(0, 1).map(
-                          (cat: string, index: number) => (
-                            <Badge
-                              key={index}
-                              variant="secondary"
-                              className="text-xs font-normal"
-                            >
-                              {cat}
-                            </Badge>
-                          )
-                        )}
-                        {opportunity.category.length > 1 && (
-                          <Badge
-                            variant="secondary"
-                            className="text-xs font-normal text-gray-500"
-                          >
-                            +{opportunity.category.length - 1} more
-                          </Badge>
-                        )}
-                      </div>
-
-                      <div className="flex-1">
-                        <div
-                          className="text-sm text-gray-600 line-clamp-3"
-                          dangerouslySetInnerHTML={{
-                            __html: opportunity.description,
-                          }}
-                        />
-                      </div>
-
-                      <div className="mt-auto pt-4">
-                        <div className="text-xs text-gray-500 mb-2">
-                          Posted{" "}
-                          {formatDistanceToNow(opportunity.createdAt, {
-                            addSuffix: true,
-                          })}
-                        </div>
-                        {opportunity.date?.start_date && (
-                          <div className="text-xs text-gray-500">
-                            Starts: {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
-                              month: 'short',
-                              day: 'numeric'
-                            })} at {opportunity.time?.start_time ? formatTimeToAMPM(opportunity.time.start_time) : 'Time TBD'}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-          </div>
-        )}
+        <div className="min-h-[400px]">
+          {renderTabContent()}
+        </div>
       </div>
       {/* Work together again section */}
       <div className="py-8 mt-4">
