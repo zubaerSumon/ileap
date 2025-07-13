@@ -232,7 +232,7 @@ export default function OrganizationProfile() {
                 <div className="flex items-center justify-between">
                   <CardTitle className="flex items-center gap-2 text-lg">
                     <Building2 className="h-5 w-5" />
-                    Organization
+                    Organisation
                   </CardTitle>
                   <div className="hidden lg:block">
                     <BackButton />
@@ -258,7 +258,7 @@ export default function OrganizationProfile() {
             {isEditMode ? (
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl">Edit Organization Profile</CardTitle>
+                  <CardTitle className="text-xl">Edit Organisation Profile</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <Form {...form}>
@@ -306,15 +306,15 @@ export default function OrganizationProfile() {
                       <FormTextarea<OrganizationProfileData>
                         control={form.control}
                         name="bio"
-                        label="About Organization"
-                        placeholder="Tell us about your organization, mission, and values..."
+                        label="About Organisation"
+                        placeholder="Tell us about your organisation, mission, and values..."
                       />
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <SelectField<OrganizationProfileData>
-                          label="Organization Type"
+                          label="Organisation Type"
                           id="type"
-                          placeholder="Select organization type"
+                          placeholder="Select organisation type"
                           register={form.register}
                           registerName="type"
                           error={form.formState.errors.type?.message}
@@ -437,9 +437,9 @@ export default function OrganizationProfile() {
                     <div className="flex items-start space-x-4">
                       <Avatar className="h-16 w-16">
                         {session?.user?.image ? (
-                          <AvatarImage src={session.user.image!} alt={profile?.title || "Organization"} />
+                          <AvatarImage src={session.user.image!} alt={profile?.title || "Organisation"} />
                         ) : profile?.profile_img ? (
-                          <AvatarImage src={profile.profile_img} alt={profile.title || "Organization"} />
+                          <AvatarImage src={profile.profile_img} alt={profile.title || "Organisation"} />
                         ) : (
                           <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
                             {profile?.title?.charAt(0)?.toUpperCase() || "O"}
@@ -448,7 +448,7 @@ export default function OrganizationProfile() {
                       </Avatar>
                       <div className="flex-1">
                         <h1 className="text-2xl font-bold text-gray-900 mb-1">
-                          {profile?.title || "Organization Profile"}
+                          {profile?.title || "Organisation Profile"}
                         </h1>
                         <div className="flex items-center text-gray-600 mb-2">
                           <MapPin className="h-4 w-4 mr-1" />
@@ -491,7 +491,7 @@ export default function OrganizationProfile() {
                       <CardHeader>
                         <CardTitle className="text-lg flex items-center gap-2">
                           <Building2 className="h-5 w-5" />
-                          Organization Type
+                          Organisation Type
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
