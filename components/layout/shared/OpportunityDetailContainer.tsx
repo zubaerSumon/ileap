@@ -215,7 +215,7 @@ export default function OpportunityDetailContainer({
         onMessageSent={() => {
           setIsGroupMessageModalOpen(false);
           router.push(
-            userRole === "organisation" ? "/organisation/messages" : "/messages"
+            userRole === "organisation" ? "/organisation/messages" : `/${userRole}/messages`
           );
         }}
       />

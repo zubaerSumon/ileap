@@ -164,12 +164,32 @@ export const organizationMentorRouter = router({
           });
         }
 
-        // Check if current user is an admin or mentor
+        // Check if current user is an admin, mentor, or assigned as mentor for this opportunity
         const currentUser = await User.findOne({ email: sessionUser.email });
-        if (!currentUser || (currentUser.role !== UserRole.ADMIN && currentUser.role !== UserRole.MENTOR)) {
+        if (!currentUser) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Current user not found.",
+          });
+        }
+
+        // Check if user is admin or has mentor role
+        const isAdminOrMentor = currentUser.role === UserRole.ADMIN || currentUser.role === UserRole.MENTOR;
+        
+        // If not admin or mentor, check if they are assigned as mentor for this specific opportunity
+        let isOpportunityMentor = false;
+        if (!isAdminOrMentor) {
+          const mentorAssignment = await OpportunityMentor.findOne({
+            opportunity: input.opportunityId,
+            volunteer: currentUser._id,
+          });
+          isOpportunityMentor = !!mentorAssignment;
+        }
+
+        if (!isAdminOrMentor && !isOpportunityMentor) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only admins and mentors can mark volunteers as mentors.",
+            message: "Only admins, mentors, or opportunity mentors can mark volunteers as mentors.",
           });
         }
 
@@ -182,8 +202,22 @@ export const organizationMentorRouter = router({
           });
         }
 
-        // Check if current user belongs to the same organization as the opportunity
-        if (currentUser.organization_profile?.toString() !== opportunity.organization_profile.toString()) {
+        // Check organization permissions
+        let hasOrganizationAccess = false;
+        
+        if (isAdminOrMentor) {
+          // For admins and global mentors, check their organization_profile
+          hasOrganizationAccess = currentUser.organization_profile?.toString() === opportunity.organization_profile.toString();
+        } else if (isOpportunityMentor) {
+          // For opportunity-specific mentors, check if the opportunity belongs to the same organization as their mentor assignment
+          const mentorAssignment = await OpportunityMentor.findOne({
+            opportunity: input.opportunityId,
+            volunteer: currentUser._id,
+          });
+          hasOrganizationAccess = mentorAssignment?.organization_profile?.toString() === opportunity.organization_profile.toString();
+        }
+        
+        if (!hasOrganizationAccess) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You can only mark volunteers as mentors for opportunities within your organization.",
@@ -248,12 +282,32 @@ export const organizationMentorRouter = router({
           });
         }
 
-        // Check if current user is an admin or mentor
+        // Check if current user is an admin, mentor, or assigned as mentor for this opportunity
         const currentUser = await User.findOne({ email: sessionUser.email });
-        if (!currentUser || (currentUser.role !== UserRole.ADMIN && currentUser.role !== UserRole.MENTOR)) {
+        if (!currentUser) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Current user not found.",
+          });
+        }
+
+        // Check if user is admin or has mentor role
+        const isAdminOrMentor = currentUser.role === UserRole.ADMIN || currentUser.role === UserRole.MENTOR;
+        
+        // If not admin or mentor, check if they are assigned as mentor for this specific opportunity
+        let isOpportunityMentor = false;
+        if (!isAdminOrMentor) {
+          const mentorAssignment = await OpportunityMentor.findOne({
+            opportunity: input.opportunityId,
+            volunteer: currentUser._id,
+          });
+          isOpportunityMentor = !!mentorAssignment;
+        }
+
+        if (!isAdminOrMentor && !isOpportunityMentor) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only admins and mentors can remove mentors.",
+            message: "Only admins, mentors, or opportunity mentors can remove mentors.",
           });
         }
 
@@ -266,8 +320,22 @@ export const organizationMentorRouter = router({
           });
         }
 
-        // Check if current user belongs to the same organization as the opportunity
-        if (currentUser.organization_profile?.toString() !== opportunity.organization_profile.toString()) {
+        // Check organization permissions
+        let hasOrganizationAccess = false;
+        
+        if (isAdminOrMentor) {
+          // For admins and global mentors, check their organization_profile
+          hasOrganizationAccess = currentUser.organization_profile?.toString() === opportunity.organization_profile.toString();
+        } else if (isOpportunityMentor) {
+          // For opportunity-specific mentors, check if the opportunity belongs to the same organization as their mentor assignment
+          const mentorAssignment = await OpportunityMentor.findOne({
+            opportunity: input.opportunityId,
+            volunteer: currentUser._id,
+          });
+          hasOrganizationAccess = mentorAssignment?.organization_profile?.toString() === opportunity.organization_profile.toString();
+        }
+        
+        if (!hasOrganizationAccess) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You can only remove mentors for opportunities within your organization.",
@@ -308,12 +376,32 @@ export const organizationMentorRouter = router({
           });
         }
 
-        // Check if current user is an admin or mentor
+        // Check if current user is an admin, mentor, or assigned as mentor for this opportunity
         const currentUser = await User.findOne({ email: sessionUser.email });
-        if (!currentUser || (currentUser.role !== UserRole.ADMIN && currentUser.role !== UserRole.MENTOR)) {
+        if (!currentUser) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Current user not found.",
+          });
+        }
+
+        // Check if user is admin or has mentor role
+        const isAdminOrMentor = currentUser.role === UserRole.ADMIN || currentUser.role === UserRole.MENTOR;
+        
+        // If not admin or mentor, check if they are assigned as mentor for this specific opportunity
+        let isOpportunityMentor = false;
+        if (!isAdminOrMentor) {
+          const mentorAssignment = await OpportunityMentor.findOne({
+            opportunity: input.opportunityId,
+            volunteer: currentUser._id,
+          });
+          isOpportunityMentor = !!mentorAssignment;
+        }
+
+        if (!isAdminOrMentor && !isOpportunityMentor) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only admins and mentors can toggle mentor status.",
+            message: "Only admins, mentors, or opportunity mentors can toggle mentor status.",
           });
         }
 
@@ -326,8 +414,22 @@ export const organizationMentorRouter = router({
           });
         }
 
-        // Check if current user belongs to the same organization as the opportunity
-        if (currentUser.organization_profile?.toString() !== opportunity.organization_profile.toString()) {
+        // Check organization permissions
+        let hasOrganizationAccess = false;
+        
+        if (isAdminOrMentor) {
+          // For admins and global mentors, check their organization_profile
+          hasOrganizationAccess = currentUser.organization_profile?.toString() === opportunity.organization_profile.toString();
+        } else if (isOpportunityMentor) {
+          // For opportunity-specific mentors, check if the opportunity belongs to the same organization as their mentor assignment
+          const mentorAssignment = await OpportunityMentor.findOne({
+            opportunity: input.opportunityId,
+            volunteer: currentUser._id,
+          });
+          hasOrganizationAccess = mentorAssignment?.organization_profile?.toString() === opportunity.organization_profile.toString();
+        }
+        
+        if (!hasOrganizationAccess) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You can only toggle mentor status for opportunities within your organization.",
