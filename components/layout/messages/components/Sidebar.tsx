@@ -76,7 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
       </div>
 
       {/* Tabs and Content */}
-      <div className="flex-1 min-h-0 flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col overflow-hidden">
           {userRole !== "volunteer" && (
             <div className="flex-shrink-0 px-4 pt-3 pb-2">
@@ -88,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = React.memo(({
           )}
 
           <div className="flex-1 min-h-0 overflow-hidden">
-            <TabsContent value="conversations" className="mt-0 h-full overflow-hidden">
+            <TabsContent value="conversations" className="mt-0 h-full overflow-hidden data-[state=active]:flex data-[state=active]:flex-col">
               <ConversationList 
                 conversations={filteredConversations}
                 groups={filteredGroups}
