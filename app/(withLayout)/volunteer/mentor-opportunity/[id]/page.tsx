@@ -197,6 +197,8 @@ export default function MentorOpportunityDetailsPage() {
           onMessageClick={() => handleOpenMessageModal(applicant)}
           opportunityId={opportunityId}
           showMarkAsMentor={true}
+          opportunity={opportunity}
+          isCurrentUserMentor={isCurrentUserMentor}
         />
       ))}
       {filteredApplicants?.length === 0 && (
@@ -239,6 +241,8 @@ export default function MentorOpportunityDetailsPage() {
           hideRecruitButton={true}
           opportunityId={opportunityId}
           showMarkAsMentor={true}
+          opportunity={opportunity}
+          isCurrentUserMentor={isCurrentUserMentor}
         />
       ))}
       {filteredRecruitedApplicants?.length === 0 && (

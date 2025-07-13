@@ -106,6 +106,7 @@ export default function OpportunityDetailContainer({
       userRole={userRole}
       isCurrentUserMentor={isCurrentUserMentor || false}
       currentUserId={session?.user?.id}
+      opportunity={opportunity}
     />
   );
 
@@ -117,6 +118,7 @@ export default function OpportunityDetailContainer({
       isCurrentUserMentor={isCurrentUserMentor || false}
       currentUserId={session?.user?.id}
       onCreateGroup={() => setIsCreateGroupModalOpen(true)}
+      opportunity={opportunity}
     />
   );
 
@@ -199,6 +201,11 @@ export default function OpportunityDetailContainer({
           setCreatedGroupId(groupId);
           setIsGroupMessageModalOpen(true);
         }}
+        recruitedApplicants={recruitedApplicants?.map(applicant => ({
+          id: applicant.id,
+          name: applicant.name
+        })) || []}
+        opportunityTitle={opportunity?.title || ""}
       />
 
       <GroupMessageModal

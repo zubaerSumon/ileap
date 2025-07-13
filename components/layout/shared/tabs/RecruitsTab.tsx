@@ -15,6 +15,10 @@ interface RecruitsTabProps {
   isCurrentUserMentor: boolean;
   currentUserId?: string;
   onCreateGroup: () => void;
+  opportunity?: {
+    created_by?: { _id: string };
+    organization_profile?: { _id: string };
+  };
 }
 
 export function RecruitsTab({
@@ -23,6 +27,7 @@ export function RecruitsTab({
   isCurrentUserMentor,
   currentUserId,
   onCreateGroup,
+  opportunity,
 }: RecruitsTabProps) {
   const [recruitsSearchQuery, setRecruitsSearchQuery] = useState("");
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -131,8 +136,10 @@ export function RecruitsTab({
           onMessageClick={() => handleOpenMessageModal(applicant)}
           hideRecruitButton={true}
           opportunityId={opportunityId}
-          showMarkAsMentor={userRole === "volunteer" && isCurrentUserMentor}
+          showMarkAsMentor={(userRole === "volunteer" && isCurrentUserMentor) || userRole === "organisation"}
           isCurrentUser={applicant.id === currentUserId}
+          opportunity={opportunity}
+          isCurrentUserMentor={isCurrentUserMentor}
         />
       ))}
       {filteredRecruitedApplicants?.length === 0 && (
