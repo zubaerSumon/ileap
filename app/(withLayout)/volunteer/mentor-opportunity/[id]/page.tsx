@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import {
-  Loader2,
-  FileSpreadsheet,
+   FileSpreadsheet,
   MessageCircleCode,
   Hand,
   Search,
@@ -24,6 +23,7 @@ import MessageApplicantModal from "@/components/layout/organisation/opportunitie
 import Image from "next/image";
 import BackButton from "@/components/buttons/BackButton";
 import { useSession } from "next-auth/react";
+import Loading from "@/app/loading";
 
 export default function MentorOpportunityDetailsPage() {
   const params = useParams();
@@ -134,15 +134,9 @@ export default function MentorOpportunityDetailsPage() {
   if (isLoading || isLoadingApplicants || isLoadingRecruitedApplicants) {
     return (
       <ProtectedLayout>
-        <div className="bg-[#F5F7FA] py-6 sm:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-xl min-h-screen p-4 sm:p-8">
-              <div className="flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-              </div>
-            </div>
-          </div>
-        </div>
+        <Loading size="medium">
+          <p className="text-gray-600 mt-2">Wait a sec...</p>
+        </Loading>
       </ProtectedLayout>
     );
   }

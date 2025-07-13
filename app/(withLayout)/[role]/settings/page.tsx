@@ -2,9 +2,22 @@
 
 import React, { useState, useEffect } from "react";
 import { trpc } from "@/utils/trpc";
-import { Loader2, Users, UserPlus, Settings, ChevronRight, UserMinus } from "lucide-react";
+import {
+  Loader2,
+  Users,
+  UserPlus,
+  Settings,
+  ChevronRight,
+  UserMinus,
+} from "lucide-react";
 import InviteMentorDialog from "@/components/layout/organisation/dashboard/InviteMentorDialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
@@ -12,6 +25,7 @@ import UserManagementTable from "@/components/layout/organisation/dashboard/User
 import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
+import Loading from "@/app/loading";
 
 export default function OrganizationSettingsPage() {
   const [activeSection, setActiveSection] = useState("users");
@@ -22,7 +36,7 @@ export default function OrganizationSettingsPage() {
       utils.users.profileCheckup.invalidate();
       toast.success("Profile picture updated successfully!");
       // Force a page refresh to ensure the session is updated
-      console.log('Profile picture updated, refreshing page...');
+      console.log("Profile picture updated, refreshing page...");
       setTimeout(() => {
         window.location.reload();
       }, 500);
@@ -31,7 +45,11 @@ export default function OrganizationSettingsPage() {
       toast.error(error.message || "Failed to update profile picture");
     },
   });
-  const { data: mentors, isLoading: isLoadingMentors, refetch: refetchMentors } = trpc.mentors.getMentors.useQuery(
+  const {
+    data: mentors,
+    isLoading: isLoadingMentors,
+    refetch: refetchMentors,
+  } = trpc.mentors.getMentors.useQuery(
     { organizationId: profileData?.organizationProfile?._id || "" },
     { enabled: !!profileData?.organizationProfile?._id }
   );
@@ -51,18 +69,29 @@ export default function OrganizationSettingsPage() {
 
   const handleRemoveMentorRole = (mentorId: string) => {
     demoteMentorMutation.mutate({
-      userId: mentorId
+      userId: mentorId,
     });
   };
 
   const isVolunteer = session?.user?.role === "volunteer";
-  const isOrganization = session?.user?.role === "admin" || session?.user?.role === "mentor";
+  const isOrganization =
+    session?.user?.role === "admin" || session?.user?.role === "mentor";
 
   // Define menu items based on user role
   const getMenuItems = () => {
     const baseItems = [
-      { id: "users", label: "Users & Roles", icon: Users, description: "Manage organization users and their roles" },
-      { id: "general", label: "General Settings", icon: Settings, description: "Organization preferences and settings" },
+      {
+        id: "users",
+        label: "Users & Roles",
+        icon: Users,
+        description: "Manage organization users and their roles",
+      },
+      {
+        id: "general",
+        label: "General Settings",
+        icon: Settings,
+        description: "Organization preferences and settings",
+      },
     ];
 
     // Only show mentors section for organization users
@@ -71,7 +100,7 @@ export default function OrganizationSettingsPage() {
         id: "mentors",
         label: "Mentors",
         icon: UserPlus,
-        description: "Invite and manage mentors"
+        description: "Invite and manage mentors",
       });
     }
 
@@ -82,7 +111,7 @@ export default function OrganizationSettingsPage() {
 
   // Set default active section based on available options
   useEffect(() => {
-    if (!menuItems.find(item => item.id === activeSection)) {
+    if (!menuItems.find((item) => item.id === activeSection)) {
       setActiveSection(menuItems[0]?.id || "users");
     }
   }, [menuItems, activeSection]);
@@ -97,10 +126,9 @@ export default function OrganizationSettingsPage() {
               {isVolunteer ? "Account Settings" : "Organization Settings"}
             </h1>
             <p className="mt-2 text-sm sm:text-base text-gray-600">
-              {isVolunteer 
+              {isVolunteer
                 ? "Manage your account settings and preferences"
-                : "Manage your organization&apos;s users, mentors, and general settings"
-              }
+                : "Manage your organization&apos;s users, mentors, and general settings"}
             </p>
           </div>
 
@@ -115,23 +143,29 @@ export default function OrganizationSettingsPage() {
                     onClick={() => setActiveSection(item.id)}
                     className={cn(
                       "w-full flex items-center justify-between p-4 border-b last:border-b-0 transition-colors",
-                      activeSection === item.id 
-                        ? "bg-blue-50 border-blue-200" 
+                      activeSection === item.id
+                        ? "bg-blue-50 border-blue-200"
                         : "hover:bg-gray-50"
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "p-2 rounded-lg",
-                        activeSection === item.id 
-                          ? "bg-blue-100 text-blue-600" 
-                          : "bg-gray-100 text-gray-600"
-                      )}>
+                      <div
+                        className={cn(
+                          "p-2 rounded-lg",
+                          activeSection === item.id
+                            ? "bg-blue-100 text-blue-600"
+                            : "bg-gray-100 text-gray-600"
+                        )}
+                      >
                         <Icon className="h-5 w-5" />
                       </div>
                       <div className="text-left">
-                        <div className="font-medium text-gray-900">{item.label}</div>
-                        <div className="text-sm text-gray-500">{item.description}</div>
+                        <div className="font-medium text-gray-900">
+                          {item.label}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {item.description}
+                        </div>
                       </div>
                     </div>
                     <ChevronRight className="h-5 w-5 text-gray-400" />
@@ -158,22 +192,26 @@ export default function OrganizationSettingsPage() {
                         onClick={() => setActiveSection(item.id)}
                         className={cn(
                           "w-full flex items-center gap-3 p-3 rounded-lg text-left transition-colors",
-                          activeSection === item.id 
-                            ? "bg-blue-50 text-blue-700 border border-blue-200" 
+                          activeSection === item.id
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
                             : "text-gray-700 hover:bg-gray-50"
                         )}
                       >
-                        <div className={cn(
-                          "p-2 rounded-lg",
-                          activeSection === item.id 
-                            ? "bg-blue-100 text-blue-600" 
-                            : "bg-gray-100 text-gray-600"
-                        )}>
+                        <div
+                          className={cn(
+                            "p-2 rounded-lg",
+                            activeSection === item.id
+                              ? "bg-blue-100 text-blue-600"
+                              : "bg-gray-100 text-gray-600"
+                          )}
+                        >
                           <Icon className="h-5 w-5" />
                         </div>
                         <div>
                           <div className="font-medium">{item.label}</div>
-                          <div className="text-sm text-gray-500">{item.description}</div>
+                          <div className="text-sm text-gray-500">
+                            {item.description}
+                          </div>
                         </div>
                       </button>
                     );
@@ -192,10 +230,9 @@ export default function OrganizationSettingsPage() {
                       {isVolunteer ? "Account Information" : "Manage Users"}
                     </CardTitle>
                     <CardDescription>
-                      {isVolunteer 
+                      {isVolunteer
                         ? "View and manage your account information"
-                        : "View and manage users in your organization"
-                      }
+                        : "View and manage users in your organization"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -212,12 +249,21 @@ export default function OrganizationSettingsPage() {
                           />
                         </div>
                         <div className="text-center">
-                          <h3 className="text-lg font-medium text-gray-900 mb-2">Account Information</h3>
-                          <p className="text-sm text-gray-500">Update your profile picture and manage account settings</p>
+                          <h3 className="text-lg font-medium text-gray-900 mb-2">
+                            Account Information
+                          </h3>
+                          <p className="text-sm text-gray-500">
+                            Update your profile picture and manage account
+                            settings
+                          </p>
                         </div>
                       </div>
                     ) : (
-                      <UserManagementTable organizationId={profileData?.organizationProfile?._id || ""} />
+                      <UserManagementTable
+                        organizationId={
+                          profileData?.organizationProfile?._id || ""
+                        }
+                      />
                     )}
                   </CardContent>
                 </Card>
@@ -236,14 +282,18 @@ export default function OrganizationSettingsPage() {
                           Invite and manage mentors for your organization
                         </CardDescription>
                       </div>
-                      <InviteMentorDialog organizationId={profileData?.organizationProfile?._id || ""} />
+                      <InviteMentorDialog
+                        organizationId={
+                          profileData?.organizationProfile?._id || ""
+                        }
+                      />
                     </div>
                   </CardHeader>
                   <CardContent>
                     {isLoadingMentors ? (
-                      <div className="flex items-center justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-                      </div>
+                      <Loading size="medium">
+                        <p className="text-gray-600 mt-2">Wait a sec...</p>
+                      </Loading>
                     ) : mentors && mentors.length > 0 ? (
                       <div className="space-y-4">
                         {mentors.map((mentor) => (
@@ -252,14 +302,20 @@ export default function OrganizationSettingsPage() {
                             className="flex items-center justify-between p-4 border rounded-lg bg-gray-50"
                           >
                             <div>
-                              <h3 className="font-medium text-gray-900">{mentor.name}</h3>
-                              <p className="text-sm text-gray-500">{mentor.email}</p>
+                              <h3 className="font-medium text-gray-900">
+                                {mentor.name}
+                              </h3>
+                              <p className="text-sm text-gray-500">
+                                {mentor.email}
+                              </p>
                             </div>
                             {session?.user?.role === "admin" && (
                               <Button
                                 variant="outline"
                                 size="sm"
-                                onClick={() => handleRemoveMentorRole(mentor._id)}
+                                onClick={() =>
+                                  handleRemoveMentorRole(mentor._id)
+                                }
                                 disabled={demoteMentorMutation.isPending}
                                 className="text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 hover:text-red-700 transition-all duration-200 font-medium"
                               >
@@ -279,8 +335,12 @@ export default function OrganizationSettingsPage() {
                         <div className="text-gray-400 mb-2">
                           <UserPlus className="h-12 w-12 mx-auto" />
                         </div>
-                        <p className="text-gray-500 font-medium">No mentors yet</p>
-                        <p className="text-sm text-gray-400 mt-1">Invite mentors to help manage your organization</p>
+                        <p className="text-gray-500 font-medium">
+                          No mentors yet
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Invite mentors to help manage your organization
+                        </p>
                       </div>
                     )}
                   </CardContent>
@@ -295,10 +355,9 @@ export default function OrganizationSettingsPage() {
                       General Settings
                     </CardTitle>
                     <CardDescription>
-                      {isVolunteer 
+                      {isVolunteer
                         ? "Manage your account preferences and settings"
-                        : "Manage your organization&apos;s general settings"
-                      }
+                        : "Manage your organization&apos;s general settings"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -308,10 +367,9 @@ export default function OrganizationSettingsPage() {
                       </div>
                       <p className="text-gray-500 font-medium">Coming Soon</p>
                       <p className="text-sm text-gray-400 mt-1">
-                        {isVolunteer 
+                        {isVolunteer
                           ? "Account settings features are under development"
-                          : "General settings features are under development"
-                        }
+                          : "General settings features are under development"}
                       </p>
                     </div>
                   </CardContent>
@@ -330,10 +388,9 @@ export default function OrganizationSettingsPage() {
                     {isVolunteer ? "Account Information" : "Manage Users"}
                   </CardTitle>
                   <CardDescription>
-                    {isVolunteer 
+                    {isVolunteer
                       ? "View and manage your account information"
-                      : "View and manage users in your organization"
-                    }
+                      : "View and manage users in your organization"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -342,11 +399,19 @@ export default function OrganizationSettingsPage() {
                       <div className="text-gray-400 mb-2">
                         <Users className="h-12 w-12 mx-auto" />
                       </div>
-                      <p className="text-gray-500 font-medium">Account Management</p>
-                      <p className="text-sm text-gray-400 mt-1">Manage your volunteer account settings</p>
+                      <p className="text-gray-500 font-medium">
+                        Account Management
+                      </p>
+                      <p className="text-sm text-gray-400 mt-1">
+                        Manage your volunteer account settings
+                      </p>
                     </div>
                   ) : (
-                    <UserManagementTable organizationId={profileData?.organizationProfile?._id || ""} />
+                    <UserManagementTable
+                      organizationId={
+                        profileData?.organizationProfile?._id || ""
+                      }
+                    />
                   )}
                 </CardContent>
               </Card>
@@ -365,7 +430,11 @@ export default function OrganizationSettingsPage() {
                         Invite and manage mentors for your organization
                       </CardDescription>
                     </div>
-                    <InviteMentorDialog organizationId={profileData?.organizationProfile?._id || ""} />
+                    <InviteMentorDialog
+                      organizationId={
+                        profileData?.organizationProfile?._id || ""
+                      }
+                    />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -381,8 +450,12 @@ export default function OrganizationSettingsPage() {
                           className="flex items-center justify-between p-4 border rounded-lg bg-gray-50"
                         >
                           <div>
-                            <h3 className="font-medium text-gray-900">{mentor.name}</h3>
-                            <p className="text-sm text-gray-500">{mentor.email}</p>
+                            <h3 className="font-medium text-gray-900">
+                              {mentor.name}
+                            </h3>
+                            <p className="text-sm text-gray-500">
+                              {mentor.email}
+                            </p>
                           </div>
                           {session?.user?.role === "admin" && (
                             <Button
@@ -408,8 +481,12 @@ export default function OrganizationSettingsPage() {
                       <div className="text-gray-400 mb-2">
                         <UserPlus className="h-12 w-12 mx-auto" />
                       </div>
-                      <p className="text-gray-500 font-medium">No mentors yet</p>
-                      <p className="text-sm text-gray-400 mt-1">Invite mentors to help manage your organization</p>
+                      <p className="text-gray-500 font-medium">
+                        No mentors yet
+                      </p>
+                      <p className="text-sm text-gray-400 mt-1">
+                        Invite mentors to help manage your organization
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -424,10 +501,9 @@ export default function OrganizationSettingsPage() {
                     General Settings
                   </CardTitle>
                   <CardDescription>
-                    {isVolunteer 
+                    {isVolunteer
                       ? "Manage your account preferences and settings"
-                      : "Manage your organization&apos;s general settings"
-                    }
+                      : "Manage your organization&apos;s general settings"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -437,10 +513,9 @@ export default function OrganizationSettingsPage() {
                     </div>
                     <p className="text-gray-500 font-medium">Coming Soon</p>
                     <p className="text-sm text-gray-400 mt-1">
-                      {isVolunteer 
+                      {isVolunteer
                         ? "Account settings features are under development"
-                        : "General settings features are under development"
-                      }
+                        : "General settings features are under development"}
                     </p>
                   </div>
                 </CardContent>
@@ -451,4 +526,4 @@ export default function OrganizationSettingsPage() {
       </div>
     </ProtectedLayout>
   );
-} 
+}

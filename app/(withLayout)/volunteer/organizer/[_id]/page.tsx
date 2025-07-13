@@ -6,19 +6,17 @@ import Link from "next/link";
 import Image from "next/image";
 import OrganizationOpportunities from "@/components/layout/volunteer/home-page/OrganizationOpportunities";
 import { trpc } from "@/utils/trpc";
-import { Loader2 } from "lucide-react";
-import BackButton from "@/components/buttons/BackButton";
+ import BackButton from "@/components/buttons/BackButton";
+import Loading from "@/app/loading";
 
 export default function OrganizerDetailPage() {
   const params = useParams();
   const organizerId = params?._id;
 
-  const { data, isLoading, error } = trpc.organizations.getOrganizationProfile.useQuery(
-    organizerId as string,
-    {
+  const { data, isLoading, error } =
+    trpc.organizations.getOrganizationProfile.useQuery(organizerId as string, {
       enabled: !!organizerId,
-    }
-  );
+    });
 
   if (!organizerId) {
     return (
@@ -30,16 +28,18 @@ export default function OrganizerDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="max-w-[1440px] mx-auto px-4 mb-8 pt-20 flex items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-      </div>
+      <Loading size="medium">
+        <p className="text-gray-600 mt-2">Wait a sec...</p>
+      </Loading>
     );
   }
 
   if (error) {
     return (
       <div className="max-w-[1440px] mx-auto px-4 mb-8 pt-20">
-        <h1 className="text-2xl font-bold text-red-600">Error loading organizer profile</h1>
+        <h1 className="text-2xl font-bold text-red-600">
+          Error loading organizer profile
+        </h1>
         <p className="text-gray-600 mt-2">{error.message}</p>
       </div>
     );
@@ -58,7 +58,7 @@ export default function OrganizerDetailPage() {
   console.log("Organization Profile Data:", {
     profile_img: organizationProfile.profile_img,
     title: organizationProfile.title,
-    cover_img: organizationProfile.cover_img
+    cover_img: organizationProfile.cover_img,
   });
 
   return (
@@ -94,10 +94,14 @@ export default function OrganizerDetailPage() {
 
               <div className="flex flex-col md:flex-row md:justify-between md:items-start items-center text-center md:text-left gap-6 md:gap-0">
                 <div className="flex flex-col items-center md:items-start gap-1 md:w-1/3">
-                  <h1 className="text-2xl font-bold">{organizationProfile?.title}</h1>
+                  <h1 className="text-2xl font-bold">
+                    {organizationProfile?.title}
+                  </h1>
                   <div className="flex items-center text-gray-600">
                     <span className="mr-1">📍</span>
-                    <span>{organizationProfile.area}, {organizationProfile.state}</span>
+                    <span>
+                      {organizationProfile.area}, {organizationProfile.state}
+                    </span>
                   </div>
                   {organizationProfile.website && (
                     <div className="flex items-center text-blue-600 underline">
@@ -158,13 +162,19 @@ export default function OrganizerDetailPage() {
               {organizationProfile.bio && (
                 <div className="mt-8 text-center md:text-left">
                   <h2 className="text-lg font-semibold mb-2">About us</h2>
-                  <p className="text-gray-700 text-justify">{organizationProfile.bio}</p>
+                  <p className="text-gray-700 text-justify">
+                    {organizationProfile.bio}
+                  </p>
                 </div>
               )}
 
               <div className="mt-8">
-                <h2 className="text-lg font-semibold mb-4">All Opportunities</h2>
-                <OrganizationOpportunities organizationId={organizerId as string} />
+                <h2 className="text-lg font-semibold mb-4">
+                  All Opportunities
+                </h2>
+                <OrganizationOpportunities
+                  organizationId={organizerId as string}
+                />
               </div>
             </div>
           </div>

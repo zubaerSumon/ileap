@@ -1,13 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Loader2,
-  Users,
-  FileSpreadsheet,
-  MessageCircleCode,
-  Hand,
-} from "lucide-react";
+import { Users, FileSpreadsheet, MessageCircleCode, Hand } from "lucide-react";
+import Loading from "@/app/loading";
 import { useRouter, useParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
@@ -21,6 +16,7 @@ import { ApplicantsTab } from "./tabs/ApplicantsTab";
 import { CreateGroupModal } from "./modals/CreateGroupModal";
 import { RecruitsTab } from "./tabs/RecruitsTab";
 import { GroupMessageModal } from "./modals/GroupMessageModal";
+import NotFound from "@/app/not-found";
 
 interface OpportunityDetailContainerProps {
   userRole: "volunteer" | "organisation";
@@ -54,15 +50,17 @@ export default function OpportunityDetailContainer({
       { enabled: !!opportunityId }
     );
 
-  const { data: applicants } = trpc.applications.getOpportunityApplicants.useQuery(
-    { opportunityId },
-    { enabled: !!opportunityId }
-  );
+  const { data: applicants } =
+    trpc.applications.getOpportunityApplicants.useQuery(
+      { opportunityId },
+      { enabled: !!opportunityId }
+    );
 
-  const { data: recruitedApplicants } = trpc.recruits.getRecruitedApplicants.useQuery(
-    { opportunityId },
-    { enabled: !!opportunityId }
-  );
+  const { data: recruitedApplicants } =
+    trpc.recruits.getRecruitedApplicants.useQuery(
+      { opportunityId },
+      { enabled: !!opportunityId }
+    );
 
   // Check if current user is a mentor for this opportunity
   const isCurrentUserMentor = opportunityMentors?.some(
@@ -73,9 +71,7 @@ export default function OpportunityDetailContainer({
   if (!opportunityId) {
     return (
       <ProtectedLayout>
-        <div className="container mx-auto px-4 py-8">
-          <p className="text-gray-600">Invalid opportunity ID.</p>
-        </div>
+        <NotFound />
       </ProtectedLayout>
     );
   }
@@ -83,15 +79,9 @@ export default function OpportunityDetailContainer({
   if (isLoading) {
     return (
       <ProtectedLayout>
-        <div className="bg-[#F5F7FA] py-6 sm:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-xl min-h-screen p-4 sm:p-8">
-              <div className="flex items-center justify-center">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-              </div>
-            </div>
-          </div>
-        </div>
+        <Loading size="medium">
+          <p className="text-gray-600 mt-2">Wait a sec...</p>
+        </Loading>
       </ProtectedLayout>
     );
   }
@@ -99,15 +89,7 @@ export default function OpportunityDetailContainer({
   if (error || !opportunity) {
     return (
       <ProtectedLayout>
-        <div className="bg-[#F5F7FA] py-6 sm:py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="bg-white rounded-xl min-h-screen p-4 sm:p-8">
-              <p className="text-red-600">
-                Error loading opportunity. Please try again later.
-              </p>
-            </div>
-          </div>
-        </div>
+        <NotFound />
       </ProtectedLayout>
     );
   }
