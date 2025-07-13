@@ -29,7 +29,7 @@ export const organizationProfileRouter = router({
         if (!organizationProfile) {
           throw new TRPCError({
             code: "NOT_FOUND",
-            message: "Organization profile not found",
+            message: "Organisation profile not found",
           });
         }
 
@@ -41,10 +41,10 @@ export const organizationProfileRouter = router({
           }
         };
       } catch (error) {
-        console.error("Error fetching organization profile:", error);
+        console.error("Error fetching organisation profile:", error);
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to fetch organization profile",
+          message: "Failed to fetch organisation profile",
           cause: error,
         });
       }

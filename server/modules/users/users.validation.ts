@@ -69,18 +69,18 @@ const volunteerProfileSchema = z.object({
 });
 
 const organizationProfileSchema = z.object({
-  title: z.string().min(1, "Organization name is required"),
+  title: z.string().min(1, "Organisation name is required"),
   contact_email: z.string().email("Invalid email address").min(1, "Contact email is required"),
   phone_number: z.string().min(1, "Phone number is required"),
-  bio: z.string().min(1, "Organization description is required"),
-  type: z.string().min(1, "Organization type is required")
+  bio: z.string().min(1, "Organisation description is required"),
+  type: z.string().min(1, "Organisation type is required")
     .refine((val) => [
       "ngo", "nonprofit", "community_group", "social_enterprise", "charity",
       "educational_institution", "healthcare_provider", "religious_institution",
       "environmental_group", "youth_organization", "arts_culture_group",
       "disaster_relief_agency", "advocacy_group", "international_aid",
       "sports_club", "animal_shelter"
-    ].includes(val), "Please select a valid organization type"),
+    ].includes(val), "Please select a valid organisation type"),
   opportunity_types: z.array(z.string())
     .min(1, "Please select at least one opportunity type")
     .refine((arr) => arr.every(item => item.length > 0), "All opportunity types must be valid"),

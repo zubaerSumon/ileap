@@ -8,7 +8,7 @@ export const PUBLIC_NAV_OPTIONS: NavItem[] = [
     className: "hover:text-blue-500",
   },
   {
-    label: "Organization sign up",
+    label: "Organisation sign up",
     href: "/signup?role=organisation",
     className: "hover:text-blue-500",
   },

@@ -84,13 +84,13 @@ export default function OrganizationSettingsPage() {
         id: "users",
         label: "Users & Roles",
         icon: Users,
-        description: "Manage organization users and their roles",
+        description: "Manage organisation users and their roles",
       },
       {
         id: "general",
         label: "General Settings",
         icon: Settings,
-        description: "Organization preferences and settings",
+        description: "Organisation preferences and settings",
       },
     ];
 
@@ -123,12 +123,12 @@ export default function OrganizationSettingsPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              {isVolunteer ? "Account Settings" : "Organization Settings"}
+              {isVolunteer ? "Account Settings" : "Organisation Settings"}
             </h1>
             <p className="mt-2 text-sm sm:text-base text-gray-600">
               {isVolunteer
                 ? "Manage your account settings and preferences"
-                : "Manage your organization&apos;s users, mentors, and general settings"}
+                : "Manage your organisation&apos;s users, mentors, and general settings"}
             </p>
           </div>
 
@@ -232,7 +232,7 @@ export default function OrganizationSettingsPage() {
                     <CardDescription>
                       {isVolunteer
                         ? "View and manage your account information"
-                        : "View and manage users in your organization"}
+                        : "View and manage users in your organisation"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -279,7 +279,7 @@ export default function OrganizationSettingsPage() {
                           Manage Mentors
                         </CardTitle>
                         <CardDescription>
-                          Invite and manage mentors for your organization
+                          Invite and manage mentors for your organisation
                         </CardDescription>
                       </div>
                       <InviteMentorDialog
@@ -339,7 +339,7 @@ export default function OrganizationSettingsPage() {
                           No mentors yet
                         </p>
                         <p className="text-sm text-gray-400 mt-1">
-                          Invite mentors to help manage your organization
+                          Invite mentors to help manage your organisation
                         </p>
                       </div>
                     )}
@@ -357,7 +357,7 @@ export default function OrganizationSettingsPage() {
                     <CardDescription>
                       {isVolunteer
                         ? "Manage your account preferences and settings"
-                        : "Manage your organization&apos;s general settings"}
+                        : "Manage your organisation&apos;s general settings"}
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -390,7 +390,7 @@ export default function OrganizationSettingsPage() {
                   <CardDescription>
                     {isVolunteer
                       ? "View and manage your account information"
-                      : "View and manage users in your organization"}
+                      : "View and manage users in your organisation"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -427,7 +427,7 @@ export default function OrganizationSettingsPage() {
                         Manage Mentors
                       </CardTitle>
                       <CardDescription>
-                        Invite and manage mentors for your organization
+                        Invite and manage mentors for your organisation
                       </CardDescription>
                     </div>
                     <InviteMentorDialog
@@ -485,7 +485,7 @@ export default function OrganizationSettingsPage() {
                         No mentors yet
                       </p>
                       <p className="text-sm text-gray-400 mt-1">
-                        Invite mentors to help manage your organization
+                        Invite mentors to help manage your organisation
                       </p>
                     </div>
                   )}
@@ -503,7 +503,7 @@ export default function OrganizationSettingsPage() {
                   <CardDescription>
                     {isVolunteer
                       ? "Manage your account preferences and settings"
-                      : "Manage your organization&apos;s general settings"}
+                      : "Manage your organisation&apos;s general settings"}
                   </CardDescription>
                 </CardHeader>
                 <CardContent>

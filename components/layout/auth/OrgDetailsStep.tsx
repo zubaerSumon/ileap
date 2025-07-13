@@ -38,7 +38,7 @@ export function OrgDetailsStep({ form, onImageUploadStateChange }: OrgDetailsSte
     <>
       <div className="mb-8">
         <h2 className="text-2xl font-semibold text-gray-900">
-          Organization Details
+          Organisation Details
         </h2>
         <p className="mt-2 text-sm text-gray-600">
           Please provide additional details about your organization
@@ -47,9 +47,9 @@ export function OrgDetailsStep({ form, onImageUploadStateChange }: OrgDetailsSte
 
       <div className="space-y-6">
         <FormSelect
-          label="Organization type"
+          label="Organisation type"
           id="type"
-          placeholder="Select organization type"
+          placeholder="Select organisation type"
           control={form.control}
           registerName="type"
           error={form.formState.errors.type?.message}
@@ -60,7 +60,7 @@ export function OrgDetailsStep({ form, onImageUploadStateChange }: OrgDetailsSte
             // Validate the type before setting it
             const isValidType = organizationTypes.some(opt => opt.value === value);
             if (!isValidType) {
-              console.warn("Invalid organization type selected:", value);
+              console.warn("Invalid organisation type selected:", value);
               return;
             }
             form.setValue("type", value);

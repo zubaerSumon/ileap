@@ -18,16 +18,16 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           We&apos;re excited to have you on board!
         </h2>
         <p className="mt-2 text-sm text-gray-600">
-          Please provide your organization details so we can keep you updated on
+          Please provide your organisation details so we can keep you updated on
           our efforts and ways you can get involved.
         </p>
       </div>
 
       <div className="space-y-6">
         <FormField
-          label="Organization Name"
+          label="Organisation Name"
           id="title"
-          placeholder={`Enter your organization name`}
+          placeholder={`Enter your organisation name`}
           register={form.register}
           registerName="title"
           error={form.formState.errors.title?.message}
@@ -36,7 +36,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           label="Contact email"
           id="contact_email"
           type="email"
-          placeholder={`Enter your organization email `}
+          placeholder={`Enter your organisation email `}
           register={form.register}
           registerName="contact_email"
           error={form.formState.errors.contact_email?.message}
@@ -45,7 +45,7 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           label="About us"
           id="bio"
           type="textarea"
-          placeholder="We are a community-driven volunteer organization dedicated to ....."
+          placeholder="We are a community-driven volunteer organisation dedicated to ....."
           register={form.register}
           registerName="bio"
           error={form.formState.errors.bio?.message}

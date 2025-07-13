@@ -36,7 +36,7 @@ export const opportunityRouter = router({
         throw new TRPCError({
           code: "NOT_FOUND",
           message:
-            "Organization profile not found. Please complete your organization profile first.",
+            "Organisation profile not found. Please complete your organisation profile first.",
         });
       }
 
@@ -184,14 +184,14 @@ export const opportunityRouter = router({
       if (!user.organization_profile) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Organization profile not found",
+          message: "Organisation profile not found",
         });
       }
 
       const opportunities = await Opportunity.find({
         organization_profile: user.organization_profile,
       })
-        .populate("organization_profile")
+        .populate("organisation_profile")
         .sort({ createdAt: -1 });
 
       // Get applicant and recruit counts for each opportunity
@@ -478,12 +478,12 @@ export const opportunityRouter = router({
         if (opportunities.length > 0) {
           console.log("Checking organization_profile references...");
           const orgProfileIds = opportunities.map(opp => opp.organization_profile?._id).filter(id => id);
-          console.log("Organization profile IDs:", orgProfileIds);
+          console.log("Organisation profile IDs:", orgProfileIds);
           
           // Check if these organization profiles exist
           const OrganizationProfile = mongoose.model('organization_profile');
           const existingOrgs = await OrganizationProfile.find({ _id: { $in: orgProfileIds } }).lean();
-          console.log(`Found ${existingOrgs.length} existing organization profiles out of ${orgProfileIds.length} references`);
+          console.log(`Found ${existingOrgs.length} existing organisation profiles out of ${orgProfileIds.length} references`);
         }
         
         console.log("=== END DEBUGGING ===");

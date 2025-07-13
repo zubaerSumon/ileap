@@ -490,7 +490,7 @@ export const messsageRouter = router({
         if (input.isOrganizationGroup && user.role !== "admin" && user.role !== "mentor") {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only admins and mentors can create organization groups",
+            message: "Only admins and mentors can create organisation groups",
           });
         }
 

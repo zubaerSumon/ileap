@@ -32,8 +32,8 @@ export const locations = [
 ];
 
 export const organizationTypes = [
-  { value: "ngo", label: "Non-Governmental Organization (NGO)" },
-  { value: "nonprofit", label: "Nonprofit Organization" },
+  { value: "ngo", label: "Non-Governmental Organisation (NGO)" },
+  { value: "nonprofit", label: "Nonprofit Organisation" },
   { value: "community_group", label: "Community Group" },
   { value: "social_enterprise", label: "Social Enterprise" },
   { value: "charity", label: "Charity" },

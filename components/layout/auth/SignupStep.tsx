@@ -126,19 +126,19 @@ export function SignupStep({
 
       <div className="space-y-6">
         <FormField
-          label={customORG ? "Organization name" : "Name"}
+          label={customORG ? "Organisation name" : "Name"}
           id="name"
-          placeholder={`Enter your ${customORG ? "organization name" : "name"}`}
+          placeholder={`Enter your ${customORG ? "organisation name" : "name"}`}
           register={form.register}
           registerName="name"
           error={form.formState.errors.name?.message}
         />
         <FormField
-          label={customORG ? "Organization email" : "Email"}
+          label={customORG ? "Organisation email" : "Email"}
           id="email"
           type="email"
           placeholder={`Enter your ${
-            customORG ? "organization email" : "email"
+            customORG ? "organisation email" : "email"
           }`}
           register={form.register}
           registerName="email"
