@@ -98,7 +98,7 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
         )}
         
         {/* Action Menu - Dropdown for better mobile experience - Hidden for volunteers, but allow group creators */}
-        {(userRole !== "volunteer" || (isGroup && 'createdBy' in user && user.createdBy === currentUserId)) && (
+        {(userRole !== "volunteer" || (userRole === "volunteer" && isGroup && 'createdBy' in user && user.createdBy === currentUserId)) && (
           <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button

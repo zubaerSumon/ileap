@@ -806,13 +806,7 @@ export const messsageRouter = router({
           });
         }
 
-        // Check if user is a volunteer
-        if (user.role === "volunteer") {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Volunteers cannot delete groups",
-          });
-        }
+        // Note: Volunteer permissions are checked in the permission logic below
 
         // Find the group
         const group = await Group.findById(input.groupId);
