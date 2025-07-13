@@ -85,6 +85,10 @@ export function ApplicantsCard({
       utils.recruits.getRecruitedApplicants.invalidate();
       utils.applications.getOpportunityApplicants.invalidate();
       utils.applications.getApplicationStatus.invalidate();
+      utils.applications.getCurrentUserActiveApplicationsCount.invalidate();
+      utils.applications.getCurrentUserRecentApplicationsCount.invalidate();
+      utils.applications.getCurrentUserActiveApplications.invalidate();
+      utils.applications.getCurrentUserRecentApplications.invalidate();
       utils.opportunities.getOrganizationOpportunities.invalidate();
     },
     onError: (error: TRPCClientErrorLike<AppRouter>) => {
@@ -106,6 +110,9 @@ export function ApplicantsCard({
         setIsMentorForOpportunity(false);
       }
       utils.mentors.getOpportunityMentors.invalidate();
+      // Invalidate dashboard mentor opportunities queries
+      utils.opportunities.getMentorOpportunities.invalidate();
+      utils.opportunities.getMentorOpportunitiesCount.invalidate();
     },
     onError: (error: TRPCClientErrorLike<AppRouter>) => {
       toast.error(error.message);

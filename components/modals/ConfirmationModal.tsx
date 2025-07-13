@@ -43,7 +43,12 @@ export function ConfirmationModal({
         `Successfully applied to "${opportunityDetails.title}"!`,
         {}
       );
+      // Invalidate all application-related queries to update dashboard tabs
       utils.applications.getApplicationStatus.invalidate();
+      utils.applications.getCurrentUserActiveApplicationsCount.invalidate();
+      utils.applications.getCurrentUserRecentApplicationsCount.invalidate();
+      utils.applications.getCurrentUserActiveApplications.invalidate();
+      utils.applications.getCurrentUserRecentApplications.invalidate();
       utils.opportunities.getAllOpportunities.invalidate();
       utils.applications.getVolunteerApplications.invalidate();
       onClose();

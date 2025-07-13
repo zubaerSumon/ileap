@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 export const useVolunteerApplication = (opportunityId: string) => {
   const [isApplied, setIsApplied] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const utils = trpc.useUtils();
 
   // Query to check if user has already applied
   const { data: applicationStatus, isPending: isStatusPending } = trpc.applications.getApplicationStatus.useQuery(
@@ -32,6 +33,12 @@ export const useVolunteerApplication = (opportunityId: string) => {
   const applyMutation = trpc.applications.applyToOpportunity.useMutation({
     onSuccess: () => {
       setIsApplied(true);
+      // Invalidate all application-related queries to update dashboard tabs
+      utils.applications.getApplicationStatus.invalidate();
+      utils.applications.getCurrentUserActiveApplicationsCount.invalidate();
+      utils.applications.getCurrentUserRecentApplicationsCount.invalidate();
+      utils.applications.getCurrentUserActiveApplications.invalidate();
+      utils.applications.getCurrentUserRecentApplications.invalidate();
     },
   });
 
