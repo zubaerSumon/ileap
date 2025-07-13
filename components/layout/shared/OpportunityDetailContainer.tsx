@@ -206,6 +206,7 @@ export default function OpportunityDetailContainer({
           name: applicant.name
         })) || []}
         opportunityTitle={opportunity?.title || ""}
+        opportunityId={opportunityId}
       />
 
       <GroupMessageModal

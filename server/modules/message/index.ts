@@ -431,6 +431,7 @@ export const messsageRouter = router({
       memberIds: z.array(z.string()),
       isOrganizationGroup: z.boolean().optional(),
       adminIds: z.array(z.string()).optional(),
+      opportunityId: z.string().optional(),
     }))
     .mutation(async ({ input, ctx }) => {
       try {
@@ -453,19 +454,35 @@ export const messsageRouter = router({
         // Check if user can create groups
         const canCreateGroups = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
         
-        // If user is a volunteer, check if they are assigned as a mentor for any opportunity
+        // If user is a volunteer, check if they are assigned as a mentor
         if (!canCreateGroups && user.role === "volunteer") {
-          // Check if the user is assigned as a mentor for any opportunity
           const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
-          const mentorAssignment = await OpportunityMentor.findOne({
-            volunteer: user._id,
-          });
           
-          if (!mentorAssignment) {
-            throw new TRPCError({
-              code: "FORBIDDEN",
-              message: "Volunteers cannot create groups unless they are assigned as mentors",
+          if (input.opportunityId) {
+            // Check if the user is assigned as a mentor for this specific opportunity
+            const mentorAssignment = await OpportunityMentor.findOne({
+              volunteer: user._id,
+              opportunity: input.opportunityId,
             });
+            
+            if (!mentorAssignment) {
+              throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "You can only create groups for opportunities where you are assigned as a mentor",
+              });
+            }
+          } else {
+            // Check if the user is assigned as a mentor for any opportunity
+            const mentorAssignment = await OpportunityMentor.findOne({
+              volunteer: user._id,
+            });
+            
+            if (!mentorAssignment) {
+              throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "Volunteers cannot create groups unless they are assigned as mentors",
+              });
+            }
           }
         }
 
@@ -477,15 +494,31 @@ export const messsageRouter = router({
           });
         }
 
-        // Create group with opportunity mentors as admins if adminIds provided
+        // Deduplicate member IDs and identify mentors
+        const allMemberIds = [...input.memberIds.map(id => new Types.ObjectId(id)), user._id];
+        const uniqueMemberIds = Array.from(new Set(allMemberIds.map(id => id.toString()))).map(id => new Types.ObjectId(id));
+        
+        // Check which members are mentors for this opportunity (if opportunityId is provided)
+        const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
+        let mentorIds: Types.ObjectId[] = [];
+        
+        if (input.opportunityId) {
+          const mentorAssignments = await OpportunityMentor.find({
+            volunteer: { $in: uniqueMemberIds },
+            opportunity: input.opportunityId,
+          });
+          mentorIds = mentorAssignments.map(assignment => assignment.volunteer);
+        }
+        
+        // Add any manually specified admin IDs
         const adminIds = input.adminIds || [];
-        const allAdmins = [user._id, ...adminIds.map(id => new Types.ObjectId(id))];
+        const allAdmins = [...new Set([user._id, ...mentorIds, ...adminIds.map(id => new Types.ObjectId(id))])];
 
         const group = await Group.create({
           name: input.name,
           description: input.description,
           createdBy: user._id,
-          members: [...input.memberIds.map(id => new Types.ObjectId(id)), user._id],
+          members: uniqueMemberIds,
           admins: allAdmins,
           isOrganizationGroup: input.isOrganizationGroup || false,
         });
@@ -503,7 +536,7 @@ export const messsageRouter = router({
           });
         }
 
-        // Convert to the expected format with mentor labels for opportunity mentors
+        // Convert to the expected format with proper mentor labels
         const formattedGroup = {
           _id: group._id.toString(),
           name: group.name,
@@ -511,7 +544,7 @@ export const messsageRouter = router({
           members: (populatedGroup as any).members || [],
           admins: (populatedGroup as any).admins.map((admin: any) => ({
             ...admin,
-            role: adminIds.includes(admin._id.toString()) ? "mentor" : admin.role
+            role: mentorIds.some(id => id.toString() === admin._id.toString()) ? "mentor" : admin.role
           })) || [],
           createdBy: group.createdBy.toString(),
           isOrganizationGroup: group.isOrganizationGroup,

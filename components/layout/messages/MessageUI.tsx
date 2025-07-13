@@ -263,7 +263,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
           </div>
         ) : (
           // Mobile Conversation List
-          <div className="h-full">
+          <div className="h-full overflow-hidden">
             <Sidebar
               activeTab={activeTab}
               setActiveTab={setActiveTab}

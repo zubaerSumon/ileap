@@ -50,23 +50,7 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
     return user.members?.length || 0;
   };
 
-  // Get admin count for groups
-  const getAdminCount = () => {
-    if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
-    return user.admins?.length || 0;
-  };
 
-  // Get mentor count for groups
-  const getMentorCount = () => {
-    if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
-    return user.admins?.filter(admin => admin.role === "volunteer").length || 0;
-  };
-
-  // Get regular admin count (excluding mentors)
-  const getRegularAdminCount = () => {
-    if (!isGroup || !('admins' in user) || !Array.isArray(user.admins)) return 0;
-    return user.admins?.filter(admin => admin.role !== "volunteer").length || 0;
-  };
   
   return (
     <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-white">
@@ -87,20 +71,7 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
             <h2 className={`font-semibold truncate text-gray-900 ${isGroup ? getTextSizeClass(user.name) : 'text-sm sm:text-base'}`}>
               {user.name}
             </h2>
-            {isGroup && getAdminCount() > 0 && (
-              <div className="flex items-center gap-1">
-                {getMentorCount() > 0 && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 flex-shrink-0">
-                    {getMentorCount()} mentor{getMentorCount() !== 1 ? 's' : ''}
-                  </span>
-                )}
-                {getRegularAdminCount() > 0 && (
-                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 flex-shrink-0">
-                    {getRegularAdminCount()} admin{getRegularAdminCount() !== 1 ? 's' : ''}
-                  </span>
-                )}
-              </div>
-            )}
+
           </div>
           
           {isGroup && (
@@ -109,30 +80,6 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
                 <Users className="h-3 w-3" />
                 {getMemberCount()} member{getMemberCount() !== 1 ? 's' : ''}
               </p>
-              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
-                <span className="text-xs text-gray-400">•</span>
-              )}
-              {getMentorCount() > 0 && (
-                <p className="text-xs text-blue-600">
-                  {getMentorCount()} mentor{getMentorCount() !== 1 ? 's' : ''}
-                </p>
-              )}
-              {getMentorCount() > 0 && getRegularAdminCount() > 0 && (
-                <span className="text-xs text-gray-400">•</span>
-              )}
-              {getRegularAdminCount() > 0 && (
-                <p className="text-xs text-yellow-600">
-                  {getRegularAdminCount()} admin{getRegularAdminCount() !== 1 ? 's' : ''}
-                </p>
-              )}
-              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
-                <span className="text-xs text-gray-400">•</span>
-              )}
-              {(getMentorCount() > 0 || getRegularAdminCount() > 0) && (
-                <p className="text-xs text-gray-500">
-                  {getMemberCount() - getAdminCount()} regular
-                </p>
-              )}
             </div>
           )}
         </div>
@@ -151,44 +98,44 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
         {/* Action Menu - Dropdown for better mobile experience - Hidden for volunteers */}
         {userRole !== "volunteer" && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0 hover:bg-gray-100"
-              >
-                <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">Open menu</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {isGroup && onDeleteGroup && (
-                <>
-                  <DropdownMenuItem
-                    onClick={onDeleteGroup}
-                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Group
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-              
-              {!isGroup && onDeleteConversation && (
-                <>
-                  <DropdownMenuItem
-                    onClick={onDeleteConversation}
-                    className="text-red-600 focus:text-red-600 focus:bg-red-50"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Delete Conversation
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 w-8 p-0 hover:bg-gray-100"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-48">
+            {isGroup && onDeleteGroup && (
+              <>
+                <DropdownMenuItem
+                  onClick={onDeleteGroup}
+                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Group
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
+            
+            {!isGroup && onDeleteConversation && (
+              <>
+                <DropdownMenuItem
+                  onClick={onDeleteConversation}
+                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Conversation
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+              </>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
         )}
       </div>
     </div>

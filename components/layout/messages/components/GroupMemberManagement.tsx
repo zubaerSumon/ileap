@@ -197,9 +197,9 @@ export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({
                         )}
                       </div>
                       <span className="text-xs text-gray-500">
-                        {isCurrentUserAdmin(member._id) ? 
-                          (member.role === "volunteer" ? "Mentor" : "Admin") : 
-                          "Member"}
+                        {isCurrentUserAdmin(member._id)
+                          ? (member.role === "volunteer" ? "Mentor" : "Group Admin")
+                          : "Member"}
                       </span>
                     </div>
                   </div>
@@ -321,7 +321,9 @@ export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({
                       <Avatar name={user.name} avatar={user.avatar} size={28} />
                       <div className="min-w-0 flex-1">
                         <span className="block text-sm font-medium truncate">{user.name}</span>
-                        <span className="block text-xs text-gray-500 truncate">{user.role}</span>
+                        <span className="block text-xs text-gray-500 truncate">
+                          {user.role === "volunteer" ? "Mentor" : "Member"}
+                        </span>
                       </div>
                     </label>
                   </div>

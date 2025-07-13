@@ -1,7 +1,6 @@
 import React from "react";
 import { format } from "date-fns";
 import { Users } from "lucide-react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import Avatar from "./Avatar";
 import CreateGroupDialog from "./CreateGroupDialog";
@@ -51,7 +50,7 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
     });
 
     return (
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full overflow-hidden">
         {/* Groups Section Header - Always visible for non-volunteers */}
         {userRole !== "volunteer" && (
           <div className="flex-shrink-0 p-3 sm:p-4 flex items-center justify-between border-b border-gray-100">
@@ -62,7 +61,7 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
           </div>
         )}
 
-        <ScrollArea className="flex-1">
+        <div className="flex-1 h-full overflow-y-auto">
           <div className="pr-2 sm:pr-4">
             {isLoading || isLoadingGroups ? (
               <div className="p-4 text-center text-gray-500 text-sm">Loading...</div>
@@ -203,7 +202,7 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
               </div>
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
     );
   }
