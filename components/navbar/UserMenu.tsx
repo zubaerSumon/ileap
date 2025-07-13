@@ -48,7 +48,7 @@ export function UserMenu({ user }: UserMenuProps) {
     user.role === "admin" ||
     user.role === "mentor";
   const isVolunteer = user.role === "volunteer";
-  const organizationName = user.organization_profile?.title || "Organization";
+  const organizationName = user.organization_profile?.title || "Organisation";
 
   // Fetch current availability status
   const { data: volunteerProfile } =
