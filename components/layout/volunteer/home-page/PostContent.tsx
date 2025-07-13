@@ -1,14 +1,12 @@
-import Link from "next/link";
-import Image from "next/image";
+ 
 import { ApplyButton } from "@/components/buttons/ApplyButton";
 import { FavoriteButton } from "@/components/buttons/FavoriteButton";
 import { useSession } from "next-auth/react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
-import BackButton from "@/components/buttons/BackButton";
-import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
-import { MapPin, Users, Calendar, Clock, ExternalLink, Target } from "lucide-react";
+ import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
+import { MapPin, Users, Calendar, Clock, ExternalLink, Target, Mail, Phone } from "lucide-react";
 
 type Opportunity = {
   _id: string;
@@ -44,15 +42,18 @@ type Opportunity = {
   };
   banner_img?: string;
   external_event_link?: string;
+  email_contact?: string;
+  phone_contact?: string;
 };
+
 interface PostContentProps {
   opportunity: Opportunity;
-  isMentor?: boolean;
-}
+ }
 
-export function PostContent({ opportunity, isMentor }: PostContentProps) {
+export function PostContent({ opportunity,   }: PostContentProps) {
   const { data: session } = useSession();
-  const isOrganization = session?.user?.role === "organization";
+   const isOrganisation = session?.user?.role === "admin";
+  const isCreator = session?.user?.id === opportunity.created_by?._id;
 
   const editor = useEditor({
     extensions: [
@@ -89,164 +90,165 @@ export function PostContent({ opportunity, isMentor }: PostContentProps) {
   };
 
   return (
-    <div className="flex-1 w-full lg:max-w-3xl">
-      {!isMentor && <BackButton />}
+    <div className="flex-1 w-full lg:max-w-3xl space-y-8">
+      
 
-      {!isMentor && (
-        <>
-          <div className="w-full h-[150px] md:h-[200px] relative mb-4 md:mb-6">
-            <Image
-              src={opportunity.banner_img || "/fallbackbanner.png"}
-              alt={`${opportunity.title} Banner`}
-              fill
-              className="object-cover rounded-lg"
-            />
+      {/* Key Details Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="flex items-center gap-3">
+          <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0" />
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Location</p>
+            <p className="text-sm font-medium text-gray-900">{opportunity.location}</p>
           </div>
+        </div>
 
-          <h1 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 w-full">
-            {opportunity.title}
-          </h1>
-        </>
+        <div className="flex items-center gap-3">
+          <Calendar className="w-5 h-5 text-gray-600 flex-shrink-0" />
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Date</p>
+            <p className="text-sm font-medium text-gray-900">
+              {new Date(opportunity.date.start_date).toLocaleDateString("en-US", {
+                weekday: "short",
+                month: "short",
+                day: "numeric",
+              })}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Clock className="w-5 h-5 text-gray-600 flex-shrink-0" />
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Time</p>
+            <p className="text-sm font-medium text-gray-900">
+              {formatTimeToAMPM(opportunity.time.start_time)}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Users className="w-5 h-5 text-gray-600 flex-shrink-0" />
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Available Spots</p>
+            <p className="text-sm font-medium text-gray-900">{opportunity.number_of_volunteers} spots</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <Target className="w-5 h-5 text-gray-600 flex-shrink-0" />
+          <div>
+            <p className="text-xs text-gray-500 uppercase tracking-wide">Commitment</p>
+            <p className="text-sm font-medium text-gray-900">{opportunity.commitment_type}</p>
+          </div>
+        </div>
+
+        {opportunity.external_event_link && (
+          <div className="flex items-center gap-3">
+            <ExternalLink className="w-5 h-5 text-gray-600 flex-shrink-0" />
+            <div>
+              <p className="text-xs text-gray-500 uppercase tracking-wide">External Link</p>
+              <a
+                href={opportunity.external_event_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+              >
+                View Event
+              </a>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Contact Information */}
+      {(opportunity.email_contact || opportunity.phone_contact) && (
+        <div className="flex flex-col sm:flex-row gap-6">
+          {opportunity.email_contact && (
+            <div className="flex items-center gap-3">
+              <Mail className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Email</p>
+                <a
+                  href={`mailto:${opportunity.email_contact}`}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {opportunity.email_contact}
+                </a>
+              </div>
+            </div>
+          )}
+
+          {opportunity.phone_contact && (
+            <div className="flex items-center gap-3">
+              <Phone className="w-5 h-5 text-blue-600 flex-shrink-0" />
+              <div>
+                <p className="text-xs text-gray-500 uppercase tracking-wide">Phone</p>
+                <a
+                  href={`tel:${opportunity.phone_contact}`}
+                  className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                >
+                  {opportunity.phone_contact}
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
       )}
 
-      <div className="text-sm text-gray-600 mb-3 w-full">
-        Posted by
-        <Link
-          href={`/volunteer/organizer/${opportunity.organization_profile._id}`}
-        >
-          <span className="text-blue-600 hover:underline cursor-pointer">
-            {" "}
-            {opportunity?.organization_profile?.title || "Organization name"}
-          </span>
-        </Link>
-      </div>
-
-            {/* Opportunity Details */}
-      <div className="mb-6 space-y-4">
-                {/* Key Details Card */}
-        <div className="p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-200">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-            <div className="flex items-start gap-2 sm:items-center">
-              <MapPin className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5 sm:mt-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-gray-500">Location</p>
-                <p className="text-sm font-medium text-gray-800 break-words">{opportunity.location}</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 sm:items-center">
-              <Users className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5 sm:mt-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-gray-500">Available Spots</p>
-                <p className="text-sm font-medium text-gray-800">{opportunity.number_of_volunteers} spots</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 sm:items-center">
-              <Target className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5 sm:mt-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-gray-500">Commitment</p>
-                <p className="text-sm font-medium text-gray-800 break-words">{opportunity.commitment_type}</p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 sm:items-center">
-              <Calendar className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5 sm:mt-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-gray-500">Date</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {new Date(opportunity.date.start_date).toLocaleDateString("en-US", {
-                    weekday: "short",
-                    month: "short",
-                    day: "numeric",
-                  })}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-start gap-2 sm:items-center">
-              <Clock className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5 sm:mt-0" />
-              <div className="min-w-0 flex-1">
-                <p className="text-xs text-gray-500">Time</p>
-                <p className="text-sm font-medium text-gray-800">
-                  {formatTimeToAMPM(opportunity.time.start_time)}
-                </p>
-              </div>
-            </div>
-
-            {opportunity.external_event_link && (
-              <div className="flex items-start gap-2 sm:items-center">
-                <ExternalLink className="w-4 h-4 text-gray-600 flex-shrink-0 mt-0.5 sm:mt-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs text-gray-500">External Link</p>
-                  <a
-                    href={opportunity.external_event_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm font-medium text-blue-600 hover:text-blue-800 hover:underline break-all"
+      {/* Categories and Skills */}
+      {(opportunity.category.length > 0 || opportunity.required_skills.length > 0) && (
+        <div className="space-y-4">
+          {opportunity.category.length > 0 && (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-3">Categories</p>
+              <div className="flex flex-wrap gap-2">
+                {opportunity.category.map((cat, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1.5 bg-blue-50 text-blue-700 text-sm rounded-full border border-blue-200 font-medium"
                   >
-                    View Event
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Categories and Skills */}
-        {(opportunity.category.length > 0 || opportunity.required_skills.length > 0) && (
-          <div className="p-3 md:p-4 bg-gray-50 rounded-lg border border-gray-200">
-            {opportunity.category.length > 0 && (
-              <div className="mb-4 md:mb-3">
-                <p className="text-sm font-medium text-gray-700 mb-2 md:mb-2">Categories</p>
-                <div className="flex flex-wrap gap-1.5 md:gap-2">
-                  {opportunity.category.map((cat, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-blue-50 text-blue-700 text-xs md:text-sm rounded border border-blue-200"
-                    >
-                      {cat}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {opportunity.required_skills.length > 0 && (
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Required Skills</p>
-                <div className="flex flex-wrap gap-1.5 md:gap-2">
-                  {opportunity.required_skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="px-2 py-1 bg-gray-100 text-gray-700 text-xs md:text-sm rounded border"
-                    >
-                      {skill}
+                    {cat}
                   </span>
-                  ))}
-                </div>
+                ))}
               </div>
-            )}
-          </div>
-        )}
-      </div>
+            </div>
+          )}
 
-      <div className="prose w-full max-w-none text-gray-700 space-y-4">
-        <div className="text-sm md:text-base leading-relaxed w-full text-justify">
-          <EditorContent editor={editor} />
+          {opportunity.required_skills.length > 0 && (
+            <div>
+              <p className="text-sm font-medium text-gray-700 mb-3">Required Skills</p>
+              <div className="flex flex-wrap gap-2">
+                {opportunity.required_skills.map((skill, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-full border border-gray-300 font-medium"
+                  >
+                    {skill}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
+      )}
 
-        {!isOrganization && (
-          <div className="flex items-center gap-2 w-full">
-            <ApplyButton
-              opportunityId={opportunity._id}
-              opportunityDetails={opportunityDetails}
-              className="bg-blue-600 hover:bg-blue-700 h-8 px-4 md:px-5 font-normal text-sm text-white"
-            />
-            <FavoriteButton opportunityId={opportunity._id} />
-          </div>
-        )}
+      {/* Description */}
+      <div className="prose prose-sm md:prose-base max-w-none text-gray-700">
+        <EditorContent editor={editor} />
       </div>
+
+      {/* Action Buttons */}
+      { !isOrganisation &&   !isCreator && (
+        <div className="flex items-center gap-3 pt-4">
+          <ApplyButton
+            opportunityId={opportunity._id}
+            opportunityDetails={opportunityDetails}
+            className="bg-blue-600 h-10 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors"
+          />
+          <FavoriteButton opportunityId={opportunity._id} />
+        </div>
+      )}
     </div>
   );
 }

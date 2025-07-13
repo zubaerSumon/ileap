@@ -10,9 +10,9 @@ import {
   BookOpen,
 } from "lucide-react";
 import { getGreeting } from "@/utils/helpers/getGreeting";
-import MobileTabsSlider from "@/components/shared/MobileTabsSlider";
+import MobileTabsSlider from "@/components/layout/shared/MobileTabsSlider";
 import OpportunityCarousel from "./OpportunityCarousel";
-import EmptyState from "@/components/shared/EmptyState";
+import EmptyState from "@/components/layout/shared/EmptyState";
 import TabwiseOpportunityCard from "./TabwiseOpportunityCard";
 import { PaginationWrapper } from "@/components/PaginationWrapper";
 import {  VolunteerDashboardTabKey, VOLUNTEER_DASHBOARD_TABS } from "@/utils/constants/volunteer-dashboard-tabs";

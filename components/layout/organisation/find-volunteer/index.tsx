@@ -17,7 +17,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import EmptyState from "@/components/shared/EmptyState";
+import EmptyState from "@/components/layout/shared/EmptyState";
 import { Users } from "lucide-react";
 
 interface Volunteer {

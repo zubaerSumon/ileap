@@ -32,7 +32,7 @@ export const VOLUNTEER_DASHBOARD_TABS = [
   },
   {
     key: "favorites",
-    label: "Favorite opportunities",
+    label: "Favourite opportunities",
     icon: Heart,
     emptyState: {
       title: "No favorite opportunities",

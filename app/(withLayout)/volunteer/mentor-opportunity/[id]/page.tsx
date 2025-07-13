@@ -1,15 +1,25 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, FileSpreadsheet, MessageCircleCode, Hand, Search, Users } from "lucide-react";
+import {
+  Loader2,
+  FileSpreadsheet,
+  MessageCircleCode,
+  Hand,
+  Search,
+  Users,
+} from "lucide-react";
 import { OpportunityDetail } from "@/components/layout/volunteer/home-page/OpportunityDetail";
 import { useParams, useRouter } from "next/navigation";
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import { trpc } from "@/utils/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DynamicTabs, TabItem } from "@/components/shared/DynamicTabs";
-import { Applicant, ApplicantsCard } from "@/components/layout/organisation/opportunities/ApplicantsCard";
+import { DynamicTabs, TabItem } from "@/components/layout/shared/DynamicTabs";
+import {
+  Applicant,
+  ApplicantsCard,
+} from "@/components/layout/organisation/opportunities/ApplicantsCard";
 import MessageApplicantModal from "@/components/layout/organisation/opportunities/MessageApplicantModal";
 import Image from "next/image";
 import BackButton from "@/components/buttons/BackButton";
@@ -21,7 +31,9 @@ export default function MentorOpportunityDetailsPage() {
   const { data: session } = useSession();
   const opportunityId = params.id as string;
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
+    null
+  );
   const [applicantsSearchQuery, setApplicantsSearchQuery] = useState("");
   const [recruitsSearchQuery, setRecruitsSearchQuery] = useState("");
 
@@ -34,10 +46,11 @@ export default function MentorOpportunityDetailsPage() {
   });
 
   // Check if current user is a mentor for this opportunity
-  const { data: opportunityMentors } = trpc.mentors.getOpportunityMentors.useQuery(
-    { opportunityId },
-    { enabled: !!opportunityId }
-  );
+  const { data: opportunityMentors } =
+    trpc.mentors.getOpportunityMentors.useQuery(
+      { opportunityId },
+      { enabled: !!opportunityId }
+    );
 
   const { data: applicants, isLoading: isLoadingApplicants } =
     trpc.applications.getOpportunityApplicants.useQuery(
@@ -72,23 +85,41 @@ export default function MentorOpportunityDetailsPage() {
     if (applicant.id === session?.user?.id) {
       return false;
     }
-    
-    return applicant.name.toLowerCase().includes(applicantsSearchQuery.toLowerCase()) ||
-      applicant.location.toLowerCase().includes(applicantsSearchQuery.toLowerCase()) ||
-      applicant.skills.some(skill => skill.toLowerCase().includes(applicantsSearchQuery.toLowerCase()));
+
+    return (
+      applicant.name
+        .toLowerCase()
+        .includes(applicantsSearchQuery.toLowerCase()) ||
+      applicant.location
+        .toLowerCase()
+        .includes(applicantsSearchQuery.toLowerCase()) ||
+      applicant.skills.some((skill) =>
+        skill.toLowerCase().includes(applicantsSearchQuery.toLowerCase())
+      )
+    );
   });
 
   // Filter recruited applicants based on search query and exclude current mentor
-  const filteredRecruitedApplicants = recruitedApplicants?.filter((applicant) => {
-    // Exclude current user if they are a mentor
-    if (applicant.id === session?.user?.id) {
-      return false;
+  const filteredRecruitedApplicants = recruitedApplicants?.filter(
+    (applicant) => {
+      // Exclude current user if they are a mentor
+      if (applicant.id === session?.user?.id) {
+        return false;
+      }
+
+      return (
+        applicant.name
+          .toLowerCase()
+          .includes(recruitsSearchQuery.toLowerCase()) ||
+        applicant.location
+          .toLowerCase()
+          .includes(recruitsSearchQuery.toLowerCase()) ||
+        applicant.skills.some((skill) =>
+          skill.toLowerCase().includes(recruitsSearchQuery.toLowerCase())
+        )
+      );
     }
-    
-    return applicant.name.toLowerCase().includes(recruitsSearchQuery.toLowerCase()) ||
-      applicant.location.toLowerCase().includes(recruitsSearchQuery.toLowerCase()) ||
-      applicant.skills.some(skill => skill.toLowerCase().includes(recruitsSearchQuery.toLowerCase()));
-  });
+  );
 
   if (!opportunityId) {
     return (
@@ -140,11 +171,7 @@ export default function MentorOpportunityDetailsPage() {
 
   // Define tab content for mentor view
   const postContent = (
-    <OpportunityDetail 
-      opportunity={opportunity} 
-      userRole="volunteer" 
-      isMentor={true}
-    />
+    <OpportunityDetail opportunity={opportunity} userRole="volunteer" />
   );
 
   const applicantsContent = (
@@ -157,7 +184,7 @@ export default function MentorOpportunityDetailsPage() {
             <Input
               placeholder="Search volunteers"
               className="pl-10 bg-gray-50 border-0"
-              value={applicantsSearchQuery}
+              value={applicantsSearchQuery || ""}
               onChange={(e) => setApplicantsSearchQuery(e.target.value)}
             />
           </div>
@@ -180,7 +207,9 @@ export default function MentorOpportunityDetailsPage() {
       ))}
       {filteredApplicants?.length === 0 && (
         <div className="text-center text-gray-500 py-8">
-          {applicantsSearchQuery ? "No matching applicants found" : "No applicants yet"}
+          {applicantsSearchQuery
+            ? "No matching applicants found"
+            : "No applicants yet"}
         </div>
       )}
     </div>
@@ -195,7 +224,7 @@ export default function MentorOpportunityDetailsPage() {
             <Input
               placeholder="Search volunteers"
               className="pl-10 bg-gray-50 border-0"
-              value={recruitsSearchQuery}
+              value={recruitsSearchQuery || ""}
               onChange={(e) => setRecruitsSearchQuery(e.target.value)}
             />
           </div>
@@ -220,7 +249,9 @@ export default function MentorOpportunityDetailsPage() {
       ))}
       {filteredRecruitedApplicants?.length === 0 && (
         <div className="text-center text-gray-500 py-8">
-          {recruitsSearchQuery ? "No matching volunteers found" : "No recruited volunteers yet"}
+          {recruitsSearchQuery
+            ? "No matching volunteers found"
+            : "No recruited volunteers yet"}
         </div>
       )}
     </div>
@@ -271,11 +302,17 @@ export default function MentorOpportunityDetailsPage() {
                   </h1>
                   <div className="flex items-center gap-2">
                     <Users className="h-4 w-4 text-purple-600" />
-                    <span className="text-sm text-purple-600 font-medium">Mentor View</span>
+                    <span className="text-sm text-purple-600 font-medium">
+                      Mentor View
+                    </span>
                   </div>
                 </div>
               </div>
-              <DynamicTabs defaultValue="post" tabs={tabs} className="mb-6 sm:mb-8" />
+              <DynamicTabs
+                defaultValue="post"
+                tabs={tabs}
+                className="mb-6 sm:mb-8"
+              />
             </div>
           </div>
         </div>
@@ -287,4 +324,4 @@ export default function MentorOpportunityDetailsPage() {
       />
     </ProtectedLayout>
   );
-} 
+}
