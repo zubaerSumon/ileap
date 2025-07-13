@@ -36,6 +36,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   onLoadMore,
   hasMore,
   isLoadingMore,
+  currentUserId,
   isSending,
   selectedConversationId,
 }) => {
@@ -155,6 +156,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
             onDeleteConversation={onDeleteConversation}
             onGroupUpdated={onGroupUpdated}
             userRole={session?.user?.role}
+            currentUserId={currentUserId}
           />
         )}
         <div className="flex-1 flex flex-col items-center justify-center py-8 px-4">
@@ -197,6 +199,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
           onDeleteConversation={onDeleteConversation}
           onGroupUpdated={onGroupUpdated}
           userRole={session?.user?.role}
+          currentUserId={currentUserId}
         />
       )}
 

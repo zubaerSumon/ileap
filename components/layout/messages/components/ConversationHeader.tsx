@@ -23,6 +23,7 @@ interface ConversationHeaderProps {
   onDeleteConversation?: () => void;
   onGroupUpdated?: () => void;
   userRole?: string;
+  currentUserId?: string;
 }
 
 export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
@@ -31,7 +32,8 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
   onDeleteGroup,
   onDeleteConversation,
   onGroupUpdated,
-  userRole
+  userRole,
+  currentUserId
 }) => {
   if (!user) return null;
 
@@ -95,8 +97,8 @@ export const ConversationHeader: React.FC<ConversationHeaderProps> = ({
           />
         )}
         
-        {/* Action Menu - Dropdown for better mobile experience - Hidden for volunteers */}
-        {userRole !== "volunteer" && (
+        {/* Action Menu - Dropdown for better mobile experience - Hidden for volunteers, but allow group creators */}
+        {(userRole !== "volunteer" || (isGroup && 'createdBy' in user && user.createdBy === currentUserId)) && (
           <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button

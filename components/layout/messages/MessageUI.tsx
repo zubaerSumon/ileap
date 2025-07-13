@@ -170,7 +170,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
                   selectedConversation={isGroup ? selectedGroup : selectedConversation || { _id: selectedUserId, user: { name: "New Conversation", avatar: "" } }}
                   session={session}
                   isGroup={isGroup}
-                  onDeleteGroup={isGroup && session?.user?.role !== "volunteer" ? () => setShowDeleteModal(true) : undefined}
+                  onDeleteGroup={isGroup && (session?.user?.role !== "volunteer" || selectedGroup?.createdBy === session?.user?.id) ? () => setShowDeleteModal(true) : undefined}
                   onLoadMore={handleLoadMore}
                   hasMore={hasMore}
                   isLoadingMore={isLoadingMore}
@@ -239,7 +239,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
                 selectedConversation={isGroup ? selectedGroup : selectedConversation || { _id: selectedUserId, user: { name: "New Conversation", avatar: "" } }}
                 session={session}
                 isGroup={isGroup}
-                onDeleteGroup={isGroup && session?.user?.role !== "volunteer" ? () => setShowDeleteModal(true) : undefined}
+                onDeleteGroup={isGroup && (session?.user?.role !== "volunteer" || selectedGroup?.createdBy === session?.user?.id) ? () => setShowDeleteModal(true) : undefined}
                 onLoadMore={handleLoadMore}
                 hasMore={hasMore}
                 isLoadingMore={isLoadingMore}

@@ -823,14 +823,15 @@ export const messsageRouter = router({
           });
         }
 
-        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
+        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group OR if user is the group creator
         const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
         const isGroupAdmin = group.admins.includes(user._id);
+        const isGroupCreator = group.createdBy.toString() === user._id.toString();
         
-        if (!isAdminOrMentor && !isGroupAdmin) {
+        if (!isAdminOrMentor && !isGroupAdmin && !isGroupCreator) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "You don't have permission to delete this group",
+            message: "You don't have permission to delete this group. Only group creators, admins, mentors, and organizations can delete groups.",
           });
         }
 
