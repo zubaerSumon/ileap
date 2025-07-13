@@ -234,7 +234,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
             )}
             {sortedMessages.map((message: Message, index) => (
               <div
-                key={`${message._id}-${index}`}
+                key={message._id}
                 ref={index === sortedMessages.length - 1 ? lastMessageRef : null}
               >
                 <MessageBubble
