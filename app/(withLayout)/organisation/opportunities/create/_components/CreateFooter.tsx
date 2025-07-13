@@ -1,8 +1,8 @@
 "use client";
 
+import Loading from "@/app/loading";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-
+ 
 interface CreateFooterProps {
   onCreate: () => void;
   isLoading: boolean;
@@ -20,10 +20,9 @@ export default function CreateFooter({
         disabled={isLoading}
       >
         {isLoading ? (
-          <div className="flex items-center">
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            Creating...
-          </div>
+          <Loading size="medium">
+            <p className="text-gray-600 mt-2">Creating...</p>
+          </Loading>
         ) : (
           "Create Opportunity"
         )}

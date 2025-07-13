@@ -1,10 +1,10 @@
 "use client";
 import { Fragment, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2 } from "lucide-react";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 import TopNavigationBar from "@/components/navbar/TopNavigationBar";
 import UpdatedFooter from "../UpdatedFooter";
+import Loading from "@/app/loading";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -34,10 +34,9 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
 
   if (isLoading || !isAuthenticated) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-4 text-gray-600">Wait a sec...</p>
-      </div>
+      <Loading size="medium">
+        <p className="text-gray-600 mt-2">Wait a sec...</p>
+      </Loading>
     );
   }
 

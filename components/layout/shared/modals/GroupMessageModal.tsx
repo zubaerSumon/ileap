@@ -83,7 +83,7 @@ export function GroupMessageModal({
               disabled={
                 !groupMessage.trim() || sendGroupMessageMutation.isPending
               }
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto bg-blue-600 text-white hover:bg-blue-700"
             >
               {sendGroupMessageMutation.isPending
                 ? "Sending..."

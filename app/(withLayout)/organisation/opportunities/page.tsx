@@ -20,6 +20,7 @@ import { PaginationWrapper } from "@/components/PaginationWrapper";
 import { usePagination } from "@/hooks/usePagination";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import OpportunityActionsDropdown from "@/components/layout/organisation/opportunities/OpportunityActionsDropdown";
+import Loading from "@/app/loading";
 
 export default function OpportunitiesPage() {
   const [activeTab, setActiveTab] = useState("open");
@@ -367,9 +368,9 @@ export default function OpportunitiesPage() {
               {/* Mobile Card View */}
               <div className="md:hidden px-4 flex-1 min-h-[400px]">
                 {isLoading ? (
-                  <div className="flex justify-center items-center py-10 text-gray-500 min-h-[300px]">
-                    Loading...
-                  </div>
+                  <Loading size="medium">
+                    <p className="text-gray-600 mt-2">Wait a sec...</p>
+                  </Loading>
                 ) : paginatedData.length === 0 ? (
                   <div className="flex justify-center items-center py-10 text-gray-500 min-h-[300px]">
                     No opportunities found.

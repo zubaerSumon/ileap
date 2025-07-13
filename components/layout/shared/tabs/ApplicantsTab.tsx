@@ -12,6 +12,10 @@ interface ApplicantsTabProps {
   userRole: "volunteer" | "organisation";
   isCurrentUserMentor: boolean;
   currentUserId?: string;
+  opportunity?: {
+    created_by?: { _id: string };
+    organization_profile?: { _id: string };
+  };
 }
 
 export function ApplicantsTab({
@@ -19,6 +23,7 @@ export function ApplicantsTab({
   userRole,
   isCurrentUserMentor,
   currentUserId,
+  opportunity,
 }: ApplicantsTabProps) {
   const [applicantsSearchQuery, setApplicantsSearchQuery] = useState("");
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
@@ -97,8 +102,10 @@ export function ApplicantsTab({
           applicant={applicant}
           onMessageClick={() => handleOpenMessageModal(applicant)}
           opportunityId={opportunityId}
-          showMarkAsMentor={userRole === "volunteer" && isCurrentUserMentor}
+          showMarkAsMentor={(userRole === "volunteer" && isCurrentUserMentor) || userRole === "organisation"}
           isCurrentUser={applicant.id === currentUserId}
+          opportunity={opportunity}
+          isCurrentUserMentor={isCurrentUserMentor}
         />
       ))}
       {filteredApplicants?.length === 0 && (

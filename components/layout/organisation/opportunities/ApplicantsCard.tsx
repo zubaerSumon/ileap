@@ -1,12 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  MapPin,
-  UserCheck,
-  Loader2,
-  CheckCircle2,
-} from "lucide-react";
+import { MapPin, UserCheck, Loader2, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
 import { HiClipboardDocumentList } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
@@ -40,6 +35,8 @@ export function ApplicantsCard({
   opportunityId,
   showMarkAsMentor = false,
   isCurrentUser = false,
+  opportunity,
+  isCurrentUserMentor = false,
 }: {
   setIsModalOpen?: (isOpen: boolean) => void;
   hideRecruitButton?: boolean;
@@ -48,6 +45,11 @@ export function ApplicantsCard({
   opportunityId?: string;
   showMarkAsMentor?: boolean;
   isCurrentUser?: boolean;
+  opportunity?: {
+    created_by?: { _id: string };
+    organization_profile?: { _id: string };
+  };
+  isCurrentUserMentor?: boolean;
 }) {
   const utils = trpc.useUtils();
   const { data: session } = useSession();
@@ -93,10 +95,14 @@ export function ApplicantsCard({
   const toggleMentorMutation = trpc.mentors.toggleMentor.useMutation({
     onSuccess: (data) => {
       if (data.action === "added") {
-        toast.success("Volunteer has been marked as mentor for this opportunity successfully.");
+        toast.success(
+          "Volunteer has been marked as mentor for this opportunity successfully."
+        );
         setIsMentorForOpportunity(true);
       } else {
-        toast.success("Mentor has been removed from this opportunity successfully.");
+        toast.success(
+          "Mentor has been removed from this opportunity successfully."
+        );
         setIsMentorForOpportunity(false);
       }
       utils.mentors.getOpportunityMentors.invalidate();
@@ -125,7 +131,13 @@ export function ApplicantsCard({
   };
 
   const canMarkAsMentor =
-    session?.user?.role === "admin" || session?.user?.role === "mentor";
+    session?.user?.role === "admin" ||
+    session?.user?.role === "mentor" ||
+    session?.user?.role === "organisation" ||
+    (session?.user?.role === "volunteer" && isCurrentUserMentor) ||
+    opportunity?.created_by?._id === session?.user?.id ||
+    opportunity?.organization_profile?._id ===
+      session?.user?.organization_profile?._id;
 
   return (
     <div className="space-y-4 sm:space-y-6">

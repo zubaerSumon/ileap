@@ -12,6 +12,7 @@ import { Eye, EyeOff } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuthCheck } from "@/hooks/useAuthCheck";
 import { trpc } from "@/utils/trpc";
+import Loading from "@/app/loading";
 
 const signInSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -78,10 +79,9 @@ export default function LoginPage() {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <p className="mt-4 text-gray-600">Wait a sec...</p>
-      </div>
+      <Loading size="medium">
+          <p className="text-gray-600 mt-2">Wait a sec...</p>
+        </Loading>
     );
   }
 
