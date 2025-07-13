@@ -3,7 +3,7 @@
 import OpportunityCard from "./OpportunityCard";
 import OpportunityCardSkeleton from "./OpportunityCardSkeleton";
 import { Opportunity } from "@/types/opportunities";
-import EmptyState from "@/components/shared/EmptyState";
+import EmptyState from "@/components/layout/shared/EmptyState";
 import { Search } from "lucide-react";
 
 interface OpportunityListProps {

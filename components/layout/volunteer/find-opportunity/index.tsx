@@ -11,7 +11,7 @@ import OpportunityList from "./OpportunityList";
 import { Opportunity } from "@/types/opportunities";
 import { Button } from "@/components/ui/button";
 import { Filter, Search } from "lucide-react";
-import EmptyState from "@/components/shared/EmptyState";
+import EmptyState from "@/components/layout/shared/EmptyState";
 
 export default function FindOpportunity() {
   const [currentPage, setCurrentPage] = useState(1);

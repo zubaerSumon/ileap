@@ -39,6 +39,7 @@ export function ApplicantsCard({
   onMessageClick,
   opportunityId,
   showMarkAsMentor = false,
+  isCurrentUser = false,
 }: {
   setIsModalOpen?: (isOpen: boolean) => void;
   hideRecruitButton?: boolean;
@@ -46,6 +47,7 @@ export function ApplicantsCard({
   onMessageClick: () => void;
   opportunityId?: string;
   showMarkAsMentor?: boolean;
+  isCurrentUser?: boolean;
 }) {
   const utils = trpc.useUtils();
   const { data: session } = useSession();
@@ -228,8 +230,9 @@ export function ApplicantsCard({
 
           <Button
             size="lg"
-            className="bg-[#246BFD] hover:bg-[#246BFD]/90 text-white px-4 sm:px-6 rounded-[6px] w-full sm:w-auto"
+            className="bg-[#246BFD] hover:bg-[#246BFD]/90 text-white px-4 sm:px-6 rounded-[6px] w-full sm:w-auto disabled:bg-gray-300 disabled:cursor-not-allowed"
             onClick={onMessageClick}
+            disabled={isCurrentUser}
           >
             Send message
           </Button>

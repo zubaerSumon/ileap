@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Session } from "next-auth";
 import { SessionUser } from "@/types/navigation";
-import ausleapnewlogo from "../../public/ausleapnewlogo.jpg";
+import ausleapnewlogo from "../../public/images/logos/gradrient-ausleap-logo.png";
 import { STATIC_LINKS } from "@/utils/constants/navigation";
 import { UserMenu } from "./UserMenu";
 import { GiBinoculars } from "react-icons/gi";

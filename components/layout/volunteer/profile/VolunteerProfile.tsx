@@ -53,7 +53,7 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
       {/* Back Button */}
       <div className="mb-4">
         <BackButton />
@@ -81,7 +81,7 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
 
       <div className="mt-4 sm:mt-6 space-y-4 sm:space-y-6">
         {/* Basic Info */}
-        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
+        <div className=" ">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6">
             <div className="flex-1">
               <h2 className="text-xl sm:text-2xl font-semibold text-gray-800 mb-3 sm:mb-4">
@@ -147,7 +147,7 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
         </div>
 
         {/* Additional Info */}
-        <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
+        <div className=" ">
           <h3 className="text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
             Additional Information
           </h3>
@@ -177,7 +177,7 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
 
         {/* Experience/Applications Section */}
         {applications && applications.length > 0 && (
-          <div className="bg-white rounded-lg p-4 sm:p-6 shadow-sm">
+          <div className=" ">
             <h3 className="text-lg font-semibold text-gray-800 mb-3 sm:mb-4">
               Experience & Applications
             </h3>
