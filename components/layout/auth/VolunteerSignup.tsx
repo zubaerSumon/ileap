@@ -59,14 +59,17 @@ export default function VolunteerSignup() {
                 : `/${role}/dashboard`
             );
           }
+          // Don't set isProfileLoading to false here - let the redirection happen while button is still disabled
         }, 1000);
       } catch (error) {
         console.error("Error updating user with profile:", error);
         toast.error("Failed to complete profile setup");
+        setIsProfileLoading(false);
       }
     },
     onError: (error) => {
       setError(error.message || "Failed to setup profile");
+      setIsProfileLoading(false);
     },
   });
 
@@ -147,7 +150,6 @@ export default function VolunteerSignup() {
           });
         } catch (err) {
           console.error("Profile setup error:", err);
-        } finally {
           setIsProfileLoading(false);
         }
       }
@@ -264,7 +266,7 @@ export default function VolunteerSignup() {
                         type="button"
                         variant="outline"
                         onClick={handleBack}
-                        disabled={isSignupLoading || isProfileLoading}
+                        disabled={isSignupLoading || isProfileLoading || isProfileSetupComplete}
                       >
                         Back
                       </Button>
@@ -273,7 +275,7 @@ export default function VolunteerSignup() {
                   <Button
                     type="button"
                     onClick={handleNext}
-                    disabled={isSignupLoading || isProfileLoading}
+                    disabled={isSignupLoading || isProfileLoading || isProfileSetupComplete}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
                     {isSignupLoading || isProfileLoading ? (

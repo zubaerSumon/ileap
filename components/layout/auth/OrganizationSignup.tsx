@@ -45,21 +45,26 @@ export default function OrganizationSignup() {
 
         await utils.users.profileCheckup.invalidate();
 
-        const role = session?.user?.role?.toLowerCase();
-        if (role) {
-          router.replace(
-            role !== "volunteer"
-              ? "/organisation/dashboard"
-              : `/${role}/dashboard`
-          );
-        }
+        setTimeout(() => {
+          const role = session?.user?.role?.toLowerCase();
+          if (role) {
+            router.replace(
+              role !== "volunteer"
+                ? "/organisation/dashboard"
+                : `/${role}/dashboard`
+            );
+          }
+          // Don't set isProfileLoading to false here - let the redirection happen while button is still disabled
+        }, 1000);
       } catch (error) {
         console.error("Error updating user with profile:", error);
         toast.error("Failed to complete profile setup");
+        setIsProfileLoading(false);
       }
     },
     onError: (error) => {
       setError(error.message || "Failed to setup profile");
+      setIsProfileLoading(false);
     },
   });
 
@@ -176,7 +181,6 @@ export default function OrganizationSignup() {
           });
         } catch (err) {
           console.error("Profile setup error:", err);
-        } finally {
           setIsProfileLoading(false);
         }
       }
@@ -273,7 +277,7 @@ export default function OrganizationSignup() {
                     variant="outline"
                     onClick={handleBack}
                     disabled={
-                      isSignupLoading || isProfileLoading || isImageUploading
+                      isSignupLoading || isProfileLoading || isImageUploading || isProfileSetupComplete
                     }
                     className="cursor-pointer"
                   >
@@ -285,7 +289,7 @@ export default function OrganizationSignup() {
                 type="button"
                 onClick={handleNext}
                 disabled={
-                  isSignupLoading || isProfileLoading || isImageUploading
+                  isSignupLoading || isProfileLoading || isImageUploading || isProfileSetupComplete
                 }
                 className="bg-blue-600 hover:bg-blue-700 cursor-pointer"
               >
