@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { GiBinoculars } from "react-icons/gi";
 import { Session } from "next-auth";
-import Logo from "../../public/AusLeap.png";
+import Logo from "../../public/images/logos/gradrient-ausleap-logo.png";
 import { PUBLIC_NAV_OPTIONS, STATIC_LINKS } from "@/utils/constants/navigation";
 import { NavLink } from "./NavLink";
 import { NotificationBell } from "@/components/ui/notification-bell";
@@ -51,7 +51,7 @@ export function MobileMenu({
             alt="iLEAP Logo"
             width={100}
             height={40}
-            className="h-10 w-auto"
+            className="h-10 w-auto bg-transparent"
             style={{ width: "auto", height: "40px" }}
             priority
           />

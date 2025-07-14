@@ -97,7 +97,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
               }
               width={20}
               height={20}
-              className="rounded-full"
+              className="rounded-full w-5 h-5 object-cover"
             />
           </div>
           <div className="text-sm text-gray-600 min-w-0">
