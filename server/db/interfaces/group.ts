@@ -7,6 +7,7 @@ export interface IGroup extends Document {
   admins: Types.ObjectId[];
   createdBy: Types.ObjectId;
   isOrganizationGroup: boolean;
+  opportunityId?: Types.ObjectId; // Add opportunity ID for opportunity-specific groups
   avatar?: string;
   createdAt: Date;
   updatedAt: Date;

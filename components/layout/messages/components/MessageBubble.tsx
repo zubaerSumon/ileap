@@ -11,12 +11,16 @@ interface MessageBubbleProps {
 
 const formatMessageDate = (date: Date): string => {
   const now = new Date();
-  const diffDays = differenceInDays(now, date);
-
-  if (diffDays === 0) {
+  const diffInDays = differenceInDays(now, date);
+  
+  if (diffInDays === 0) {
     return format(date, "h:mm a");
+  } else if (diffInDays === 1) {
+    return "Yesterday";
+  } else if (diffInDays < 7) {
+    return format(date, "EEEE");
   } else {
-    return `${diffDays} days ago`;
+    return format(date, "MMM d");
   }
 };
 
@@ -26,7 +30,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwnMess
   >
     {!isOwnMessage && message.sender && (
       <div className="flex-shrink-0 mr-2 sm:mr-3">
-        <Avatar name={message.sender.name || ''} avatar={message.sender.avatar} size={28} />
+        <Avatar name={message.sender.name || ''} image={message.sender.image} size={28} />
       </div>
     )}
     <div
@@ -47,7 +51,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({ message, isOwnMess
     </div>
     {isOwnMessage && message.sender && (
       <div className="flex-shrink-0 ml-2 sm:ml-3">
-        <Avatar name={message.sender.name || ''} avatar={message.sender.avatar} size={28} />
+        <Avatar name={message.sender.name || ''} image={message.sender.image} size={28} />
       </div>
     )}
   </div>

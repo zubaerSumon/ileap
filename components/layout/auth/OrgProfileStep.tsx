@@ -3,14 +3,18 @@ import { PhoneField } from "@/components/form-input/PhoneField";
 import { UseFormReturn } from "react-hook-form";
 import { OrgSignupFormData } from "@/types/auth";
 import { FormSelect } from "@/components/form-input/FormSelect";
+import { Button } from "@/components/ui/button";
 import { suburbs } from "@/utils/constants/suburb";
 import { locations } from "@/utils/constants/select-options";
+import { useState } from "react";
 
 interface OrgProfileStepProps {
   form: UseFormReturn<OrgSignupFormData>;
 }
 
 export function OrgProfileStep({ form }: OrgProfileStepProps) {
+  const [isCustomArea, setIsCustomArea] = useState(false);
+
   return (
     <>
       <div className="mb-8">
@@ -73,16 +77,47 @@ export function OrgProfileStep({ form }: OrgProfileStepProps) {
           searchEnabled
         />
 
-        <FormSelect
-          label="Suburb"
-          id="area"
-          placeholder="Select suburb"
-          control={form.control}
-          registerName="area"
-          error={form.formState.errors.area?.message}
-          options={suburbs}
-          searchEnabled
-        />
+        {!isCustomArea ? (
+          <FormSelect
+            label="Suburb"
+            id="area"
+            placeholder="Select suburb"
+            control={form.control}
+            registerName="area"
+            error={form.formState.errors.area?.message}
+            options={suburbs}
+            searchEnabled
+            onChange={(value) => {
+              if (value === "custom") {
+                setIsCustomArea(true);
+                form.setValue("area", "");
+              }
+            }}
+          />
+        ) : (
+          <div className="space-y-2">
+            <FormField
+              label="Suburb"
+              id="area"
+              placeholder="Enter your suburb/area"
+              register={form.register}
+              registerName="area"
+              error={form.formState.errors.area?.message}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setIsCustomArea(false);
+                form.setValue("area", "");
+              }}
+              className="text-xs"
+            >
+              ← Back to existing suburbs
+            </Button>
+          </div>
+        )}
 
         <FormField
           label="ABN"

@@ -14,7 +14,7 @@ interface SidebarProps {
   onSelectUser: (userId: string) => void;
   isLoadingConversations: boolean;
   isLoadingGroups: boolean;
-  availableUsers: { _id: string; name: string; avatar: string; role: string }[] | undefined;
+  availableUsers: { _id: string; name: string; image: string; role: string }[] | undefined;
   isLoadingUsers: boolean;
   userRole?: string;
   onGroupCreated: () => void;

@@ -52,7 +52,7 @@ export const messsageRouter = router({
 
         // Populate the sender information for the response
         const populatedMessage = await Message.findById(message._id)
-          .populate('sender', 'name avatar role')
+          .populate('sender', 'name image role')
           .lean();
 
         // Publish the new message to both sender and receiver channels
@@ -118,7 +118,7 @@ export const messsageRouter = router({
           .sort({ createdAt: -1 })
           .limit(limit + 1)
           .skip(cursor ? 1 : 0)
-          .populate('sender', 'name avatar role')
+          .populate('sender', 'name image role')
           .lean();
 
         let nextCursor: string | undefined = undefined;
@@ -243,7 +243,7 @@ export const messsageRouter = router({
               {
                 $project: {
                   name: 1,
-                  avatar: 1,
+                  image: 1,
                   role: 1,
                   organization_profile: {
                     title: 1
@@ -452,7 +452,7 @@ export const messsageRouter = router({
         }
 
         // Check if user can create groups
-        const canCreateGroups = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        const canCreateGroups = user.role === "admin" || user.role === "organization";
         
         // If user is a volunteer, check if they are assigned as a mentor
         if (!canCreateGroups && user.role === "volunteer") {
@@ -487,10 +487,10 @@ export const messsageRouter = router({
         }
 
         // Check if user is an admin or mentor when creating an organization group
-        if (input.isOrganizationGroup && user.role !== "admin" && user.role !== "mentor") {
+        if (input.isOrganizationGroup && user.role !== "admin") {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "Only admins and mentors can create organisation groups",
+            message: "Only admins can create organization groups",
           });
         }
 
@@ -521,12 +521,13 @@ export const messsageRouter = router({
           members: uniqueMemberIds,
           admins: allAdmins,
           isOrganizationGroup: input.isOrganizationGroup || false,
+          opportunityId: input.opportunityId ? new Types.ObjectId(input.opportunityId) : undefined,
         });
 
         // Get the populated group data
         const populatedGroup = await Group.findById(group._id)
-          .populate('members', 'name avatar role')
-          .populate('admins', 'name avatar role')
+          .populate('members', 'name image role')
+          .populate('admins', 'name image role')
           .lean();
 
         if (!populatedGroup) {
@@ -548,6 +549,7 @@ export const messsageRouter = router({
           })) || [],
           createdBy: group.createdBy.toString(),
           isOrganizationGroup: group.isOrganizationGroup,
+          opportunityId: group.opportunityId?.toString(),
           avatar: group.avatar,
           createdAt: group.createdAt,
           updatedAt: group.updatedAt,
@@ -587,8 +589,8 @@ export const messsageRouter = router({
 
         // Get groups where user is a member
         const groups = await Group.find({ members: currentUserId })
-          .populate('members', 'name avatar role')
-          .populate('admins', 'name avatar role')
+          .populate('members', 'name image role')
+          .populate('admins', 'name image role')
           .lean();
 
         // Get the last message and unread count for each group
@@ -596,8 +598,8 @@ export const messsageRouter = router({
           groups.map(async (group: any) => {
             const lastMessage = await Message.findOne({ group: group._id })
               .sort({ createdAt: -1 })
-              .populate('sender', 'name avatar role')
-              .lean() as (IMessage & { sender: { name: string; avatar: string; role: string } }) | null;
+              .populate('sender', 'name image role')
+              .lean() as (IMessage & { sender: { name: string; image: string; role: string } }) | null;
 
             // Count unread messages (messages not in readBy array for current user)
             const unreadCount = await Message.countDocuments({
@@ -608,6 +610,7 @@ export const messsageRouter = router({
 
             return {
               ...group,
+              opportunityId: group.opportunityId?.toString(),
               lastMessage: lastMessage ? {
                 content: lastMessage.content,
                 isRead: lastMessage.readBy.some((read: { user: Types.ObjectId }) => 
@@ -669,7 +672,7 @@ export const messsageRouter = router({
 
         // Populate the sender information for the response
         const populatedMessage = await Message.findById(message._id)
-          .populate('sender', 'name avatar role')
+          .populate('sender', 'name image role')
           .populate('group', 'name')
           .lean();
 
@@ -745,7 +748,7 @@ export const messsageRouter = router({
           .sort({ createdAt: -1 })
           .limit(limit + 1)
           .skip(cursor ? 1 : 0)
-          .populate('sender', 'name avatar role')
+          .populate('sender', 'name image role')
           .lean();
 
         let nextCursor: string | undefined = undefined;
@@ -817,15 +820,26 @@ export const messsageRouter = router({
           });
         }
 
-        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group OR if user is the group creator
-        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        // Check permissions: Allow if user is admin/organization OR if user is admin of the group OR if user is the group creator OR if user is an opportunity mentor
+        const isAdminOrOrganization = user.role === "admin" || user.role === "organization";
         const isGroupAdmin = group.admins.includes(user._id);
         const isGroupCreator = group.createdBy.toString() === user._id.toString();
         
-        if (!isAdminOrMentor && !isGroupAdmin && !isGroupCreator) {
+        // Check if user is an opportunity mentor for this group's opportunity
+        let isOpportunityMentor = false;
+        if (group.opportunityId && user.role === "volunteer") {
+          const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
+          const mentorAssignment = await OpportunityMentor.findOne({
+            volunteer: user._id,
+            opportunity: group.opportunityId,
+          });
+          isOpportunityMentor = !!mentorAssignment;
+        }
+        
+        if (!isAdminOrOrganization && !isGroupAdmin && !isGroupCreator && !isOpportunityMentor) {
           throw new TRPCError({
             code: "FORBIDDEN",
-            message: "You don't have permission to delete this group. Only group creators, admins, mentors, and organizations can delete groups.",
+            message: "You don't have permission to delete this group. Only group creators, admins, organizations, and opportunity mentors can delete groups.",
           });
         }
 
@@ -876,11 +890,25 @@ export const messsageRouter = router({
           });
         }
 
-        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
-        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        // Check permissions: Allow if user is admin/organization OR if user is admin of the group OR if user is an opportunity mentor OR if user is the group creator
+        const isAdminOrOrganization = user.role === "admin" || user.role === "organization";
         const isGroupAdmin = group.admins.includes(user._id);
+        const isGroupCreator = group.createdBy.toString() === user._id.toString();
         
-        if (!isAdminOrMentor && !isGroupAdmin) {
+        // Check if user is an opportunity mentor for this group's opportunity
+        let isOpportunityMentor = false;
+        if (group.opportunityId && user.role === "volunteer") {
+          const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
+          const mentorAssignment = await OpportunityMentor.findOne({
+            volunteer: user._id,
+            opportunity: group.opportunityId,
+          });
+          isOpportunityMentor = !!mentorAssignment;
+          
+
+        }
+        
+        if (!isAdminOrOrganization && !isGroupAdmin && !isOpportunityMentor && !isGroupCreator) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You don't have permission to add members to this group",
@@ -911,8 +939,8 @@ export const messsageRouter = router({
 
         // Get the updated group with populated data
         const updatedGroup = await Group.findById(input.groupId)
-          .populate('members', 'name avatar role')
-          .populate('admins', 'name avatar role')
+          .populate('members', 'name image role')
+          .populate('admins', 'name image role')
           .lean();
 
         return updatedGroup;
@@ -956,11 +984,23 @@ export const messsageRouter = router({
           });
         }
 
-        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
-        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        // Check permissions: Allow if user is admin/organization OR if user is admin of the group OR if user is an opportunity mentor OR if user is the group creator
+        const isAdminOrOrganization = user.role === "admin" || user.role === "organization";
         const isGroupAdmin = group.admins.includes(user._id);
+        const isGroupCreator = group.createdBy.toString() === user._id.toString();
         
-        if (!isAdminOrMentor && !isGroupAdmin) {
+        // Check if user is an opportunity mentor for this group's opportunity
+        let isOpportunityMentor = false;
+        if (group.opportunityId && user.role === "volunteer") {
+          const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
+          const mentorAssignment = await OpportunityMentor.findOne({
+            volunteer: user._id,
+            opportunity: group.opportunityId,
+          });
+          isOpportunityMentor = !!mentorAssignment;
+        }
+        
+        if (!isAdminOrOrganization && !isGroupAdmin && !isOpportunityMentor && !isGroupCreator) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You don't have permission to remove members from this group",
@@ -996,8 +1036,8 @@ export const messsageRouter = router({
 
         // Get the updated group with populated data
         const updatedGroup = await Group.findById(input.groupId)
-          .populate('members', 'name avatar role')
-          .populate('admins', 'name avatar role')
+          .populate('members', 'name image role')
+          .populate('admins', 'name image role')
           .lean();
 
         return updatedGroup;
@@ -1041,11 +1081,23 @@ export const messsageRouter = router({
           });
         }
 
-        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
-        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        // Check permissions: Allow if user is admin/organization OR if user is admin of the group OR if user is an opportunity mentor OR if user is the group creator
+        const isAdminOrOrganization = user.role === "admin" || user.role === "organization";
         const isGroupAdmin = group.admins.includes(user._id);
+        const isGroupCreator = group.createdBy.toString() === user._id.toString();
         
-        if (!isAdminOrMentor && !isGroupAdmin) {
+        // Check if user is an opportunity mentor for this group's opportunity
+        let isOpportunityMentor = false;
+        if (group.opportunityId && user.role === "volunteer") {
+          const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
+          const mentorAssignment = await OpportunityMentor.findOne({
+            volunteer: user._id,
+            opportunity: group.opportunityId,
+          });
+          isOpportunityMentor = !!mentorAssignment;
+        }
+        
+        if (!isAdminOrOrganization && !isGroupAdmin && !isOpportunityMentor && !isGroupCreator) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You don't have permission to promote members in this group",
@@ -1075,8 +1127,8 @@ export const messsageRouter = router({
 
         // Get the updated group with populated data
         const updatedGroup = await Group.findById(input.groupId)
-          .populate('members', 'name avatar role')
-          .populate('admins', 'name avatar role')
+          .populate('members', 'name image role')
+          .populate('admins', 'name image role')
           .lean();
 
         return updatedGroup;
@@ -1120,11 +1172,23 @@ export const messsageRouter = router({
           });
         }
 
-        // Check permissions: Allow if user is admin/mentor/organization OR if user is admin of the group
-        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organisation";
+        // Check permissions: Allow if user is admin/organization OR if user is admin of the group OR if user is an opportunity mentor OR if user is the group creator
+        const isAdminOrOrganization = user.role === "admin" || user.role === "organization";
         const isGroupAdmin = group.admins.includes(user._id);
+        const isGroupCreator = group.createdBy.toString() === user._id.toString();
         
-        if (!isAdminOrMentor && !isGroupAdmin) {
+        // Check if user is an opportunity mentor for this group's opportunity
+        let isOpportunityMentor = false;
+        if (group.opportunityId && user.role === "volunteer") {
+          const OpportunityMentor = (await import("@/server/db/models/opportunity-mentor")).default;
+          const mentorAssignment = await OpportunityMentor.findOne({
+            volunteer: user._id,
+            opportunity: group.opportunityId,
+          });
+          isOpportunityMentor = !!mentorAssignment;
+        }
+        
+        if (!isAdminOrOrganization && !isGroupAdmin && !isOpportunityMentor && !isGroupCreator) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You don't have permission to demote admins in this group",
@@ -1155,8 +1219,8 @@ export const messsageRouter = router({
 
         // Get the updated group with populated data
         const updatedGroup = await Group.findById(input.groupId)
-          .populate('members', 'name avatar role')
-          .populate('admins', 'name avatar role')
+          .populate('members', 'name image role')
+          .populate('admins', 'name image role')
           .lean();
 
         return updatedGroup;
@@ -1198,9 +1262,9 @@ export const messsageRouter = router({
           });
         }
 
-        // Only allow admin, mentor, or organization users to delete conversations
-        const isAdminOrMentor = user.role === "admin" || user.role === "mentor" || user.role === "organization";
-        if (!isAdminOrMentor) {
+        // Only allow admin or organization users to delete conversations
+        const isAdminOrOrganization = user.role === "admin" || user.role === "organization";
+        if (!isAdminOrOrganization) {
           throw new TRPCError({
             code: "FORBIDDEN",
             message: "You don't have permission to delete conversations",

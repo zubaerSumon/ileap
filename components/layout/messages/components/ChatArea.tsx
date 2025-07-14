@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MessageBubble from "./MessageBubble";
-import ConversationHeader from "./ConversationHeader";
+import ConversationHeaderOptimized from "./ConversationHeaderOptimized";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Users } from "lucide-react";
@@ -19,9 +19,9 @@ interface ChatAreaProps {
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
-  currentUserId: string;
   isSending: boolean;
   selectedConversationId: string | null;
+  onBack?: () => void;
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = React.memo(({ 
@@ -36,9 +36,9 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   onLoadMore,
   hasMore,
   isLoadingMore,
-  currentUserId,
   isSending,
   selectedConversationId,
+  onBack,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
@@ -122,10 +122,11 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   const headerData = isGroup ? {
     name: (selectedConversation as Group)?.name,
     members: (selectedConversation as Group)?.members?.length,
-    avatar: (selectedConversation as Group)?.avatar
+    image: (selectedConversation as Group)?.avatar
   } : selectedConversation && 'user' in selectedConversation ? {
     name: selectedConversation.user.name,
-    avatar: selectedConversation.user.avatar
+    image: selectedConversation.user.image,
+    _id: selectedConversation.user._id
   } : undefined;
 
   // Sort messages by creation time in ascending order and remove duplicates
@@ -149,14 +150,16 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
     return (
       <div className="flex-1 flex flex-col">
         {selectedConversation && (
-          <ConversationHeader 
-            user={isGroup ? (selectedConversation as Group) : (headerData || { name: "Unknown", avatar: "" })}
+          <ConversationHeaderOptimized 
+            user={isGroup ? (selectedConversation as Group) : (headerData || { name: "Unknown", image: "" })}
             isGroup={isGroup}
             onDeleteGroup={onDeleteGroup}
             onDeleteConversation={onDeleteConversation}
             onGroupUpdated={onGroupUpdated}
             userRole={session?.user?.role}
-            currentUserId={currentUserId}
+            currentUserId={session?.user?.id}
+            onBack={onBack}
+            showBackButton={true}
           />
         )}
         <div className="flex-1 flex flex-col items-center justify-center py-8 px-4">
@@ -192,14 +195,16 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
   return (
     <div className="flex flex-col h-full">
       {selectedConversation && (
-        <ConversationHeader 
-          user={isGroup ? (selectedConversation as Group) : (headerData || { name: "Unknown", avatar: "" })}
+        <ConversationHeaderOptimized 
+          user={isGroup ? (selectedConversation as Group) : (headerData || { name: "Unknown", image: "" })}
           isGroup={isGroup}
           onDeleteGroup={onDeleteGroup}
           onDeleteConversation={onDeleteConversation}
           onGroupUpdated={onGroupUpdated}
           userRole={session?.user?.role}
-          currentUserId={currentUserId}
+          currentUserId={session?.user?.id}
+          onBack={onBack}
+          showBackButton={true}
         />
       )}
 

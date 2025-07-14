@@ -58,6 +58,7 @@ const defaultValues: OrganizationProfileData = {
 export default function OrganizationProfile() {
   const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
+  const [isCustomArea, setIsCustomArea] = useState(false);
   const { data: profileData, isLoading } = trpc.users.profileCheckup.useQuery();
   const { data: session } = useSession();
   const utils = trpc.useUtils();
@@ -121,6 +122,13 @@ export default function OrganizationProfile() {
         keepIsValid: false,
         keepSubmitCount: false,
       });
+
+      // Check if the area is a custom value (not in the suburbs list)
+      if (profile.area) {
+        const areaValue = profile.area.replace(/_/g, ' ');
+        const isInSuburbsList = suburbs.some(suburb => suburb.value === areaValue || suburb.label === areaValue);
+        setIsCustomArea(!isInSuburbsList);
+      }
     }
   }, [profileData?.organizationProfile, isLoading, form]);
 
@@ -343,16 +351,45 @@ export default function OrganizationProfile() {
                           searchEnabled
                         />
 
-                        <FormSelect<OrganizationProfileData>
-                          label="Area"
-                          id="area"
-                          placeholder="Select your area"
-                          control={form.control}
-                          registerName="area"
-                          error={form.formState.errors.area?.message}
-                          options={suburbs}
-                          searchEnabled
-                        />
+                        {!isCustomArea ? (
+                          <FormSelect<OrganizationProfileData>
+                            label="Area"
+                            id="area"
+                            placeholder="Select your suburb"
+                            control={form.control}
+                            registerName="area"
+                            error={form.formState.errors.area?.message}
+                            options={suburbs}
+                            searchEnabled
+                            onChange={(value) => {
+                              if (value === "custom") {
+                                setIsCustomArea(true);
+                                form.setValue("area", "");
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="space-y-2">
+                            <FormInput<OrganizationProfileData>
+                              control={form.control}
+                              name="area"
+                              label="Area"
+                              placeholder="Enter your suburb/area"
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setIsCustomArea(false);
+                                form.setValue("area", "");
+                              }}
+                              className="text-xs"
+                            >
+                              ← select from existing list
+                            </Button>
+                          </div>
+                        )}
                       </div>
 
                       <FormInput<OrganizationProfileData>
@@ -485,7 +522,7 @@ export default function OrganizationProfile() {
                 </Card>
 
                 {/* Organization Details */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6">
                   {profile?.type && (
                     <Card>
                       <CardHeader>
@@ -495,8 +532,10 @@ export default function OrganizationProfile() {
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <Badge variant="secondary" className="px-3 py-1 text-sm">
-                          {organizationTypes.find(type => type.value === profile.type)?.label || profile.type}
+                        <Badge variant="secondary" className="px-3 py-1 text-sm break-words max-w-full">
+                          <span className="break-words">
+                            {organizationTypes.find(type => type.value === profile.type)?.label || profile.type}
+                          </span>
                         </Badge>
                       </CardContent>
                     </Card>
@@ -549,9 +588,11 @@ export default function OrganizationProfile() {
                           <Badge
                             key={index}
                             variant="secondary"
-                            className="px-3 py-1 text-sm"
+                            className="px-3 py-1 text-sm break-words max-w-full"
                           >
-                            {volunteerTypes.find(t => t.value === type)?.label || type}
+                            <span className="break-words">
+                              {volunteerTypes.find(t => t.value === type)?.label || type}
+                            </span>
                           </Badge>
                         ))}
                       </div>
@@ -576,9 +617,11 @@ export default function OrganizationProfile() {
                           <Badge
                             key={index}
                             variant="outline"
-                            className="px-3 py-1 text-sm"
+                            className="px-3 py-1 text-sm break-words max-w-full"
                           >
-                            {volunteerTypes.find(s => s.value === skill)?.label || skill}
+                            <span className="break-words">
+                              {volunteerTypes.find(s => s.value === skill)?.label || skill}
+                            </span>
                           </Badge>
                         ))}
                       </div>
