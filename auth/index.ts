@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import connectToDatabase from "@/server/config/mongoose";
 import User from "@/server/db/models/user";
 import { authConfig } from "./config";
+import { opportunityArchiver } from "@/server/services/opportunity-archiver";
 
 export const {
   handlers: { GET, POST },
@@ -22,6 +23,13 @@ export const {
   callbacks: {
     async signIn({ user, account }) {
       await connectToDatabase();
+
+      // Run opportunity archiving on login
+      try {
+        await opportunityArchiver.manualArchive();
+      } catch {
+        // Silent error handling for archiving
+      }
 
       if (account?.provider === "google") {
         try {

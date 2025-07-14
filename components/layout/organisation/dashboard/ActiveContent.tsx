@@ -6,7 +6,6 @@ interface ActiveContract {
   profileImg?: string;
   jobTitle: string;
   freelancerName: string;
-  startedAt: string;
 }
 
 interface ActiveContentProps {
@@ -27,7 +26,6 @@ const ActiveContent = ({ activeContracts, isLoadingRecruited }: ActiveContentPro
           avatar={contract.profileImg || "/avatar.svg"}
           jobTitle={contract.jobTitle}
           freelancerName={contract.freelancerName}
-          startedAt={contract.startedAt}
           onFundMilestone={() => {}}
           onMessage={() => {}}
         />

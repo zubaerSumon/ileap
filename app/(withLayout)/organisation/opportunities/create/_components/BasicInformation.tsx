@@ -23,6 +23,8 @@ export type OpportunityFormValues = {
   external_event_link?: string;
   start_date: string;
   start_time: string;
+  end_date?: string;
+  end_time?: string;
   is_recurring: boolean;
   recurrence?: {
     type: string;
@@ -321,6 +323,38 @@ export default function BasicInformation({
                 />
               </div>
             </div>
+
+            {/* End Date & Time */}
+            {form.watch("commitment_type") === "workbased" && (
+              <div>
+                <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
+                  End Date & Time
+                  <span className="text-red-500 ml-1">*</span>
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-500 mb-4">
+                  When does this opportunity end? This helps volunteers plan
+                  their availability.
+                </p>
+                <div className="space-y-4">
+                  <FormInput
+                    name={"end_date" as Path<OpportunityFormValues>}
+                    label="End Date"
+                    placeholder=""
+                    type="date"
+                    control={form.control}
+                    className="w-full sm:w-[382px]"
+                  />
+                  <FormInput
+                    name={"end_time" as Path<OpportunityFormValues>}
+                    label="End Time"
+                    placeholder=""
+                    type="time"
+                    control={form.control}
+                    className="w-full sm:w-[382px]"
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Banner Image */}
             <div>

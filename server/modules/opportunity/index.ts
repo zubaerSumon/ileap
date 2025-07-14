@@ -11,6 +11,7 @@ import OrganisationRecruitment from "@/server/db/models/organisation-recruitment
 import { publicProcedure } from "@/server/trpc";
 import mongoose from "mongoose";
 import OpportunityMentor from "@/server/db/models/opportunity-mentor";
+import { opportunityArchiver } from "@/server/services/opportunity-archiver";
  
 export const opportunityRouter = router({
   createOpportunity: protectedProcedure
@@ -96,11 +97,11 @@ export const opportunityRouter = router({
           // Map date and time fields to the nested structure
           date: {
             start_date: input.start_date ? new Date(input.start_date) : new Date(),
-            end_date: undefined, // Will be set if needed
+            end_date: input.end_date ? new Date(input.end_date) : undefined,
           },
           time: {
             start_time: input.start_time || "09:00",
-            end_time: undefined, // Will be set if needed
+            end_time: input.end_time || undefined,
           },
           is_recurring: input.is_recurring || false,
           banner_img: input.banner_img && input.banner_img.trim() !== "" ? input.banner_img : "/fallbackbanner.png",
@@ -758,6 +759,41 @@ export const opportunityRouter = router({
       throw new TRPCError({
         code: "INTERNAL_SERVER_ERROR",
         message: "Failed to test opportunities",
+        cause: error,
+      });
+    }
+  }),
+
+  // Manual archiving endpoint for testing
+  manualArchiveOpportunities: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to trigger manual archiving",
+        });
+      }
+
+      try {
+        // Check if user is admin
+        const user = await User.findById(sessionUser.id);
+        if (!user || user.role !== "admin") {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Only admins can trigger manual archiving",
+          });
+        }
+
+        // Trigger manual archiving
+        await opportunityArchiver.manualArchive();
+        
+        return { success: true, message: "Manual archiving completed" };
+      } catch (error) {
+        console.error("Error in manual archiving:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to trigger manual archiving",
         cause: error,
       });
     }

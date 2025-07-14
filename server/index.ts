@@ -10,6 +10,13 @@ import { volunteerApplicationRouter } from "./modules/volunteer-application";
 import { organisationRecruitmentRouter } from "@/server/modules/organisation-recruitment";
 import { messsageRouter } from "./modules/message";
 import { organizationMentorRouter } from "./modules/organization-mentors";
+import { notificationRouter } from "./modules/notification";
+import { initializeCronJobs } from "./services/init-cron";
+
+// Initialize cron jobs when the module is loaded
+if (process.env.NODE_ENV !== 'test') {
+  initializeCronJobs();
+}
 
 export const appRouter = router({
   users: userRouter,
@@ -21,7 +28,8 @@ export const appRouter = router({
   applications: volunteerApplicationRouter,
   recruits: organisationRecruitmentRouter,
   messages: messsageRouter,
-  mentors: organizationMentorRouter
+  mentors: organizationMentorRouter,
+  notifications: notificationRouter
 });
 
 export type AppRouter = typeof appRouter;
