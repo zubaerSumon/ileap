@@ -193,7 +193,7 @@ export default function OrganizationOpportunities({
             value="favorites"
             onClick={() => setActiveTab("favorites")}
           >
-            Favorites (
+            Favourites (
             {favoriteOpportunities?.filter((fav) =>
               opportunitiesWithSpots.some(
                 (opp) => opp._id.toString() === fav.opportunity
@@ -208,15 +208,15 @@ export default function OrganizationOpportunities({
         <div className="text-center py-8">
           <h2 className="text-xl font-semibold text-gray-600 mb-2">
             {activeTab === "favorites"
-              ? "No Favorite Opportunities"
+              ? "No Favourite Opportunities"
               : "No Opportunities Available"}
           </h2>
           <p className="text-gray-500">
             {activeTab === "favorites"
-              ? "You haven't favorited any opportunities from this organization yet. Browse all opportunities and add some to your favorites!"
+              ? "You haven't favourited any opportunities from this organisation yet. Browse all opportunities and add some to your favourites!"
               : isOrgAdminOrMentor && isUserFromThisOrg
-              ? "Your organization hasn't posted any opportunities yet. Create your first opportunity to get started!"
-              : "This organization hasn't posted any opportunities yet."}
+              ? "Your organisation hasn't posted any opportunities yet. Create your first opportunity to get started!"
+              : "This organisation hasn't posted any opportunities yet."}
           </p>
           {activeTab === "all" && isOrgAdminOrMentor && isUserFromThisOrg && (
             <div className="mt-4">
@@ -250,7 +250,7 @@ export default function OrganizationOpportunities({
                         "/avatar.svg"
                       }
                       alt={
-                        opportunity?.created_by?.name || "Unknown Organization"
+                        opportunity?.created_by?.name || "Unknown Organisation"
                       }
                       width={40}
                       height={40}

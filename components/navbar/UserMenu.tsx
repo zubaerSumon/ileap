@@ -30,12 +30,7 @@ export function UserMenu({ user }: UserMenuProps) {
   const [isAvailable, setIsAvailable] = useState(true);
   const hasInitialized = useRef(false);
   
-  // Debug logging
-  console.log('UserMenu user object:', {
-    name: user.name,
-    image: user.image,
-    role: user.role
-  });
+
   
 
   const userRole =
@@ -142,8 +137,8 @@ export function UserMenu({ user }: UserMenuProps) {
                       </p>
                       <p className="text-xs text-slate-300 leading-relaxed">
                         {isAvailable 
-                          ? "Organizations can see your profile and contact you for volunteer work."
-                          : "Your profile is hidden from organizations. Toggle to become visible again."}
+                          ? "Organisations can see your profile and contact you for volunteer work."
+                          : "Your profile is hidden from organisations. Toggle to become visible again."}
                       </p>
                     </div>
                   </div>

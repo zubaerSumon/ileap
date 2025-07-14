@@ -6,13 +6,13 @@ export type Message = {
     sender: {
       _id: string;
       name: string;
-      avatar: string;
+      image: string;
       role?: string;
     };
     receiver?: {
       _id: string;
       name: string;
-      avatar: string;
+      image: string;
       role?: string;
     };
     group?: {
@@ -27,7 +27,7 @@ export type Message = {
     user: {
       _id: string;
       name: string;
-      avatar: string;
+      image: string;
       role: string;
       organization_profile?: {
         title: string;
@@ -48,13 +48,13 @@ export type Message = {
     members: Array<{
       _id: string;
       name: string;
-      avatar: string;
+      image: string;
       role: string;
     }>;
     admins: Array<{
       _id: string;
       name: string;
-      avatar: string;
+      image: string;
       role: string;
     }>;
     lastMessage?: {
@@ -69,4 +69,5 @@ export type Message = {
     createdAt?: string;
     updatedAt?: string;
     isOrganizationGroup?: boolean;
+    opportunityId?: string; // Add opportunity ID for opportunity-specific groups
   };

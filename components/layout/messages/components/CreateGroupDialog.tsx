@@ -105,7 +105,7 @@ export const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({ onGroupCre
                     className="flex items-center justify-between p-2 bg-white rounded-md shadow-sm border"
                   >
                     <div className="flex items-center space-x-2 min-w-0 flex-1">
-                      <Avatar name={user.name} avatar={user.avatar} size={24} />
+                      <Avatar name={user.name} image={user.image} size={24} />
                       <span className="text-sm font-medium truncate">{user.name}</span>
                     </div>
                     <button
@@ -160,7 +160,7 @@ export const CreateGroupDialog: React.FC<CreateGroupDialogProps> = ({ onGroupCre
                       className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
                     />
                     <label htmlFor={user._id} className="flex items-center space-x-2 sm:space-x-3 cursor-pointer flex-1 min-w-0">
-                      <Avatar name={user.name} avatar={user.avatar} size={28} />
+                      <Avatar name={user.name} image={user.image} size={28} />
                       <div className="min-w-0 flex-1">
                         <span className="block text-sm font-medium truncate">{user.name}</span>
                         <span className="block text-xs text-gray-500 truncate">{user.role}</span>

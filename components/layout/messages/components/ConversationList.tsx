@@ -151,7 +151,7 @@ export const ConversationList: React.FC<ConversationListProps> = React.memo(
                           <div className="flex-shrink-0">
                             <Avatar
                               name={conversation.user.name}
-                              avatar={conversation.user.avatar}
+                              image={conversation.user.image}
                               size={32}
                             />
                           </div>
