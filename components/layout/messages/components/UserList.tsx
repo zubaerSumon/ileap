@@ -4,7 +4,7 @@ import Avatar from "./Avatar";
 interface User {
   _id: string;
   name: string;
-  avatar: string;
+  image: string;
   role: string;
 }
 
@@ -43,7 +43,7 @@ export const UserList: React.FC<UserListProps> = React.memo(({
                 >
                   <div className="flex items-center gap-3">
                     <div className="flex-shrink-0">
-                      <Avatar name={user.name} avatar={user.avatar} size={32} />
+                      <Avatar name={user.name} image={user.image} size={32} />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-medium truncate text-sm sm:text-base">{user.name}</h3>

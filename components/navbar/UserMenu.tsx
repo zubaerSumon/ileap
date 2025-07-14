@@ -30,12 +30,7 @@ export function UserMenu({ user }: UserMenuProps) {
   const [isAvailable, setIsAvailable] = useState(true);
   const hasInitialized = useRef(false);
   
-  // Debug logging
-  console.log('UserMenu user object:', {
-    name: user.name,
-    image: user.image,
-    role: user.role
-  });
+
   
 
   const userRole =

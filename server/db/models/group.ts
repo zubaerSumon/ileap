@@ -29,6 +29,11 @@ const groupSchema = new Schema<IGroup>(
       type: Boolean,
       default: false,
     },
+    opportunityId: {
+      type: Schema.Types.ObjectId,
+      ref: 'opportunity',
+      required: false,
+    },
     avatar: {
       type: String,
       required: false,

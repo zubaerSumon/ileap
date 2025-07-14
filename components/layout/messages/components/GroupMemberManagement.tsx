@@ -14,17 +14,33 @@ import { useSession } from "next-auth/react";
 interface GroupMemberManagementProps {
   group: Group;
   onGroupUpdated: () => void;
+  opportunityId?: string; // Add opportunityId to check if user is an opportunity mentor
 }
 
 export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({ 
   group, 
-  onGroupUpdated 
+  onGroupUpdated,
+  opportunityId
 }) => {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const { data: session } = useSession();
   const utils = trpc.useUtils();
+
+  // Check if current user is an opportunity mentor for this specific opportunity
+  const { data: opportunityMentors } = trpc.mentors.getOpportunityMentors.useQuery(
+    { opportunityId: opportunityId || group.opportunityId || "" },
+    { enabled: !!(opportunityId || group.opportunityId) }
+  );
+
+
+
+  const isCurrentUserOpportunityMentor = opportunityMentors?.some(
+    (mentor) => mentor.volunteer._id === session?.user?.id
+  ) || false;
+
+
 
   // Safety check: ensure group object is valid
   if (!group || !group._id || !group.name) {
@@ -102,10 +118,18 @@ export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({
     if (!session?.user) return false;
     
     const userRole = session.user.role;
-    const isAdminOrMentor = userRole === "admin" || userRole === "mentor" || userRole === "organisation";
+    // For base roles: admin and organization can always manage
+    const isAdminOrOrganization = userRole === "admin" || userRole === "organization";
+    // Check if user is a group admin
     const isGroupAdmin = group.admins?.some(admin => admin._id === session.user.id) || false;
+    // Check if user is an opportunity mentor for this specific opportunity
+    const isOpportunityMentor = isCurrentUserOpportunityMentor;
+    // Check if user is the group creator
+    const isGroupCreator = group.createdBy === session.user.id;
     
-    return isAdminOrMentor || isGroupAdmin;
+
+    
+    return isAdminOrOrganization || isGroupAdmin || isOpportunityMentor || isGroupCreator;
   };
 
   const handleAddMembers = (e: React.FormEvent) => {
@@ -150,6 +174,8 @@ export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({
     return memberId === session?.user?.id;
   };
 
+
+
   if (!canManageMembers()) {
     return null;
   }
@@ -188,7 +214,7 @@ export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({
                   className="flex items-center justify-between p-3 hover:bg-gray-50"
                 >
                   <div className="flex items-center space-x-3 min-w-0 flex-1">
-                    <Avatar name={member.name} avatar={member.avatar} size={32} />
+                    <Avatar name={member.name} image={member.image} size={32} />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium truncate">{member.name}</span>
@@ -274,7 +300,7 @@ export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({
                       className="flex items-center justify-between p-2 bg-white rounded-md shadow-sm border"
                     >
                       <div className="flex items-center space-x-2 min-w-0 flex-1">
-                        <Avatar name={user.name} avatar={user.avatar} size={24} />
+                        <Avatar name={user.name} image={user.image} size={24} />
                         <span className="text-sm font-medium truncate">{user.name}</span>
                       </div>
                       <button
@@ -318,7 +344,7 @@ export const GroupMemberManagement: React.FC<GroupMemberManagementProps> = ({
                       className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 flex-shrink-0"
                     />
                     <label htmlFor={user._id} className="flex items-center space-x-2 sm:space-x-3 cursor-pointer flex-1 min-w-0">
-                      <Avatar name={user.name} avatar={user.avatar} size={28} />
+                      <Avatar name={user.name} image={user.image} size={28} />
                       <div className="min-w-0 flex-1">
                         <span className="block text-sm font-medium truncate">{user.name}</span>
                         <span className="block text-xs text-gray-500 truncate">

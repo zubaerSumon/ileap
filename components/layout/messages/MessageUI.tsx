@@ -11,8 +11,6 @@ import MessageInput from './components/MessageInput';
 import { useConversations } from "@/hooks/useConversations";
 import { useMessages } from "@/hooks/useMessages";
 import { Group } from "@/types/message";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface MessageUIProps {
   initialUserId?: string | null;
@@ -39,6 +37,8 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   const selectedGroup = (groups as Group[] | undefined)?.find((g) => g._id === selectedUserId);
   const isGroup = selectedGroup !== undefined;
 
+
+
   const { 
     newMessage, 
     setNewMessage, 
@@ -60,15 +60,7 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
 
   const availableUsers = availableUsersData?.users || [];
 
-  console.log('🔍 MessageUI - Available Users Debug:', {
-    totalUsers: availableUsersData?.total || 0,
-    returnedUsers: availableUsers.length,
-    currentPage: (availableUsersData as { currentPage?: number })?.currentPage || 1,
-    totalPages: availableUsersData?.totalPages || 0,
-    hasNextPage: (availableUsersData as { hasNextPage?: boolean })?.hasNextPage || false,
-    userRole: session?.user?.role,
-    isEnabled: !!session && session.user?.role !== "volunteer"
-  });
+
 
   const handleSelectUser = (userId: string) => {
     setSelectedUserId(userId);
@@ -80,10 +72,6 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
   };
 
   const handleGroupCreated = () => {
-    utils.messages.getGroups.invalidate();
-  };
-
-  const handleGroupUpdated = () => {
     utils.messages.getGroups.invalidate();
   };
 
@@ -120,10 +108,6 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
     if (selectedUserId) {
       deleteGroupMutation.mutate({ groupId: selectedUserId });
     }
-  };
-
-  const handleDeleteConversation = () => {
-    setShowDeleteConversationModal(true);
   };
 
   const handleConfirmDeleteConversation = () => {
@@ -164,22 +148,37 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
           {selectedUserId ? (
             <div className="flex flex-col h-full">
               <div className="flex-1 min-h-0 relative">
-                <ChatArea
-                  messages={flattenedMessages}
-                  isLoadingMessages={isLoadingMessages}
-                  selectedConversation={isGroup ? selectedGroup : selectedConversation || { _id: selectedUserId, user: { name: "New Conversation", avatar: "" } }}
-                  session={session}
-                  isGroup={isGroup}
-                  onDeleteGroup={isGroup && (session?.user?.role !== "volunteer" || (session?.user?.role === "volunteer" && selectedGroup?.createdBy === session?.user?.id)) ? () => setShowDeleteModal(true) : undefined}
-                  onLoadMore={handleLoadMore}
-                  hasMore={hasMore}
-                  isLoadingMore={isLoadingMore}
-                  currentUserId={session?.user?.id || ""} 
-                  isSending={false} 
-                  selectedConversationId={null}
-                  onDeleteConversation={!isGroup && (session?.user?.role === "admin" || session?.user?.role === "mentor" || session?.user?.role === "organization") ? handleDeleteConversation : undefined}
-                  onGroupUpdated={isGroup ? handleGroupUpdated : undefined}
-                />
+                              <ChatArea
+                messages={flattenedMessages}
+                isLoadingMessages={isLoadingMessages}
+                selectedConversation={
+                  isGroup
+                    ? selectedGroup
+                    : selectedConversation ||
+                      (selectedUserId
+                        ? {
+                            _id: selectedUserId,
+                            user:
+                              availableUsers.find((u) => u._id === selectedUserId) || {
+                                _id: selectedUserId,
+                                name: "Unknown User",
+                                image: "",
+                              },
+                          }
+                        : undefined)
+                }
+                session={session}
+                isGroup={isGroup}
+                onDeleteGroup={isGroup && (session?.user?.role !== "volunteer" || (session?.user?.role === "volunteer" && selectedGroup?.createdBy === session?.user?.id)) ? () => setShowDeleteModal(true) : undefined}
+                onDeleteConversation={!isGroup ? () => setShowDeleteConversationModal(true) : undefined}
+                onGroupUpdated={handleGroupCreated}
+                onLoadMore={handleLoadMore}
+                hasMore={hasMore}
+                isLoadingMore={isLoadingMore}
+                isSending={false} 
+                selectedConversationId={null}
+                onBack={handleBackToConversations}
+              />
               </div>
               <div className="flex-shrink-0 border-t bg-white">
                 <MessageInput
@@ -211,43 +210,23 @@ export const MessageUI: React.FC<MessageUIProps> = ({ initialUserId }) => {
         {selectedUserId ? (
           // Mobile Chat Area
           <div className="flex flex-col h-full">
-            {/* Mobile Header with Back Button */}
-            <div className="flex-shrink-0 p-3 border-b border-gray-200 bg-white flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleBackToConversations}
-                className="h-8 w-8 p-0"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </Button>
-              {/* <div className="flex-1 min-w-0">
-                <h2 className="font-semibold text-sm truncate">
-                  {isGroup ? (selectedGroup as Group)?.name : selectedConversation?.user?.name || "Conversation"}
-                </h2>
-                {isGroup && (selectedGroup as Group)?.members && (
-                  <p className="text-xs text-gray-500">{(selectedGroup as Group).members.length} members</p>
-                )}
-              </div> */}
-            </div>
-
             {/* Chat Area */}
             <div className="flex-1 min-h-0 relative">
               <ChatArea
                 messages={flattenedMessages}
                 isLoadingMessages={isLoadingMessages}
-                selectedConversation={isGroup ? selectedGroup : selectedConversation || { _id: selectedUserId, user: { name: "New Conversation", avatar: "" } }}
+                selectedConversation={isGroup ? selectedGroup : selectedConversation || { _id: selectedUserId, user: { _id: selectedUserId, name: "New Conversation", image: "" } }}
                 session={session}
                 isGroup={isGroup}
                 onDeleteGroup={isGroup && (session?.user?.role !== "volunteer" || (session?.user?.role === "volunteer" && selectedGroup?.createdBy === session?.user?.id)) ? () => setShowDeleteModal(true) : undefined}
+                onDeleteConversation={!isGroup ? () => setShowDeleteConversationModal(true) : undefined}
+                onGroupUpdated={handleGroupCreated}
                 onLoadMore={handleLoadMore}
                 hasMore={hasMore}
                 isLoadingMore={isLoadingMore}
-                currentUserId={session?.user?.id || ""} 
                 isSending={false} 
                 selectedConversationId={null}
-                onDeleteConversation={!isGroup && (session?.user?.role === "admin" || session?.user?.role === "mentor" || session?.user?.role === "organization") ? handleDeleteConversation : undefined}
-                onGroupUpdated={isGroup ? handleGroupUpdated : undefined}
+                onBack={handleBackToConversations}
               />
             </div>
 
