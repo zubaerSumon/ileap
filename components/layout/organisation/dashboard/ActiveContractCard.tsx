@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { MessageCircle } from "lucide-react";
 import UserAvatar from "@/components/ui/UserAvatar";
 
@@ -6,7 +5,6 @@ interface ActiveContractCardProps {
   avatar: string;
   jobTitle: string;
   freelancerName: string;
-  startedAt: string;
   onFundMilestone: () => void;
   onMessage: () => void;
 }
@@ -15,7 +13,6 @@ const ActiveContractCard = ({
   avatar,
   jobTitle,
   freelancerName,
-  startedAt,
   onFundMilestone,
   onMessage,
 }: ActiveContractCardProps) => {
@@ -32,7 +29,6 @@ const ActiveContractCard = ({
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-xs text-muted-foreground truncate">{freelancerName}</span>
             <span className="inline-block text-xs font-semibold text-blue-700 bg-blue-50 border border-blue-200 rounded px-2 py-0.5">Active contract</span>
-            <span className="text-xs text-muted-foreground">Started {startedAt ? format(new Date(startedAt), "MMM d") : "-"}</span>
           </div>
         </div>
       </div>
