@@ -184,7 +184,7 @@ export default function TabwiseOpportunityCard({
       <div className="p-4 h-full flex flex-col">
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center">
-            <div className="w-10 h-10 mr-3">
+            <div className="w-10 h-10 mr-3 flex-shrink-0">
               <Image
                 src={
                   opportunity?.organization_profile?.profile_img ||
@@ -196,10 +196,10 @@ export default function TabwiseOpportunityCard({
                 }
                 width={40}
                 height={40}
-                className="rounded-full"
+                className="rounded-full w-full h-full"
               />
             </div>
-            <h3  className="text-lg font-semibold hover:text-blue-600">
+            <h3  className="text-lg font-semibold hover:text-blue-600 line-clamp-2 flex-1 min-w-0">
               {opportunity.title}
             </h3>
           </div>
