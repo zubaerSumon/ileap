@@ -206,9 +206,11 @@ export function TopBar({
                   </span>
                 )}
               </Link>
-              <div className="hidden md:flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-800 transition-colors">
-                <NotificationBell />
-              </div>
+              {session?.user?.role !== "volunteer" && (
+                <div className="hidden md:flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-800 transition-colors">
+                  <NotificationBell />
+                </div>
+              )}
               {session?.user && <UserMenu user={session.user as SessionUser} />}
             </div>
           </div>
