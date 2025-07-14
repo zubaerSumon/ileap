@@ -14,6 +14,8 @@ const createOpportunitySchema = z.object({
   external_event_link: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   start_date: z.string().optional(),
   start_time: z.string().optional(),
+  end_date: z.string().optional(),
+  end_time: z.string().optional(),
   is_recurring: z.boolean().default(false),
   recurrence: z.object({
     type: z.string(),
@@ -29,6 +31,26 @@ const createOpportunitySchema = z.object({
     occurrences: z.number().optional()
   }).optional(),
   banner_img: z.string().optional()
+}).refine((data) => {
+  // For work-based opportunities, end_date is required
+  if (data.commitment_type === "workbased") {
+    return data.end_date && data.end_date.trim() !== "";
+  }
+  return true;
+}, {
+  message: "End date is required for work-based opportunities",
+  path: ["end_date"]
+}).refine((data) => {
+  // If both start_date and end_date are provided, end_date must be after or equal to start_date
+  if (data.start_date && data.end_date && data.start_date.trim() !== "" && data.end_date.trim() !== "") {
+    const startDate = new Date(data.start_date);
+    const endDate = new Date(data.end_date);
+    return endDate >= startDate;
+  }
+  return true;
+}, {
+  message: "End date must be on or after start date",
+  path: ["end_date"]
 });
 
 const getAllOpportunitiesSchema = z.object({

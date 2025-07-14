@@ -13,6 +13,7 @@ import { Session } from "next-auth";
 import Logo from "../../public/AusLeap.png";
 import { PUBLIC_NAV_OPTIONS, STATIC_LINKS } from "@/utils/constants/navigation";
 import { NavLink } from "./NavLink";
+import { NotificationBell } from "@/components/ui/notification-bell";
 
 interface MobileMenuProps {
   isMenuOpen: boolean;
@@ -163,6 +164,12 @@ export function MobileMenu({
                   badgeCount={totalUnreadCount}
                   onClick={handleCloseMenu}
                 />
+                <div className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-800 transition-colors duration-200">
+                  <div className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-800 transition-colors relative">
+                    <NotificationBell />
+                  </div>
+                  <span>Notifications</span>
+                </div>
                 <NavLink
                   href="/profile"
                   label="Profile"

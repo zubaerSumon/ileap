@@ -16,6 +16,7 @@ import { UserMenu } from "./UserMenu";
 import { GiBinoculars } from "react-icons/gi";
 import { useSearchParams, usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/ui/notification-bell";
 
 interface TopBarProps {
   isMenuOpen: boolean;
@@ -196,15 +197,18 @@ export function TopBar({
                     ? "organisation"
                     : `${session?.user?.role}`
                 }/messages`}
-                className="hidden md:flex items-center justify-center w-10 h-10 rounded-full hover:bg-gray-800 transition-colors relative"
+                className="hidden md:flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-800 transition-colors relative"
               >
-                <MessageCircle className="h-6 w-6" />
+                <MessageCircle className="h-4 w-4" />
                 {totalUnreadCount > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                     {totalUnreadCount}
                   </span>
                 )}
               </Link>
+              <div className="hidden md:flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-800 transition-colors">
+                <NotificationBell />
+              </div>
               {session?.user && <UserMenu user={session.user as SessionUser} />}
             </div>
           </div>
