@@ -58,7 +58,6 @@ const defaultValues: OrganizationProfileData = {
 export default function OrganizationProfile() {
   const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
-  const [isCustomArea, setIsCustomArea] = useState(false);
   const { data: profileData, isLoading } = trpc.users.profileCheckup.useQuery();
   const { data: session } = useSession();
   const utils = trpc.useUtils();
@@ -123,12 +122,7 @@ export default function OrganizationProfile() {
         keepSubmitCount: false,
       });
 
-      // Check if the area is a custom value (not in the suburbs list)
-      if (profile.area) {
-        const areaValue = profile.area.replace(/_/g, ' ');
-        const isInSuburbsList = suburbs.some(suburb => suburb.value === areaValue || suburb.label === areaValue);
-        setIsCustomArea(!isInSuburbsList);
-      }
+
     }
   }, [profileData?.organizationProfile, isLoading, form]);
 
@@ -351,45 +345,16 @@ export default function OrganizationProfile() {
                           searchEnabled
                         />
 
-                        {!isCustomArea ? (
-                          <FormSelect<OrganizationProfileData>
-                            label="Area"
-                            id="area"
-                            placeholder="Select your suburb"
-                            control={form.control}
-                            registerName="area"
-                            error={form.formState.errors.area?.message}
-                            options={suburbs}
-                            searchEnabled
-                            onChange={(value) => {
-                              if (value === "custom") {
-                                setIsCustomArea(true);
-                                form.setValue("area", "");
-                              }
-                            }}
-                          />
-                        ) : (
-                          <div className="space-y-2">
-                            <FormInput<OrganizationProfileData>
-                              control={form.control}
-                              name="area"
-                              label="Area"
-                              placeholder="Enter your suburb/area"
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setIsCustomArea(false);
-                                form.setValue("area", "");
-                              }}
-                              className="text-xs"
-                            >
-                              ← select from existing list
-                            </Button>
-                          </div>
-                        )}
+                        <FormSelect<OrganizationProfileData>
+                          label="Area"
+                          id="area"
+                          placeholder="Select your suburb"
+                          control={form.control}
+                          registerName="area"
+                          error={form.formState.errors.area?.message}
+                          options={suburbs}
+                          searchEnabled
+                        />
                       </div>
 
                       <FormInput<OrganizationProfileData>
