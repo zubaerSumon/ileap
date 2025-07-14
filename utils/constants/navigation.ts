@@ -1,7 +1,6 @@
-import { NavItem } from '@/types/navigation';
+import { NavItem } from "@/types/navigation";
 
 export const PUBLIC_NAV_OPTIONS: NavItem[] = [
- 
   {
     label: "Volunteer sign up",
     href: "/signup",
@@ -12,18 +11,21 @@ export const PUBLIC_NAV_OPTIONS: NavItem[] = [
     href: "/signup?role=organisation",
     className: "hover:text-blue-500",
   },
-   {
+  {
     label: "Log in",
     href: "/login",
     className: "hover:text-blue-500",
   },
-  
 ];
 
 export const STATIC_LINKS: NavItem[] = [
   {
     label: "About",
     href: "/about",
+  },
+  {
+    label: "Gallery",
+    href: "/ausleap/gallery",
   },
   {
     label: "Contact",
@@ -35,7 +37,16 @@ export const STATIC_LINKS: NavItem[] = [
   },
 ];
 
-export const PROTECTED_PATHS = ["/organisation", "/volunteer", "/profile", "/settings", "/messages", "/search", "/find-opportunity","/find-volunteer" ];
+export const PROTECTED_PATHS = [
+  "/organisation",
+  "/volunteer",
+  "/profile",
+  "/settings",
+  "/messages",
+  "/search",
+  "/find-opportunity",
+  "/find-volunteer",
+];
 
 export const AUTH_PATHS = ["/login", "/signup", "/reset-password"];
 
@@ -45,4 +56,4 @@ export interface SessionUser {
   email: string;
   role: "organization" | "volunteer";
   image?: string;
-} 
+}

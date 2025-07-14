@@ -28,10 +28,20 @@ interface UserMenuProps {
 
 export function UserMenu({ user }: UserMenuProps) {
   const [isAvailable, setIsAvailable] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
   const hasInitialized = useRef(false);
+
+   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
-  // Debug logging
-  console.log('UserMenu user object:', {
+   console.log('UserMenu user object:', {
     name: user.name,
     image: user.image,
     role: user.role
@@ -50,14 +60,12 @@ export function UserMenu({ user }: UserMenuProps) {
   const isVolunteer = user.role === "volunteer";
   const organizationName = user.organization_profile?.title || "Organisation";
 
-  // Fetch current availability status
-  const { data: volunteerProfile } =
+   const { data: volunteerProfile } =
     trpc.volunteers.getVolunteerProfile.useQuery(undefined, {
       enabled: isVolunteer,
     });
 
-  // Update availability mutation
-  const updateVolunteerProfile =
+   const updateVolunteerProfile =
     trpc.volunteers.updateVolunteerProfile.useMutation({
       onSuccess: () => {
         // Don't update local state here, let the user's choice persist
@@ -133,7 +141,12 @@ export function UserMenu({ user }: UserMenuProps) {
                     />
                   </div>
                 </TooltipTrigger>
-                <TooltipContent className="max-w-[180px] p-2.5 bg-slate-900 border-slate-700 shadow-lg">
+                <TooltipContent 
+                  sideOffset={4} 
+                  side={isMobile ? "bottom" : "left"} 
+                  align={isMobile ? "center" : "start"} 
+                  className="max-w-[180px] p-2.5 bg-slate-900 border-slate-700 shadow-lg"
+                >
                   <div className="flex items-start gap-2">
                     <Info className="h-3.5 w-3.5 text-blue-400 mt-0.5 flex-shrink-0" />
                     <div className="space-y-1">

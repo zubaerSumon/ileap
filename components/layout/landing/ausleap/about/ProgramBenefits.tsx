@@ -35,26 +35,28 @@ export default function ProgramBenefits() {
   ];
 
   return (
-    <section className="text-center py-20">
-      <h2 className="text-2xl font-bold text-black pb-6">See the program</h2>
-      <p className="text-gray-500 text-sm mb-6">Take a view on our program</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-6">
-        {items.map((item, index) => (
-          <div key={index} className="bg-white shadow-md rounded-lg p-8 text-center border border-gray-100">
-            <div className="h-28 mb-6 rounded-md flex items-center justify-center relative">
-              <Image 
-                src={item.image} 
-                alt={item.title} 
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                priority
-              />
+    <section className="text-center py-12 sm:py-16 md:py-20 lg:py-24">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-black pb-4 sm:pb-6">See the program</h2>
+        <p className="text-gray-500 text-xs sm:text-sm md:text-base mb-6 sm:mb-8">Take a view on our program</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 max-w-6xl mx-auto">
+          {items.map((item, index) => (
+            <div key={index} className="bg-white shadow-md rounded-lg p-4 sm:p-6 md:p-8 text-center border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+              <div className="h-20 sm:h-24 md:h-28 mb-4 sm:mb-6 rounded-md flex items-center justify-center relative">
+                <Image 
+                  src={item.image} 
+                  alt={item.title} 
+                  fill
+                  className="object-contain"
+                  sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  priority
+                />
+              </div>
+              <h3 className="text-sm sm:text-base md:text-lg font-medium text-[#4A4A4A] mb-2 sm:mb-3">{item.title}</h3>
+              <p className="text-gray-400 text-xs sm:text-sm md:text-base leading-relaxed">{item.description}</p>
             </div>
-            <h3 className="text-base font-medium text-[#4A4A4A]">{item.title}</h3>
-            <p className="text-gray-400 text-xs mt-2">{item.description}</p>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );
