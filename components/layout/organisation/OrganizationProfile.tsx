@@ -298,8 +298,8 @@ export default function OrganizationProfile() {
                         {/* Organization Profile Picture Upload */}
                         <div className="space-y-4">
                           <div className="text-center">
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">Organization Profile Picture</h3>
-                            <p className="text-sm text-gray-500 mb-4">This will be displayed as your organization&apos;s logo</p>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Organisation Profile Picture</h3>
+                            <p className="text-sm text-gray-500 mb-4">This will be displayed as your organisation&apos;s logo</p>
                           </div>
                           <div className="flex justify-center">
                             <ProfilePictureUpload
