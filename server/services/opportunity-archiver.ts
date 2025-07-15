@@ -119,8 +119,8 @@ export class OpportunityArchiverService {
       return;
     }
 
-    // Run every minute (for testing)
-    cron.schedule('* * * * *', async () => {
+    // Run every hour
+    cron.schedule('0 * * * *', async () => {
       await this.runCronJob();
     }, {
       timezone: 'UTC'
