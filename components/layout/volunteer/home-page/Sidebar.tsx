@@ -83,7 +83,7 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
         </div>
 
         <div className="mt-4 pt-4 border-t">
-                      <Link href={`/volunteer/organisation/${opportunity.organization_profile._id}`}>
+                      <Link href={`/view-profile/organisation/details/${opportunity.organization_profile._id}`}>
             <Button variant="outline" className="w-full">
               View Organization Profile
             </Button>

@@ -1,35 +1,20 @@
 "use client";
 import { useState } from "react";
 // import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/navigation";
-import { ChevronRight,   Trash2, MapPin } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import VolunteerCarousel from "./VolunteerCarousel";
 import { useSession } from "next-auth/react";
 import MessageDialog from "../MessageDialog";
 import { Opportunity } from "@/types/opportunities";
-import { formatDistanceToNow } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import ConfirmationDialog from "@/components/modals/ConfirmationDialog";
 import { toast } from "react-hot-toast";
-import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import { getGreeting } from "@/utils/helpers/getGreeting";
 import { CreateOpportunityButton } from "@/components/buttons/CreateOpportunityButton";
 import MobileTabsSlider from "@/components/layout/shared/MobileTabsSlider";
-import UserAvatar from "@/components/ui/UserAvatar";
-import EmptyState from "@/components/layout/shared/EmptyState";
 import { ORGANISATION_DASHBOARD_TABS, OrganisationDashboardTabKey } from "@/utils/constants/organisation-dashboard-tabs";
+import TabContent from "./TabContent";
 
 interface Volunteer {
   _id: string;
@@ -226,232 +211,10 @@ const OrganisationDashboard = () => {
   // Get current tab config
   const currentTabConfig = ORGANISATION_DASHBOARD_TABS.find(t => t.key === tab);
 
-  // Render tab content dynamically
-  const renderTabContent = () => {
-    if (isLoadingOpportunities) {
-      return (
-        <div className="text-center py-12">
-          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading opportunities...</p>
-        </div>
-      );
-    }
-
-    if (tab === "active") {
-      if (activeContracts.length > 0) {
-        return (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activeContracts.map((contract) => (
-              <div
-                key={contract.uniqueKey}
-                className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[340px]"
-              >
-                <div className="p-4 h-full flex flex-col">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-center">
-                      <div className="w-10 h-10 mr-3">
-                        <UserAvatar
-                          user={{ name: contract.freelancerName, image: contract.profileImg }}
-                          size={40}
-                          className="rounded-full"
-                        />
-                      </div>
-                      <h3 
-                        className="text-lg font-semibold text-gray-900 cursor-pointer hover:text-blue-600 transition-colors"
-                        onClick={() => {
-                          router.push(`/find-volunteer/volunteer/details/${contract.id}`);
-                        }}
-                      >
-                        {contract.freelancerName}
-                      </h3>
-                    </div>
-                  </div>
-
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-600 font-medium mb-1">
-                      Active Opportunities ({contract.opportunities.length}):
-                    </p>
-                    <div className="space-y-1">
-                      {contract.opportunities.slice(0, 6).map((opportunity) => (
-                        <p 
-                          key={opportunity.id}
-                          className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors"
-                          onClick={() => {
-                            router.push(`/organisation/opportunities/${opportunity.id}`);
-                          }}
-                        >
-                          • {opportunity.title}
-                        </p>
-                      ))}
-                      {contract.opportunities.length > 6 && (
-                        <p 
-                          className="text-sm text-blue-600 cursor-pointer hover:text-blue-800 transition-colors font-medium"
-                          onClick={() => {
-                            router.push(`/find-volunteer/volunteer/details/${contract.id}`);
-                          }}
-                        >
-                          +{contract.opportunities.length - 6} more
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="mt-auto pt-4">
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-      } else {
-        return (
-          <EmptyState
-            icon={currentTabConfig?.icon}
-            title={currentTabConfig?.emptyState.title || "No active volunteers"}
-            description={currentTabConfig?.emptyState.description || "No active volunteers found."}
-            actionLabel="Find Volunteers"
-            onAction={() => router.push("/find-volunteer")}
-            variant="card"
-            className="min-h-[400px]"
-          />
-        );
-      }
-    }
-
-    // For open and archived tabs
-    const opportunities = tab === "open" ? openOpportunities : archivedOpportunities;
-    
-    if (opportunities.length > 0) {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {opportunities.map((opportunity) => (
-            <div
-              key={opportunity._id}
-              className="bg-white border rounded-lg overflow-hidden hover:shadow-lg transition-shadow relative h-[300px]"
-            >
-              <div className="p-4 h-full flex flex-col">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 mr-3">
-                      <Image
-                        src={
-                          opportunity?.organization_profile
-                            ?.profile_img || "/avatar.svg"
-                        }
-                        alt={
-                          opportunity?.organization_profile?.title ||
-                          "Organization Logo"
-                        }
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                    </div>
-                    <h3
-                      className="text-lg font-semibold cursor-pointer hover:text-blue-600"
-                      onClick={() =>
-                        router.push(
-                          `/organisation/opportunities/${opportunity._id}`
-                        )
-                      }
-                    >
-                      {opportunity.title}
-                    </h3>
-                  </div>
-                  {tab !== "archived" && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 text-gray-500 hover:text-red-600"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setOpportunityToDelete(opportunity);
-                        setIsDeleteDialogOpen(true);
-                      }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  )}
-                </div>
-
-                <div className="flex items-center text-sm text-gray-500 mb-3">
-                  <MapPin className="w-4 h-4 mr-1 text-blue-500" />
-                  <span>{opportunity.location}</span>
-                </div>
-
-                <div className="flex flex-wrap gap-1 mb-3">
-                  <Badge
-                    variant="outline"
-                    className="ml-2 px-2 py-0.5 text-xs"
-                  >
-                    {opportunity.commitment_type === "workbased"
-                      ? "Work based"
-                      : "Event based"}
-                  </Badge>
-                  {opportunity.category.slice(0, 1).map(
-                    (cat: string, index: number) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="text-xs font-normal"
-                      >
-                        {cat}
-                      </Badge>
-                    )
-                  )}
-                  {opportunity.category.length > 1 && (
-                    <Badge
-                      variant="secondary"
-                      className="text-xs font-normal text-gray-500"
-                    >
-                      +{opportunity.category.length - 1} more
-                    </Badge>
-                  )}
-                </div>
-
-                <div className="flex-1">
-                  <div
-                    className="text-sm text-gray-600 line-clamp-3"
-                    dangerouslySetInnerHTML={{
-                      __html: opportunity.description,
-                    }}
-                  />
-                </div>
-
-                <div className="mt-auto pt-4">
-                  <div className="text-xs text-gray-500 mb-2">
-                    Posted{" "}
-                    {formatDistanceToNow(opportunity.createdAt, {
-                      addSuffix: true,
-                    })}
-                  </div>
-                  {opportunity.date?.start_date && (
-                    <div className="text-xs text-gray-500">
-                      Starts: {new Date(opportunity.date.start_date).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                      })} at {opportunity.time?.start_time ? formatTimeToAMPM(opportunity.time.start_time) : 'Time TBD'}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      );
-    } else {
-      return (
-        <EmptyState
-          icon={currentTabConfig?.icon}
-          title={currentTabConfig?.emptyState.title || "No items found"}
-          description={currentTabConfig?.emptyState.description || "No items available."}
-          actionLabel={tab === "open" ? "Create Opportunity" : "View All Opportunities"}
-          onAction={() => router.push(tab === "open" ? "/organisation/opportunities/create" : "/organisation/opportunities")}
-          variant="card"
-          className="min-h-[400px]"
-        />
-      );
-    }
+  // Handle opportunity deletion
+  const handleDeleteOpportunity = (opportunity: Opportunity) => {
+    setOpportunityToDelete(opportunity);
+    setIsDeleteDialogOpen(true);
   };
 
   // Prepare mobile tabs data
@@ -521,7 +284,15 @@ const OrganisationDashboard = () => {
       {/* Tab Content */}
       <div className="transition-all duration-300 ease-in-out">
         <div className="min-h-[400px]">
-          {renderTabContent()}
+          <TabContent
+            tab={tab}
+            activeContracts={activeContracts}
+            openOpportunities={openOpportunities}
+            archivedOpportunities={archivedOpportunities}
+            currentTabConfig={currentTabConfig}
+            onDeleteOpportunity={handleDeleteOpportunity}
+            isLoading={isLoadingOpportunities}
+          />
         </div>
       </div>
       {/* Work together again section */}
@@ -551,38 +322,28 @@ const OrganisationDashboard = () => {
         volunteer={selectedVolunteer}
       />
 
-      <AlertDialog
-        open={isDeleteDialogOpen}
+      <ConfirmationDialog
+        isOpen={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              {tab === "archived"
-                ? "This action cannot be undone. This will permanently delete the opportunity."
-                : "This will move the opportunity to the archive. You can delete it permanently from there."}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => {
-                if (opportunityToDelete) {
-                  if (tab === "archived") {
-                    handleDelete(opportunityToDelete);
-                  } else {
-                    handleArchive(opportunityToDelete);
-                  }
-                }
-              }}
-              className="bg-red-600 hover:bg-red-700"
-            >
-              {tab === "archived" ? "Delete" : "Archive"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        title="Are you sure?"
+        description={
+          tab === "archived"
+            ? "This action cannot be undone. This will permanently delete the opportunity."
+            : "This will move the opportunity to the archive. You can delete it permanently from there."
+        }
+        confirmText={tab === "archived" ? "Delete" : "Archive"}
+        onConfirm={() => {
+          if (opportunityToDelete) {
+            if (tab === "archived") {
+              handleDelete(opportunityToDelete);
+            } else {
+              handleArchive(opportunityToDelete);
+            }
+          }
+        }}
+        variant="destructive"
+        isLoading={archiveMutation.isPending || deleteMutation.isPending}
+      />
     </div>
   );
 };

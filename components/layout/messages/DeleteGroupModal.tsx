@@ -1,12 +1,6 @@
 'use client'
 import React from 'react';
-import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import ConfirmationDialog from "@/components/modals/ConfirmationDialog";
 
 interface DeleteGroupModalProps {
   groupName: string;
@@ -20,34 +14,15 @@ export const DeleteGroupModal: React.FC<DeleteGroupModalProps> = ({
   onDelete,
 }) => {
   return (
-    <Dialog open={true} onOpenChange={() => onClose()}>
-      <DialogContent className="sm:max-w-[450px]">
-        <DialogHeader>
-          <DialogTitle>Delete Group</DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-4">
-          <p className="text-gray-600">
-            Are you sure you want to delete the group &quot;{groupName}&quot;? This action cannot be undone.
-          </p>
-          
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="destructive"
-              onClick={onDelete}
-            >
-              Delete Group
-            </Button>
-            <Button
-              variant="outline"
-              onClick={onClose}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+    <ConfirmationDialog
+      isOpen={true}
+      onOpenChange={() => onClose()}
+      title="Delete Group"
+      description={`Are you sure you want to delete the group "${groupName}"? This action cannot be undone.`}
+      confirmText="Delete Group"
+      onConfirm={onDelete}
+      variant="destructive"
+    />
   );
 };
 

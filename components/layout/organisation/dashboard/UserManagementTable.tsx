@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import {
   useReactTable,
   getCoreRowModel,
@@ -26,6 +26,7 @@ import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import ConfirmationDialog from "@/components/modals/ConfirmationDialog";
 
 interface User {
   _id: string;
@@ -40,6 +41,8 @@ const columnHelper = createColumnHelper<User>();
 function useUserMutations() {
   const utils = trpc.useUtils();
   const { data: session } = useSession();
+  const [userToDelete, setUserToDelete] = useState<string | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const updateRoleMutation = trpc.users.updateUserRole.useMutation({
     onSuccess: () => {
@@ -65,9 +68,13 @@ function useUserMutations() {
     onSuccess: () => {
       toast.success("User deleted successfully");
       utils.users.getOrganizationUsers.invalidate();
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
     },
     onError: (error) => {
       toast.error(error.message || "Failed to delete user");
+      setIsDeleteDialogOpen(false);
+      setUserToDelete(null);
     },
   });
 
@@ -85,8 +92,13 @@ function useUserMutations() {
   };
 
   const handleDeleteUser = (userId: string) => {
-    if (confirm("Are you sure you want to delete this user?")) {
-      deleteUserMutation.mutate({ userId });
+    setUserToDelete(userId);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteUser = () => {
+    if (userToDelete) {
+      deleteUserMutation.mutate({ userId: userToDelete });
     }
   };
 
@@ -97,6 +109,10 @@ function useUserMutations() {
     handleUpdateRole,
     handleToggleMentor,
     handleDeleteUser,
+    confirmDeleteUser,
+    userToDelete,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
     session,
   };
 }
@@ -114,9 +130,13 @@ export default function UserManagementTable({
   const {
     updateRoleMutation,
     demoteMentorMutation,
+    deleteUserMutation,
     handleUpdateRole,
     handleToggleMentor,
     handleDeleteUser,
+    confirmDeleteUser,
+    isDeleteDialogOpen,
+    setIsDeleteDialogOpen,
     session,
   } = useUserMutations();
 
@@ -552,6 +572,18 @@ export default function UserManagementTable({
           Next
         </Button>
       </div>
+
+      {/* Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        title="Delete User"
+        description="Are you sure you want to delete this user? This action cannot be undone."
+        confirmText="Delete User"
+        onConfirm={confirmDeleteUser}
+        variant="destructive"
+        isLoading={deleteUserMutation.isPending}
+      />
     </div>
   );
 }
