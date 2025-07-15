@@ -10,6 +10,7 @@ type ProfilePictureUploadProps = {
   userName: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  uniqueId?: string;
 };
 
 export function ProfilePictureUpload({
@@ -18,6 +19,7 @@ export function ProfilePictureUpload({
   userName,
   size = 'md',
   className,
+  uniqueId = 'default',
 }: ProfilePictureUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string>('');
@@ -115,7 +117,7 @@ export function ProfilePictureUpload({
         
         {/* Upload overlay */}
         <label 
-          htmlFor="profile-picture-upload"
+          htmlFor={`profile-picture-upload-${uniqueId}`}
           className={cn(
             "absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full cursor-pointer transition-opacity opacity-0 hover:opacity-100",
             isUploading && "opacity-100 cursor-not-allowed"
@@ -123,7 +125,7 @@ export function ProfilePictureUpload({
         >
           <Camera className="h-6 w-6 text-white" />
           <input 
-            id="profile-picture-upload"
+            id={`profile-picture-upload-${uniqueId}`}
             type="file"
             accept="image/*"
             onChange={handleFileSelect}
@@ -135,13 +137,13 @@ export function ProfilePictureUpload({
       
       <div className="text-center">
         <label 
-          htmlFor="profile-picture-upload-alt"
+          htmlFor={`profile-picture-upload-alt-${uniqueId}`}
           className="text-sm text-blue-600 hover:text-blue-700 cursor-pointer font-medium"
         >
           {isUploading ? 'Uploading...' : 'Change photo'}
         </label>
         <input 
-          id="profile-picture-upload-alt"
+          id={`profile-picture-upload-alt-${uniqueId}`}
           type="file"
           accept="image/*"
           onChange={handleFileSelect}

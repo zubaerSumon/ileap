@@ -67,8 +67,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
         {/* Title and Favorite Button Row */}
         <div className="flex justify-between items-start   flex-shrink-0">
           <h3 className="text-sm sm:text-base font-bold text-gray-900 truncate group-hover:text-blue-600 transition-colors flex-1 pr-2">
-            {opportunity.title.charAt(0).toUpperCase() +
-              opportunity.title.slice(1)}
+            {opportunity.title ? opportunity.title.charAt(0).toUpperCase() + opportunity.title.slice(1) : 'Untitled Opportunity'}
           </h3>
           <div className="flex items-center gap-2 flex-shrink-0">
             {isPopular && (
@@ -142,7 +141,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
 
         {/* Categories */}
         <div className="flex flex-wrap gap-1.5  flex-shrink-0">
-          {opportunity.category.slice(0, 2).map((category, idx) => (
+          {opportunity.category && opportunity.category.slice(0, 2).map((category, idx) => (
             <span
               key={idx}
               className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full text-xs font-medium border border-blue-100"
@@ -150,7 +149,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
               {category}
             </span>
           ))}
-          {opportunity.category.length > 2 && (
+          {opportunity.category && opportunity.category.length > 2 && (
             <span className="bg-gray-50 text-gray-600 px-2 py-0.5 rounded-full text-xs font-medium border border-gray-100">
               +{opportunity.category.length - 2} more
             </span>
