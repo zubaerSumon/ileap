@@ -12,7 +12,7 @@ import { publicProcedure } from "@/server/trpc";
 import mongoose from "mongoose";
 import OpportunityMentor from "@/server/db/models/opportunity-mentor";
 import { opportunityArchiver } from "@/server/services/opportunity-archiver";
- 
+
 export const opportunityRouter = router({
   createOpportunity: protectedProcedure
     .input(opportunityValidation.createOpportunitySchema)
@@ -96,7 +96,9 @@ export const opportunityRouter = router({
           external_event_link: input.external_event_link || undefined,
           // Map date and time fields to the nested structure
           date: {
-            start_date: input.start_date ? new Date(input.start_date) : new Date(),
+            start_date: input.start_date
+              ? new Date(input.start_date)
+              : new Date(),
             end_date: input.end_date ? new Date(input.end_date) : undefined,
           },
           time: {
@@ -104,7 +106,10 @@ export const opportunityRouter = router({
             end_time: input.end_time || undefined,
           },
           is_recurring: input.is_recurring || false,
-          banner_img: input.banner_img && input.banner_img.trim() !== "" ? input.banner_img : "/fallbackbanner.png",
+          banner_img:
+            input.banner_img && input.banner_img.trim() !== ""
+              ? input.banner_img
+              : "/fallbackbanner.png",
           organization_profile: user.organization_profile,
           created_by: sessionUser.id,
         };
@@ -115,8 +120,12 @@ export const opportunityRouter = router({
             type: input.recurrence.type,
             days: input.recurrence.days || [],
             date_range: {
-              start_date: input.recurrence.date_range.start_date ? new Date(input.recurrence.date_range.start_date) : new Date(),
-              end_date: input.recurrence.date_range.end_date ? new Date(input.recurrence.date_range.end_date) : undefined,
+              start_date: input.recurrence.date_range.start_date
+                ? new Date(input.recurrence.date_range.start_date)
+                : new Date(),
+              end_date: input.recurrence.date_range.end_date
+                ? new Date(input.recurrence.date_range.end_date)
+                : undefined,
             },
             time_range: {
               start_time: input.recurrence.time_range.start_time,
@@ -231,15 +240,17 @@ export const opportunityRouter = router({
   }),
 
   getMentorOpportunities: protectedProcedure
-    .input(z.object({
-      page: z.number().min(1).default(1),
-      limit: z.number().min(1).max(50).default(6),
-      search: z.string().optional(),
-      categories: z.array(z.string()).optional(),
-      commitmentType: z.string().optional(),
-      location: z.string().optional(),
-      availability: z.string().optional(),
-    }))
+    .input(
+      z.object({
+        page: z.number().min(1).default(1),
+        limit: z.number().min(1).max(50).default(6),
+        search: z.string().optional(),
+        categories: z.array(z.string()).optional(),
+        commitmentType: z.string().optional(),
+        location: z.string().optional(),
+        availability: z.string().optional(),
+      })
+    )
     .query(async ({ ctx, input }) => {
       const sessionUser = ctx.user as JwtPayload;
       if (!sessionUser || !sessionUser?.id) {
@@ -261,12 +272,12 @@ export const opportunityRouter = router({
         // Find all opportunities where the current user is a mentor
         const mentorAssignments = await OpportunityMentor.find({
           volunteer: user._id,
-        }).populate('opportunity');
+        }).populate("opportunity");
 
         const mentorOpportunityIds = mentorAssignments.map(
           (assignment) => assignment.opportunity
         );
-        console.log({mentorOpportunityIds});
+        console.log({ mentorOpportunityIds });
 
         if (mentorOpportunityIds.length === 0) {
           return {
@@ -334,70 +345,80 @@ export const opportunityRouter = router({
       }
     }),
 
-  getMentorOpportunitiesCount: protectedProcedure
-    .query(async ({ ctx }) => {
-      const sessionUser = ctx.user as JwtPayload;
-      if (!sessionUser || !sessionUser?.id) {
+  getMentorOpportunitiesCount: protectedProcedure.query(async ({ ctx }) => {
+    const sessionUser = ctx.user as JwtPayload;
+    if (!sessionUser || !sessionUser?.id) {
+      return { total: 0 };
+    }
+
+    try {
+      const user = await User.findById(sessionUser.id);
+      if (!user) {
         return { total: 0 };
       }
 
-      try {
-        const user = await User.findById(sessionUser.id);
-        if (!user) {
-          return { total: 0 };
-        }
+      // Find all opportunities where the current user is a mentor
+      const mentorAssignments = await OpportunityMentor.find({
+        volunteer: user._id,
+      });
 
-        // Find all opportunities where the current user is a mentor
-        const mentorAssignments = await OpportunityMentor.find({
-          volunteer: user._id,
-        });
+      const mentorOpportunityIds = mentorAssignments.map(
+        (assignment) => assignment.opportunity
+      );
 
-        const mentorOpportunityIds = mentorAssignments.map(
-          (assignment) => assignment.opportunity
-        );
-
-        if (mentorOpportunityIds.length === 0) {
-          return { total: 0 };
-        }
-
-        // Count opportunities that are not archived
-        const total = await Opportunity.countDocuments({
-          _id: { $in: mentorOpportunityIds },
-          is_archived: { $ne: true },
-        });
-
-        return { total };
-      } catch (error) {
-        console.error("Error fetching mentor opportunities count:", error);
+      if (mentorOpportunityIds.length === 0) {
         return { total: 0 };
       }
-    }),
+
+      // Count opportunities that are not archived
+      const total = await Opportunity.countDocuments({
+        _id: { $in: mentorOpportunityIds },
+        is_archived: { $ne: true },
+      });
+
+      return { total };
+    } catch (error) {
+      console.error("Error fetching mentor opportunities count:", error);
+      return { total: 0 };
+    }
+  }),
 
   getAllOpportunities: protectedProcedure
     .input(opportunityValidation.getAllOpportunitiesSchema)
     .query(async ({ input }) => {
       try {
-        const { page, limit, search, categories, commitmentType, location, availability } = input;
+        const {
+          page,
+          limit,
+          search,
+          categories,
+          commitmentType,
+          location,
+          availability,
+        } = input;
         const skip = (page - 1) * limit;
 
-        // Simplified base query for debugging
         const baseQuery: Record<string, unknown> = {
-          is_archived: { $ne: true }, // Exclude archived opportunities
-          // Temporarily remove deleted_at filter to see if that's the issue
-          // deleted_at: { $exists: false }, // Explicitly exclude deleted opportunities
+          //is_archived: { $ne: true },
         };
 
-        // Temporarily disable complex filtering for debugging
         console.log("=== DEBUGGING OPPORTUNITIES ===");
-        console.log("Input parameters:", { page, limit, search, categories, commitmentType, location, availability });
-        
-        // Only apply simple filters for now
+        console.log("Input parameters:", {
+          page,
+          limit,
+          search,
+          categories,
+          commitmentType,
+          location,
+          availability,
+        });
+
         if (search) {
-          const searchRegex = new RegExp(search, 'i');
+          const searchRegex = new RegExp(search, "i");
           baseQuery.$or = [
             { title: searchRegex },
             { description: searchRegex },
-            { location: searchRegex }
+            { location: searchRegex },
           ];
         }
 
@@ -416,13 +437,12 @@ export const opportunityRouter = router({
         }
 
         if (location) {
-          const locationRegex = new RegExp(location, 'i');
+          const locationRegex = new RegExp(location, "i");
           baseQuery.location = locationRegex;
         }
 
         console.log("Final base query:", JSON.stringify(baseQuery, null, 2));
 
-        // Get total count for pagination
         const total = await Opportunity.countDocuments(baseQuery);
         const totalPages = Math.ceil(total / limit);
 
@@ -431,20 +451,22 @@ export const opportunityRouter = router({
         console.log("Skip:", skip);
         console.log("Limit:", limit);
 
-        // Debug: Check total opportunities in database
         const totalInDB = await Opportunity.countDocuments({});
         console.log("Total opportunities in database:", totalInDB);
-        
-        // Debug: Check archived opportunities
-        const archivedCount = await Opportunity.countDocuments({ is_archived: true });
+
+        const archivedCount = await Opportunity.countDocuments({
+          is_archived: true,
+        });
         console.log("Archived opportunities:", archivedCount);
-        
-        // Debug: Check non-archived opportunities
-        const nonArchivedCount = await Opportunity.countDocuments({ is_archived: { $ne: true } });
+
+        const nonArchivedCount = await Opportunity.countDocuments({
+          is_archived: { $ne: true },
+        });
         console.log("Non-archived opportunities:", nonArchivedCount);
 
-        // Debug: Check deleted opportunities
-        const deletedCount = await Opportunity.countDocuments({ deleted_at: { $ne: null } });
+        const deletedCount = await Opportunity.countDocuments({
+          deleted_at: { $ne: null },
+        });
         console.log("Deleted opportunities:", deletedCount);
 
         // Execute query with pagination
@@ -456,13 +478,22 @@ export const opportunityRouter = router({
           .limit(limit)
           .lean();
 
-        console.log(`Found ${opportunities.length} opportunities out of ${total} total`);
-        console.log("Opportunity IDs found:", opportunities.map(opp => opp._id));
-        
+        console.log(
+          `Found ${opportunities.length} opportunities out of ${total} total`
+        );
+        console.log(
+          "Opportunity IDs found:",
+          opportunities.map((opp) => opp._id)
+        );
+
         // Debug: Check if opportunities have organization_profile
-        const opportunitiesWithOrg = opportunities.filter(opp => opp.organization_profile);
-        console.log(`Opportunities with organization_profile: ${opportunitiesWithOrg.length}`);
-        
+        const opportunitiesWithOrg = opportunities.filter(
+          (opp) => opp.organization_profile
+        );
+        console.log(
+          `Opportunities with organization_profile: ${opportunitiesWithOrg.length}`
+        );
+
         // Debug: Check opportunity details
         opportunities.forEach((opp, index) => {
           console.log(`Opportunity ${index + 1}:`, {
@@ -471,22 +502,28 @@ export const opportunityRouter = router({
             hasOrgProfile: !!opp.organization_profile,
             orgProfileId: opp.organization_profile?._id,
             isArchived: opp.is_archived,
-            deletedAt: opp.deleted_at
+            deletedAt: opp.deleted_at,
           });
         });
-        
+
         // Debug: Check organization_profile references
         if (opportunities.length > 0) {
           console.log("Checking organization_profile references...");
-          const orgProfileIds = opportunities.map(opp => opp.organization_profile?._id).filter(id => id);
+          const orgProfileIds = opportunities
+            .map((opp) => opp.organization_profile?._id)
+            .filter((id) => id);
           console.log("Organisation profile IDs:", orgProfileIds);
-          
+
           // Check if these organization profiles exist
-          const OrganizationProfile = mongoose.model('organization_profile');
-          const existingOrgs = await OrganizationProfile.find({ _id: { $in: orgProfileIds } }).lean();
-          console.log(`Found ${existingOrgs.length} existing organisation profiles out of ${orgProfileIds.length} references`);
+          const OrganizationProfile = mongoose.model("organization_profile");
+          const existingOrgs = await OrganizationProfile.find({
+            _id: { $in: orgProfileIds },
+          }).lean();
+          console.log(
+            `Found ${existingOrgs.length} existing organisation profiles out of ${orgProfileIds.length} references`
+          );
         }
-        
+
         console.log("=== END DEBUGGING ===");
 
         return {
@@ -646,21 +683,26 @@ export const opportunityRouter = router({
         return { success: true, message: "Opportunity deleted successfully" };
       } catch (error) {
         console.error("Error deleting opportunity:", error);
-        
+
         // If it's already a TRPC error, re-throw it
         if (error instanceof TRPCError) {
           throw error;
         }
-        
+
         // Handle mongoose validation errors
-        if (error && typeof error === 'object' && 'name' in error && error.name === 'ValidationError') {
+        if (
+          error &&
+          typeof error === "object" &&
+          "name" in error &&
+          error.name === "ValidationError"
+        ) {
           throw new TRPCError({
             code: "BAD_REQUEST",
             message: "Validation error while deleting opportunity",
             cause: error,
           });
         }
-        
+
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Failed to delete opportunity",
@@ -673,37 +715,45 @@ export const opportunityRouter = router({
   debugOpportunities: publicProcedure.query(async () => {
     try {
       console.log("Debug endpoint called");
-      
+
       // Use the native collection to bypass middleware
       const collection = Opportunity.collection;
-      
+
       const totalInDB = await collection.countDocuments({});
       console.log("Total in DB (native):", totalInDB);
-      
-      const archivedCount = await collection.countDocuments({ is_archived: true });
-      console.log("Archived count (native):", archivedCount);
-      
-      const nonArchivedCount = await collection.countDocuments({ is_archived: { $ne: true } });
-      console.log("Non-archived count (native):", nonArchivedCount);
-      
-      const nonDeletedCount = await collection.countDocuments({ deleted_at: { $exists: false } });
-      console.log("Non-deleted count (native):", nonDeletedCount);
-      
-      const deletedCount = await collection.countDocuments({ deleted_at: { $ne: null } });
-      console.log("Deleted count (native):", deletedCount);
-      
-      // Get a sample opportunity using native collection
-      const sampleOpportunity = await collection.findOne({ 
-        is_archived: { $ne: true },
-        deleted_at: { $exists: false }
+
+      const archivedCount = await collection.countDocuments({
+        is_archived: true,
       });
-      
+      console.log("Archived count (native):", archivedCount);
+
+      const nonArchivedCount = await collection.countDocuments({
+        is_archived: { $ne: true },
+      });
+      console.log("Non-archived count (native):", nonArchivedCount);
+
+      const nonDeletedCount = await collection.countDocuments({
+        deleted_at: { $exists: false },
+      });
+      console.log("Non-deleted count (native):", nonDeletedCount);
+
+      const deletedCount = await collection.countDocuments({
+        deleted_at: { $ne: null },
+      });
+      console.log("Deleted count (native):", deletedCount);
+
+      // Get a sample opportunity using native collection
+      const sampleOpportunity = await collection.findOne({
+        is_archived: { $ne: true },
+        deleted_at: { $exists: false },
+      });
+
       console.log("Sample opportunity (native):", sampleOpportunity);
-      
+
       // Get all opportunities without middleware
       const allOpportunities = await collection.find({}).toArray();
       console.log("All opportunities (native):", allOpportunities.length);
-      
+
       return {
         totalInDB,
         archivedCount,
@@ -711,7 +761,7 @@ export const opportunityRouter = router({
         nonDeletedCount,
         deletedCount,
         sampleOpportunity,
-        allOpportunitiesCount: allOpportunities.length
+        allOpportunitiesCount: allOpportunities.length,
       };
     } catch (error) {
       console.error("Error in debug endpoint:", error);
@@ -727,32 +777,39 @@ export const opportunityRouter = router({
   testOpportunities: publicProcedure.query(async () => {
     try {
       console.log("Test opportunities endpoint called");
-      
+
       // Use the native collection to bypass middleware
       const collection = Opportunity.collection;
-      
+
       // Get all opportunities without any filtering
       const allOpportunities = await collection.find({}).toArray();
       console.log("Raw opportunities found:", allOpportunities.length);
-      
+
       // Get opportunities without middleware filtering
-      const nonArchivedOpportunities = await collection.find({ 
-        is_archived: { $ne: true } 
-      }).toArray();
-      console.log("Non-archived opportunities:", nonArchivedOpportunities.length);
-      
+      const nonArchivedOpportunities = await collection
+        .find({
+          is_archived: { $ne: true },
+        })
+        .toArray();
+      console.log(
+        "Non-archived opportunities:",
+        nonArchivedOpportunities.length
+      );
+
       // Get opportunities with explicit deleted_at filter
-      const activeOpportunities = await collection.find({ 
-        is_archived: { $ne: true },
-        deleted_at: { $exists: false }
-      }).toArray();
+      const activeOpportunities = await collection
+        .find({
+          is_archived: { $ne: true },
+          deleted_at: { $exists: false },
+        })
+        .toArray();
       console.log("Active opportunities:", activeOpportunities.length);
-      
+
       return {
         total: allOpportunities.length,
         nonArchived: nonArchivedOpportunities.length,
         active: activeOpportunities.length,
-        opportunities: activeOpportunities.slice(0, 5) // Return first 5 for inspection
+        opportunities: activeOpportunities.slice(0, 5), // Return first 5 for inspection
       };
     } catch (error) {
       console.error("Error in test endpoint:", error);
@@ -765,35 +822,34 @@ export const opportunityRouter = router({
   }),
 
   // Manual archiving endpoint for testing
-  manualArchiveOpportunities: protectedProcedure
-    .mutation(async ({ ctx }) => {
-      const sessionUser = ctx.user as JwtPayload;
-      if (!sessionUser || !sessionUser?.id) {
+  manualArchiveOpportunities: protectedProcedure.mutation(async ({ ctx }) => {
+    const sessionUser = ctx.user as JwtPayload;
+    if (!sessionUser || !sessionUser?.id) {
+      throw new TRPCError({
+        code: "UNAUTHORIZED",
+        message: "You must be logged in to trigger manual archiving",
+      });
+    }
+
+    try {
+      // Check if user is admin
+      const user = await User.findById(sessionUser.id);
+      if (!user || user.role !== "admin") {
         throw new TRPCError({
-          code: "UNAUTHORIZED",
-          message: "You must be logged in to trigger manual archiving",
+          code: "FORBIDDEN",
+          message: "Only admins can trigger manual archiving",
         });
       }
 
-      try {
-        // Check if user is admin
-        const user = await User.findById(sessionUser.id);
-        if (!user || user.role !== "admin") {
-          throw new TRPCError({
-            code: "FORBIDDEN",
-            message: "Only admins can trigger manual archiving",
-          });
-        }
+      // Trigger manual archiving
+      await opportunityArchiver.manualArchive();
 
-        // Trigger manual archiving
-        await opportunityArchiver.manualArchive();
-        
-        return { success: true, message: "Manual archiving completed" };
-      } catch (error) {
-        console.error("Error in manual archiving:", error);
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Failed to trigger manual archiving",
+      return { success: true, message: "Manual archiving completed" };
+    } catch (error) {
+      console.error("Error in manual archiving:", error);
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to trigger manual archiving",
         cause: error,
       });
     }
