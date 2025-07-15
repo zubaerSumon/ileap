@@ -26,9 +26,9 @@ import { AppRouter } from "@/server";
 import { SelectField } from "@/components/form-input/SelectField";
 import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
 import BackButton from "@/components/buttons/BackButton";
-import { Edit, Building2, Phone, MapPin, Mail, Globe, Hash, Heart } from "lucide-react";
+import { Edit, Building2, Phone, MapPin, Mail, Globe, Hash, Heart, User } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
 import { MultiSelectField } from "@/components/form-input/MultiSelectField";
@@ -78,10 +78,16 @@ export default function OrganizationProfile() {
   });
   
   const organizationProfileUpdateMutation = trpc.users.setupOrgProfile.useMutation({
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       utils.users.profileCheckup.invalidate();
-      toast.success("Organization profile updated successfully!");
-      setIsEditMode(false); // Exit edit mode after successful update
+      // Only show success message and exit edit mode if it's a full form submission
+      // For profile image updates, just invalidate the cache
+      if (variables.title && variables.contact_email) {
+        toast.success("Organization profile updated successfully!");
+        setIsEditMode(false); // Exit edit mode after successful update
+      } else {
+        toast.success("Organization profile picture updated successfully!");
+      }
     },
     onError: (error: TRPCClientErrorLike<AppRouter>) => {
       toast.error(error.message || "Failed to update profile");
@@ -258,24 +264,75 @@ export default function OrganizationProfile() {
           {/* Main Content */}
           <div className="lg:col-span-2">
             {isEditMode ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-xl">Edit Organisation Profile</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-                      {/* Profile Picture Upload */}
-                      <div className="flex justify-center">
-                        <ProfilePictureUpload
-                          currentImage={session?.user?.image || undefined}
-                          onImageChange={(imageUrl) => {
-                            updateUserMutation.mutate({ image: imageUrl });
-                          }}
-                          userName={profile?.title || session?.user?.name || "Organization"}
-                          size="lg"
-                        />
-                      </div>
+              <div className="space-y-6">
+                {/* Admin Profile Picture Upload - Separate from Organization Form */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl">Your Profile Picture</CardTitle>
+                    <CardDescription>Your personal profile picture for the platform</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex justify-center">
+                      <ProfilePictureUpload
+                        currentImage={session?.user?.image || undefined}
+                        onImageChange={(imageUrl) => {
+                          // Update only the admin's profile image
+                          updateUserMutation.mutate({ image: imageUrl });
+                        }}
+                        userName={session?.user?.name || "Admin"}
+                        size="lg"
+                        uniqueId="admin"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Organization Profile Form */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl">Edit Organisation Profile</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Form {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        {/* Organization Profile Picture Upload */}
+                        <div className="space-y-4">
+                          <div className="text-center">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Organization Profile Picture</h3>
+                            <p className="text-sm text-gray-500 mb-4">This will be displayed as your organization&apos;s logo</p>
+                          </div>
+                          <div className="flex justify-center">
+                            <ProfilePictureUpload
+                              currentImage={profile?.profile_img || undefined}
+                              onImageChange={(imageUrl) => {
+                                // Update the form field
+                                form.setValue("profile_img", imageUrl);
+                                // Also update immediately to the server
+                                if (profileData?.organizationProfile) {
+                                  const currentData = {
+                                    title: profileData.organizationProfile.title || "",
+                                    contact_email: profileData.organizationProfile.contact_email || "",
+                                    phone_number: profileData.organizationProfile.phone_number || "",
+                                    bio: profileData.organizationProfile.bio || "",
+                                    type: profileData.organizationProfile.type || "",
+                                    opportunity_types: Array.isArray(profileData.organizationProfile.opportunity_types) ? profileData.organizationProfile.opportunity_types : [],
+                                    required_skills: Array.isArray(profileData.organizationProfile.required_skills) ? profileData.organizationProfile.required_skills : [],
+                                    state: profileData.organizationProfile.state || "",
+                                    area: profileData.organizationProfile.area || "",
+                                    abn: profileData.organizationProfile.abn || "",
+                                    website: profileData.organizationProfile.website || "",
+                                    profile_img: imageUrl,
+                                    cover_img: profileData.organizationProfile.cover_img || "",
+                                  };
+                                  organizationProfileUpdateMutation.mutate(currentData);
+                                }
+                              }}
+                              userName={profile?.title || "Organization"}
+                              size="lg"
+                              uniqueId="organization"
+                            />
+                          </div>
+                        </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <FormInput<OrganizationProfileData>
@@ -430,56 +487,100 @@ export default function OrganizationProfile() {
                   </Form>
                 </CardContent>
               </Card>
+            </div>
             ) : (
               // View Mode
               <div className="space-y-6">
                 {/* Profile Header */}
                 <Card>
                   <CardContent className="pt-6">
-                    <div className="flex items-start space-x-4">
-                      <Avatar className="h-16 w-16">
-                        {session?.user?.image ? (
-                          <AvatarImage src={session.user.image!} alt={profile?.title || "Organisation"} />
-                        ) : profile?.profile_img ? (
-                          <AvatarImage src={profile.profile_img} alt={profile.title || "Organisation"} />
-                        ) : (
-                          <AvatarFallback className="text-lg font-semibold bg-blue-100 text-blue-600">
-                            {profile?.title?.charAt(0)?.toUpperCase() || "O"}
-                          </AvatarFallback>
-                        )}
-                      </Avatar>
-                      <div className="flex-1">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-1">
+                    {/* Organization Information */}
+                    <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
+                      {/* Organization Profile Picture */}
+                      <div className="flex flex-col items-center space-y-2 flex-shrink-0">
+                        <Avatar className="h-20 w-20">
+                          {profile?.profile_img ? (
+                            <AvatarImage src={profile.profile_img} alt={profile.title || "Organisation"} />
+                          ) : (
+                            <AvatarFallback className="text-xl font-semibold bg-blue-100 text-blue-600">
+                              {profile?.title?.charAt(0)?.toUpperCase() || "O"}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        <div className="text-xs text-gray-500 text-center font-medium">
+                          Organisation Logo
+                        </div>
+                      </div>
+
+                      {/* Organization Details */}
+                      <div className="flex-1 min-w-0">
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2 break-words">
                           {profile?.title || "Organisation Profile"}
                         </h1>
-                        <div className="flex items-center text-gray-600 mb-2">
-                          <MapPin className="h-4 w-4 mr-1" />
-                          <span>
+                        <div className="flex items-center text-gray-600 mb-3">
+                          <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                          <span className="break-words">
                             {profile?.area && profile?.state 
                               ? `${profile.area}, ${profile.state.replace(/_/g, ' ')}`
                               : "Location not specified"
                             }
                           </span>
                         </div>
-                        <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                        <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 text-sm text-gray-600">
                           {profile?.contact_email && (
-                            <div className="flex items-center">
-                              <Mail className="h-4 w-4 mr-1" />
-                              <span>{profile.contact_email}</span>
+                            <div className="flex items-center min-w-0">
+                              <Mail className="h-4 w-4 mr-2 flex-shrink-0" />
+                              <span className="break-all">{profile.contact_email}</span>
                             </div>
                           )}
                           {profile?.phone_number && (
-                            <div className="flex items-center">
-                              <Phone className="h-4 w-4 mr-1" />
-                              <span>{profile.phone_number}</span>
+                            <div className="flex items-center min-w-0">
+                              <Phone className="h-4 w-4 mr-2 flex-shrink-0" />
+                              <span className="break-all">{profile.phone_number}</span>
                             </div>
                           )}
                           {profile?.website && (
-                            <div className="flex items-center">
-                              <Globe className="h-4 w-4 mr-1" />
-                              <span>{profile.website}</span>
+                            <div className="flex items-center min-w-0">
+                              <Globe className="h-4 w-4 mr-2 flex-shrink-0" />
+                              <span className="break-all">{profile.website}</span>
                             </div>
                           )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Admin Information */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      Admin Information
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-start space-x-4">
+                      <Avatar className="h-16 w-16 flex-shrink-0">
+                        {session?.user?.image ? (
+                          <AvatarImage src={session.user.image!} alt={session?.user?.name || "Admin"} />
+                        ) : (
+                          <AvatarFallback className="text-lg font-semibold bg-green-100 text-green-600">
+                            {session?.user?.name?.charAt(0)?.toUpperCase() || "A"}
+                          </AvatarFallback>
+                        )}
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-gray-900 text-lg mb-1 break-words">
+                          {session?.user?.name || "Admin"}
+                        </h3>
+                        <p className="text-sm text-gray-600 mb-1 break-all">
+                          {session?.user?.email}
+                        </p>
+                        <div className="flex items-center">
+                          <Badge variant="secondary" className="text-xs">
+                            Organisation Administrator
+                          </Badge>
                         </div>
                       </div>
                     </div>
