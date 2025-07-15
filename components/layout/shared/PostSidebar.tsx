@@ -57,7 +57,7 @@ export function PostSidebar({
         {/* Quick Actions */}
         {userRole === "volunteer" && orgProfile?._id && (
           <div className="relative">
-            <Link href={`/volunteer/organisation/${orgProfile._id.toString()}`}>
+            <Link href={`/view-profile/organisation/details/${orgProfile._id.toString()}`}>
               <Button 
                 className="w-full h-10 cursor-pointer bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white text-sm font-semibold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 border-0"
               >
@@ -144,7 +144,7 @@ export function PostSidebar({
             }
           </p>
           {orgProfile.bio.length > 120 && userRole === "volunteer" && orgProfile?._id && (
-            <Link href={`/volunteer/organisation/${orgProfile._id.toString()}`}>
+            <Link href={`/view-profile/organisation/details/${orgProfile._id.toString()}`}>
               <span className="text-sm text-blue-600 hover:text-blue-800 hover:underline cursor-pointer">
                 Read more
               </span>

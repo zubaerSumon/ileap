@@ -96,7 +96,7 @@ export function ConfirmationModal({
               </Link>{" "}
               with{" "}
               <Link
-                href={`/volunteer/organisation/${opportunityDetails.organization?.id}`}
+                href={`/view-profile/organisation/details/${opportunityDetails.organization?.id}`}
                 className="text-blue-600 font-semibold"
               >
                 {opportunityDetails.organization?.title}

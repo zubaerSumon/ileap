@@ -145,9 +145,14 @@ export default function OpportunityDetailContainer({
     },
   ];
 
+  // Check if current user belongs to the organization that posted the opportunity
+  const isCurrentUserFromOpportunityOrg = 
+    userRole === "organisation" && 
+    session?.user?.organization_profile?._id === opportunity.organization_profile._id;
+
   const shouldShowTabs =
     (userRole === "volunteer" && isCurrentUserMentor) ||
-    userRole === "organisation";
+    (userRole === "organisation" && isCurrentUserFromOpportunityOrg);
 
   return (
     <ProtectedLayout>

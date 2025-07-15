@@ -102,7 +102,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
           <div className="text-sm text-gray-600 min-w-0">
             <span className="text-gray-500 text-xs">Posted by: </span>
             <Link
-                              href={`/volunteer/organisation/${opportunity.organization_profile?._id}`}
+                              href={`/view-profile/organisation/details/${opportunity.organization_profile?._id}`}
               className="text-blue-600 font-medium hover:text-blue-800 transition-colors block truncate"
               onClick={(e) => e.stopPropagation()}
             >
