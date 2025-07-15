@@ -220,6 +220,7 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
               <ApplyButton
                 opportunityId={opportunity._id}
                 opportunityDetails={opportunityDetails}
+                opportunityDate={opportunity.date}
                 className="bg-blue-500 hover:bg-blue-600 text-white h-10 px-4 rounded-lg text-sm font-medium min-w-[100px]"
               />
             </div>

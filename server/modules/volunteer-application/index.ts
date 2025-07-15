@@ -380,6 +380,17 @@ export const volunteerApplicationRouter = router({
           });
         }
 
+        // Check if opportunity has ended
+        const now = new Date();
+        const opportunityEndDate = opportunity.date?.end_date || opportunity.date?.start_date;
+        
+        if (opportunityEndDate && new Date(opportunityEndDate) < now) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "This opportunity has already ended and is no longer accepting applications.",
+          });
+        }
+
         const existingApplication = await VolunteerApplication.findOne({
           opportunity: input.opportunityId,
           volunteer: user._id,

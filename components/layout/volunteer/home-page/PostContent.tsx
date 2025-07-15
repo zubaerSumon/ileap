@@ -244,6 +244,7 @@ export function PostContent({ opportunity,   }: PostContentProps) {
           <ApplyButton
             opportunityId={opportunity._id}
             opportunityDetails={opportunityDetails}
+            opportunityDate={opportunity.date}
             className="bg-blue-600 h-10 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors"
           />
           <FavoriteButton opportunityId={opportunity._id} />
