@@ -6,6 +6,14 @@ interface ActiveContract {
   profileImg?: string;
   jobTitle: string;
   freelancerName: string;
+  startedAt: string;
+  opportunityTitle?: string;
+  opportunityId?: string;
+  uniqueKey: string;
+  opportunities: Array<{
+    id: string;
+    title: string;
+  }>;
 }
 
 interface ActiveContentProps {
@@ -23,11 +31,7 @@ const ActiveContent = ({ activeContracts, isLoadingRecruited }: ActiveContentPro
       activeContracts.map((contract) => (
         <ActiveContractCard
           key={contract.id}
-          avatar={contract.profileImg || "/avatar.svg"}
-          jobTitle={contract.jobTitle}
-          freelancerName={contract.freelancerName}
-          onFundMilestone={() => {}}
-          onMessage={() => {}}
+          contract={contract}
         />
       ))
     )}
