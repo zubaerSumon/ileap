@@ -379,6 +379,7 @@ export default function OrganizationOpportunities({
                         },
                         location: opportunity.location,
                       }}
+                      opportunityDate={opportunity.date}
                     />
                   </div>
                   <div onClick={(e) => e.stopPropagation()}>

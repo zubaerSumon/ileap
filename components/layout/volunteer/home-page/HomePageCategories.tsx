@@ -272,6 +272,7 @@ export default function Categories() {
                       },
                       location: opportunity.location,
                     }}
+                    opportunityDate={opportunity.date}
                   />
                 </div>
                 <div onClick={(e) => e.stopPropagation()}>

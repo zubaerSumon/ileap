@@ -63,10 +63,10 @@ export class NotificationService {
         return;
       }
 
-      // Find all users associated with this organization
+      // Find all users associated with this organization only
       const organizationUsers = await User.find({
         organization_profile: organizationId,
-        role: { $in: ['organization', 'admin'] }
+        role: { $in: ['organization', 'admin', 'mentor'] }
       });
 
       console.log(`👥 Organization users found: ${organizationUsers.length}`);
@@ -74,23 +74,8 @@ export class NotificationService {
         console.log(`   - ${user.name} (${user.email}) - Role: ${user.role}`);
       });
 
-      // Also find all admin users (regardless of organization)
-      const adminUsers = await User.find({
-        role: 'admin'
-      });
-
-      console.log(`👑 Admin users found: ${adminUsers.length}`);
-      adminUsers.forEach(user => {
-        console.log(`   - ${user.name} (${user.email}) - Role: ${user.role}`);
-      });
-
-      // Combine and deduplicate users
+      // Only notify users from this specific organization
       const allUsers = [...organizationUsers];
-      adminUsers.forEach(adminUser => {
-        if (!allUsers.some(user => user._id.toString() === adminUser._id.toString())) {
-          allUsers.push(adminUser);
-        }
-      });
 
       console.log(`📧 Total users to notify: ${allUsers.length}`);
 
@@ -141,8 +126,8 @@ export class NotificationService {
         await this.sendNotificationToUser(user, notificationData);
       }
 
-      // Note: We're now sending notifications to all admin users, so the opportunity creator
-      // will be notified if they have admin role, regardless of organization association
+      // Note: We're now only sending notifications to users from the specific organization
+      // that created the opportunity, ensuring privacy and preventing cross-organization notifications
 
       console.log(`✅ Archive notification sent for opportunity: ${opportunityTitle}`);
       console.log(`📊 Summary: Notified ${allUsers.length} users for opportunity "${opportunityTitle}"`);
