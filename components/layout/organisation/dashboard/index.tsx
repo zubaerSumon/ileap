@@ -297,12 +297,6 @@ const OrganisationDashboard = () => {
                   </div>
 
                   <div className="mt-auto pt-4">
-                    <div className="text-xs text-gray-500 mb-4">
-                      Started{" "}
-                      {formatDistanceToNow(new Date(contract.startedAt), {
-                        addSuffix: true,
-                      })}
-                    </div>
                   </div>
                 </div>
               </div>
