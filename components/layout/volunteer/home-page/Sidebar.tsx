@@ -1,8 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import Image from "next/image";
 import Link from "next/link";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 
 type Opportunity = {
   _id: string;
@@ -38,14 +38,14 @@ export function Sidebar({ opportunity }: { opportunity: Opportunity }) {
     <div className="w-[350px] space-y-4">
       <Card className="p-4">
         <div className="flex items-center gap-3 mb-4">
-          <div className="relative w-12 h-12">
-            <Image
-              src={opportunity?.organization_profile?.profile_img || '/avatar.svg'}
-              alt={opportunity?.created_by?.name || opportunity?.organization_profile?.name || 'Organisation Logo'}
-              fill
-              className="object-cover rounded-full"
-            />
-          </div>
+          <OrganizationAvatar
+            organization={{
+              title: opportunity?.organization_profile?.name || "Organization",
+              profile_img: opportunity?.organization_profile?.profile_img
+            }}
+            size={48}
+            className="w-12 h-12"
+          />
           <div>
             <h3 className="font-semibold">{opportunity.organization_profile.name}</h3>
             <p className="text-sm text-gray-500">

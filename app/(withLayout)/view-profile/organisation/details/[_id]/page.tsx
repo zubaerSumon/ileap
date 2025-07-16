@@ -8,6 +8,8 @@ import OrganizationOpportunities from "@/components/layout/volunteer/home-page/O
 import { trpc } from "@/utils/trpc";
 import BackButton from "@/components/buttons/BackButton";
 import Loading from "@/app/loading";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
+import { formatText } from "@/utils/helpers/formatText";
 
 export default function OrganizerDetailPage() {
   const params = useParams();
@@ -63,7 +65,8 @@ export default function OrganizerDetailPage() {
             <BackButton />
           </div>
 
-          <div className="relative mb-6 pt-4">
+          {/* Cover Image */}
+          <div className="relative mb-8 pt-4">
             <div className="w-full h-[200px] relative rounded-lg overflow-hidden">
               <Image
                 src={organizationProfile.cover_img || "/pfbg2.svg"}
@@ -71,83 +74,93 @@ export default function OrganizerDetailPage() {
                 fill
                 className="object-cover"
               />
+            </div>
+          </div>
 
-              <div className="absolute bottom-4 left-4 w-[80px] h-[80px] rounded-lg overflow-hidden border-4 border-white bg-white">
-                <Image
-                  src={organizationProfile.profile_img || "/Easy.svg"}
-                  alt={`${organizationProfile.title} Logo`}
-                  width={80}
-                  height={80}
-                  className="object-cover h-full w-full "
-                />
+          {/* Organization Header with Avatar */}
+          <div className="flex flex-col md:flex-row items-start gap-6 mb-8">
+            {/* Avatar Section */}
+            <div className="flex-shrink-0">
+              <OrganizationAvatar
+                organization={{
+                  title: organizationProfile.title,
+                  profile_img: organizationProfile.profile_img
+                }}
+                size={120}
+                className="w-24 h-24 md:w-32 md:h-32 border-4 border-white shadow-lg"
+              />
+            </div>
+
+            {/* Organization Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-col gap-3">
+                <div>
+                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                    {organizationProfile?.title}
+                  </h1>
+                  <div className="flex items-center text-gray-600 mb-2">
+                    <span className="mr-1">📍</span>
+                    <span>
+                      {formatText(organizationProfile.area, organizationProfile.state)}
+                    </span>
+                  </div>
+                  {organizationProfile.website && (
+                    <div className="flex items-center mb-2">
+                      <Link
+                        href={organizationProfile.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 hover:underline flex items-center"
+                      >
+                        <span className="mr-1">🌐</span>
+                        {organizationProfile.website}
+                      </Link>
+                    </div>
+                  )}
+                  <div className="mt-2">
+                    <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                      {organizationProfile.type}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col md:flex-row md:justify-between md:items-start items-center text-center md:text-left gap-6 md:gap-0">
-            <div className="flex flex-col items-center md:items-start gap-1 md:w-1/3">
-              <h1 className="text-2xl font-bold">
-                {organizationProfile?.title}
-              </h1>
-              <div className="flex items-center text-gray-600">
-                <span className="mr-1">📍</span>
-                <span>
-                  {organizationProfile.area}, {organizationProfile.state}
-                </span>
-              </div>
-              {organizationProfile.website && (
-                <div className="flex items-center text-blue-600 underline">
-                  <Link
-                    href={organizationProfile.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:text-blue-600 hover:underline"
-                  >
-                    {organizationProfile.website}
-                  </Link>
-                </div>
-              )}
-              <div className="mt-1 text-sm">
-                <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full">
-                  {organizationProfile.type}
-                </span>
-              </div>
+          {/* Contact and Location Info */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center text-center sm:text-left mb-8">
+            <div>
+              <h2 className="text-lg font-semibold mb-2">Location</h2>
+              <p className="text-gray-600">{formatText(organizationProfile.area)}</p>
+              <p className="text-gray-600">
+                {formatText(organizationProfile.state)}, <br />
+                Australia
+              </p>
             </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 justify-center text-center sm:text-left md:w-2/3">
-              <div>
-                <h2 className="text-lg font-semibold mb-2">Location</h2>
-                <p className="text-gray-600">{organizationProfile.area}</p>
-                <p className="text-gray-600">
-                  {organizationProfile.state}, <br />
-                  Australia
+            <div>
+              <h2 className="text-lg font-semibold mb-2">Contact Us</h2>
+              {user.email && (
+                <p className="text-gray-700">
+                  Mail-{" "}
+                  <a
+                    href={`mailto:${user.email}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {organizationProfile.contact_email}
+                  </a>
                 </p>
-              </div>
-              <div>
-                <h2 className="text-lg font-semibold mb-2">Contact Us</h2>
-                {user.email && (
-                  <p className="text-gray-700">
-                    Mail-{" "}
-                    <a
-                      href={`mailto:${user.email}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      {organizationProfile.contact_email}
-                    </a>
-                  </p>
-                )}
-                {organizationProfile.phone_number && (
-                  <p className="text-gray-700">
-                    Phone -{" "}
-                    <a
-                      href={`tel:${organizationProfile.phone_number}`}
-                      className="text-blue-600 hover:underline"
-                    >
-                      {organizationProfile.phone_number}
-                    </a>
-                  </p>
-                )}
-              </div>
+              )}
+              {organizationProfile.phone_number && (
+                <p className="text-gray-700">
+                  Phone -{" "}
+                  <a
+                    href={`tel:${organizationProfile.phone_number}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    {organizationProfile.phone_number}
+                  </a>
+                </p>
+              )}
             </div>
           </div>
 

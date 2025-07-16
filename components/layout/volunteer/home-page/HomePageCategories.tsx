@@ -15,6 +15,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { useSession } from "next-auth/react";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 
 export type OpportunityDetails = {
   id: string;
@@ -152,16 +153,12 @@ export default function Categories() {
             <CardContent className="px-4 pt-4">
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
-                  <Image
-                    src={
-                      opportunity?.organization_profile?.profile_img ||
-                      "/avatar.svg"
-                    }
-                    alt={
-                      opportunity?.created_by?.name || "Unknown Organization"
-                    }
-                    width={40}
-                    height={40}
+                  <OrganizationAvatar
+                    organization={{
+                      title: opportunity?.organization_profile?.title || "Organization",
+                      profile_img: opportunity?.organization_profile?.profile_img
+                    }}
+                    size={40}
                     className="rounded-full"
                   />
                   <div className="flex items-center gap-2">
