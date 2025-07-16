@@ -17,7 +17,7 @@ export type OpportunityFormValues = {
   commitment_type: string;
   location: string;
   number_of_volunteers: number;
-  email_contact: string;
+  email_contact?: string;
   phone_contact?: string;
   internal_reference?: string;
   external_event_link?: string;
@@ -262,15 +262,14 @@ export default function BasicInformation({
             <div>
               <h2 className="text-base sm:text-lg font-medium mb-1 flex items-center">
                 Contact Information
-                <span className="text-red-500 ml-1">*</span>
               </h2>
               <p className="text-xs sm:text-sm text-gray-500 mb-4">
-                How can volunteers reach out to you with questions?
+                How can volunteers reach out to you with questions? (Optional)
               </p>
               <div className="space-y-4">
                 <FormInput
                   name={"email_contact" as Path<OpportunityFormValues>}
-                  label="Email"
+                  label="Email (optional)"
                   placeholder="contact@organization.com"
                   type="email"
                   control={form.control}

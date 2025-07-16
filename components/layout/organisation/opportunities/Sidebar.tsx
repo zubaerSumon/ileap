@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "@/components/ui/separator";
-import { MapPin, Mail, Phone, Globe } from "lucide-react";
+import { MapPin, Globe } from "lucide-react";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
 import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 import { formatText } from "@/utils/helpers/formatText";
@@ -62,7 +62,7 @@ export function Sidebar({ opportunity }: SidebarProps) {
       <div className="py-4 rounded-lg">
         <h3 className="font-semibold mb-3 text-center">Organisation Information</h3>
         <div className="space-y-3 text-center">
-          {opportunity.organization_profile.contact_email && (
+          {/* {opportunity.organization_profile.contact_email && (
             <div className="flex items-center justify-center text-sm">
               <Mail className="w-4 h-4 mr-2 text-gray-500" />
               <span>{opportunity.organization_profile.contact_email}</span>
@@ -74,7 +74,7 @@ export function Sidebar({ opportunity }: SidebarProps) {
               <Phone className="w-4 h-4 mr-2 text-gray-500" />
               <span>{opportunity.organization_profile.phone_number}</span>
             </div>
-          )}
+          )} */}
           
           {opportunity.organization_profile.website && (
             <div className="flex items-center justify-center text-sm">
