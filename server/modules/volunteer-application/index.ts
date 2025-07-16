@@ -10,6 +10,7 @@ import connectDB from "@/server/config/mongoose";
 import { sendApplicationConfirmationMail } from "@/utils/helpers/sendApplicationConfirmationMail";
 import { volunteerApplicationValidation } from "./volunteer-application.validation";
 import { z } from "zod";
+import { formatText } from "@/utils/helpers/formatText";
 
 export const volunteerApplicationRouter = router({
   getApplicationStatus: protectedProcedure
@@ -600,7 +601,7 @@ export const volunteerApplicationRouter = router({
           // Construct location from state and area
           const state = app.volunteer.volunteer_profile?.state || "";
           const area = app.volunteer.volunteer_profile?.area || "";
-          const location = state && area ? `${area}, ${state}` : state || area || "";
+          const location = formatText(area, state);
 
           return {
             id: app.volunteer._id.toString(),

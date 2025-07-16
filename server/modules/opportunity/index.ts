@@ -51,7 +51,7 @@ export const opportunityRouter = router({
           commitment_type: string;
           location: string;
           number_of_volunteers: number;
-          email_contact: string;
+          email_contact?: string;
           phone_contact?: string;
           internal_reference?: string;
           external_event_link?: string;
@@ -90,7 +90,7 @@ export const opportunityRouter = router({
           commitment_type: input.commitment_type,
           location: input.location,
           number_of_volunteers: input.number_of_volunteers,
-          email_contact: input.email_contact,
+          email_contact: input.email_contact || "",
           phone_contact: input.phone_contact || undefined,
           internal_reference: input.internal_reference || undefined,
           external_event_link: input.external_event_link || undefined,
@@ -226,7 +226,7 @@ export const opportunityRouter = router({
           commitment_type: string;
           location: string;
           number_of_volunteers: number;
-          email_contact: string;
+          email_contact?: string;
           phone_contact?: string;
           internal_reference?: string;
           external_event_link?: string;
