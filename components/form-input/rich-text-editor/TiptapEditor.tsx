@@ -63,6 +63,7 @@ export function TiptapEditor<T extends FieldValues>({
         ...(placeholder ? { "data-placeholder": placeholder } : {}),
       },
     },
+    immediatelyRender: false,
   });
 
   useEffect(() => {

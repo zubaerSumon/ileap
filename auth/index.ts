@@ -65,8 +65,12 @@ export const {
       // Always fetch the latest user data to ensure profile updates are reflected
       if (token.email) {
         try {
+          // Ensure database connection is established
+          await connectToDatabase();
+          
           const retrievedUser = await User.findOne({ email: token.email })
-            .populate("organization_profile");
+            .populate("organization_profile")
+            .maxTimeMS(5000); // 5 second timeout
           
           if (retrievedUser) {
             token.id = retrievedUser.id;
@@ -84,14 +88,19 @@ export const {
           }
         } catch (error) {
           console.error('Error fetching user data in JWT callback:', error);
+          // Don't throw the error, just log it and continue with existing token data
         }
       }
       
       // Handle initial sign in
       if (trigger === 'signIn' && user) {
         try {
+          // Ensure database connection is established
+          await connectToDatabase();
+          
           const retrievedUser = await User.findOne({ email: user.email })
-            .populate("organization_profile");
+            .populate("organization_profile")
+            .maxTimeMS(5000); // 5 second timeout
           
           if (retrievedUser) {
             token.id = retrievedUser.id;
@@ -109,6 +118,7 @@ export const {
           }
         } catch (error) {
           console.error('Error fetching user data on sign in:', error);
+          // Don't throw the error, just log it and continue with existing token data
         }
       }
       

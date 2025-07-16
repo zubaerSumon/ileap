@@ -84,7 +84,7 @@ const EditOpportunityPage = () => {
         form.setValue(key as keyof OpportunityFormValues, value);
       });
     }
-  }, [opportunity, form, getDefaultValues]);
+  }, [opportunity, form]);
 
   const onSubmit = async (data: OpportunityFormValues) => {
     try {
