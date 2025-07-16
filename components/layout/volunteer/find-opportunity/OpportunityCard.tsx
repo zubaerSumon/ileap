@@ -25,10 +25,10 @@ interface OpportunityCardProps {
 export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
   const router = useRouter();
   const spotsLeft =
-    opportunity.number_of_volunteers - (opportunity.recruitCount || 0);
+    opportunity.number_of_volunteers - (opportunity.applicantCount || 0);
   const isUrgent = spotsLeft <= 2;
   const isPopular =
-    (opportunity.recruitCount || 0) > opportunity.number_of_volunteers * 0.7;
+    (opportunity.applicantCount || 0) > opportunity.number_of_volunteers * 0.7;
 
   const handleCardClick = () => {
     router.push(`/find-opportunity/opportunity/details/${opportunity._id}`);

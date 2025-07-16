@@ -367,6 +367,7 @@ export const opportunityRouter = router({
           const [applicantCount, recruitCount] = await Promise.all([
             VolunteerApplication.countDocuments({
               opportunity: opportunity._id,
+              status: { $in: ["pending", "approved"] },
             }),
             OrganisationRecruitment.countDocuments({
               application: {
@@ -643,8 +644,33 @@ export const opportunityRouter = router({
           opportunities.map((opp) => opp._id)
         );
 
+        // Get applicant and recruit counts for each opportunity
+        const opportunitiesWithCounts = await Promise.all(
+          opportunities.map(async (opportunity) => {
+            const [applicantCount, recruitCount] = await Promise.all([
+              VolunteerApplication.countDocuments({
+                opportunity: opportunity._id,
+                status: { $in: ["pending", "approved"] },
+              }),
+              OrganisationRecruitment.countDocuments({
+                application: {
+                  $in: await VolunteerApplication.find({
+                    opportunity: opportunity._id,
+                  }).select("_id"),
+                },
+              }),
+            ]);
+
+            return {
+              ...opportunity,
+              applicantCount,
+              recruitCount,
+            } as typeof opportunity & { applicantCount: number; recruitCount: number };
+          })
+        );
+
         // Debug: Check if opportunities have organization_profile
-        const opportunitiesWithOrg = opportunities.filter(
+        const opportunitiesWithOrg = opportunitiesWithCounts.filter(
           (opp) => opp.organization_profile
         );
         console.log(
@@ -652,7 +678,7 @@ export const opportunityRouter = router({
         );
 
         // Debug: Check opportunity details
-        opportunities.forEach((opp, index) => {
+        opportunitiesWithCounts.forEach((opp, index) => {
           console.log(`Opportunity ${index + 1}:`, {
             id: opp._id,
             title: opp.title,
@@ -660,13 +686,14 @@ export const opportunityRouter = router({
             orgProfileId: opp.organization_profile?._id,
             isArchived: opp.is_archived,
             deletedAt: opp.deleted_at,
+            recruitCount: opp.recruitCount,
           });
         });
 
         // Debug: Check organization_profile references
-        if (opportunities.length > 0) {
+        if (opportunitiesWithCounts.length > 0) {
           console.log("Checking organization_profile references...");
-          const orgProfileIds = opportunities
+          const orgProfileIds = opportunitiesWithCounts
             .map((opp) => opp.organization_profile?._id)
             .filter((id) => id);
           console.log("Organisation profile IDs:", orgProfileIds);
@@ -684,7 +711,7 @@ export const opportunityRouter = router({
         console.log("=== END DEBUGGING ===");
 
         return {
-          opportunities,
+          opportunities: opportunitiesWithCounts,
           total,
           totalPages,
           currentPage: page,
