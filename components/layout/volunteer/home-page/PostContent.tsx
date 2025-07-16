@@ -139,7 +139,9 @@ export function PostContent({ opportunity,   }: PostContentProps) {
           <Target className="w-5 h-5 text-gray-600 flex-shrink-0" />
           <div>
             <p className="text-xs text-gray-500 uppercase tracking-wide">Commitment</p>
-            <p className="text-sm font-medium text-gray-900">{opportunity.commitment_type}</p>
+            <p className="text-sm font-medium text-gray-900">
+              {opportunity.commitment_type === 'workbased' ? 'Work based' : 'Event based'}
+            </p>
           </div>
         </div>
 

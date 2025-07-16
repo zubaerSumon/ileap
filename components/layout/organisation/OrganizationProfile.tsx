@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -34,6 +35,147 @@ import { useSession } from "next-auth/react";
 import { MultiSelectField } from "@/components/form-input/MultiSelectField";
 import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 import { formatText } from "@/utils/helpers/formatText";
+
+// Cover Image Upload Component
+function CoverImageUpload({
+  currentImage,
+  onImageChange,
+  organizationName,
+  uniqueId = 'default',
+}: {
+  currentImage?: string;
+  onImageChange: (imageUrl: string) => void;
+  organizationName: string;
+  uniqueId?: string;
+}) {
+  const [isUploading, setIsUploading] = React.useState(false);
+  const [error, setError] = React.useState<string>('');
+
+  const uploadMutation = trpc.upload.uploadFile.useMutation();
+
+  const convertFileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+    });
+  };
+
+  const handleFileUpload = React.useCallback(
+    async (file: File) => {
+      if (file.size > 5 * 1024 * 1024) {
+        setError(`File size exceeds 5MB limit (${(file.size / (1024 * 1024)).toFixed(1)}MB)`);
+        return;
+      }
+      
+      if (!file.type.startsWith('image/')) {
+        setError("Please select an image file");
+        return;
+      }
+
+      setError('');
+      setIsUploading(true);
+      try {
+        const base64File = await convertFileToBase64(file);
+        
+        const result = await uploadMutation.mutateAsync({
+          base64File,
+          fileName: file.name,
+          fileType: file.type,
+          folder: 'covers',
+        });
+
+        if (result?.data?.link) {
+          onImageChange(result.data.link);
+        }
+      } catch (error) {
+        console.error('Upload error:', error);
+        setError('Failed to upload file');
+      } finally {
+        setIsUploading(false);
+      }
+    },
+    [uploadMutation, onImageChange]
+  );
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFileUpload(file);
+    }
+  };
+
+  return (
+    <div className="flex flex-col items-center space-y-4">
+      <div className="relative">
+        <div className="w-64 h-32 rounded-lg overflow-hidden border-2 border-gray-200 shadow-lg">
+          {isUploading ? (
+            <div className="flex items-center justify-center w-full h-full bg-gray-100">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+          ) : currentImage ? (
+            <img
+              src={currentImage}
+              alt={`${organizationName} cover`}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="flex items-center justify-center w-full h-full bg-gray-100">
+              <div className="text-center">
+                <div className="text-gray-400 text-4xl mb-2">🏢</div>
+                <div className="text-sm text-gray-500">No cover image</div>
+              </div>
+            </div>
+          )}
+        </div>
+        
+        {/* Upload overlay */}
+        <label 
+          htmlFor={`cover-image-upload-${uniqueId}`}
+          className={`
+            absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-lg cursor-pointer transition-opacity opacity-0 hover:opacity-100
+            ${isUploading ? 'opacity-100 cursor-not-allowed' : ''}
+          `}
+        >
+          <div className="text-white text-center">
+            <div className="text-2xl mb-1">📷</div>
+            <div className="text-sm">Upload Cover</div>
+          </div>
+          <input 
+            id={`cover-image-upload-${uniqueId}`}
+            type="file"
+            accept="image/*"
+            onChange={handleFileSelect}
+            className="hidden"
+            disabled={isUploading}
+          />
+        </label>
+      </div>
+      
+      <div className="text-center">
+        <label 
+          htmlFor={`cover-image-upload-alt-${uniqueId}`}
+          className="text-sm text-blue-600 hover:text-blue-700 cursor-pointer font-medium"
+        >
+          {isUploading ? 'Uploading...' : 'Change cover image'}
+        </label>
+        <input 
+          id={`cover-image-upload-alt-${uniqueId}`}
+          type="file"
+          accept="image/*"
+          onChange={handleFileSelect}
+          className="hidden"
+          disabled={isUploading}
+        />
+      </div>
+      
+      {error && (
+        <div className="text-xs text-red-500 text-center max-w-48">{error}</div>
+      )}
+    </div>
+  );
+}
 
 type OrganizationProfileData = Omit<z.infer<typeof userValidation.organizationProfileSchema>, 'opportunity_types' | 'required_skills'> & {
   opportunity_types: string[];
@@ -324,7 +466,7 @@ export default function OrganizationProfile() {
                                     abn: profileData.organizationProfile.abn || "",
                                     website: profileData.organizationProfile.website || "",
                                     profile_img: imageUrl,
-                                    cover_img: profileData.organizationProfile.cover_img || "",
+                                    cover_img: form.getValues("cover_img") || profileData.organizationProfile.cover_img || "",
                                   };
                                   organizationProfileUpdateMutation.mutate(currentData);
                                 }
@@ -332,6 +474,44 @@ export default function OrganizationProfile() {
                               userName={profile?.title || "Organization"}
                               size="lg"
                               uniqueId="organization"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Organization Cover Image Upload */}
+                        <div className="space-y-4">
+                          <div className="text-center">
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">Organisation Cover Image</h3>
+                            <p className="text-sm text-gray-500 mb-4">This will be displayed as your organisation&apos;s banner image</p>
+                          </div>
+                          <div className="flex justify-center">
+                            <CoverImageUpload
+                              currentImage={profile?.cover_img || undefined}
+                              onImageChange={(imageUrl) => {
+                                // Update the form field
+                                form.setValue("cover_img", imageUrl);
+                                // Also update immediately to the server
+                                if (profileData?.organizationProfile) {
+                                  const currentData = {
+                                    title: profileData.organizationProfile.title || "",
+                                    contact_email: profileData.organizationProfile.contact_email || "",
+                                    phone_number: profileData.organizationProfile.phone_number || "",
+                                    bio: profileData.organizationProfile.bio || "",
+                                    type: profileData.organizationProfile.type || "",
+                                    opportunity_types: Array.isArray(profileData.organizationProfile.opportunity_types) ? profileData.organizationProfile.opportunity_types : [],
+                                    required_skills: Array.isArray(profileData.organizationProfile.required_skills) ? profileData.organizationProfile.required_skills : [],
+                                    state: profileData.organizationProfile.state || "",
+                                    area: profileData.organizationProfile.area || "",
+                                    abn: profileData.organizationProfile.abn || "",
+                                    website: profileData.organizationProfile.website || "",
+                                    profile_img: form.getValues("profile_img") || profileData.organizationProfile.profile_img || "",
+                                    cover_img: imageUrl,
+                                  };
+                                  organizationProfileUpdateMutation.mutate(currentData);
+                                }
+                              }}
+                              organizationName={profile?.title || "Organization"}
+                              uniqueId="organization-cover"
                             />
                           </div>
                         </div>

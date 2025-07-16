@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MapPin, Mail, Phone, Globe, Eye } from "lucide-react";
+import { MapPin, Globe, Eye } from "lucide-react";
 import Link from "next/link";
 import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 import { IOrgnizationPofile } from "@/server/db/interfaces/organization-profile";
@@ -76,7 +76,7 @@ export function PostSidebar({
           <p className="text-sm font-medium text-gray-700">Get in Touch</p>
           
           <div className="space-y-2">
-            {orgProfile.contact_email && (
+            {/* {orgProfile.contact_email && (
               <a 
                 href={`mailto:${orgProfile.contact_email}`}
                 className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors group"
@@ -108,7 +108,7 @@ export function PostSidebar({
                   </p>
                 </div>
               </a>
-            )}
+            )} */}
 
             {orgProfile.website && (
               <a
