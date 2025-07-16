@@ -32,6 +32,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { useSession } from "next-auth/react";
 import { MultiSelectField } from "@/components/form-input/MultiSelectField";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
+import { formatText } from "@/utils/helpers/formatText";
 
 type OrganizationProfileData = Omit<z.infer<typeof userValidation.organizationProfileSchema>, 'opportunity_types' | 'required_skills'> & {
   opportunity_types: string[];
@@ -498,15 +500,14 @@ export default function OrganizationProfile() {
                     <div className="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6">
                       {/* Organization Profile Picture */}
                       <div className="flex flex-col items-center space-y-2 flex-shrink-0">
-                        <Avatar className="h-20 w-20">
-                          {profile?.profile_img ? (
-                            <AvatarImage src={profile.profile_img} alt={profile.title || "Organisation"} />
-                          ) : (
-                            <AvatarFallback className="text-xl font-semibold bg-blue-100 text-blue-600">
-                              {profile?.title?.charAt(0)?.toUpperCase() || "O"}
-                            </AvatarFallback>
-                          )}
-                        </Avatar>
+                        <OrganizationAvatar 
+                          organization={{
+                            title: profile?.title || "Organisation",
+                            profile_img: profile?.profile_img
+                          }}
+                          size={80}
+                          className="h-20 w-20"
+                        />
                         <div className="text-xs text-gray-500 text-center font-medium">
                           Organisation Logo
                         </div>
@@ -521,7 +522,7 @@ export default function OrganizationProfile() {
                           <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
                           <span className="break-words">
                             {profile?.area && profile?.state 
-                              ? `${profile.area}, ${profile.state.replace(/_/g, ' ')}`
+                              ? formatText(profile.area, profile.state)
                               : "Location not specified"
                             }
                           </span>

@@ -10,27 +10,19 @@ import { useMemo } from "react";
 import { FormSelect } from "@/components/form-input/FormSelect";
 interface DetailedProfileStepProps {
   form: UseFormReturn<VolunteerSignupForm>;
-  mediaConsent: boolean;
-  setMediaConsent: (value: boolean) => void;
-  mediaConsentError: string | null;
-  setMediaConsentError: (value: string | null) => void;
 }
 
 export function DetailedProfileStep({
   form,
-  mediaConsent,
-  setMediaConsent,
-  mediaConsentError,
-  setMediaConsentError,
 }: DetailedProfileStepProps) {
   const countryOptions = useMemo(() => countryList().getData(), []);
 
   const courseOptions = [
     { value: "phd", label: "Doctorate / PhD" },
-    { value: "masters", label: "Master’s Degree (Postgraduate)" },
-    { value: "bachelor", label: "Bachelor’s Degree (Undergraduate)" },
+    { value: "masters", label: "Master's Degree (Postgraduate)" },
+    { value: "bachelor", label: "Bachelor's Degree (Undergraduate)" },
     { value: "diploma", label: "Diploma / Certificate" },
-    { value: "professional", label: "Professional / Industry Expert" },
+    { value: "professional", label: "Professional / Industry Expert" },
     { value: "non-student", label: "Non-Student / Not Currently Studying" },
   ];
 
@@ -172,26 +164,6 @@ export function DetailedProfileStep({
             />
           )}
         </div>
-
-        <div className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            id="media_consent"
-            checked={mediaConsent}
-            onChange={(e) => {
-              setMediaConsent(e.target.checked);
-              setMediaConsentError(null);
-            }}
-            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-          />
-          <label htmlFor="media_consent" className="text-sm text-gray-600">
-            I grant permission for the use of photographs or electronic media
-            images in which I may appear
-          </label>
-        </div>
-        {mediaConsentError && (
-          <p className="text-sm text-red-600">{mediaConsentError}</p>
-        )}
       </div>
     </>
   );

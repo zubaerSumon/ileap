@@ -2,8 +2,9 @@
 
 import { Separator } from "@/components/ui/separator";
 import { MapPin, Mail, Phone, Globe } from "lucide-react";
-import Image from "next/image";
 import { IOpportunity } from "@/server/db/interfaces/opportunity";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
+import { formatText } from "@/utils/helpers/formatText";
 import { IOrgnizationPofile } from "@/server/db/interfaces/organization-profile";
 
 interface SidebarProps {
@@ -18,11 +19,12 @@ export function Sidebar({ opportunity }: SidebarProps) {
       {/* Organization Logo at Top */}
       <div className="py-4 rounded-lg mb-4">
         <div className="flex flex-col items-center text-center">
-          <Image
-            src={opportunity.organization_profile.profile_img || "/avatar.svg"}
-            alt={opportunity.organization_profile.title}
-            width={80}
-            height={80}
+          <OrganizationAvatar
+            organization={{
+              title: opportunity.organization_profile.title,
+              profile_img: opportunity.organization_profile.profile_img
+            }}
+            size={80}
             className="rounded-full mb-3"
           />
           <h3 className="font-semibold text-lg">{opportunity.organization_profile.title}</h3>
@@ -91,7 +93,7 @@ export function Sidebar({ opportunity }: SidebarProps) {
           {opportunity.organization_profile.area && (
             <div className="flex items-start justify-center text-sm">
               <MapPin className="w-4 h-4 mr-2 text-gray-500 mt-0.5" />
-              <span>{opportunity.organization_profile.area}, {opportunity.organization_profile.state}</span>
+              <span>{formatText(opportunity.organization_profile.area, opportunity.organization_profile.state)}</span>
             </div>
           )}
         </div>

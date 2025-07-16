@@ -26,6 +26,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
 import { useSession } from "next-auth/react";
+import { formatText } from "@/utils/helpers/formatText";
 
 
 
@@ -372,7 +373,7 @@ export function VolunteerProfileForm() {
                           <MapPin className="h-4 w-4 mr-1" />
                           <span>
                             {volunteerProfile?.area && volunteerProfile?.state 
-                              ? `${volunteerProfile.area}, ${volunteerProfile.state.replace(/_/g, ' ')}`
+                              ? formatText(volunteerProfile.area, volunteerProfile.state)
                               : "Location not specified"
                             }
                           </span>

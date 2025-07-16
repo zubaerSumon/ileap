@@ -2,8 +2,9 @@ import { LogOut, User, MessageCircle, Info } from "lucide-react";
 import Link from "next/link";
 import { signOut } from "next-auth/react";
 import { SessionUser } from "@/types/navigation";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+
 import { Switch } from "../ui/switch";
+import UserAvatar from "@/components/ui/UserAvatar";
 import {
   Tooltip,
   TooltipContent,
@@ -99,15 +100,14 @@ export function UserMenu({ user }: UserMenuProps) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className="relative focus:outline-none cursor-pointer">
-          <Avatar className="h-9 w-9 ring-2 ring-blue-500 border border-white transition-transform duration-200 hover:scale-105">
-            <AvatarImage
-              src={user.image && user.image !== null ? user.image : undefined}
-              alt={userName}
-            />
-            <AvatarFallback className="bg-blue-600 text-white">
-              {userName[0].toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
+          <UserAvatar
+            user={{
+              name: userName,
+              image: user.image
+            }}
+            size={36}
+            className="h-9 w-9 ring-2 ring-blue-500 border border-white transition-transform duration-200 hover:scale-105"
+          />
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>

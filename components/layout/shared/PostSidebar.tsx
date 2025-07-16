@@ -2,8 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { MapPin, Mail, Phone, Globe, Eye } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 import { IOrgnizationPofile } from "@/server/db/interfaces/organization-profile";
 import { Types } from "mongoose";
 import { formatText } from "@/utils/helpers/formatText";
@@ -27,7 +27,6 @@ export function PostSidebar({
   // Handle both populated and unpopulated organization_profile
   const orgProfile = organization_profile as unknown as OrganizationProfileData;
   const orgName = orgProfile?.title || orgProfile?.name || "Organization";
-  const orgImage = orgProfile?.profile_img || "/avatar.svg";
 
   return (
     <div className="w-full lg:w-[350px] space-y-6">
@@ -35,14 +34,14 @@ export function PostSidebar({
       <div className="space-y-4">
         {/* Organization Header */}
         <div className="flex items-center gap-3">
-          <div className="relative w-14 h-14 md:w-16 md:h-16 flex-shrink-0">
-            <Image
-              src={orgImage}
-              alt={orgName}
-              fill
-              className="object-cover rounded-full border-2 border-gray-200"
-            />
-          </div>
+          <OrganizationAvatar
+            organization={{
+              title: orgName,
+              profile_img: orgProfile?.profile_img
+            }}
+            size={64}
+            className="w-14 h-14 md:w-16 md:h-16 flex-shrink-0 border-2 border-gray-200"
+          />
           <div className="min-w-0 flex-1">
             <h3 className="font-semibold text-base md:text-lg text-gray-900 break-words mb-1">{orgName}</h3>
             {orgProfile.area && (

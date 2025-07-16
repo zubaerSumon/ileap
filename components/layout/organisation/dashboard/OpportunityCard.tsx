@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Trash2 } from 'lucide-react';
@@ -10,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { formatTimeToAMPM } from '@/utils/helpers/formatTime';
 import { Opportunity } from '@/types/opportunities';
 import { DASHBOARD_CARD_HEIGHT, DASHBOARD_CARD_STYLES } from './constants';
+import OrganizationAvatar from '@/components/ui/OrganizationAvatar';
 
 interface OpportunityCardProps {
   opportunity: Opportunity;
@@ -30,17 +30,12 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center">
             <div className="w-10 h-10 mr-3">
-              <Image
-                src={
-                  opportunity?.organization_profile
-                    ?.profile_img || "/avatar.svg"
-                }
-                alt={
-                  opportunity?.organization_profile?.title ||
-                  "Organization Logo"
-                }
-                width={40}
-                height={40}
+              <OrganizationAvatar
+                organization={{
+                  title: opportunity?.organization_profile?.title || "Organization",
+                  profile_img: opportunity?.organization_profile?.profile_img
+                }}
+                size={40}
                 className="rounded-full"
               />
             </div>

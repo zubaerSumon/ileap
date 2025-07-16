@@ -28,10 +28,6 @@ export default function VolunteerSignup() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsError, setTermsError] = useState<string | null>(null);
-  const [mediaConsent, setMediaConsent] = useState(false);
-  const [mediaConsentError, setMediaConsentError] = useState<string | null>(
-    null
-  );
   const [isSignupLoading, setIsSignupLoading] = useState(false);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
   const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false);
@@ -123,12 +119,6 @@ export default function VolunteerSignup() {
       } else if (step === 2) {
         setStep(step + 1);
       } else if (step === 3) {
-        if (!mediaConsent) {
-          setMediaConsentError(
-            "You must grant media consent to complete your profile"
-          );
-          return;
-        }
         try {
           setIsProfileLoading(true);
           const formData = form.getValues();
@@ -250,10 +240,6 @@ export default function VolunteerSignup() {
             {step === 3 && (
               <DetailedProfileStep
                 form={form}
-                mediaConsent={mediaConsent}
-                setMediaConsent={setMediaConsent}
-                mediaConsentError={mediaConsentError}
-                setMediaConsentError={setMediaConsentError}
               />
             )}
 
