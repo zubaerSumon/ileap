@@ -9,6 +9,7 @@ import connectDB from "@/server/config/mongoose";
 import { organisationRecruitmentValidation } from "./organisation-recruitment.validation";
 import { z } from "zod";
 import { sendRecruitmentConfirmationMail } from "@/utils/helpers/sendRecruitmentConfirmationMail";
+import { formatText } from "@/utils/helpers/formatText";
 
 export const organisationRecruitmentRouter = router({
   getRecruitmentStatus: protectedProcedure
@@ -177,7 +178,7 @@ export const organisationRecruitmentRouter = router({
           // Construct location from state and area
           const state = app.application.volunteer.volunteer_profile?.state || "";
           const area = app.application.volunteer.volunteer_profile?.area || "";
-          const location = state && area ? `${area}, ${state}` : state || area || "";
+          const location = formatText(area, state);
 
           return {
             id: app.application.volunteer._id.toString(),
