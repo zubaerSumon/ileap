@@ -122,9 +122,19 @@ export const useEditOpportunity = () => {
     }
 
     try {
+      const formattedData = {
+        ...data,
+        email_contact: data.email_contact || "",
+        phone_contact: data.phone_contact || "",
+        internal_reference: data.internal_reference || "",
+        external_event_link: data.external_event_link || "",
+        end_date: data.end_date || "",
+        end_time: data.end_time || "",
+        banner_img: data.banner_img || "",
+      };
       await updateOpportunity.mutateAsync({
         id: opportunityId,
-        ...data,
+        ...formattedData,
       });
     } catch (error) {
       // Error is already handled by the onError callback in useMutation

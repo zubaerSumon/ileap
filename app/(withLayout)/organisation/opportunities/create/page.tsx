@@ -83,7 +83,18 @@ export default function CreateOpportunityPage() {
   const onSubmit = async (data: OpportunityFormValues) => {
     try {
       console.log("Form data being submitted:", data);
-      await createOpportunity.mutateAsync(data);
+      // Ensure optional fields are properly formatted
+      const formattedData = {
+        ...data,
+        email_contact: data.email_contact || "",
+        phone_contact: data.phone_contact || "",
+        internal_reference: data.internal_reference || "",
+        external_event_link: data.external_event_link || "",
+        end_date: data.end_date || "",
+        end_time: data.end_time || "",
+        banner_img: data.banner_img || "",
+      };
+      await createOpportunity.mutateAsync(formattedData);
     } catch (error) {
       // Error is already handled by the onError callback in useMutation
       console.error("Error creating opportunity:", error);

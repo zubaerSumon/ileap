@@ -35,6 +35,7 @@ import { useSession } from "next-auth/react";
 import { MultiSelectField } from "@/components/form-input/MultiSelectField";
 import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 import { formatText } from "@/utils/helpers/formatText";
+import Image from "next/image";
 
 // Cover Image Upload Component
 function CoverImageUpload({
@@ -115,10 +116,11 @@ function CoverImageUpload({
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
           ) : currentImage ? (
-            <img
+            <Image
               src={currentImage}
               alt={`${organizationName} cover`}
-              className="w-full h-full object-cover"
+              fill
+              className="object-cover"
             />
           ) : (
             <div className="flex items-center justify-center w-full h-full bg-gray-100">
