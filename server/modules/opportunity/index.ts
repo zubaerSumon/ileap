@@ -173,6 +173,163 @@ export const opportunityRouter = router({
       }
     }),
 
+  updateOpportunity: protectedProcedure
+    .input(opportunityValidation.updateOpportunitySchema)
+    .mutation(async ({ ctx, input }) => {
+      const sessionUser = ctx.user as JwtPayload;
+      if (!sessionUser || !sessionUser?.id) {
+        throw new TRPCError({
+          code: "UNAUTHORIZED",
+          message: "You must be logged in to update an opportunity",
+        });
+      }
+
+      try {
+        // Check if opportunity exists and user has permission to edit it
+        const existingOpportunity = await Opportunity.findById(input.id)
+          .populate("organization_profile")
+          .populate("created_by");
+
+        if (!existingOpportunity) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Opportunity not found",
+          });
+        }
+
+        // Check if user is the creator or has admin/organization role
+        const user = await User.findById(sessionUser.id);
+        if (!user) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "User not found",
+          });
+        }
+
+        const isCreator = existingOpportunity.created_by.toString() === sessionUser.id;
+        const isAdmin = user.role === "admin";
+        const isOrganization = user.role === "organization";
+
+        if (!isCreator && !isAdmin && !isOrganization) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "You don't have permission to update this opportunity",
+          });
+        }
+
+        // Transform the form data to match the database model structure
+        interface OpportunityUpdateData {
+          title: string;
+          description: string;
+          category: string[];
+          required_skills: string[];
+          commitment_type: string;
+          location: string;
+          number_of_volunteers: number;
+          email_contact: string;
+          phone_contact?: string;
+          internal_reference?: string;
+          external_event_link?: string;
+          date: {
+            start_date: Date;
+            end_date?: Date;
+          };
+          time: {
+            start_time: string;
+            end_time?: string;
+          };
+          is_recurring: boolean;
+          banner_img?: string;
+          recurrence?: {
+            type: string;
+            days: string[];
+            date_range: {
+              start_date: Date;
+              end_date?: Date;
+            };
+            time_range: {
+              start_time: string;
+              end_time: string;
+            };
+            occurrences?: number;
+          };
+        }
+
+        const opportunityUpdateData: OpportunityUpdateData = {
+          title: input.title,
+          description: input.description,
+          category: input.category,
+          required_skills: input.required_skills,
+          commitment_type: input.commitment_type,
+          location: input.location,
+          number_of_volunteers: input.number_of_volunteers,
+          email_contact: input.email_contact,
+          phone_contact: input.phone_contact || undefined,
+          internal_reference: input.internal_reference || undefined,
+          external_event_link: input.external_event_link || undefined,
+          // Map date and time fields to the nested structure
+          date: {
+            start_date: input.start_date
+              ? new Date(input.start_date)
+              : new Date(),
+            end_date: input.end_date ? new Date(input.end_date) : undefined,
+          },
+          time: {
+            start_time: input.start_time || "09:00",
+            end_time: input.end_time || undefined,
+          },
+          is_recurring: input.is_recurring || false,
+          banner_img:
+            input.banner_img && input.banner_img.trim() !== ""
+              ? input.banner_img
+              : "/fallbackbanner.png",
+        };
+
+        // Handle recurrence data if it exists
+        if (input.is_recurring && input.recurrence) {
+          opportunityUpdateData.recurrence = {
+            type: input.recurrence.type,
+            days: input.recurrence.days || [],
+            date_range: {
+              start_date: input.recurrence.date_range.start_date
+                ? new Date(input.recurrence.date_range.start_date)
+                : new Date(),
+              end_date: input.recurrence.date_range.end_date
+                ? new Date(input.recurrence.date_range.end_date)
+                : undefined,
+            },
+            time_range: {
+              start_time: input.recurrence.time_range.start_time,
+              end_time: input.recurrence.time_range.end_time,
+            },
+            occurrences: input.recurrence.occurrences,
+          };
+        }
+
+        const updatedOpportunity = await Opportunity.findByIdAndUpdate(
+          input.id,
+          opportunityUpdateData,
+          { new: true, runValidators: true }
+        );
+
+        if (!updatedOpportunity) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to update opportunity",
+          });
+        }
+
+        return updatedOpportunity;
+      } catch (error) {
+        console.error("Opportunity update error:", error);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to update opportunity",
+          cause: error,
+        });
+      }
+    }),
+
   getOrganizationOpportunities: protectedProcedure.query(async ({ ctx }) => {
     const sessionUser = ctx.user as JwtPayload;
     if (!sessionUser || !sessionUser?.id) {

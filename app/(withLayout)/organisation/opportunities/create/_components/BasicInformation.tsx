@@ -54,14 +54,14 @@ export default function BasicInformation({
   };
 
   return (
-    <div className="max-w-[1240px] mx-auto">
-      <BackButton />
+    <div className="max-w-7xl mx-auto">
+      <BackButton className="mx-4 sm:mx-6" />
       <Card
-        className="bg-white rounded-lg shadow-none border-0 relative"
+        className="bg-transparent shadow-none border-0 "
         role="dialog"
         aria-labelledby="basic-info-title"
       >
-        <div className="pt-8 sm:pt-16 px-4 sm:px-6 pb-6">
+        <div className="  px-4 sm:px-6 pb-6">
           <h2 id="basic-info-title" className="sr-only">
             Basic Information Form
           </h2>
@@ -358,7 +358,9 @@ export default function BasicInformation({
 
             {/* Banner Image */}
             <div>
-              <h2 className="text-base sm:text-lg font-medium mb-1">Banner Image</h2>
+              <h2 className="text-base sm:text-lg font-medium mb-1">
+                Banner Image
+              </h2>
               <p className="text-xs sm:text-sm text-gray-500 mb-4">
                 Add a banner image to make your opportunity stand out.
               </p>
@@ -374,7 +376,6 @@ export default function BasicInformation({
           </div>
         </div>
       </Card>
-         
     </div>
   );
 }
