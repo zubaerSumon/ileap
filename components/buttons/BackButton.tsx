@@ -9,6 +9,7 @@ const BackButton = () => {
 
   return (
     <Button
+      type="button"
       onClick={() => router.back()}
       variant="ghost"
       size="sm"
