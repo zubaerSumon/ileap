@@ -1,18 +1,13 @@
 import mongoose from 'mongoose';
 
 const connectToDatabase = async () => {
-  // Check if already connected or connecting
-  if (mongoose.connection.readyState >= 1) {
-    console.log('MongoDB already connected, readyState:', mongoose.connection.readyState);
-    return;
-  }
+  if (mongoose.connection.readyState >= 1) return;
 
   try {
     if (!process.env.MONGODB_URI) {
       throw new Error('MONGODB_URI is not set');
     }
 
-    console.log('Connecting to MongoDB...');
     await mongoose.connect(process.env.MONGODB_URI, {
       maxPoolSize: 10,
       minPoolSize: 5,
@@ -22,12 +17,11 @@ const connectToDatabase = async () => {
       heartbeatFrequencyMS: 10000,
       retryWrites: true,
       retryReads: true,
-      bufferCommands: false, // Disable mongoose buffering
     });
 
     mongoose.connection.on('error', (err) => {
       console.error('MongoDB connection error:', err);
-      setTimeout(() => {
+       setTimeout(() => {
         console.log('Attempting to reconnect to MongoDB...');
         connectToDatabase();
       }, 5000);
@@ -35,13 +29,13 @@ const connectToDatabase = async () => {
 
     mongoose.connection.on('disconnected', () => {
       console.warn('MongoDB disconnected. Retrying connection...');
-      setTimeout(() => {
+       setTimeout(() => {
         console.log('Attempting to reconnect to MongoDB...');
         connectToDatabase();
       }, 5000);
     });
 
-    mongoose.connection.on('connected', () => {
+     mongoose.connection.on('connected', () => {
       console.log('MongoDB connected successfully');
     });
 
