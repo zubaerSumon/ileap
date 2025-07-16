@@ -8,7 +8,7 @@ import BackButton from "@/components/buttons/BackButton";
 import Loading from "@/app/loading";
 import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 import { formatText } from "@/utils/helpers/formatText";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Globe, Building2, Heart } from "lucide-react";
 
@@ -73,7 +73,7 @@ export default function OrganizationProfileView({ organizerId }: OrganizationPro
   const { organizationProfile } = data;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <div className="min-h-screen  ">
       <div className="max-w-7xl mx-auto">
         <div className="container mx-auto px-4 py-6">
           {/* Header with Back Button */}
@@ -83,7 +83,7 @@ export default function OrganizationProfileView({ organizerId }: OrganizationPro
 
           {/* Hero Section with Cover Image */}
           <div className="relative mb-8 rounded-2xl overflow-hidden shadow-2xl">
-            <div className="w-full h-[300px] md:h-[400px] relative">
+            <div className="w-full h-[200px] md:h-[250px] relative">
               <Image
                 src={organizationProfile.cover_img || "/pfbg2.svg"}
                 alt={`${organizationProfile.title} Cover`}
@@ -146,62 +146,48 @@ export default function OrganizationProfileView({ organizerId }: OrganizationPro
           <div className="space-y-6">
             {/* About Section */}
             {organizationProfile.bio && (
-              <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <Building2 className="w-5 h-5 text-blue-600" />
-                    About Us
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-700 leading-relaxed text-justify">
-                    {organizationProfile.bio}
-                  </p>
-                </CardContent>
-              </Card>
+              <div className="mb-6">
+                <h2 className="flex items-center gap-2 text-xl font-bold text-gray-800 mb-4">
+                  <Building2 className="w-5 h-5 text-blue-600" />
+                  About Us
+                </h2>
+                <p className="text-gray-700 leading-relaxed text-justify">
+                  {organizationProfile.bio}
+                </p>
+              </div>
             )}
 
             {/* Location & Details */}
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <MapPin className="w-5 h-5 text-green-600" />
-                  Location & Details
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-3">
-                    <h3 className="font-semibold text-gray-800">Address</h3>
-                    <div className="space-y-1 text-gray-600">
-                      <p>{formatText(organizationProfile.area)}</p>
-                      <p>{formatText(organizationProfile.state)}, Australia</p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <h3 className="font-semibold text-gray-800">Organization Type</h3>
-                    <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
-                      {organizationProfile.type}
-                    </Badge>
+            <div className="mb-6">
+              <h2 className="flex items-center gap-2 text-xl font-bold text-gray-800 mb-4">
+                <MapPin className="w-5 h-5 text-green-600" />
+                Location & Details
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-gray-800">Address</h3>
+                  <div className="space-y-1 text-gray-600">
+                    <p>{formatText(organizationProfile.area)}</p>
+                    <p>{formatText(organizationProfile.state)}, Australia</p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-gray-800">Organization Type</h3>
+                  <Badge variant="outline" className="text-blue-600 border-blue-200 bg-blue-50">
+                    {organizationProfile.type}
+                  </Badge>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Full Width Opportunities Section */}
           <div className="mt-8">
-            <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-xl">
-                  <Heart className="w-5 h-5 text-red-600" />
-                  Volunteer Opportunities
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <OrganizationOpportunities organizationId={organizerId} />
-              </CardContent>
-            </Card>
+            <h2 className="flex items-center gap-2 text-xl font-bold text-gray-800 mb-4">
+              <Heart className="w-5 h-5 text-red-600" />
+              Volunteer Opportunities
+            </h2>
+            <OrganizationOpportunities organizationId={organizerId} />
           </div>
         </div>
       </div>

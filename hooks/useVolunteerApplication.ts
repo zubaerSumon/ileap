@@ -39,6 +39,8 @@ export const useVolunteerApplication = (opportunityId: string) => {
       utils.applications.getCurrentUserRecentApplicationsCount.invalidate();
       utils.applications.getCurrentUserActiveApplications.invalidate();
       utils.applications.getCurrentUserRecentApplications.invalidate();
+      // Invalidate opportunities to update recruit counts
+      utils.opportunities.getAllOpportunities.invalidate();
     },
   });
 
