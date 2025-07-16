@@ -27,6 +27,7 @@ import toast from "react-hot-toast";
 import { useSession } from "next-auth/react";
 import { cn } from "@/lib/utils";
 import ConfirmationDialog from "@/components/modals/ConfirmationDialog";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 interface User {
   _id: string;
@@ -151,9 +152,14 @@ export default function UserManagementTable({
         header: "Name",
         cell: (info) => (
           <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium">
-              {info.getValue()[0].toUpperCase()}
-            </div>
+            <UserAvatar
+              user={{
+                name: info.getValue(),
+                image: info.row.original.avatar
+              }}
+              size={32}
+              className="w-8 h-8"
+            />
             <div className="min-w-0 flex-1">
               <p className="font-medium text-sm sm:text-base truncate">
                 {info.getValue()}
@@ -407,19 +413,24 @@ export default function UserManagementTable({
             return (
               <div key={row.id} className="border rounded-lg p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium flex-shrink-0">
-                      {user.name[0].toUpperCase()}
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-sm truncate">
-                        {user.name}
-                      </p>
-                      <p className="text-xs text-muted-foreground truncate">
-                        {user.email}
-                      </p>
-                    </div>
+                                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                  <UserAvatar
+                    user={{
+                      name: user.name,
+                      image: user.avatar
+                    }}
+                    size={40}
+                    className="w-10 h-10 flex-shrink-0"
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm truncate">
+                      {user.name}
+                    </p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {user.email}
+                    </p>
                   </div>
+                </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button

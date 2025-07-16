@@ -42,12 +42,6 @@ export function UserMenu({ user }: UserMenuProps) {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
   
-   console.log('UserMenu user object:', {
-    name: user.name,
-    image: user.image,
-    role: user.role
-  });
-  
 
   const userRole =
     user.role === "admin" || user.role === "mentor"

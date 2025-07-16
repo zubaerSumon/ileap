@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { MapPin, UserCheck, Loader2, CheckCircle2 } from "lucide-react";
-import Image from "next/image";
 import { HiClipboardDocumentList } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
@@ -14,6 +13,7 @@ import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { ApplicantActionsDropdown } from "./ApplicantActionsDropdown";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 export interface Applicant {
   id: string;
@@ -162,14 +162,14 @@ export function ApplicantsCard({
           <div className="flex gap-3 sm:gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <div className="relative w-[34px] h-[34px] shrink-0">
-                  <Image
-                    src={applicant.profileImg}
-                    alt={`${applicant.name}'s avatar`}
-                    fill
-                    className="rounded-full object-cover"
-                  />
-                </div>
+                <UserAvatar
+                  user={{
+                    name: applicant.name,
+                    image: applicant.profileImg
+                  }}
+                  size={34}
+                  className="w-[34px] h-[34px] shrink-0"
+                />
                 <h3 className="font-medium truncate">{applicant.name}</h3>
                 <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded flex-shrink-0">
                   Verified
