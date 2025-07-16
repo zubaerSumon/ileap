@@ -55,7 +55,7 @@ export default function OrganizerDetailPage() {
     );
   }
 
-  const { organizationProfile, user } = data;
+  const { organizationProfile } = data;
 
   return (
     <ProtectedLayout>
@@ -138,8 +138,8 @@ export default function OrganizerDetailPage() {
               </p>
             </div>
             <div>
-              <h2 className="text-lg font-semibold mb-2">Contact Us</h2>
-              {user.email && (
+              {/* <h2 className="text-lg font-semibold mb-2">Contact Us</h2> */}
+              {/* {user.email && (
                 <p className="text-gray-700">
                   Mail-{" "}
                   <a
@@ -160,7 +160,7 @@ export default function OrganizerDetailPage() {
                     {organizationProfile.phone_number}
                   </a>
                 </p>
-              )}
+              )} */}
             </div>
           </div>
 
