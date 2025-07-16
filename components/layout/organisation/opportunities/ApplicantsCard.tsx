@@ -67,6 +67,17 @@ export function ApplicantsCard({
       }
     );
 
+  // Get dynamic completed opportunities count
+  const { data: dynamicCompletedCount } = trpc.applications.getDynamicCompletedOpportunities.useQuery(
+    {
+      volunteerId: applicant.id,
+      currentOpportunityId: opportunityId || "",
+    },
+    {
+      enabled: !!opportunityId && !!applicant.id,
+    }
+  );
+
   useEffect(() => {
     if (opportunityMentors) {
       const isMentor = opportunityMentors.some(
@@ -89,6 +100,7 @@ export function ApplicantsCard({
       utils.applications.getCurrentUserRecentApplicationsCount.invalidate();
       utils.applications.getCurrentUserActiveApplications.invalidate();
       utils.applications.getCurrentUserRecentApplications.invalidate();
+      utils.applications.getDynamicCompletedOpportunities.invalidate();
       utils.opportunities.getOrganizationOpportunities.invalidate();
     },
     onError: (error: TRPCClientErrorLike<AppRouter>) => {
@@ -174,9 +186,7 @@ export function ApplicantsCard({
                   className="w-[34px] h-[34px] shrink-0"
                 />
                 <h3 className="font-medium truncate">{applicant.name}</h3>
-                <span className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded flex-shrink-0">
-                  Verified
-                </span>
+
                 {isMentorForOpportunity && (
                   <span className="text-xs bg-purple-50 text-purple-600 px-2 py-1 rounded flex-shrink-0">
                     Mentor
@@ -189,10 +199,18 @@ export function ApplicantsCard({
                   <MapPin className="w-4 h-4 flex-shrink-0" />
                   <span className="truncate">{applicant.location}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <HiClipboardDocumentList className="w-4 h-4 text-blue-600 flex-shrink-0" />
-                  <span>{applicant.completedProjects} projects completed</span>
-                </div>
+                {((dynamicCompletedCount?.count !== undefined && dynamicCompletedCount.count > 0) || 
+                  (dynamicCompletedCount?.count === undefined && applicant.completedProjects > 0)) && (
+                  <div className="flex items-center gap-1">
+                    <HiClipboardDocumentList className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                                      <span>
+                    {dynamicCompletedCount?.count !== undefined 
+                      ? `${dynamicCompletedCount.count} ${dynamicCompletedCount.count === 1 ? 'opportunity' : 'opportunities'} completed`
+                      : `${applicant.completedProjects} ${applicant.completedProjects === 1 ? 'opportunity' : 'opportunities'} completed`
+                    }
+                  </span>
+                  </div>
+                )}
               </div>
 
               <div className="flex flex-wrap gap-2 mt-2">

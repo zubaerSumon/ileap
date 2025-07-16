@@ -565,9 +565,10 @@ export const volunteerApplicationRouter = router({
             populate: {
               path: "volunteer_profile",
               select:
-                "location bio skills completed_projects availability",
+                "state area bio interested_on completed_projects availability",
             },
           })
+          .sort({ createdAt: -1 }) // Sort by application date, most recent first
           .lean();
 
         if (!applications) {
@@ -585,15 +586,21 @@ export const volunteerApplicationRouter = router({
               name?: string;
               email?: string;
               image?: string;
-              volunteer_profile?: {
-                location?: string;
-                bio?: string;
-                skills?: string[];
-                completed_projects?: number;
-                availability?: string;
-              };
+                              volunteer_profile?: {
+                  state?: string;
+                  area?: string;
+                  bio?: string;
+                  interested_on?: string[];
+                  completed_projects?: number;
+                  availability?: string;
+                };
             };
           };
+
+          // Construct location from state and area
+          const state = app.volunteer.volunteer_profile?.state || "";
+          const area = app.volunteer.volunteer_profile?.area || "";
+          const location = state && area ? `${area}, ${state}` : state || area || "";
 
           return {
             id: app.volunteer._id.toString(),
@@ -601,9 +608,9 @@ export const volunteerApplicationRouter = router({
             email: app.volunteer.email || "",
             profileImg:
               app.volunteer.image || null,
-            location: app.volunteer.volunteer_profile?.location || "",
+            location: location,
             bio: app.volunteer.volunteer_profile?.bio || "",
-            skills: app.volunteer.volunteer_profile?.skills || [],
+            skills: app.volunteer.volunteer_profile?.interested_on || [],
             completedProjects:
               app.volunteer.volunteer_profile?.completed_projects || 0,
             availability: app.volunteer.volunteer_profile?.availability || "",
@@ -612,6 +619,127 @@ export const volunteerApplicationRouter = router({
         });
       } catch (error) {
         console.error("Error getting opportunity applicants:", error);
+        throw error;
+      }
+    }),
+
+  getDynamicCompletedOpportunities: protectedProcedure
+    .input(z.object({
+      volunteerId: z.string(),
+      currentOpportunityId: z.string(),
+    }))
+    .query(async ({ ctx, input }) => {
+      try {
+        const sessionUser = ctx.user as JwtPayload;
+        if (!sessionUser?.email) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "You must be logged in to view completed opportunities.",
+          });
+        }
+
+        // Get the current opportunity to check its organization and skills/categories
+        const currentOpportunity = await Opportunity.findById(input.currentOpportunityId)
+          .populate("organization_profile")
+          .lean() as {
+            organization_profile?: { _id: string };
+            required_skills?: string[];
+            category?: string[];
+          } | null;
+
+        if (!currentOpportunity) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Current opportunity not found.",
+          });
+        }
+
+        // Get all approved applications for the volunteer
+        const approvedApplications = await VolunteerApplication.find({
+          volunteer: input.volunteerId,
+          status: "approved",
+        })
+          .populate({
+            path: "opportunity",
+            select: "title description category required_skills organization_profile commitment_type date time",
+            populate: {
+              path: "organization_profile",
+              select: "title _id",
+            },
+          })
+          .lean();
+
+        const now = new Date();
+
+        // Filter applications based on criteria:
+        // 1. Same organization as current opportunity
+        // 2. Skills or categories match current opportunity
+        // 3. Opportunity has actually ended based on commitment type
+        const matchingApplications = approvedApplications.filter((app) => {
+          if (!app.opportunity) return false;
+
+          const opp = app.opportunity as {
+            organization_profile?: { _id: string };
+            required_skills?: string[];
+            category?: string[];
+            commitment_type?: string;
+            date?: {
+              start_date?: Date;
+              end_date?: Date;
+            };
+            time?: {
+              start_time?: string;
+              end_time?: string;
+            };
+          };
+          const currentOrgId = currentOpportunity.organization_profile?._id?.toString();
+          const appOrgId = opp.organization_profile?._id?.toString();
+
+          // Check if same organization
+          const isSameOrganization = currentOrgId === appOrgId;
+
+          // Check if skills or categories match
+          const currentSkills = currentOpportunity.required_skills || [];
+          const currentCategories = currentOpportunity.category || [];
+          const appSkills = opp.required_skills || [];
+          const appCategories = opp.category || [];
+
+          const hasMatchingSkills = currentSkills.some((skill: string) =>
+            appSkills.includes(skill)
+          );
+          const hasMatchingCategories = currentCategories.some((category: string) =>
+            appCategories.includes(category)
+          );
+
+          // Check if opportunity has actually ended based on commitment type
+          let hasEnded = false;
+          
+          if (opp.commitment_type === "workbased") {
+            // For work-based: check if end_date and end_time have passed
+            if (opp.date?.end_date && opp.time?.end_time) {
+              const endDateTime = new Date(opp.date.end_date);
+              const [endHour, endMinute] = opp.time.end_time.split(':').map(Number);
+              endDateTime.setHours(endHour, endMinute, 0, 0);
+              hasEnded = endDateTime < now;
+            }
+          } else if (opp.commitment_type === "eventbased") {
+            // For event-based: check if start_date and start_time have passed
+            if (opp.date?.start_date && opp.time?.start_time) {
+              const startDateTime = new Date(opp.date.start_date);
+              const [startHour, startMinute] = opp.time.start_time.split(':').map(Number);
+              startDateTime.setHours(startHour, startMinute, 0, 0);
+              hasEnded = startDateTime < now;
+            }
+          }
+
+          return isSameOrganization && (hasMatchingSkills || hasMatchingCategories) && hasEnded;
+        });
+
+        return {
+          count: matchingApplications.length,
+        };
+      } catch (error) {
+        console.error("Error getting dynamic completed opportunities:", error);
         throw error;
       }
     }),

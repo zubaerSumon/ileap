@@ -127,7 +127,7 @@ export const organisationRecruitmentRouter = router({
                 populate: {
                   path: "volunteer_profile",
                   select:
-                    "location bio skills completed_projects availability",
+                    "state area bio interested_on completed_projects availability",
                 },
               },
               {
@@ -136,6 +136,7 @@ export const organisationRecruitmentRouter = router({
               },
             ],
           })
+          .sort({ createdAt: -1 }) // Sort by recruitment date, most recent first
           .lean();
 
         // Filter out null applications (where opportunity didn't match) and applications with missing volunteer data
@@ -154,9 +155,10 @@ export const organisationRecruitmentRouter = router({
                 email?: string;
                 image?: string;
                 volunteer_profile?: {
-                  location?: string;
+                  state?: string;
+                  area?: string;
                   bio?: string;
-                  skills?: string[];
+                  interested_on?: string[];
                   completed_projects?: number;
                   availability?: string;
                 };
@@ -172,16 +174,20 @@ export const organisationRecruitmentRouter = router({
             };
           };
 
+          // Construct location from state and area
+          const state = app.application.volunteer.volunteer_profile?.state || "";
+          const area = app.application.volunteer.volunteer_profile?.area || "";
+          const location = state && area ? `${area}, ${state}` : state || area || "";
+
           return {
             id: app.application.volunteer._id.toString(),
             name: app.application.volunteer.name || "",
             email: app.application.volunteer.email || "",
             profileImg:
               app.application.volunteer.image || null,
-            location:
-              app.application.volunteer.volunteer_profile?.location || "",
+            location: location,
             bio: app.application.volunteer.volunteer_profile?.bio || "",
-            skills: app.application.volunteer.volunteer_profile?.skills || [],
+            skills: app.application.volunteer.volunteer_profile?.interested_on || [],
             completedProjects:
               app.application.volunteer.volunteer_profile?.completed_projects ||
               0,
