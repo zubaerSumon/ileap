@@ -15,7 +15,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 

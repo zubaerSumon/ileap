@@ -78,7 +78,7 @@ export const ChatArea: React.FC<ChatAreaProps> = React.memo(({
         observerRef.current.disconnect();
       }
     };
-  }, [hasMore, isLoadingMore, onLoadMore]);
+  }, [hasMore, isLoadingMore, onLoadMore, hasReachedTop, isLoading]);
 
   // Reset hasReachedTop when conversation changes
   useEffect(() => {
