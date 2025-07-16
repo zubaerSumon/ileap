@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 interface Applicant {
   id: string;
   name: string;
-  profileImg: string;
+  profileImg: string | null;
 }
 
 interface MessageApplicantModalProps {

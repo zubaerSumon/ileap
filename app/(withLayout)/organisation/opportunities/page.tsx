@@ -276,8 +276,8 @@ export default function OpportunitiesPage() {
 
   return (
     <ProtectedLayout>
-      <div className="bg-[#F5F7FA] min-h-screen">
-        <div className="max-w-[1240px] py-4 sm:py-8 px-4 mx-auto">
+      <div className="  min-h-screen">
+        <div className="max-w-7xl py-4 sm:py-8 px-4 mx-auto">
           <div className="bg-white rounded-lg flex flex-col min-h-[600px]">
             <div className="px-4 pt-5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">

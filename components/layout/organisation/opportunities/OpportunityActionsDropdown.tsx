@@ -29,9 +29,9 @@ export default function OpportunityActionsDropdown({
   const router = useRouter();
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  
+
   const utils = trpc.useUtils();
-  
+
   const deleteMutation = trpc.opportunities.deleteOpportunity.useMutation({
     onSuccess: () => {
       utils.opportunities.getOrganizationOpportunities.invalidate();
@@ -65,7 +65,7 @@ export default function OpportunityActionsDropdown({
 
   const handleEdit = () => {
     setIsDropdownOpen(false);
-    console.log("Edit opportunity:", opportunityId);
+    router.push(`/organisation/opportunities/${opportunityId}/edit`);
   };
 
   const handleDelete = () => {
@@ -97,12 +97,12 @@ export default function OpportunityActionsDropdown({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem onClick={handleViewApplication}>
+          <DropdownMenuItem onClick={handleViewApplication} className="cursor-pointer">
             View Application
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={handleEdit}>Edit</DropdownMenuItem>
+          <DropdownMenuItem onClick={handleEdit} className="cursor-pointer">Edit</DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" onClick={handleDelete}>
+          <DropdownMenuItem variant="destructive" onClick={handleDelete} className="cursor-pointer">
             {activeTab === "archived" ? "Delete" : "Archive"}
           </DropdownMenuItem>
         </DropdownMenuContent>

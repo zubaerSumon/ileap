@@ -177,8 +177,7 @@ export const organisationRecruitmentRouter = router({
             name: app.application.volunteer.name || "",
             email: app.application.volunteer.email || "",
             profileImg:
-              app.application.volunteer.image ||
-              "/avatar.svg",
+              app.application.volunteer.image || null,
             location:
               app.application.volunteer.volunteer_profile?.location || "",
             bio: app.application.volunteer.volunteer_profile?.bio || "",

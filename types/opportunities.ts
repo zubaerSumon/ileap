@@ -6,6 +6,10 @@ export type CreateOpportunityInput = z.infer<
   typeof opportunityValidation.createOpportunitySchema
 >;
 
+export type UpdateOpportunityInput = z.infer<
+  typeof opportunityValidation.updateOpportunitySchema
+>;
+
 export type Opportunity = CreateOpportunityInput & {
   _id: string;
   createdAt: Date;

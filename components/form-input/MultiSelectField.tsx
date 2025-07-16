@@ -52,7 +52,7 @@ export const MultiSelectField = <T extends FieldValues>({
       <MultiSelect
         options={options}
         onValueChange={handleValueChange}
-        defaultValue={value}
+        value={value}
         placeholder={placeholder}
         disabled={disabled}
         className={cn(

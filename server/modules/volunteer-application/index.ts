@@ -600,7 +600,7 @@ export const volunteerApplicationRouter = router({
             name: app.volunteer.name || "",
             email: app.volunteer.email || "",
             profileImg:
-              app.volunteer.image || "/avatar.svg",
+              app.volunteer.image || null,
             location: app.volunteer.volunteer_profile?.location || "",
             bio: app.volunteer.volunteer_profile?.bio || "",
             skills: app.volunteer.volunteer_profile?.skills || [],
