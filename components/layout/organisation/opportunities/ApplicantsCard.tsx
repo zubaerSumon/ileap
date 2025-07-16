@@ -18,7 +18,7 @@ import UserAvatar from "@/components/ui/UserAvatar";
 export interface Applicant {
   id: string;
   name: string;
-  profileImg: string;
+  profileImg: string | null;
   location: string;
   bio: string;
   skills: string[];

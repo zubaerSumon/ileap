@@ -76,7 +76,7 @@ const EditOpportunityPage = () => {
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="max-w-7xl mx-auto  py-4 sm:py-8"
+            className="max-w-7xl mx-auto py-4 sm:py-8"
           >
             <EditBasicInformation
               form={form}

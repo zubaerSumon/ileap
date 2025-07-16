@@ -27,15 +27,25 @@ export default function CreateOpportunityPage() {
     },
     onError: (error) => {
       // Handle validation errors
-      if (error.data && 'zodError' in error.data) {
-        const fieldErrors = (error.data as { zodError: { fieldErrors: Record<string, string[]> } }).zodError.fieldErrors;
+      if (error.data && "zodError" in error.data) {
+        const fieldErrors = (
+          error.data as { zodError: { fieldErrors: Record<string, string[]> } }
+        ).zodError.fieldErrors;
         Object.entries(fieldErrors).forEach(([field, errors]) => {
           if (errors?.[0]) {
-            toast.error(`${field.charAt(0).toUpperCase() + field.slice(1).replace(/_/g, ' ')}: ${errors[0]}`);
+            toast.error(
+              `${
+                field.charAt(0).toUpperCase() +
+                field.slice(1).replace(/_/g, " ")
+              }: ${errors[0]}`
+            );
           }
         });
       } else {
-        toast.error(error.message || "Failed to create opportunity. Please check all required fields and try again.");
+        toast.error(
+          error.message ||
+            "Failed to create opportunity. Please check all required fields and try again."
+        );
       }
     },
   });
@@ -79,14 +89,17 @@ export default function CreateOpportunityPage() {
       console.error("Error creating opportunity:", error);
     }
   };
-  
+
   return (
     <ProtectedLayout>
-      <div className="bg-[#F5F7FA] min-h-screen">
+      <div className="  min-h-screen">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="max-w-[1240px] mx-auto px-2 sm:px-4 py-4 sm:py-8">
-            <BasicInformation 
-              form={form} 
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="max-w-[1240px] mx-auto px-2 sm:px-4 py-4 sm:py-8"
+          >
+            <BasicInformation
+              form={form}
               onImageUploadStateChange={setIsImageUploading}
             />
             <CreateFooter
