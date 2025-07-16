@@ -1,6 +1,8 @@
 import NextAuth from "next-auth";
 import connectToDatabase from "@/server/config/mongoose";
 import User from "@/server/db/models/user";
+// Import models to ensure they're registered
+import "@/server/db/models";
 import { authConfig } from "./config";
 import { opportunityArchiver } from "@/server/services/opportunity-archiver";
 
@@ -60,8 +62,6 @@ export const {
       return false;
     },
     async jwt({ token, user, trigger }) {
-      console.log('JWT callback triggered:', { trigger, hasToken: !!token, hasUser: !!user });
-      
       // Always fetch the latest user data to ensure profile updates are reflected
       if (token.email) {
         try {
@@ -79,12 +79,6 @@ export const {
             token.role = retrievedUser.role || '';
             token.image = retrievedUser.image;
             token.organization_profile = retrievedUser.organization_profile;
-            
-            console.log('JWT callback - Updated token with fresh user data:', {
-              name: retrievedUser.name,
-              image: retrievedUser.image,
-              email: retrievedUser.email
-            });
           }
         } catch (error) {
           console.error('Error fetching user data in JWT callback:', error);
@@ -109,12 +103,6 @@ export const {
             token.role = retrievedUser.role || '';
             token.image = retrievedUser.image;
             token.organization_profile = retrievedUser.organization_profile;
-            
-            console.log('JWT callback - Initial sign in with user data:', {
-              name: retrievedUser.name,
-              image: retrievedUser.image,
-              email: retrievedUser.email
-            });
           }
         } catch (error) {
           console.error('Error fetching user data on sign in:', error);
@@ -124,15 +112,12 @@ export const {
       
       // Handle session update
       if (trigger === 'update') {
-        console.log('JWT callback - Update trigger received');
         // The session update should trigger a fresh fetch of user data
       }
       
       return token;
     },
     async session({ session, token }) {
-      console.log('Session callback triggered:', { hasToken: !!token, hasSession: !!session });
-      
       if (!token) {
         return {
           ...session,
@@ -153,12 +138,6 @@ export const {
         image: typeof token.image === 'string' ? token.image : null,
         organization_profile: token.organization_profile,
       };
-      
-      console.log('Session callback - Creating session with user data:', {
-        name: sessionUser.name,
-        image: sessionUser.image,
-        email: sessionUser.email
-      });
       
       return {
         ...session,
