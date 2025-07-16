@@ -319,6 +319,8 @@ export default function UserManagementTable({
       handleUpdateRole,
       handleToggleMentor,
       handleDeleteUser,
+      demoteMentorMutation.isPending,
+      updateRoleMutation.isPending,
     ]
   );
 
