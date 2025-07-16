@@ -83,6 +83,16 @@ export default function CreateOpportunityPage() {
   const onSubmit = async (data: OpportunityFormValues) => {
     try {
       console.log("Form data being submitted:", data);
+      
+      // Validate email if provided
+      if (data.email_contact && data.email_contact.trim() !== "") {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.email_contact)) {
+          toast.error("Please enter a valid email address");
+          return;
+        }
+      }
+      
       // Ensure optional fields are properly formatted
       const formattedData = {
         ...data,

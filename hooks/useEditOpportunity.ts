@@ -3,6 +3,7 @@ import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
 import { OpportunityFormValues } from "@/app/(withLayout)/organisation/opportunities/create/_components/BasicInformation";
 import { formatDateForInput } from "@/utils/helpers/formatDateForInput";
+import { useCallback } from "react";
 
 export const useEditOpportunity = () => {
   const params = useParams();
@@ -43,7 +44,7 @@ export const useEditOpportunity = () => {
   });
 
   // Transform opportunity data to form values
-  const getDefaultValues = (): OpportunityFormValues => {
+  const getDefaultValues = useCallback((): OpportunityFormValues => {
     if (!opportunity) {
       return {
         title: "",
@@ -113,7 +114,7 @@ export const useEditOpportunity = () => {
       },
       banner_img: opportunity.banner_img || "",
     };
-  };
+  }, [opportunity]);
 
   const handleUpdate = async (data: OpportunityFormValues) => {
     if (!opportunityId) {
@@ -122,6 +123,15 @@ export const useEditOpportunity = () => {
     }
 
     try {
+      // Validate email if provided
+      if (data.email_contact && data.email_contact.trim() !== "") {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(data.email_contact)) {
+          toast.error("Please enter a valid email address");
+          return;
+        }
+      }
+      
       const formattedData = {
         ...data,
         email_contact: data.email_contact || "",

@@ -8,7 +8,7 @@ export interface IOpportunity extends Document {
   commitment_type: string; 
   location: string;
   number_of_volunteers: number;
-  email_contact: string;
+  email_contact?: string;
   phone_contact: string;
   internal_reference?: string;
   external_event_link?: string;
