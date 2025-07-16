@@ -1,13 +1,25 @@
+"use client";
+
 import ProtectedLayout from "@/components/layout/ProtectedLayout";
 import OrganizationProfile from "../../../../components/layout/organisation/OrganizationProfile";
-
+import { VolunteerProfileForm } from "../../../../components/layout/volunteer/VolunteerProfileForm";
+import { useParams } from "next/navigation";
+import NotFound from "@/app/not-found";
 
 export default function ProfilePage() {
-  return (
-    <ProtectedLayout>
-      
-        <OrganizationProfile/>
-      
-    </ProtectedLayout>
-  );
+  const params = useParams();
+  const role = params.role as string;
+
+  const renderProfile = () => {
+    switch (role) {
+      case "volunteer":
+        return <VolunteerProfileForm />;
+      case "organisation":
+        return <OrganizationProfile />;
+      default:
+        return <NotFound />;
+    }
+  };
+
+  return <ProtectedLayout>{renderProfile()}</ProtectedLayout>;
 }
