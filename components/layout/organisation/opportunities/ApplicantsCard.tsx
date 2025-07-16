@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { MapPin, UserCheck, Loader2, CheckCircle2 } from "lucide-react";
+import { MapPin, Loader2, CheckCircle2 } from "lucide-react";
 import { HiClipboardDocumentList } from "react-icons/hi2";
 import { trpc } from "@/utils/trpc";
 import toast from "react-hot-toast";
@@ -158,14 +158,17 @@ export function ApplicantsCard({
           />
         )}
 
-        <Link href={`/volunteer/${applicant.id}/profile`} className="block">
+        <Link
+          href={`/view-profile/volunteer/details/${applicant.id}`}
+          className="block"
+        >
           <div className="flex gap-3 sm:gap-4">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <UserAvatar
                   user={{
                     name: applicant.name,
-                    image: applicant.profileImg
+                    image: applicant.profileImg,
                   }}
                   size={34}
                   className="w-[34px] h-[34px] shrink-0"
@@ -189,14 +192,6 @@ export function ApplicantsCard({
                 <div className="flex items-center gap-1">
                   <HiClipboardDocumentList className="w-4 h-4 text-blue-600 flex-shrink-0" />
                   <span>{applicant.completedProjects} projects completed</span>
-                </div>
-                <div className="flex items-center gap-1 text-green-600">
-                  <UserCheck className="w-4 h-4 flex-shrink-0" />
-                  <span className="truncate">{applicant.availability}</span>
-                </div>
-                <div className="flex items-center gap-1 text-orange-600">
-                  <UserCheck className="w-4 h-4 flex-shrink-0" />
-                  <span>{applicant.skills.length} matched skills</span>
                 </div>
               </div>
 
