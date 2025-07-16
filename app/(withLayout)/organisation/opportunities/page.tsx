@@ -10,7 +10,7 @@ import {
   flexRender,
   createColumnHelper,
 } from "@tanstack/react-table";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+
 import { Calendar, Users, UserCheck } from "lucide-react";
 import { trpc } from "@/utils/trpc";
 import type { Opportunity } from "@/types/opportunities";
@@ -21,6 +21,7 @@ import { usePagination } from "@/hooks/usePagination";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import OpportunityActionsDropdown from "@/components/layout/organisation/opportunities/OpportunityActionsDropdown";
 import Loading from "@/app/loading";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 
 export default function OpportunitiesPage() {
   const [activeTab, setActiveTab] = useState("open");
@@ -89,13 +90,14 @@ export default function OpportunitiesPage() {
         const org = info.row.original.organization_profile;
         return (
           <div className="flex items-center gap-3 min-h-[64px]">
-            <Avatar className="size-8">
-              <AvatarImage
-                src={org?.profile_img || "/avatar.svg"}
-                alt={org?.title || "Org"}
-              />
-              <AvatarFallback>{org?.title?.slice(0, 2) || "CO"}</AvatarFallback>
-            </Avatar>
+            <OrganizationAvatar
+              organization={{
+                title: org?.title || "Organization",
+                profile_img: org?.profile_img
+              }}
+              size={32}
+              className="size-8"
+            />
             <div>
               <div className="font-medium text-[15px]">
                 {info.row.original.title}
@@ -197,13 +199,14 @@ export default function OpportunitiesPage() {
       <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 shadow-sm hover:shadow-md transition-shadow">
         <div className="flex items-start justify-between mb-3 gap-3">
           <div className="flex items-start gap-3 flex-1 min-w-0">
-            <Avatar className="size-10 flex-shrink-0">
-              <AvatarImage
-                src={org?.profile_img || "/avatar.svg"}
-                alt={org?.title || "Org"}
-              />
-              <AvatarFallback>{org?.title?.slice(0, 2) || "CO"}</AvatarFallback>
-            </Avatar>
+            <OrganizationAvatar
+              organization={{
+                title: org?.title || "Organization",
+                profile_img: org?.profile_img
+              }}
+              size={40}
+              className="size-10 flex-shrink-0"
+            />
             <div className="flex-1 min-w-0">
               <h3 className="font-semibold text-base text-gray-900 break-words leading-tight mb-1">
                 {opportunity.title}

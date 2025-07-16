@@ -17,6 +17,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 
 interface OpportunityCardProps {
   opportunity: Opportunity;
@@ -87,16 +88,13 @@ export default function OpportunityCard({ opportunity }: OpportunityCardProps) {
         {/* Posted by section */}
         <div className="flex items-center gap-2   flex-shrink-0">
           <div className="p-1.5 bg-blue-50 rounded-lg flex-shrink-0">
-            <Image
-              src={
-                opportunity?.organization_profile?.profile_img || "/avatar.svg"
-              }
-              alt={
-                opportunity?.organization_profile?.title || "Organization Logo"
-              }
-              width={20}
-              height={20}
-              className="rounded-full w-5 h-5 object-cover"
+            <OrganizationAvatar
+              organization={{
+                title: opportunity?.organization_profile?.title || "Organization",
+                profile_img: opportunity?.organization_profile?.profile_img
+              }}
+              size={20}
+              className="w-5 h-5"
             />
           </div>
           <div className="text-sm text-gray-600 min-w-0">

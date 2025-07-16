@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import Image from "next/image";
 import {
   MapPin,
   Calendar,
@@ -15,6 +14,7 @@ import {
 } from "lucide-react";
 import { formatTimeToAMPM } from "@/utils/helpers/formatTime";
 import { Opportunity } from "@/types/opportunities";
+import OrganizationAvatar from "@/components/ui/OrganizationAvatar";
 
 interface Application {
   _id: string;
@@ -185,17 +185,12 @@ export default function TabwiseOpportunityCard({
         <div className="flex justify-between items-start mb-3">
           <div className="flex items-center">
             <div className="w-10 h-10 mr-3 flex-shrink-0">
-              <Image
-                src={
-                  opportunity?.organization_profile?.profile_img ||
-                  "/avatar.svg"
-                }
-                alt={
-                  opportunity?.organization_profile?.title ||
-                  "Organization Logo"
-                }
-                width={40}
-                height={40}
+              <OrganizationAvatar
+                organization={{
+                  title: opportunity?.organization_profile?.title || "Organization",
+                  profile_img: opportunity?.organization_profile?.profile_img
+                }}
+                size={40}
                 className="rounded-full w-full h-full"
               />
             </div>
