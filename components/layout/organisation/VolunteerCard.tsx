@@ -69,10 +69,7 @@ export default function VolunteerCard({
               <span className="text-sm">Sydney, Australia</span>
             </div>
             <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
-            <div className="flex items-center gap-1">
-              <span className="text-sm">🏆</span>
-              <span className="text-sm">10 projects</span>
-            </div>
+            
           </div>
 
           <div className="flex flex-wrap gap-1 mb-4">
