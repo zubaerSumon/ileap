@@ -26,6 +26,7 @@ import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUplo
 import { useSession } from "next-auth/react";
 import toast from "react-hot-toast";
 import Loading from "@/app/loading";
+import UserAvatar from "@/components/ui/UserAvatar";
 
 export default function OrganizationSettingsPage() {
   const [activeSection, setActiveSection] = useState("users");
@@ -301,13 +302,23 @@ export default function OrganizationSettingsPage() {
                             key={mentor._id}
                             className="flex items-center justify-between p-4 border rounded-lg bg-gray-50"
                           >
-                            <div>
-                              <h3 className="font-medium text-gray-900">
-                                {mentor.name}
-                              </h3>
-                              <p className="text-sm text-gray-500">
-                                {mentor.email}
-                              </p>
+                            <div className="flex items-center gap-3">
+                              <UserAvatar
+                                user={{
+                                  name: mentor.name,
+                                  image: mentor.image
+                                }}
+                                size={40}
+                                className="w-10 h-10"
+                              />
+                              <div>
+                                <h3 className="font-medium text-gray-900">
+                                  {mentor.name}
+                                </h3>
+                                <p className="text-sm text-gray-500">
+                                  {mentor.email}
+                                </p>
+                              </div>
                             </div>
                             {session?.user?.role === "admin" && (
                               <Button
@@ -449,13 +460,23 @@ export default function OrganizationSettingsPage() {
                           key={mentor._id}
                           className="flex items-center justify-between p-4 border rounded-lg bg-gray-50"
                         >
-                          <div>
-                            <h3 className="font-medium text-gray-900">
-                              {mentor.name}
-                            </h3>
-                            <p className="text-sm text-gray-500">
-                              {mentor.email}
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <UserAvatar
+                              user={{
+                                name: mentor.name,
+                                image: mentor.image
+                              }}
+                              size={40}
+                              className="w-10 h-10"
+                            />
+                            <div>
+                              <h3 className="font-medium text-gray-900">
+                                {mentor.name}
+                              </h3>
+                              <p className="text-sm text-gray-500">
+                                {mentor.email}
+                              </p>
+                            </div>
                           </div>
                           {session?.user?.role === "admin" && (
                             <Button
