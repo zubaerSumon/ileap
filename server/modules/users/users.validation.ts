@@ -46,7 +46,7 @@ const resetPasswordSchema = z
   });
 
 const volunteerProfileSchema = z.object({
-  bio: z.string().nonempty("Your motivation is required"),
+  bio: z.string().optional(),
   interested_on: z
     .array(z.string())
     .nonempty("Please select at least one interest"),
@@ -58,13 +58,19 @@ const volunteerProfileSchema = z.object({
   state: z.string().nonempty("State is required"),
   area: z.string().nonempty("Area/Suburb is required"),
   postcode: z.string().nonempty("Postcode is required"),
-  student_type: z.string().nonempty("Please specify if you are a student"),
-  course: z.string().nonempty("Course is required"),
+  student_type: z.string().optional(),
+  course: z.string().optional(),
   major: z.string().optional(),
   major_other: z.string().optional(),
   referral_source: z.string().nonempty("Please select a referral source"),
   home_country: z.string().optional(),
   referral_source_other: z.string().optional(),
+  // New fields for staff/alumni
+  is_currently_studying: z.string().optional(),
+  non_student_type: z.string().optional(),
+  university: z.string().optional(),
+  graduation_year: z.string().optional(),
+  study_area: z.string().optional(),
   user: z.string().optional(),
 });
 

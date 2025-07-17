@@ -5,7 +5,7 @@ const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
   {
     bio: {
       type: String,
-      required: true,
+      required: false,
     },
     interested_on: {
       type: [String],
@@ -37,7 +37,7 @@ const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
     student_type: {
       type: String,
       enum: ["yes", "no"],
-      default: "no",
+      required: false,
     },
     home_country: {
       type: String,
@@ -55,6 +55,24 @@ const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
       type: String,
     },
     referral_source_other: {
+      type: String,
+    },
+    // New fields for staff/alumni
+    is_currently_studying: {
+      type: String,
+      enum: ["yes", "no"],
+    },
+    non_student_type: {
+      type: String,
+      enum: ["staff", "alumni", "general_public"],
+    },
+    university: {
+      type: String,
+    },
+    graduation_year: {
+      type: String,
+    },
+    study_area: {
       type: String,
     },
     availability_date: {
