@@ -27,7 +27,7 @@ export const userRouter = router({
         throw new Error("Current user not found");
       }
 
-      const { page, limit, search, categories, studentType, availability } = input;
+      const { page, limit, search, categories, studentType, memberType, availability } = input;
       const skip = (page - 1) * limit;
 
       // Build base query
@@ -74,7 +74,17 @@ export const userRouter = router({
 
       // Add student type filter (only for volunteers)
       if (studentType !== "all" && (currentUser.role === "admin" || currentUser.role === "mentor" || currentUser.role === "organization")) {
-        baseQuery['volunteer_profile.student_type'] = studentType;
+        baseQuery['volunteer_profile.is_currently_studying'] = studentType;
+      } else if (studentType === "all" && (currentUser.role === "admin" || currentUser.role === "mentor" || currentUser.role === "organization")) {
+        baseQuery.$or = [
+          { 'volunteer_profile.is_currently_studying': { $in: ["yes", "no"] } },
+          { 'volunteer_profile.is_currently_studying': { $exists: false } }
+        ];
+      }
+
+      // Add member type filter (only for volunteers who are not currently studying)
+      if (memberType !== "all" && (currentUser.role === "admin" || currentUser.role === "mentor" || currentUser.role === "organization")) {
+        baseQuery['volunteer_profile.non_student_type'] = memberType;
       }
 
       // Add availability filter (only for volunteers)
@@ -131,10 +141,17 @@ export const userRouter = router({
                 } : {},
                 // Student type filter - include both "yes" and "no" when "all" is selected
                 studentType !== "all" ? {
-                  'volunteer_profile.student_type': studentType
+                  'volunteer_profile.is_currently_studying': studentType
                 } : {
-                  'volunteer_profile.student_type': { $in: ["yes", "no"] }
+                  $or: [
+                    { 'volunteer_profile.is_currently_studying': { $in: ["yes", "no"] } },
+                    { 'volunteer_profile.is_currently_studying': { $exists: false } }
+                  ]
                 },
+                // Member type filter
+                memberType !== "all" ? {
+                  'volunteer_profile.non_student_type': memberType
+                } : {},
                 // Availability filter
                 availability?.startDate && availability?.endDate ? {
                   'volunteer_profile.availability_date.start_date': { 
@@ -204,10 +221,17 @@ export const userRouter = router({
                 } : {},
                 // Student type filter - include both "yes" and "no" when "all" is selected
                 studentType !== "all" ? {
-                  'volunteer_profile.student_type': studentType
+                  'volunteer_profile.is_currently_studying': studentType
                 } : {
-                  'volunteer_profile.student_type': { $in: ["yes", "no"] }
+                  $or: [
+                    { 'volunteer_profile.is_currently_studying': { $in: ["yes", "no"] } },
+                    { 'volunteer_profile.is_currently_studying': { $exists: false } }
+                  ]
                 },
+                // Member type filter
+                memberType !== "all" ? {
+                  'volunteer_profile.non_student_type': memberType
+                } : {},
                 // Availability filter
                 availability?.startDate && availability?.endDate ? {
                   'volunteer_profile.availability_date.start_date': { 
