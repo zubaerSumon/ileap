@@ -357,6 +357,7 @@ export function VolunteerProfileForm() {
                         ]}
                         setValue={form.setValue}
                         value={form.watch("interested_on")}
+                        manualInputEnabled 
                       />
 
                       <MultiSelectField
@@ -378,6 +379,7 @@ export function VolunteerProfileForm() {
                         ]}
                         setValue={form.setValue}
                         value={form.watch("interested_categories")}
+                        manualInputEnabled={true}
                       />
 
                       {/* Academic Information Section */}

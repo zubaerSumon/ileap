@@ -72,6 +72,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
           ]}
           setValue={form.setValue}
           value={form.watch("interested_on")}
+          manualInputEnabled
         />
 
         <MultiSelectField
