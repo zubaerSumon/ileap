@@ -9,6 +9,7 @@ type Opportunity = {
   description: string;
   category: string[];
   required_skills: string[];
+  requirements?: string[];
   commitment_type: string;
   location: string;
   number_of_volunteers: number;

@@ -79,10 +79,34 @@ export const volunteerProfileRouter = router({
         );
       }
 
+      // Handle field clearing based on is_currently_studying status and student_type
+      const processedInput = { 
+        ...input,
+        ...(input.is_currently_studying === "yes" ? {
+          // Clear alumni-related fields when currently studying
+          non_student_type: "",
+          university: "",
+          graduation_year: "",
+          study_area: "",
+        } : {}),
+        ...(input.is_currently_studying === "no" ? {
+          // Clear student-related fields when not currently studying
+          student_type: "",
+          home_country: "",
+          course: "",
+          major: "",
+          major_other: "",
+        } : {}),
+        // Clear home_country when student_type changes from "yes" to "no" (international to domestic)
+        ...(input.student_type === "no" ? {
+          home_country: "",
+        } : {}),
+      };
+
       // Merge existing required fields with updates
       const updateData = {
         ...existingProfile.toObject(),
-        ...input,
+        ...processedInput,
         // Ensure required fields are not removed
         bio: input.bio || existingProfile.bio,
         interested_on: input.interested_on !== undefined ? input.interested_on : existingProfile.interested_on,

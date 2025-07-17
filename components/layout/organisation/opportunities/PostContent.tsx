@@ -127,6 +127,37 @@ export function PostContent({ opportunity }: PostContentProps) {
               ))}
             </div>
           </div>
+
+          {/* Requirements (Police Check, Working with Children Check, etc.) */}
+          {opportunity.requirements && opportunity.requirements.length > 0 && (
+            <div>
+              <h4 className="font-medium text-sm text-gray-700 mb-2">Requirements</h4>
+              <div className="flex flex-wrap gap-2">
+                {opportunity.requirements.map((requirement, index) => (
+                  <span
+                    key={index}
+                    className="px-2 sm:px-3 py-1 bg-orange-50 text-orange-700 text-xs sm:text-sm rounded-full border border-orange-200 flex items-center gap-1"
+                  >
+                    <svg
+                      className="w-3 h-3 sm:w-4 sm:h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M20 6L9 17L4 12"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                    {requirement}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

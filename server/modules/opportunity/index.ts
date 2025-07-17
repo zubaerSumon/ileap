@@ -48,6 +48,7 @@ export const opportunityRouter = router({
           description: string;
           category: string[];
           required_skills: string[];
+          requirements?: string[];
           commitment_type: string;
           location: string;
           number_of_volunteers: number;
@@ -87,6 +88,7 @@ export const opportunityRouter = router({
           description: input.description,
           category: input.category,
           required_skills: input.required_skills,
+          requirements: input.requirements || [],
           commitment_type: input.commitment_type,
           location: input.location,
           number_of_volunteers: input.number_of_volunteers,
@@ -223,6 +225,7 @@ export const opportunityRouter = router({
           description: string;
           category: string[];
           required_skills: string[];
+          requirements?: string[];
           commitment_type: string;
           location: string;
           number_of_volunteers: number;
@@ -260,6 +263,7 @@ export const opportunityRouter = router({
           description: input.description,
           category: input.category,
           required_skills: input.required_skills,
+          requirements: input.requirements || [],
           commitment_type: input.commitment_type,
           location: input.location,
           number_of_volunteers: input.number_of_volunteers,

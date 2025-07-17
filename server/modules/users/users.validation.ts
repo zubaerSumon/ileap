@@ -115,6 +115,7 @@ const getAvailableUsersSchema = z.object({
   search: z.string().optional(),
   categories: z.array(z.string()).optional(),
   studentType: z.enum(["all", "yes", "no"]).default("all"),
+  memberType: z.enum(["all", "staff", "alumni", "general_public"]).default("all"),
   availability: z.object({
     startDate: z.string().optional(),
     endDate: z.string().optional(),

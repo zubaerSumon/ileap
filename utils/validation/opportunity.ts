@@ -18,6 +18,7 @@ export const opportunityValidationSchema = z.object({
     return true; // Empty string is valid
   }, "Please enter a valid email address"),
   phone_contact: z.string().optional(),
+  requirements: z.array(z.string()).optional(),
   internal_reference: z.string().optional(),
   external_event_link: z.string().url("Please enter a valid URL").optional().or(z.literal("")),
   start_date: z.string().min(1, "Please select a start date"),

@@ -15,6 +15,7 @@ interface FilterSidebarProps {
 export interface VolunteerFilters {
   categories: string[];
   studentType: "yes" | "no" | "all";
+  memberType: "staff" | "alumni" | "general_public" | "all";
   availability: {
     startDate: string | null;
     endDate: string | null;
@@ -26,6 +27,7 @@ export default function FilterSidebar({ onFilterChange, currentFilters }: Filter
     currentFilters || {
       categories: [],
       studentType: "all",
+      memberType: "all",
       availability: {
         startDate: null,
         endDate: null,
@@ -52,6 +54,12 @@ export default function FilterSidebar({ onFilterChange, currentFilters }: Filter
 
   const handleStudentTypeChange = (type: "yes" | "no" | "all") => {
     const newFilters = { ...filters, studentType: type };
+    setFilters(newFilters);
+    onFilterChange(newFilters);
+  };
+
+  const handleMemberTypeChange = (type: "staff" | "alumni" | "general_public" | "all") => {
+    const newFilters = { ...filters, memberType: type };
     setFilters(newFilters);
     onFilterChange(newFilters);
   };
@@ -84,7 +92,7 @@ export default function FilterSidebar({ onFilterChange, currentFilters }: Filter
 
             {/* Student Type */}
             <div>
-              <h4 className="font-medium mb-3">Studentship status</h4>
+              <h4 className="font-medium mb-3">Currently Studying</h4>
               <div className="space-y-2">
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -100,7 +108,7 @@ export default function FilterSidebar({ onFilterChange, currentFilters }: Filter
                     checked={filters.studentType === "yes"}
                     onCheckedChange={() => handleStudentTypeChange("yes")}
                   />
-                  <Label htmlFor="student-yes" className="text-sm">Student</Label>
+                  <Label htmlFor="student-yes" className="text-sm">Currently Studying</Label>
                 </div>
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -108,7 +116,48 @@ export default function FilterSidebar({ onFilterChange, currentFilters }: Filter
                     checked={filters.studentType === "no"}
                     onCheckedChange={() => handleStudentTypeChange("no")}
                   />
-                  <Label htmlFor="student-no" className="text-sm">Non-Academic</Label>
+                  <Label htmlFor="student-no" className="text-sm">Not Currently Studying</Label>
+                </div>
+              </div>
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* Member Type (for non-students) */}
+            <div>
+              <h4 className="font-medium mb-3">Member Type</h4>
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="all-members"
+                    checked={filters.memberType === "all"}
+                    onCheckedChange={() => handleMemberTypeChange("all")}
+                  />
+                  <Label htmlFor="all-members" className="text-sm">All</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="member-staff"
+                    checked={filters.memberType === "staff"}
+                    onCheckedChange={() => handleMemberTypeChange("staff")}
+                  />
+                  <Label htmlFor="member-staff" className="text-sm">Staff Member</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="member-alumni"
+                    checked={filters.memberType === "alumni"}
+                    onCheckedChange={() => handleMemberTypeChange("alumni")}
+                  />
+                  <Label htmlFor="member-alumni" className="text-sm">University Alumni</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="member-general"
+                    checked={filters.memberType === "general_public"}
+                    onCheckedChange={() => handleMemberTypeChange("general_public")}
+                  />
+                  <Label htmlFor="member-general" className="text-sm">General Public</Label>
                 </div>
               </div>
             </div>

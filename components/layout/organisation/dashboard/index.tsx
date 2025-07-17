@@ -21,6 +21,8 @@ interface Volunteer {
   name: string;
   image?: string;
   role: string;
+  area?: string;
+  state?: string;
   volunteer_profile?: {
     student_type?: "yes" | "no";
     course?: string;
@@ -160,6 +162,8 @@ const OrganisationDashboard = () => {
       name: volunteer.name || "Anonymous",
       image: volunteer.image,
       role: volunteer.role || "Volunteer",
+      area: volunteer.area,
+      state: volunteer.state,
       volunteer_profile: volunteer.volunteer_profile,
     })) || [];
 

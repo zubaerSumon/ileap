@@ -75,6 +75,7 @@ export default function CreateOpportunityPage() {
         occurrences: undefined,
       },
       banner_img: "",
+      requirements: [],
     },
     mode: "onChange",
     resolver: zodResolver(opportunityValidationSchema),

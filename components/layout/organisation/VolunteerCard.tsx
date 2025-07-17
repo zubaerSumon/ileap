@@ -3,12 +3,15 @@ import { MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import UserAvatar from "@/components/ui/UserAvatar";
+import { formatText } from "@/utils/helpers/formatText";
 
 interface Volunteer {
   _id: string;
   name: string;
   image?: string;
   role: string;
+  area?: string;
+  state?: string;
   volunteer_profile?: {
     student_type?: "yes" | "no";
     course?: string;
@@ -66,7 +69,16 @@ export default function VolunteerCard({
           <div className="flex items-center gap-3 mb-3 text-gray-600">
             <div className="flex items-center gap-1">
               <span className="text-gray-600 text-sm">📍</span>
-              <span className="text-sm">Sydney, Australia</span>
+              <span className="text-sm">
+                {volunteer.area && volunteer.state 
+                  ? `${formatText(volunteer.area)}, ${formatText(volunteer.state)}`
+                  : volunteer.state 
+                    ? formatText(volunteer.state)
+                    : volunteer.area 
+                      ? formatText(volunteer.area)
+                      : "Location not specified"
+                }
+              </span>
             </div>
             {/* <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
             <div className="flex items-center gap-1">

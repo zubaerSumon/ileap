@@ -10,6 +10,7 @@ export interface IOpportunity extends Document {
   number_of_volunteers: number;
   email_contact?: string;
   phone_contact: string;
+  requirements?: string[];
   internal_reference?: string;
   external_event_link?: string;
   date: {

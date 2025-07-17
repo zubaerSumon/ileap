@@ -40,6 +40,7 @@ export type OpportunityFormValues = {
     occurrences?: number;
   };
   banner_img?: string;
+  requirements?: string[];
 };
 
 export default function BasicInformation({
@@ -371,6 +372,112 @@ export default function BasicInformation({
                 className="w-full sm:w-[382px]"
                 onUploadStateChange={handleImageUploadStateChange}
               />
+            </div>
+
+            {/* Requirements */}
+            <div>
+              <h2 className="text-base sm:text-lg font-medium mb-1">
+                Requirements
+              </h2>
+              <p className="text-xs sm:text-sm text-gray-500 mb-4">
+                What requirements do volunteers need to meet? Select from common requirements or add your own.
+              </p>
+              <div className="space-y-4">
+                {/* Standard Requirements */}
+                <div>
+                  <h3 className="text-sm font-medium mb-3">Standard Requirements</h3>
+                  <div className="space-y-2">
+                    {[
+                      "Police Check",
+                      "Working with Children Check", 
+                      "First Aid Training"
+                    ].map((requirement) => (
+                      <label key={requirement} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          value={requirement}
+                          checked={form.watch("requirements")?.includes(requirement) || false}
+                          onChange={(e) => {
+                            const currentRequirements = form.watch("requirements") || [];
+                            if (e.target.checked) {
+                              form.setValue("requirements", [...currentRequirements, requirement]);
+                            } else {
+                              form.setValue("requirements", currentRequirements.filter(r => r !== requirement));
+                            }
+                          }}
+                          className="h-4 w-4 border-gray-300 text-primary focus:ring-primary rounded"
+                        />
+                        <span className="text-sm">{requirement}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Custom Requirements */}
+                <div>
+                  <h3 className="text-sm font-medium mb-3">Custom Requirements</h3>
+                  <div className="space-y-3">
+                    <div className="flex space-x-2">
+                      <input
+                        type="text"
+                        placeholder="Add a custom requirement"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const input = e.target as HTMLInputElement;
+                            const value = input.value.trim();
+                            if (value) {
+                              const currentRequirements = form.watch("requirements") || [];
+                              if (!currentRequirements.includes(value)) {
+                                form.setValue("requirements", [...currentRequirements, value]);
+                                input.value = '';
+                              }
+                            }
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          const input = e.currentTarget.previousElementSibling as HTMLInputElement;
+                          const value = input.value.trim();
+                          if (value) {
+                            const currentRequirements = form.watch("requirements") || [];
+                            if (!currentRequirements.includes(value)) {
+                              form.setValue("requirements", [...currentRequirements, value]);
+                              input.value = '';
+                            }
+                          }
+                        }}
+                        className="px-4 py-2 bg-primary text-white rounded-md text-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    
+                    {/* Display custom requirements */}
+                    {(form.watch("requirements") || []).filter(req => 
+                      !["Police Check", "Working with Children Check", "First Aid Training"].includes(req)
+                    ).map((requirement, index) => (
+                      <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md">
+                        <span className="text-sm">{requirement}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentRequirements = form.watch("requirements") || [];
+                            form.setValue("requirements", currentRequirements.filter(r => r !== requirement));
+                          }}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

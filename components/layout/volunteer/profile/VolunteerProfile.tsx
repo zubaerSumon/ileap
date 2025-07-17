@@ -2,13 +2,15 @@
 
  import Image from "next/image";
 import { trpc } from "@/utils/trpc";
-import { Key, useState } from "react";
+import { Key, useState, useMemo } from "react";
 import BackButton from "@/components/buttons/BackButton";
 import UserAvatar from "@/components/ui/UserAvatar";
 import { Button } from "@/components/ui/button";
 import MessageDialog from "@/components/layout/organisation/MessageDialog";
 import Loading from "@/app/loading";
 import { MessageCircle } from "lucide-react";
+import countryList from "react-select-country-list";
+import { formatText } from "@/utils/helpers/formatText";
 
 interface VolunteerProfileProps {
   volunteerId: string;
@@ -36,6 +38,14 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
   const { data: applications, isLoading: isLoadingApplications } =
     trpc.applications.getVolunteerApplications.useQuery(volunteerId);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  
+  const countryOptions = useMemo(() => countryList().getData(), []);
+  
+  // Function to get country name from ISO code
+  const getCountryName = (isoCode: string) => {
+    const country = countryOptions.find(option => option.value === isoCode);
+    return country ? country.label : isoCode;
+  };
 
   if (isLoading || isLoadingApplications) {
     return (
@@ -52,6 +62,57 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
       </div>
     );
   }
+
+  // Helper function to get display text for student status
+  const getStudentStatusDisplay = () => {
+    if (volunteer.is_currently_studying) {
+      if (volunteer.is_currently_studying === "yes") {
+        return "Currently Studying";
+      } else if (volunteer.is_currently_studying === "no") {
+        if (volunteer.non_student_type === "staff") {
+          return "Staff Member";
+        } else if (volunteer.non_student_type === "alumni") {
+          return "Alumni";
+        } else if (volunteer.non_student_type === "general") {
+          return "General Public";
+        }
+        return "Not Currently Studying";
+      }
+    }
+    
+    // Fallback for old users
+    if (volunteer.student_type) {
+      return volunteer.student_type === "yes" ? "Student" : "Non-Student";
+    }
+    
+    return "Not specified";
+  };
+
+  // Helper function to get course/study area display
+  const getCourseDisplay = () => {
+    if (volunteer.is_currently_studying === "yes" && volunteer.course) {
+      return volunteer.course;
+    }
+    if (volunteer.is_currently_studying === "no" && volunteer.study_area) {
+      return volunteer.study_area;
+    }
+    // Fallback for old users
+    if (volunteer.course) {
+      return volunteer.course;
+    }
+    return null;
+  };
+
+  // Helper function to get university display
+  const getUniversityDisplay = () => {
+    if (volunteer.is_currently_studying === "yes" && volunteer.university) {
+      return volunteer.university;
+    }
+    if (volunteer.is_currently_studying === "no" && volunteer.non_student_type === "alumni" && volunteer.university) {
+      return volunteer.university;
+    }
+    return null;
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -154,26 +215,112 @@ export function VolunteerProfile({ volunteerId }: VolunteerProfileProps) {
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {volunteer.student_type && (
+            {/* Member Type */}
+            <div>
+              <p className="text-sm font-medium text-gray-500">
+                Member Type
+              </p>
+              <p className="text-gray-700 text-sm sm:text-base">
+                {getStudentStatusDisplay()}
+              </p>
+            </div>
+
+            {/* Location */}
+            {(volunteer.state || volunteer.area) && (
               <div>
-                <p className="text-sm font-medium text-gray-500">
-                  Student Status
-                </p>
+                <p className="text-sm font-medium text-gray-500">Location</p>
                 <p className="text-gray-700 text-sm sm:text-base">
-                  {volunteer.student_type === "yes" ? "Student" : "Non-Student"}
+                  {volunteer.area && volunteer.state 
+                    ? formatText(volunteer.area, volunteer.state)
+                    : volunteer.state || formatText(volunteer.area)
+                  }
                 </p>
               </div>
             )}
 
-            {volunteer.course && (
+
+
+            {/* Home Country (for all students) */}
+            {(volunteer.is_currently_studying === "yes" || (!volunteer.is_currently_studying && volunteer.student_type)) && (
               <div>
-                <p className="text-sm font-medium text-gray-500">Course</p>
+                <p className="text-sm font-medium text-gray-500">Home Country</p>
                 <p className="text-gray-700 text-sm sm:text-base">
-                  {volunteer.course}
+                  {volunteer.student_type === "yes" ? (volunteer.home_country ? getCountryName(volunteer.home_country) : "Australia") : "Australia"}
+                </p>
+              </div>
+            )}
+
+            {/* Course/Study Area */}
+            {getCourseDisplay() && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">
+                  {volunteer.is_currently_studying === "yes" ? "Course" : "Study Area"}
+                </p>
+                <p className="text-gray-700 text-sm sm:text-base">
+                  {getCourseDisplay()}
+                </p>
+              </div>
+            )}
+
+            {/* Major */}
+            {volunteer.major && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Major</p>
+                <p className="text-gray-700 text-sm sm:text-base">
+                  {volunteer.major === "other" ? volunteer.major_other : volunteer.major}
+                </p>
+              </div>
+            )}
+
+            {/* University */}
+            {getUniversityDisplay() && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">University</p>
+                <p className="text-gray-700 text-sm sm:text-base">
+                  {getUniversityDisplay()}
+                </p>
+              </div>
+            )}
+
+            {/* Graduation Year (for alumni) */}
+            {volunteer.is_currently_studying === "no" && 
+             volunteer.non_student_type === "alumni" && 
+             volunteer.graduation_year && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Graduation Year</p>
+                <p className="text-gray-700 text-sm sm:text-base">
+                  {volunteer.graduation_year}
+                </p>
+              </div>
+            )}
+
+            {/* Postcode */}
+            {volunteer.postcode && (
+              <div>
+                <p className="text-sm font-medium text-gray-500">Postcode</p>
+                <p className="text-gray-700 text-sm sm:text-base">
+                  {volunteer.postcode}
                 </p>
               </div>
             )}
           </div>
+
+          {/* Interested Categories */}
+          {volunteer.interested_categories && volunteer.interested_categories.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-medium text-gray-500 mb-2">Interested Categories</p>
+              <div className="flex flex-wrap gap-2">
+                {volunteer.interested_categories.map((category: string, index: number) => (
+                  <span
+                    key={index}
+                    className="bg-green-50 text-green-700 px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Experience/Applications Section */}
