@@ -253,6 +253,8 @@ export const userRouter = router({
               name: 1,
               image: 1,
               role: 1,
+              area: "$volunteer_profile.area",
+              state: "$volunteer_profile.state",
               volunteer_profile: {
                 student_type: 1,
                 course: 1,

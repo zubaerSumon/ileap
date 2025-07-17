@@ -27,6 +27,8 @@ import { Badge } from "@/components/ui/badge";
 import { ProfilePictureUpload } from "@/components/form-input/ProfilePictureUpload";
 import { useSession } from "next-auth/react";
 import { formatText } from "@/utils/helpers/formatText";
+import countryList from "react-select-country-list";
+import { useMemo } from "react";
 
 
 
@@ -35,6 +37,14 @@ export function VolunteerProfileForm() {
   const { data: volunteerProfile, isLoading } = trpc.volunteers.getVolunteerProfile.useQuery();
   const { data: session, update: updateSession } = useSession();
   const utils = trpc.useUtils();
+  
+  const countryOptions = useMemo(() => countryList().getData(), []);
+  
+  // Function to get country name from ISO code
+  const getCountryName = (isoCode: string) => {
+    const country = countryOptions.find(option => option.value === isoCode);
+    return country ? country.label : isoCode;
+  };
   
   const updateUserMutation = trpc.users.updateUser.useMutation({
     onSuccess: async () => {
@@ -79,10 +89,23 @@ export function VolunteerProfileForm() {
       interested_categories: [],
       state: "",
       area: "",
+      postcode: "",
+      // Academic fields
+      student_type: "",
+      home_country: "",
+      course: "",
+      major: "",
+      major_other: "",
+      is_currently_studying: "",
+      non_student_type: "",
+      university: "",
+      graduation_year: "",
+      study_area: "",
       availability_date: {
         start_date: "",
         end_date: ""
-      }
+      },
+      is_available: false,
     },
   });
 
@@ -373,6 +396,22 @@ export function VolunteerProfileForm() {
                               { value: "yes", label: "Yes" },
                               { value: "no", label: "No" },
                             ]}
+                            onChange={(value) => {
+                              if (value === "yes") {
+                                // Reset alumni-related fields when switching to "currently studying"
+                                form.setValue("non_student_type", "");
+                                form.setValue("university", "");
+                                form.setValue("graduation_year", "");
+                                form.setValue("study_area", "");
+                              } else if (value === "no") {
+                                // Reset student-related fields when switching to "not currently studying"
+                                form.setValue("student_type", "");
+                                form.setValue("home_country", "");
+                                form.setValue("course", "");
+                                form.setValue("major", "");
+                                form.setValue("major_other", "");
+                              }
+                            }}
                           />
 
                           {form.watch("is_currently_studying") === "yes" && (
@@ -398,11 +437,7 @@ export function VolunteerProfileForm() {
                                   control={form.control}
                                   registerName="home_country"
                                   error={form.formState.errors.home_country?.message}
-                                  options={[
-                                    { value: "china", label: "China" },
-                                    { value: "india", label: "India" },
-                                    { value: "other", label: "Other" },
-                                  ]}
+                                  options={countryOptions}
                                 />
                               )}
 
@@ -686,6 +721,13 @@ export function VolunteerProfileForm() {
                             <p className="text-gray-700 text-sm">
                               {volunteerProfile.student_type === "yes" ? "International Student" : "Domestic Student"}
                             </p>
+                          </div>
+                        )}
+
+                        {(volunteerProfile?.is_currently_studying === "yes" || (!volunteerProfile?.is_currently_studying && volunteerProfile?.student_type === "yes")) && volunteerProfile?.home_country && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Home Country</p>
+                            <p className="text-gray-700 text-sm">{getCountryName(volunteerProfile.home_country)}</p>
                           </div>
                         )}
 

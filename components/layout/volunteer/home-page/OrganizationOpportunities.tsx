@@ -9,6 +9,7 @@ import { Loader2, Heart, Briefcase } from "lucide-react";
 import OpportunityCard from "../find-opportunity/OpportunityCard";
 import { Opportunity } from "@/types/opportunities";
 import EmptyState from "@/components/layout/shared/EmptyState";
+import { PaginationWrapper } from "@/components/PaginationWrapper";
 
 interface OrganizationOpportunitiesProps {
   organizationId: string;
@@ -19,8 +20,11 @@ export default function OrganizationOpportunities({
 }: OrganizationOpportunitiesProps) {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
   const { data: session } = useSession();
   const volunteerId = session?.user?.id;
+  
+  const ITEMS_PER_PAGE = 6;
 
    const {
     data: opportunitiesData,
@@ -105,16 +109,33 @@ export default function OrganizationOpportunities({
         )
       : opportunitiesWithSpots;
 
+  // Pagination logic
+  const totalItems = filteredOpportunities.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedOpportunities = filteredOpportunities.slice(startIndex, endIndex);
+
+  // Reset to page 1 when tab changes
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   return (
     <section className="w-full relative">
       <Tabs defaultValue="all" className="w-full mb-6">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="all" onClick={() => setActiveTab("all")}>
+          <TabsTrigger value="all" onClick={() => handleTabChange("all")}>
             All Opportunities ({opportunitiesWithSpots.length})
           </TabsTrigger>
           <TabsTrigger
             value="favorites"
-            onClick={() => setActiveTab("favorites")}
+            onClick={() => handleTabChange("favorites")}
           >
             Favourites (
             {favoriteOpportunities?.filter((fav) =>
@@ -157,14 +178,27 @@ export default function OrganizationOpportunities({
           className="min-h-[400px]"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredOpportunities.map((opportunity) => (
-            <OpportunityCard
-              key={opportunity._id}
-              opportunity={opportunity}
-            />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {paginatedOpportunities.map((opportunity) => (
+              <OpportunityCard
+                key={opportunity._id}
+                opportunity={opportunity}
+              />
+            ))}
+          </div>
+          
+          {/* Pagination - only show if more than 6 items */}
+          {totalItems > ITEMS_PER_PAGE && (
+            <div className="mt-8 flex justify-center">
+              <PaginationWrapper
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
+            </div>
+          )}
+        </>
       )}
     </section>
   );
