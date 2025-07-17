@@ -3,7 +3,7 @@ import React from "react";
 import { FormField } from "@/components/form-input/FormField";
 import { UseFormReturn } from "react-hook-form";
 import { VolunteerSignupForm } from "@/types/auth";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+
 import { Label } from "@/components/ui/label";
 import countryList from "react-select-country-list";
 import { useMemo } from "react";
@@ -68,6 +68,8 @@ export function DetailedProfileStep({
     }
   }, [form]);
 
+
+
   return (
     <>
       <div className="mb-8">
@@ -86,39 +88,49 @@ export function DetailedProfileStep({
             <Label className="text-sm font-medium text-gray-700">
               Are you currently studying?
             </Label>
-            <RadioGroup
-              defaultValue={isCurrentlyStudying || "yes"}
-              className="flex space-x-6"
-              onValueChange={(value) => {
-                form.setValue("is_currently_studying", value);
-                // Reset related fields when switching
-                if (value === "no") {
-                  form.setValue("student_type", undefined);
-                  form.setValue("home_country", "");
-                  form.setValue("course", "");
-                  form.setValue("major", "");
-                  form.setValue("major_other", "");
-                } else {
-                  form.setValue("non_student_type", "");
-                  form.setValue("university", "");
-                  form.setValue("graduation_year", "");
-                  form.setValue("study_area", "");
-                }
-              }}
-            >
+            <div className="flex space-x-6">
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="yes" id="studying_yes" className="" />
+                <input
+                  type="radio"
+                  id="studying_yes"
+                  value="yes"
+                  {...form.register("is_currently_studying")}
+                  checked={isCurrentlyStudying === "yes"}
+                  onChange={(e) => {
+                    form.setValue("is_currently_studying", e.target.value);
+                    // Reset related fields when switching
+                    form.setValue("non_student_type", "");
+                    form.setValue("university", "");
+                    form.setValue("graduation_year", "");
+                    form.setValue("study_area", "");
+                  }}
+                />
                 <Label htmlFor="studying_yes" className="text-sm cursor-pointer">
                   Yes
                 </Label>
               </div>
               <div className="flex items-center space-x-2">
-                <RadioGroupItem value="no" id="studying_no" className="" />
+                <input
+                  type="radio"
+                  id="studying_no"
+                  value="no"
+                  {...form.register("is_currently_studying")}
+                  checked={isCurrentlyStudying === "no"}
+                  onChange={(e) => {
+                    form.setValue("is_currently_studying", e.target.value);
+                    // Reset related fields when switching
+                    form.setValue("student_type", undefined);
+                    form.setValue("home_country", "");
+                    form.setValue("course", "");
+                    form.setValue("major", "");
+                    form.setValue("major_other", "");
+                  }}
+                />
                 <Label htmlFor="studying_no" className="text-sm cursor-pointer">
                   No
                 </Label>
               </div>
-            </RadioGroup>
+            </div>
           </div>
         </div>
 
@@ -131,24 +143,34 @@ export function DetailedProfileStep({
                 <Label className="text-sm font-medium text-gray-700">
                   Are you an international student?
                 </Label>
-                <RadioGroup
-                  defaultValue={isInternational ? "yes" : "no"}
-                  className="flex space-x-6"
-                  onValueChange={(value) => form.setValue("student_type", value)}
-                >
+                <div className="flex space-x-6">
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="yes" id="international_yes" className="" />
+                    <input
+                      type="radio"
+                      id="international_yes"
+                      value="yes"
+                      {...form.register("student_type")}
+                      checked={isInternational === true}
+                      onChange={(e) => form.setValue("student_type", e.target.value)}
+                    />
                     <Label htmlFor="international_yes" className="text-sm cursor-pointer">
                       Yes
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="no" id="international_no" className="" />
+                    <input
+                      type="radio"
+                      id="international_no"
+                      value="no"
+                      {...form.register("student_type")}
+                      checked={isInternational === false}
+                      onChange={(e) => form.setValue("student_type", e.target.value)}
+                    />
                     <Label htmlFor="international_no" className="text-sm cursor-pointer">
                       No
                     </Label>
                   </div>
-                </RadioGroup>
+                </div>
 
                 {isInternational && (
                   <div className="mt-2 p-2 rounded-lg">
