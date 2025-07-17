@@ -41,6 +41,7 @@ export default function FindVolunteer() {
   const [filters, setFilters] = useState<VolunteerFilters>({
     categories: [],
     studentType: "all",
+    memberType: "all",
     availability: {
       startDate: null,
       endDate: null,
@@ -130,6 +131,7 @@ export default function FindVolunteer() {
                   setFilters({
                     categories: [],
                     studentType: "all",
+                    memberType: "all",
                     availability: {
                       startDate: null,
                       endDate: null,
