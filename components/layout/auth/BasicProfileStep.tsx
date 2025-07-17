@@ -44,7 +44,7 @@ export function BasicProfileStep({ form }: BasicProfileStepProps) {
 
       <div className="space-y-6">
         <FormField
-          label="We'd love to hear what motivates you to volunteer"
+          label="We'd love to hear what motivates you to volunteer (optional)"
           id="bio"
           type="textarea"
           placeholder="e.g. Being a student and passionate about protecting our environment, I ..."

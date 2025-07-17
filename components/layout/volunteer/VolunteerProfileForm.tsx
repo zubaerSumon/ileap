@@ -266,7 +266,7 @@ export function VolunteerProfileForm() {
                       <FormTextarea
                         control={form.control}
                         name="bio"
-                        label="About You"
+                        label="About You (optional)"
                         placeholder="Tell us about yourself, your interests, and why you want to volunteer..."
                       />
 

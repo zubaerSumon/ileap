@@ -46,7 +46,7 @@ const resetPasswordSchema = z
   });
 
 const volunteerProfileSchema = z.object({
-  bio: z.string().nonempty("Your motivation is required"),
+  bio: z.string().optional(),
   interested_on: z
     .array(z.string())
     .nonempty("Please select at least one interest"),

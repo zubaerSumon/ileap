@@ -5,7 +5,7 @@ const VolunteerProfileSchema = new Schema<IVolunteerProfile>(
   {
     bio: {
       type: String,
-      required: true,
+      required: false,
     },
     interested_on: {
       type: [String],

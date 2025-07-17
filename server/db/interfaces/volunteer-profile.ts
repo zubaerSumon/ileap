@@ -1,7 +1,7 @@
 import { Document } from "mongoose";
 
 export interface IVolunteerProfile extends Document {
-  bio: string;
+  bio?: string;
   interested_on: string[];
   interested_categories: string[];
   phone_number: string;
