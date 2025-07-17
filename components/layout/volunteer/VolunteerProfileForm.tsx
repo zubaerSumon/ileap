@@ -88,6 +88,19 @@ export function VolunteerProfileForm() {
 
   useEffect(() => {
     if (volunteerProfile) {
+      // Handle old users who don't have is_currently_studying field
+      // If they have student_type, assume they are currently studying
+      // If they have course, assume they are currently studying
+      // Otherwise, default to "no"
+      let defaultIsCurrentlyStudying = volunteerProfile.is_currently_studying;
+      if (!defaultIsCurrentlyStudying) {
+        if (volunteerProfile.student_type || volunteerProfile.course) {
+          defaultIsCurrentlyStudying = "yes";
+        } else {
+          defaultIsCurrentlyStudying = "no";
+        }
+      }
+
       form.reset({
         name: volunteerProfile.name,
         phone_number: volunteerProfile.phone_number,
@@ -103,7 +116,7 @@ export function VolunteerProfileForm() {
         course: volunteerProfile.course,
         major: volunteerProfile.major,
         major_other: volunteerProfile.major_other,
-        is_currently_studying: volunteerProfile.is_currently_studying,
+        is_currently_studying: defaultIsCurrentlyStudying,
         non_student_type: volunteerProfile.non_student_type,
         university: volunteerProfile.university,
         graduation_year: volunteerProfile.graduation_year,
@@ -132,6 +145,16 @@ export function VolunteerProfileForm() {
     setIsEditMode(false);
     // Reset form to current profile data
     if (volunteerProfile) {
+      // Handle old users who don't have is_currently_studying field
+      let defaultIsCurrentlyStudying = volunteerProfile.is_currently_studying;
+      if (!defaultIsCurrentlyStudying) {
+        if (volunteerProfile.student_type || volunteerProfile.course) {
+          defaultIsCurrentlyStudying = "yes";
+        } else {
+          defaultIsCurrentlyStudying = "no";
+        }
+      }
+
       form.reset({
         name: volunteerProfile.name,
         phone_number: volunteerProfile.phone_number,
@@ -147,7 +170,7 @@ export function VolunteerProfileForm() {
         course: volunteerProfile.course,
         major: volunteerProfile.major,
         major_other: volunteerProfile.major_other,
-        is_currently_studying: volunteerProfile.is_currently_studying,
+        is_currently_studying: defaultIsCurrentlyStudying,
         non_student_type: volunteerProfile.non_student_type,
         university: volunteerProfile.university,
         graduation_year: volunteerProfile.graduation_year,
@@ -629,7 +652,7 @@ export function VolunteerProfileForm() {
                 </Card>
 
                 {/* Academic Information Section */}
-                {(volunteerProfile?.is_currently_studying || volunteerProfile?.student_type || volunteerProfile?.course || volunteerProfile?.non_student_type) && (
+                {(volunteerProfile?.is_currently_studying || volunteerProfile?.student_type || volunteerProfile?.course || volunteerProfile?.non_student_type || volunteerProfile?.home_country || volunteerProfile?.major) && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="text-lg flex items-center gap-2">
@@ -639,6 +662,15 @@ export function VolunteerProfileForm() {
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-3">
+                        {/* Show a note for old users who need to update their information */}
+                        {!volunteerProfile?.is_currently_studying && (volunteerProfile?.student_type || volunteerProfile?.course) && (
+                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                            <p className="text-sm text-yellow-800">
+                              <strong>Update needed:</strong> Please update your academic information to use the new format.
+                            </p>
+                          </div>
+                        )}
+
                         {volunteerProfile?.is_currently_studying && (
                           <div>
                             <p className="text-sm font-medium text-gray-500">Currently Studying</p>
@@ -648,7 +680,7 @@ export function VolunteerProfileForm() {
                           </div>
                         )}
 
-                        {volunteerProfile?.is_currently_studying === "yes" && volunteerProfile?.student_type && (
+                        {(volunteerProfile?.is_currently_studying === "yes" || (!volunteerProfile?.is_currently_studying && volunteerProfile?.student_type)) && volunteerProfile?.student_type && (
                           <div>
                             <p className="text-sm font-medium text-gray-500">Student Type</p>
                             <p className="text-gray-700 text-sm">
@@ -657,14 +689,14 @@ export function VolunteerProfileForm() {
                           </div>
                         )}
 
-                        {volunteerProfile?.is_currently_studying === "yes" && volunteerProfile?.course && (
+                        {(volunteerProfile?.is_currently_studying === "yes" || (!volunteerProfile?.is_currently_studying && volunteerProfile?.course)) && volunteerProfile?.course && (
                           <div>
                             <p className="text-sm font-medium text-gray-500">Course</p>
                             <p className="text-gray-700 text-sm">{volunteerProfile.course}</p>
                           </div>
                         )}
 
-                        {volunteerProfile?.is_currently_studying === "yes" && volunteerProfile?.major && (
+                        {(volunteerProfile?.is_currently_studying === "yes" || (!volunteerProfile?.is_currently_studying && volunteerProfile?.major)) && volunteerProfile?.major && (
                           <div>
                             <p className="text-sm font-medium text-gray-500">Major</p>
                             <p className="text-gray-700 text-sm">
