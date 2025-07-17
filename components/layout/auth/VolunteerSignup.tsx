@@ -72,6 +72,9 @@ export default function VolunteerSignup() {
   const form = useForm<VolunteerSignupForm>({
     resolver: zodResolver(volunteerSignupSchema),
     mode: "onChange",
+    defaultValues: {
+      is_currently_studying: "yes",
+    },
   });
 
   const handleNext = async () => {
