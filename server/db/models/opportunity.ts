@@ -12,6 +12,7 @@ const OpportunitySchema: Schema = new Schema<IOpportunity>(
     number_of_volunteers: { type: Number, required: true },
     email_contact: { type: String, required: false },
     phone_contact: { type: String },
+    requirements: { type: [String], default: [] },
     internal_reference: { type: String },
     external_event_link: { type: String },
     date: {
