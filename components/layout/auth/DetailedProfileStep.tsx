@@ -23,7 +23,6 @@ export function DetailedProfileStep({
     { value: "bachelor", label: "Bachelor's Degree (Undergraduate)" },
     { value: "diploma", label: "Diploma / Certificate" },
     { value: "professional", label: "Professional / Industry Expert" },
-    { value: "non-student", label: "Non-Student / Not Currently Studying" },
   ];
 
   const majorOptions = [
@@ -61,7 +60,6 @@ export function DetailedProfileStep({
   const nonStudentType = form.watch("non_student_type");
   const referralSource = form.watch("referral_source");
   const major = form.watch("major");
-  const course = form.watch("course");
 
   // Initialize is_currently_studying if not set
   React.useEffect(() => {
@@ -89,7 +87,7 @@ export function DetailedProfileStep({
               Are you currently studying?
             </Label>
             <RadioGroup
-              defaultValue={isCurrentlyStudying}
+              defaultValue={isCurrentlyStudying || "yes"}
               className="flex space-x-6"
               onValueChange={(value) => {
                 form.setValue("is_currently_studying", value);
@@ -178,17 +176,15 @@ export function DetailedProfileStep({
               options={courseOptions}
             />
 
-            {course !== "non-student" && (
-              <FormSelect
-                label="What major are you currently studying?"
-                id="major"
-                placeholder="Select your major"
-                control={form.control}
-                registerName="major"
-                error={form.formState.errors.major?.message}
-                options={majorOptions}
-              />
-            )}
+            <FormSelect
+              label="What major are you currently studying?"
+              id="major"
+              placeholder="Select your major"
+              control={form.control}
+              registerName="major"
+              error={form.formState.errors.major?.message}
+              options={majorOptions}
+            />
 
             {major === "other" && (
               <FormField

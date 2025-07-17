@@ -110,9 +110,7 @@ export default function VolunteerSignup() {
         if (studentType === "yes") {
           fieldsToValidate.push("home_country");
         }
-        if (form.watch("course") !== "non-student") {
-          fieldsToValidate.push("major");
-        }
+        fieldsToValidate.push("major");
         if (form.watch("major") === "other") {
           fieldsToValidate.push("major_other");
         }
