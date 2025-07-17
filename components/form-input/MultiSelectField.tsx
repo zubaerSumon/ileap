@@ -22,6 +22,7 @@ interface MultiSelectFieldProps<T extends FieldValues> {
   value?: string[];
   className?: string;
   disabled?: boolean;
+  manualInputEnabled?: boolean;
 }
 
 export const MultiSelectField = <T extends FieldValues>({
@@ -36,6 +37,7 @@ export const MultiSelectField = <T extends FieldValues>({
   className = "",
   value = [],
   disabled = false,
+  manualInputEnabled = false,
 }: MultiSelectFieldProps<T>) => {
   const handleValueChange = (newValue: string[]) => {
     setValue(registerName, newValue as PathValue<T, Path<T>>);
@@ -49,12 +51,14 @@ export const MultiSelectField = <T extends FieldValues>({
         type="hidden"
         {...register(registerName)}
       />
+      
       <MultiSelect
         options={options}
         onValueChange={handleValueChange}
         value={value}
         placeholder={placeholder}
         disabled={disabled}
+        manualInputEnabled={manualInputEnabled}
         className={cn(
           "w-full",
           disabled && "opacity-50 cursor-not-allowed"

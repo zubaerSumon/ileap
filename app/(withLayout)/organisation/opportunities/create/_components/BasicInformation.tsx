@@ -417,7 +417,7 @@ export default function BasicInformation({
                 <div>
                   <h3 className="text-sm font-medium mb-3">Custom Requirements</h3>
                   <div className="space-y-3">
-                    <div className="flex space-x-2">
+                    <div className="flex space-x-2 w-full sm:w-[382px]">
                       <input
                         type="text"
                         placeholder="Add a custom requirement"
@@ -458,23 +458,25 @@ export default function BasicInformation({
                     </div>
                     
                     {/* Display custom requirements */}
-                    {(form.watch("requirements") || []).filter(req => 
-                      !["Police Check", "Working with Children Check", "First Aid Training"].includes(req)
-                    ).map((requirement, index) => (
-                      <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md">
-                        <span className="text-sm">{requirement}</span>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const currentRequirements = form.watch("requirements") || [];
-                            form.setValue("requirements", currentRequirements.filter(r => r !== requirement));
-                          }}
-                          className="text-red-500 hover:text-red-700 text-sm"
-                        >
-                          Remove
-                        </button>
-                      </div>
-                    ))}
+                    <div className="w-full sm:w-[382px]">
+                      {(form.watch("requirements") || []).filter(req => 
+                        !["Police Check", "Working with Children Check", "First Aid Training"].includes(req)
+                      ).map((requirement, index) => (
+                        <div key={index} className="flex items-center justify-between bg-gray-50 px-3 py-2 rounded-md mb-2">
+                          <span className="text-sm">{requirement}</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const currentRequirements = form.watch("requirements") || [];
+                              form.setValue("requirements", currentRequirements.filter(r => r !== requirement));
+                            }}
+                            className="text-red-500 hover:text-red-700 text-sm"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

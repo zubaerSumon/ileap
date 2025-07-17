@@ -110,6 +110,12 @@ interface MultiSelectProps
   modalPopover?: boolean;
 
   /**
+   * Enable manual input functionality in the search field.
+   * Optional, defaults to false.
+   */
+  manualInputEnabled?: boolean;
+
+  /**
    * Additional class names to apply custom styles to the multi-select component.
    * Optional, can be used to add custom styles.
    */
@@ -131,6 +137,7 @@ export const MultiSelect = React.forwardRef<
       animation = 0,
       maxCount = 3,
       modalPopover = false,
+      manualInputEnabled = false,
       className,
       ...props
     },
@@ -142,6 +149,8 @@ export const MultiSelect = React.forwardRef<
       React.useState<string[]>(initialValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [isAnimating, setIsAnimating] = React.useState(false);
+    const [inputValue, setInputValue] = React.useState("");
+    const [tempInputValue, setTempInputValue] = React.useState("");
 
     // Update selectedValues when value or defaultValue changes
     React.useEffect(() => {
@@ -153,13 +162,19 @@ export const MultiSelect = React.forwardRef<
       event: React.KeyboardEvent<HTMLInputElement>
     ) => {
       if (event.key === "Enter") {
-        setIsPopoverOpen(true);
+        // Just prevent default behavior, custom input is already added
+        event.preventDefault();
       } else if (event.key === "Backspace" && !event.currentTarget.value) {
         const newSelectedValues = [...selectedValues];
         newSelectedValues.pop();
         setSelectedValues(newSelectedValues);
         onValueChange(newSelectedValues);
       }
+    };
+
+    const handleInputChange = (value: string) => {
+      setInputValue(value);
+      setTempInputValue(value);
     };
 
     const toggleOption = (option: string) => {
@@ -195,10 +210,36 @@ export const MultiSelect = React.forwardRef<
       }
     };
 
+    // Create enhanced options that include custom values
+    const enhancedOptions = [
+      ...options,
+      ...selectedValues
+        .filter(val => !options.find(opt => opt.value === val))
+        .map(val => ({ value: val, label: val, icon: undefined }))
+    ];
+
     return (
       <Popover
         open={isPopoverOpen}
-        onOpenChange={setIsPopoverOpen}
+        onOpenChange={(isOpen) => {
+          setIsPopoverOpen(isOpen);
+          if (!isOpen) {
+            // Add temporary input as permanent selection when closing
+            if (manualInputEnabled && tempInputValue.trim()) {
+              const trimmedValue = tempInputValue.trim();
+              const isExistingOption = options.find(opt => opt.value.toLowerCase() === trimmedValue.toLowerCase());
+              const isAlreadySelected = selectedValues.includes(trimmedValue);
+              
+              if (!isExistingOption && !isAlreadySelected) {
+                const newSelectedValues = [...selectedValues, trimmedValue];
+                setSelectedValues(newSelectedValues);
+                onValueChange(newSelectedValues);
+              }
+            }
+            setInputValue("");
+            setTempInputValue("");
+          }
+        }}
         modal={modalPopover}
       >
         <PopoverTrigger asChild>
@@ -211,57 +252,24 @@ export const MultiSelect = React.forwardRef<
               className
             )}
           >
-            {selectedValues.length > 0 ? (
-              <div className="flex justify-between items-center w-full">
-                <div className="flex flex-wrap items-center">
-                  {selectedValues.slice(0, maxCount).map((value) => {
-                    const option = options.find((o) => o.value === value);
-                    const IconComponent = option?.icon;
-                    return (
-                      <Badge
-                        key={value}
-                        className={cn(
-                          isAnimating ? "animate-bounce" : "",
-                          multiSelectVariants({ variant })
-                        )}
-                        style={{ animationDuration: `${animation}s` }}
-                      >
-                        {IconComponent && (
-                          <IconComponent className="h-4 w-4 mr-2" />
-                        )}
-                        {option?.label}
-                        <div
-                          role="button"
-                          tabIndex={0}
-                          className="ml-2 h-4 w-4 cursor-pointer hover:text-destructive transition-colors"
-                          onClick={(event) => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            toggleOption(value);
-                          }}
-                          onKeyDown={(event) => {
-                            if (event.key === 'Enter' || event.key === ' ') {
-                              event.preventDefault();
-                              event.stopPropagation();
-                              toggleOption(value);
-                            }
-                          }}
-                        >
-                          <XCircle className="h-4 w-4" />
-                        </div>
-                      </Badge>
-                    );
-                  })}
-                  {selectedValues.length > maxCount && (
+            <div className="flex justify-between items-center w-full">
+              <div className="flex flex-wrap items-center">
+                {selectedValues.slice(0, maxCount).map((value) => {
+                  const option = enhancedOptions.find((o) => o.value === value);
+                  const IconComponent = option?.icon;
+                  return (
                     <Badge
+                      key={value}
                       className={cn(
-                        "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
                         isAnimating ? "animate-bounce" : "",
                         multiSelectVariants({ variant })
                       )}
                       style={{ animationDuration: `${animation}s` }}
                     >
-                      {`+ ${selectedValues.length - maxCount} more`}
+                      {IconComponent && (
+                        <IconComponent className="h-4 w-4 mr-2" />
+                      )}
+                      {option?.label}
                       <div
                         role="button"
                         tabIndex={0}
@@ -269,22 +277,98 @@ export const MultiSelect = React.forwardRef<
                         onClick={(event) => {
                           event.preventDefault();
                           event.stopPropagation();
-                          clearExtraOptions();
+                          toggleOption(value);
                         }}
                         onKeyDown={(event) => {
                           if (event.key === 'Enter' || event.key === ' ') {
                             event.preventDefault();
                             event.stopPropagation();
-                            clearExtraOptions();
+                            toggleOption(value);
                           }
                         }}
                       >
                         <XCircle className="h-4 w-4" />
                       </div>
                     </Badge>
-                  )}
-                </div>
-                <div className="flex items-center justify-between">
+                  );
+                })}
+                
+                {/* Show dynamic badge for current input */}
+                {manualInputEnabled && tempInputValue.trim() && 
+                 !options.find(opt => opt.value.toLowerCase() === tempInputValue.trim().toLowerCase()) &&
+                 !selectedValues.includes(tempInputValue.trim()) && (
+                  <Badge
+                    className={cn(
+                      "border-blue-200 bg-blue-50 text-blue-700",
+                      multiSelectVariants({ variant })
+                    )}
+                  >
+                    {tempInputValue.trim()}
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className="ml-2 h-4 w-4 cursor-pointer hover:text-destructive transition-colors"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        setTempInputValue("");
+                        setInputValue("");
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setTempInputValue("");
+                          setInputValue("");
+                        }
+                      }}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </div>
+                  </Badge>
+                )}
+
+                {selectedValues.length > maxCount && (
+                  <Badge
+                    className={cn(
+                      "bg-transparent text-foreground border-foreground/1 hover:bg-transparent",
+                      isAnimating ? "animate-bounce" : "",
+                      multiSelectVariants({ variant })
+                    )}
+                    style={{ animationDuration: `${animation}s` }}
+                  >
+                    {`+ ${selectedValues.length - maxCount} more`}
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      className="ml-2 h-4 w-4 cursor-pointer hover:text-destructive transition-colors"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        clearExtraOptions();
+                      }}
+                      onKeyDown={(event) => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          clearExtraOptions();
+                        }
+                      }}
+                    >
+                      <XCircle className="h-4 w-4" />
+                    </div>
+                  </Badge>
+                )}
+                
+                {/* Show placeholder when no values and no temp input */}
+                {selectedValues.length === 0 && !tempInputValue.trim() && (
+                  <span className="text-sm text-muted-foreground mx-3">
+                    {placeholder}
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center justify-between">
+                {selectedValues.length > 0 && (
                   <div
                     role="button"
                     tabIndex={0}
@@ -304,21 +388,16 @@ export const MultiSelect = React.forwardRef<
                   >
                     <XIcon className="h-4 w-4" />
                   </div>
+                )}
+                {selectedValues.length > 0 && (
                   <Separator
                     orientation="vertical"
                     className="flex min-h-6 h-full"
                   />
-                  <ChevronDown className="h-4 mx-2 cursor-pointer text-muted-foreground" />
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between w-full mx-auto">
-                <span className="text-sm text-muted-foreground mx-3">
-                  {placeholder}
-                </span>
+                )}
                 <ChevronDown className="h-4 cursor-pointer text-muted-foreground mx-2" />
               </div>
-            )}
+            </div>
           </Button>
         </PopoverTrigger>
         <PopoverContent
@@ -328,11 +407,27 @@ export const MultiSelect = React.forwardRef<
         >
           <Command>
             <CommandInput
-              placeholder="Search..."
+              placeholder={manualInputEnabled ? "Search or type options..." : "Search..."}
               onKeyDown={handleInputKeyDown}
+              value={inputValue}
+              onValueChange={handleInputChange}
             />
             <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandEmpty className="py-2 text-center">
+                {manualInputEnabled && inputValue && (
+                  <div className="flex items-center justify-center space-x-2">
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full bg-blue-50 flex items-center justify-center border border-blue-100">
+                      <svg className="w-3.5 h-3.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                      </svg>
+                    </div>
+                    <div className="flex flex-col items-start bg-gray-50 border border-gray-100 rounded-md px-2 py-1 min-w-[120px]">
+                      <span className="text-xs text-gray-700 font-semibold leading-tight">&quot;{inputValue}&quot; not found</span>
+                      <span className="text-xs text-gray-500 mt-0.5 leading-tight">You can keep it as your input</span>
+                    </div>
+                  </div>
+                )}
+              </CommandEmpty>
               <CommandGroup>
                 <CommandItem
                   key="all"
@@ -342,7 +437,7 @@ export const MultiSelect = React.forwardRef<
                   <div
                     className={cn(
                       "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                      selectedValues.length === options.length
+                      selectedValues.length === enhancedOptions.length
                         ? "bg-primary text-primary-foreground"
                         : "opacity-50 [&_svg]:invisible"
                     )}
@@ -351,7 +446,7 @@ export const MultiSelect = React.forwardRef<
                   </div>
                   <span>(Select All)</span>
                 </CommandItem>
-                {options.map((option) => {
+                {enhancedOptions.map((option) => {
                   const isSelected = selectedValues.includes(option.value);
                   return (
                     <CommandItem
