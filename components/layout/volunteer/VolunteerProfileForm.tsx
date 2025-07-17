@@ -96,7 +96,18 @@ export function VolunteerProfileForm() {
         interested_categories: volunteerProfile.interested_categories || [],
         state: volunteerProfile.state,
         area: volunteerProfile.area?.replace(/_/g, ' '),
-        availability_date: volunteerProfile.availability_date
+        availability_date: volunteerProfile.availability_date,
+        // Academic fields
+        student_type: volunteerProfile.student_type,
+        home_country: volunteerProfile.home_country,
+        course: volunteerProfile.course,
+        major: volunteerProfile.major,
+        major_other: volunteerProfile.major_other,
+        is_currently_studying: volunteerProfile.is_currently_studying,
+        non_student_type: volunteerProfile.non_student_type,
+        university: volunteerProfile.university,
+        graduation_year: volunteerProfile.graduation_year,
+        study_area: volunteerProfile.study_area,
       });
     }
   }, [volunteerProfile, form]);
@@ -129,7 +140,18 @@ export function VolunteerProfileForm() {
         interested_categories: volunteerProfile.interested_categories || [],
         state: volunteerProfile.state,
         area: volunteerProfile.area?.replace(/_/g, ' '),
-        availability_date: volunteerProfile.availability_date
+        availability_date: volunteerProfile.availability_date,
+        // Academic fields
+        student_type: volunteerProfile.student_type,
+        home_country: volunteerProfile.home_country,
+        course: volunteerProfile.course,
+        major: volunteerProfile.major,
+        major_other: volunteerProfile.major_other,
+        is_currently_studying: volunteerProfile.is_currently_studying,
+        non_student_type: volunteerProfile.non_student_type,
+        university: volunteerProfile.university,
+        graduation_year: volunteerProfile.graduation_year,
+        study_area: volunteerProfile.study_area,
       });
     }
   };
@@ -311,6 +333,152 @@ export function VolunteerProfileForm() {
                         setValue={form.setValue}
                         value={form.watch("interested_categories")}
                       />
+
+                      {/* Academic Information Section */}
+                      <div className="border-t pt-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Academic Information</h3>
+                        
+                        <div className="space-y-4">
+                          <FormSelect
+                            label="Are you currently studying?"
+                            id="is_currently_studying"
+                            placeholder="Select your status"
+                            control={form.control}
+                            registerName="is_currently_studying"
+                            error={form.formState.errors.is_currently_studying?.message}
+                            options={[
+                              { value: "yes", label: "Yes" },
+                              { value: "no", label: "No" },
+                            ]}
+                          />
+
+                          {form.watch("is_currently_studying") === "yes" && (
+                            <>
+                              <FormSelect
+                                label="Are you an international student?"
+                                id="student_type"
+                                placeholder="Select your type"
+                                control={form.control}
+                                registerName="student_type"
+                                error={form.formState.errors.student_type?.message}
+                                options={[
+                                  { value: "yes", label: "Yes" },
+                                  { value: "no", label: "No" },
+                                ]}
+                              />
+
+                              {form.watch("student_type") === "yes" && (
+                                <FormSelect
+                                  label="Home Country"
+                                  id="home_country"
+                                  placeholder="Select your country"
+                                  control={form.control}
+                                  registerName="home_country"
+                                  error={form.formState.errors.home_country?.message}
+                                  options={[
+                                    { value: "china", label: "China" },
+                                    { value: "india", label: "India" },
+                                    { value: "other", label: "Other" },
+                                  ]}
+                                />
+                              )}
+
+                              <FormSelect
+                                label="Course"
+                                id="course"
+                                placeholder="Select your course"
+                                control={form.control}
+                                registerName="course"
+                                error={form.formState.errors.course?.message}
+                                options={[
+                                  { value: "phd", label: "Doctorate / PhD" },
+                                  { value: "masters", label: "Master's Degree (Postgraduate)" },
+                                  { value: "bachelor", label: "Bachelor's Degree (Undergraduate)" },
+                                  { value: "diploma", label: "Diploma / Certificate" },
+                                  { value: "professional", label: "Professional / Industry Expert" },
+                                ]}
+                              />
+
+                              <FormSelect
+                                label="Major"
+                                id="major"
+                                placeholder="Select your major"
+                                control={form.control}
+                                registerName="major"
+                                error={form.formState.errors.major?.message}
+                                options={[
+                                  { value: "business", label: "Business" },
+                                  { value: "engineering", label: "Engineering" },
+                                  { value: "it", label: "Information Technology" },
+                                  { value: "science", label: "Science" },
+                                  { value: "arts", label: "Arts" },
+                                  { value: "education", label: "Education" },
+                                  { value: "health", label: "Health" },
+                                  { value: "other", label: "Other" },
+                                ]}
+                              />
+
+                              {form.watch("major") === "other" && (
+                                <FormInput
+                                  control={form.control}
+                                  name="major_other"
+                                  label="Please specify your major"
+                                  placeholder="Enter your major"
+                                />
+                              )}
+                            </>
+                          )}
+
+                          {form.watch("is_currently_studying") === "no" && (
+                            <>
+                              <FormSelect
+                                label="What type of member are you?"
+                                id="non_student_type"
+                                placeholder="Select your type"
+                                control={form.control}
+                                registerName="non_student_type"
+                                error={form.formState.errors.non_student_type?.message}
+                                options={[
+                                  { value: "staff", label: "Staff Member" },
+                                  { value: "alumni", label: "University Alumni" },
+                                  { value: "general_public", label: "General Public Member" },
+                                ]}
+                              />
+
+                              {form.watch("non_student_type") === "alumni" && (
+                                <>
+                                  <FormInput
+                                    control={form.control}
+                                    name="university"
+                                    label="University"
+                                    placeholder="e.g. University of Technology Sydney, University of Sydney, etc."
+                                  />
+
+                                  <FormSelect
+                                    label="Graduation Year"
+                                    id="graduation_year"
+                                    placeholder="Select graduation year"
+                                    control={form.control}
+                                    registerName="graduation_year"
+                                    error={form.formState.errors.graduation_year?.message}
+                                    options={Array.from({ length: 30 }, (_, i) => {
+                                      const year = new Date().getFullYear() - i;
+                                      return { value: year.toString(), label: year.toString() };
+                                    })}
+                                  />
+
+                                  <FormInput
+                                    control={form.control}
+                                    name="study_area"
+                                    label="Study Area"
+                                    placeholder="e.g. Business, Engineering, Arts, etc."
+                                  />
+                                </>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      </div>
                       
 
 
@@ -459,6 +627,87 @@ export function VolunteerProfileForm() {
                     )}
                   </CardContent>
                 </Card>
+
+                {/* Academic Information Section */}
+                {(volunteerProfile?.is_currently_studying || volunteerProfile?.student_type || volunteerProfile?.course || volunteerProfile?.non_student_type) && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg flex items-center gap-2">
+                        <User className="h-5 w-5" />
+                        Academic Information
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {volunteerProfile?.is_currently_studying && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Currently Studying</p>
+                            <p className="text-gray-700 text-sm">
+                              {volunteerProfile.is_currently_studying === "yes" ? "Yes" : "No"}
+                            </p>
+                          </div>
+                        )}
+
+                        {volunteerProfile?.is_currently_studying === "yes" && volunteerProfile?.student_type && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Student Type</p>
+                            <p className="text-gray-700 text-sm">
+                              {volunteerProfile.student_type === "yes" ? "International Student" : "Domestic Student"}
+                            </p>
+                          </div>
+                        )}
+
+                        {volunteerProfile?.is_currently_studying === "yes" && volunteerProfile?.course && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Course</p>
+                            <p className="text-gray-700 text-sm">{volunteerProfile.course}</p>
+                          </div>
+                        )}
+
+                        {volunteerProfile?.is_currently_studying === "yes" && volunteerProfile?.major && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Major</p>
+                            <p className="text-gray-700 text-sm">
+                              {volunteerProfile.major === "other" ? volunteerProfile.major_other : volunteerProfile.major}
+                            </p>
+                          </div>
+                        )}
+
+                        {volunteerProfile?.is_currently_studying === "no" && volunteerProfile?.non_student_type && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Member Type</p>
+                            <p className="text-gray-700 text-sm">
+                              {volunteerProfile.non_student_type === "staff" ? "Staff Member" :
+                               volunteerProfile.non_student_type === "alumni" ? "University Alumni" :
+                               "General Public Member"}
+                            </p>
+                          </div>
+                        )}
+
+                        {volunteerProfile?.non_student_type === "alumni" && volunteerProfile?.university && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">University</p>
+                            <p className="text-gray-700 text-sm">{volunteerProfile.university}</p>
+                          </div>
+                        )}
+
+                        {volunteerProfile?.non_student_type === "alumni" && volunteerProfile?.graduation_year && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Graduation Year</p>
+                            <p className="text-gray-700 text-sm">{volunteerProfile.graduation_year}</p>
+                          </div>
+                        )}
+
+                        {volunteerProfile?.non_student_type === "alumni" && volunteerProfile?.study_area && (
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Study Area</p>
+                            <p className="text-gray-700 text-sm">{volunteerProfile.study_area}</p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
           </div>

@@ -99,15 +99,32 @@ export default function VolunteerSignup() {
         "postcode",
       ];
     } else if (step === 3) {
-      fieldsToValidate = ["student_type", "course", "major", "referral_source"];
-      if (form.watch("student_type") === "yes") {
-        fieldsToValidate.push("home_country");
+      fieldsToValidate = ["is_currently_studying", "referral_source"];
+      
+      const isCurrentlyStudying = form.watch("is_currently_studying");
+      const studentType = form.watch("student_type");
+      const nonStudentType = form.watch("non_student_type");
+      
+      if (isCurrentlyStudying === "yes") {
+        fieldsToValidate.push("student_type", "course");
+        if (studentType === "yes") {
+          fieldsToValidate.push("home_country");
+        }
+        if (form.watch("course") !== "non-student") {
+          fieldsToValidate.push("major");
+        }
+        if (form.watch("major") === "other") {
+          fieldsToValidate.push("major_other");
+        }
+      } else if (isCurrentlyStudying === "no") {
+        fieldsToValidate.push("non_student_type");
+        if (nonStudentType === "alumni") {
+          fieldsToValidate.push("university", "graduation_year", "study_area");
+        }
       }
+      
       if (form.watch("referral_source") === "other") {
         fieldsToValidate.push("referral_source_other");
-      }
-      if (form.watch("major_other") === "other") {
-        fieldsToValidate.push("major_other");
       }
     }
 
@@ -130,13 +147,18 @@ export default function VolunteerSignup() {
             state: formData.state,
             area: formData.area,
             postcode: formData.postcode,
-            student_type: formData.student_type,
+            student_type: formData.student_type || undefined,
             home_country: formData.home_country,
-            course: formData.course,
+            course: formData.course || undefined,
             major: formData.major,
             major_other: formData.major_other,
             referral_source: formData.referral_source,
             referral_source_other: formData.referral_source_other,
+            is_currently_studying: formData.is_currently_studying,
+            non_student_type: formData.non_student_type,
+            university: formData.university,
+            graduation_year: formData.graduation_year,
+            study_area: formData.study_area,
           });
         } catch (err) {
           console.error("Profile setup error:", err);
