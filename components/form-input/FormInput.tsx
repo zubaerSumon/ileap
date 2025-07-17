@@ -22,6 +22,7 @@ interface FormInputProps<T extends FieldValues> extends BaseFormFieldProps<T> {
   placeholder?: string;
   type?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 }
 
 export function FormInput<T extends FieldValues>({
@@ -32,7 +33,8 @@ export function FormInput<T extends FieldValues>({
   placeholder,
   type = "text",
   className,
-  onChange
+  onChange,
+  disabled
 }: FormInputProps<T>) {
   return (
     <FormField
@@ -46,6 +48,7 @@ export function FormInput<T extends FieldValues>({
             <Input
               type={type}
               placeholder={placeholder}
+              disabled={disabled}
               {...field}
               onChange={(e) => {
                 field.onChange(e);
