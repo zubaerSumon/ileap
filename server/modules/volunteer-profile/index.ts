@@ -84,22 +84,22 @@ export const volunteerProfileRouter = router({
         ...input,
         ...(input.is_currently_studying === "yes" ? {
           // Clear alumni-related fields when currently studying
-          non_student_type: "",
-          university: "",
-          graduation_year: "",
-          study_area: "",
+          non_student_type: undefined,
+          university: undefined,
+          graduation_year: undefined,
+          study_area: undefined,
         } : {}),
         ...(input.is_currently_studying === "no" ? {
           // Clear student-related fields when not currently studying
-          student_type: "",
-          home_country: "",
-          course: "",
-          major: "",
-          major_other: "",
+          student_type: undefined,
+          home_country: undefined,
+          course: undefined,
+          major: undefined,
+          major_other: undefined,
         } : {}),
         // Clear home_country when student_type changes from "yes" to "no" (international to domestic)
         ...(input.student_type === "no" ? {
-          home_country: "",
+          home_country: undefined,
         } : {}),
       };
 

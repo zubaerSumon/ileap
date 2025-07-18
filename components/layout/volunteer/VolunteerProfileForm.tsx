@@ -97,7 +97,7 @@ export function VolunteerProfileForm() {
       major: "",
       major_other: "",
       is_currently_studying: "",
-      non_student_type: "",
+      non_student_type: undefined,
       university: "",
       graduation_year: "",
       study_area: "",
@@ -401,17 +401,17 @@ export function VolunteerProfileForm() {
                             onChange={(value) => {
                               if (value === "yes") {
                                 // Reset alumni-related fields when switching to "currently studying"
-                                form.setValue("non_student_type", "");
-                                form.setValue("university", "");
-                                form.setValue("graduation_year", "");
-                                form.setValue("study_area", "");
+                                form.setValue("non_student_type", undefined);
+                                form.setValue("university", undefined);
+                                form.setValue("graduation_year", undefined);
+                                form.setValue("study_area", undefined);
                               } else if (value === "no") {
                                 // Reset student-related fields when switching to "not currently studying"
-                                form.setValue("student_type", "");
-                                form.setValue("home_country", "");
-                                form.setValue("course", "");
-                                form.setValue("major", "");
-                                form.setValue("major_other", "");
+                                form.setValue("student_type", undefined);
+                                form.setValue("home_country", undefined);
+                                form.setValue("course", undefined);
+                                form.setValue("major", undefined);
+                                form.setValue("major_other", undefined);
                               }
                             }}
                           />

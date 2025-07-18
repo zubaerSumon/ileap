@@ -99,10 +99,10 @@ export function DetailedProfileStep({
                   onChange={(e) => {
                     form.setValue("is_currently_studying", e.target.value);
                     // Reset related fields when switching
-                    form.setValue("non_student_type", "");
-                    form.setValue("university", "");
-                    form.setValue("graduation_year", "");
-                    form.setValue("study_area", "");
+                    form.setValue("non_student_type", undefined);
+                    form.setValue("university", undefined);
+                    form.setValue("graduation_year", undefined);
+                    form.setValue("study_area", undefined);
                   }}
                 />
                 <Label htmlFor="studying_yes" className="text-sm cursor-pointer">
@@ -120,10 +120,10 @@ export function DetailedProfileStep({
                     form.setValue("is_currently_studying", e.target.value);
                     // Reset related fields when switching
                     form.setValue("student_type", undefined);
-                    form.setValue("home_country", "");
-                    form.setValue("course", "");
-                    form.setValue("major", "");
-                    form.setValue("major_other", "");
+                    form.setValue("home_country", undefined);
+                    form.setValue("course", undefined);
+                    form.setValue("major", undefined);
+                    form.setValue("major_other", undefined);
                   }}
                 />
                 <Label htmlFor="studying_no" className="text-sm cursor-pointer">
