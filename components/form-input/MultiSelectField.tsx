@@ -35,10 +35,12 @@ export const MultiSelectField = <T extends FieldValues>({
   options,
   setValue,
   className = "",
-  value = [],
+  value,
   disabled = false,
   manualInputEnabled = false,
 }: MultiSelectFieldProps<T>) => {
+  // Ensure value is always an array
+  const safeValue = Array.isArray(value) ? value : [];
   const handleValueChange = (newValue: string[]) => {
     setValue(registerName, newValue as PathValue<T, Path<T>>);
   };
@@ -55,7 +57,7 @@ export const MultiSelectField = <T extends FieldValues>({
       <MultiSelect
         options={options}
         onValueChange={handleValueChange}
-        value={value}
+        value={safeValue}
         placeholder={placeholder}
         disabled={disabled}
         manualInputEnabled={manualInputEnabled}

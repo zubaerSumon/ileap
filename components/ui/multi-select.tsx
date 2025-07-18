@@ -144,7 +144,8 @@ export const MultiSelect = React.forwardRef<
     ref
   ) => {
     // Use value prop if provided (controlled), otherwise use defaultValue (uncontrolled)
-    const initialValue = value !== undefined ? value : defaultValue;
+    // Ensure we always have an array, even if value/defaultValue is undefined/null
+    const initialValue = (value !== undefined ? value : defaultValue) || [];
     const [selectedValues, setSelectedValues] =
       React.useState<string[]>(initialValue);
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
@@ -154,7 +155,7 @@ export const MultiSelect = React.forwardRef<
 
     // Update selectedValues when value or defaultValue changes
     React.useEffect(() => {
-      const newValue = value !== undefined ? value : defaultValue;
+      const newValue = (value !== undefined ? value : defaultValue) || [];
       setSelectedValues(newValue);
     }, [value, defaultValue]);
 

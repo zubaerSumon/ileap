@@ -74,6 +74,8 @@ export default function VolunteerSignup() {
     mode: "onChange",
     defaultValues: {
       is_currently_studying: "yes",
+      interested_on: [],
+      interested_categories: [],
     },
   });
 
